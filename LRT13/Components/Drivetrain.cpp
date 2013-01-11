@@ -66,8 +66,8 @@ void Drivetrain::onEnable()
 	double leftOutput = fwdOutput - turnOutput;
 	double rightOutput = fwdOutput + turnOutput;
 	
-	Util::Clamp<double>(leftOutput, -1.0, 1.0);
-	Util::Clamp<double>(rightOutput, -1.0, 1.0);
+	Utils::Clamp<double>(leftOutput, -1.0, 1.0);
+	Utils::Clamp<double>(rightOutput, -1.0, 1.0);
 	
 	m_escs[LEFT]->SetDutyCycle(leftOutput);
 	m_escs[LEFT]->SetDutyCycle(rightOutput);

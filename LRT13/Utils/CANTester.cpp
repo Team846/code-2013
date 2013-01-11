@@ -28,7 +28,7 @@ INT32 CANTester::Tick()
 	bool isAlive = false;
 	for(unsigned int i = 0; i < AsyncCANJaguar::jaguar_vector.size(); i++)
 	{
-		if(AsyncCANJaguar::jaguar_vector[i]->IsAlive())
+		if(AsyncCANJaguar::jaguar_vector[i]->GetBusVoltage() > 0.1)
 		{
 			isAlive = true;
 			break;

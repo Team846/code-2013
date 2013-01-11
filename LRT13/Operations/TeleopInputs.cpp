@@ -9,12 +9,15 @@ TeleopInputs::TeleopInputs(char * taskName, INT32 priority) :
 	AsyncProcess(taskName, priority)
 {
 	m_data_ptr = ComponentData::GetInstance();
-	m_driver = new DebouncedJoystick(DriverStationConfig::DRIVER_STICK_PORT,
+	m_driver_stick = new DebouncedJoystick(DriverStationConfig::DRIVER_STICK_PORT,
 			DriverStationConfig::NUM_JOYSTICK_BUTTONS,
 			DriverStationConfig::NUM_JOYSTICK_AXES);
-	m_operator = new DebouncedJoystick(DriverStationConfig::OPERATOR_STICK_PORT,
+	m_operator_stick = new DebouncedJoystick(DriverStationConfig::OPERATOR_STICK_PORT,
 			DriverStationConfig::NUM_JOYSTICK_BUTTONS,
 			DriverStationConfig::NUM_JOYSTICK_AXES);
+	m_driver_wheel = new DebouncedJoystick(DriverStationConfig::DRIVER_WHEEL_PORT,
+			DriverStationConfig::NUM_WHEEL_BUTTONS,
+			DriverStationConfig::NUM_WHEEL_AXES);
 }
 
 TeleopInputs::~TeleopInputs()
@@ -24,8 +27,8 @@ TeleopInputs::~TeleopInputs()
 
 INT32 TeleopInputs::Tick()
 {
-	m_driver->Update();
-	m_operator->Update();
+	m_driver_stick->Update();
+	m_operator_stick->Update();
 	
 	Update();
 	
@@ -38,7 +41,7 @@ void TeleopInputs::Update()
 	
 	if(current_state == RobotData::TELEOP)
 	{
-		if(m_driver->IsButtonDown(RESET_ZERO))
+		if(m_driver_stick->IsButtonDown(DriverStationConfig::RESET_ZERO))
 		{
 			
 		}
@@ -48,10 +51,10 @@ void TeleopInputs::Update()
 		}
 	}
 	
-	if(m_driver->IsButtonJustPressed(SAVE_CONFIG))
+	if(m_driver_stick->IsButtonJustPressed(DriverStationConfig::SAVE_CONFIG))
 		ConfigManager::Instance()->Save();
-	if(m_driver->IsButtonJustPressed(LOAD_CONFIG))
+	if(m_driver_stick->IsButtonJustPressed(DriverStationConfig::LOAD_CONFIG))
 		ConfigManager::Instance()->Load();
-	if(m_driver->IsButtonJustPressed(APPLY_CONFIG))
+	if(m_driver_stick->IsButtonJustPressed(DriverStationConfig::APPLY_CONFIG))
 		ConfigManager::Instance()->ConfigureAll();
 }

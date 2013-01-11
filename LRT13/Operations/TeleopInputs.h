@@ -9,11 +9,6 @@
 
 #include "../Config/ConfigManager.h"
 
-#define APPLY_CONFIG 5
-#define LOAD_CONFIG 6
-#define SAVE_CONFIG 7
-#define RESET_ZERO 10
-
 using namespace data;
 using namespace data::drivetrain;
 
@@ -41,8 +36,9 @@ private:
 	void Update();
 	
 	data::ComponentData* m_data_ptr;
-	DebouncedJoystick* m_driver;
-	DebouncedJoystick* m_operator;
+	DebouncedJoystick* m_driver_stick;
+	DebouncedJoystick* m_operator_stick;
+	DebouncedJoystick* m_driver_wheel;
 };
 
 #endif

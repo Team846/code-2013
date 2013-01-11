@@ -45,12 +45,17 @@ void ConfigManager::Save()
 	SaveConfig(CONFIG_FILE_PATH);
 }
 
-template bool ConfigManager::Get<bool>(string section, string key, bool defaultValue);
-template double ConfigManager::Get<double>(string section, string key, double defaultValue);
-template string ConfigManager::Get<string>(string section, string key, string defaultValue);
-template int ConfigManager::Get<int>(string section, string key, int defaultValue);
+template bool ConfigManager::Get<bool>(string section, string key,
+		bool defaultValue);
+template double ConfigManager::Get<double>(string section, string key,
+		double defaultValue);
+template string ConfigManager::Get<string>(string section, string key,
+		string defaultValue);
+template int ConfigManager::Get<int>(string section, string key,
+		int defaultValue);
 
-template<typename T> T ConfigManager::Get(string section, string key, T defaultValue)
+template<typename T> T ConfigManager::Get(string section, string key,
+		T defaultValue)
 {
 	if (KeyExists(section, key))
 	{
@@ -58,7 +63,8 @@ template<typename T> T ConfigManager::Get(string section, string key, T defaultV
 		T value;
 		sstream >> value;
 		return value;
-	} else
+	}
+	else
 	{
 		return defaultValue;
 	}
@@ -66,28 +72,36 @@ template<typename T> T ConfigManager::Get(string section, string key, T defaultV
 
 template void ConfigManager::Set<bool>(string section, string key, bool val);
 template void ConfigManager::Set<int>(string section, string key, int val);
-template void ConfigManager::Set<double>(string section, string key, double val);
-template void ConfigManager::Set<string>(string section, string key, string val);
+template void
+		ConfigManager::Set<double>(string section, string key, double val);
+template void
+		ConfigManager::Set<string>(string section, string key, string val);
 
-template<typename T> void ConfigManager::Set(string section, string key, T value)
+template<typename T> void ConfigManager::Set(string section, string key,
+		T value)
 {
-	string newValue = Util::ToString<T>(value);
+	string newValue = Utils::ToString<T>(value);
 	// Edit file data to save to file when Save() is called
 	if (KeyExists(section, key))
 	{
 		Config nameValuePair = (*configData)[section][key];
 		list<string>::iterator valueLocation = nameValuePair.position;
 		string oldValue = nameValuePair.value;
-
-		// Location of the first occurrence of the old value after the equals sign
-		unsigned int indexOfStartOfOldValue = valueLocation->find(oldValue, valueLocation->find(key));
-		unsigned int indexOfEquals = valueLocation->find(oldValue, valueLocation->find("="));
-		string newString = valueLocation->substr(0, indexOfStartOfOldValue);
-		newString += key + "=";
-		newString += newValue;
-		newString += valueLocation->substr(min(indexOfEquals + oldValue.size(), valueLocation->size()));
+		/*
+		 // Location of the first occurrence of the old value after the equals sign
+		 unsigned int indexOfStartOfOldValue = valueLocation->find(oldValue,
+		 valueLocation->find(key));
+		 unsigned int indexOfEquals = valueLocation->find(oldValue,
+		 valueLocation->find("="));
+		 string newString = valueLocation->substr(0, indexOfStartOfOldValue);
+		 newString += key + "=";
+		 newString += newValue;
+		 newString += valueLocation->substr(min(indexOfEquals + oldValue.size(),
+		 valueLocation->size()));*/
+		string newString = key + "=" + newValue;
 		*valueLocation = newString;
-	} else
+	}
+	else
 	{
 		if (configData->find(section) == configData->end()) // If section does not exist
 		{
@@ -107,8 +121,7 @@ template<typename T> void ConfigManager::Set(string section, string key, T value
 bool ConfigManager::KeyExists(string section, string key)
 {
 	return configData->find(section) != configData->end()
-			&& (*configData)[section].find(key)
-					!= (*configData)[section].end();
+			&& (*configData)[section].find(key) != (*configData)[section].end();
 }
 
 void ConfigManager::Register(Configurable* configurable)
@@ -119,7 +132,8 @@ void ConfigManager::Register(Configurable* configurable)
 void ConfigManager::ConfigureAll()
 {
 	AsyncPrinter::Printf("Applying configuration to all configurables\n");
-	for(vector<Configurable*>::iterator it = configures.begin(); it < configures.end(); it++)
+	for (vector<Configurable*>::iterator it = configures.begin(); it
+			< configures.end(); it++)
 	{
 		(*it)->Configure();
 	}
@@ -128,13 +142,14 @@ void ConfigManager::ConfigureAll()
 void ConfigManager::LoadConfig(string path)
 {
 	ifstream fin(path.c_str());
-	
+
 	if (!fin.is_open())
 	{
-		AsyncPrinter::Printf("ConfigManager could not open %s for reading\n", path.c_str());
+		AsyncPrinter::Printf("ConfigManager could not open %s for reading\n",
+				path.c_str());
 		return;
 	}
-	
+
 	// Clear previous data
 	if (!fileData->empty())
 	{
@@ -144,7 +159,7 @@ void ConfigManager::LoadConfig(string path)
 	{
 		sectionMap->clear();
 	}
-	
+
 	// Read lines into list
 	while (!fin.eof())
 	{
@@ -157,21 +172,22 @@ void ConfigManager::LoadConfig(string path)
 	string currentSection = "";
 	for (list<string>::iterator it = fileData->begin(); it != fileData->end(); it++)
 	{
-		unsigned int length = it->find_first_of(ConfigManager::COMMENT_DELIMITERS.c_str()); // String length up to first comment
+		unsigned int length = it->find_first_of(
+				ConfigManager::COMMENT_DELIMITERS.c_str()); // String length up to first comment
 		if (length == string::npos) // If no comments on this line
 			length = it->length();
-		
+
 		string line = Trim(it->substr(0, length)); // Trim whitespace from non-comment part of this line
 		if (line.length() == 0) // If this line contains no data
 			continue;
-		
+
 		if (line[0] == '[') // If new section
 		{
 			currentSection = line.substr(1, line.find_last_of("]") - 1); // Set current section name
 			(*sectionMap)[currentSection] = it; // Set position of current section
 			continue;
 		}
-		
+
 		stringstream sstream(line);
 		string key, value;
 		getline(sstream, key, '='); // Get key up to =
@@ -188,7 +204,8 @@ void ConfigManager::SaveConfig(string path)
 	ofstream fout(path.c_str());
 	if (!fout.is_open())
 	{
-		AsyncPrinter::Printf("ConfigManager could not open %s for writing\n", path.c_str());
+		AsyncPrinter::Printf("ConfigManager could not open %s for writing\n",
+				path.c_str());
 		return;
 	}
 
