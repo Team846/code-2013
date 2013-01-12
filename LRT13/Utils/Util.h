@@ -15,7 +15,7 @@
  * @author David Giandomenico
  */
 
-class Utils
+class Util
 {
 public:
 	/*!
@@ -134,9 +134,9 @@ public:
 	 */
 	template<typename T> static inline T AddDeadband(T raw, T deadbandSize)
 	{
-		if (Utils::Abs<T>(raw) < deadbandSize)
+		if (Util::Abs<T>(raw) < deadbandSize)
 			return 0;
-		return Utils::Sign<T>(raw) * Utils::Rescale<T>(Utils::Abs<T>(raw),
+		return Util::Sign<T>(raw) * Util::Rescale<T>(Util::Abs<T>(raw),
 				deadbandSize, 1, 0, 1);
 	}
 
@@ -149,7 +149,7 @@ public:
 	template<typename T>
 	static inline T ValWithAbsMax(T val1, T val2)
 	{
-		if (Utils::Abs<T>(val1) > Utils::Abs<T>(val2))
+		if (Util::Abs<T>(val1) > Util::Abs<T>(val2))
 			return val1;
 		return val2;
 	}

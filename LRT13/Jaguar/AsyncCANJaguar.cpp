@@ -15,12 +15,12 @@ void AsyncCANJaguar::println(const char * str)
 
 AsyncCANJaguar::AsyncCANJaguar(UINT8 channel, const char* name) :
 			AsyncProcess(
-					(std::string("JAG#") + Utils::ToString<int>(channel)).c_str()),
+					(std::string("JAG#") + Util::ToString<int>(channel)).c_str()),
 			CANJaguar(channel),
 			Loggable(),
 			m_print_ctor_dtor(m_task_name.c_str(), (m_task_name + "\n").c_str())
 {
-	m_task_name = "JAG#" + Utils::ToString<int>(channel);
+	m_task_name = "JAG#" + Util::ToString<int>(channel);
 	m_channel = channel;
 	m_setpoint.setValue(0.0);
 	m_should_disable_control = false;

@@ -3,7 +3,7 @@
 #include "../Config/ConfigManager.h"
 #include "../Config/RobotConfig.h"
 #include "../Sensors/DriveEncoders.h"
-#include "../Utils/Utils.h"
+#include "../Utils/Util.h"
 #include "../Jaguar/ESC.h"
 
 using namespace data;
@@ -66,8 +66,8 @@ void Drivetrain::onEnable()
 	double leftOutput = fwdOutput - turnOutput;
 	double rightOutput = fwdOutput + turnOutput;
 	
-	Utils::Clamp<double>(leftOutput, -1.0, 1.0);
-	Utils::Clamp<double>(rightOutput, -1.0, 1.0);
+	Util::Clamp<double>(leftOutput, -1.0, 1.0);
+	Util::Clamp<double>(rightOutput, -1.0, 1.0);
 	
 	m_escs[LEFT]->SetDutyCycle(leftOutput);
 	m_escs[LEFT]->SetDutyCycle(rightOutput);

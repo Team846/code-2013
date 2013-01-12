@@ -1,8 +1,10 @@
 #include "ComponentData.h"
 #include "DrivetrainData.h"
+#include "ConfigLoaderData.h"
 
 using namespace data;
 using namespace drivetrain;
+using namespace configLoader;
 
 ComponentData* ComponentData::GetInstance()
 {
@@ -12,7 +14,7 @@ ComponentData* ComponentData::GetInstance()
 }
 
 ComponentData::ComponentData()
-: drivetrainData(new DrivetrainData())
+: drivetrainData(new DrivetrainData()), configLoaderData(new ConfigLoaderData())
 {
 	
 }

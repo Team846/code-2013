@@ -8,7 +8,7 @@ using namespace data;
 TeleopInputs::TeleopInputs(char * taskName, INT32 priority) :
 	AsyncProcess(taskName, priority)
 {
-	m_data_ptr = ComponentData::GetInstance();
+	m_actionData = ComponentData::GetInstance();
 	m_driver_stick = new DebouncedJoystick(DriverStationConfig::DRIVER_STICK_PORT,
 			DriverStationConfig::NUM_JOYSTICK_BUTTONS,
 			DriverStationConfig::NUM_JOYSTICK_AXES);
@@ -43,7 +43,7 @@ void TeleopInputs::Update()
 	{
 		if(m_driver_stick->IsButtonDown(DriverStationConfig::RESET_ZERO))
 		{
-			
+			m_actionData->drivetrainData->setOpenLoopOutput(FORWARD, 0.0);
 		}
 		else
 		{
@@ -52,9 +52,9 @@ void TeleopInputs::Update()
 	}
 	
 	if(m_driver_stick->IsButtonJustPressed(DriverStationConfig::SAVE_CONFIG))
-		ConfigManager::Instance()->Save();
+		m_actionData->configLoaderData->save = true;
 	if(m_driver_stick->IsButtonJustPressed(DriverStationConfig::LOAD_CONFIG))
-		ConfigManager::Instance()->Load();
+		m_actionData->configLoaderData->load= true;
 	if(m_driver_stick->IsButtonJustPressed(DriverStationConfig::APPLY_CONFIG))
-		ConfigManager::Instance()->ConfigureAll();
+		m_actionData->configLoaderData->apply = true;
 }

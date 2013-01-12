@@ -21,8 +21,8 @@ public:
 	virtual ~Component();
 
 	virtual void UpdateActionData() = 0;
-	virtual void OnEnable() = 0;
-	virtual void OnDisable() = 0;
+	virtual void onEnable() = 0;
+	virtual void onDisable() = 0;
 	
 	std::string GetName();
 	

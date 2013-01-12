@@ -6,6 +6,7 @@
 #include "../Process/AsyncProcess.h"
 #include "../ComponentData/RobotData.h"
 #include "../ComponentData/DrivetrainData.h"
+#include "../ComponentData/ConfigLoaderData.h"
 
 #include "../Config/ConfigManager.h"
 
@@ -35,7 +36,7 @@ protected:
 private:
 	void Update();
 	
-	data::ComponentData* m_data_ptr;
+	data::ComponentData* m_actionData;
 	DebouncedJoystick* m_driver_stick;
 	DebouncedJoystick* m_operator_stick;
 	DebouncedJoystick* m_driver_wheel;

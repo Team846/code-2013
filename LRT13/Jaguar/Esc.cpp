@@ -88,7 +88,7 @@ void ESC::SetDutyCycle(float dutyCycle)
 {
 	double speed = m_encoder->GetRate()
 			/ DriveEncoders::GetInstance().getMaxEncoderRate();
-	speed = Utils::Clamp<double>(speed, -1, 1);
+	speed = Util::Clamp<double>(speed, -1, 1);
 	brakeAndDutyCycle command = CalculateBrakeAndDutyCycle(dutyCycle, speed);
 
 	//	static int e = 0; 
@@ -137,7 +137,7 @@ void ESC::SetDutyCycle(float dutyCycle)
 		//		AsyncPrinter::Printf("Braking\n");
 	}
 
-	dutyCycle = Utils::Clamp<float>(dutyCycle, -1.0, 1.0);
+	dutyCycle = Util::Clamp<float>(dutyCycle, -1.0, 1.0);
 
 	//	static int e = 0;
 	//	if ((e++)%21 == 0)

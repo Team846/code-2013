@@ -1,7 +1,7 @@
 #include "ConfigManager.h"
 #include "RobotConfig.h"
 #include "../Utils/AsyncPrinter.h"
-#include "../Utils/Utils.h"
+#include "../Utils/Util.h"
 #include <fstream>
 #include <sstream>
 
@@ -80,7 +80,7 @@ template void
 template<typename T> void ConfigManager::Set(string section, string key,
 		T value)
 {
-	string newValue = Utils::ToString<T>(value);
+	string newValue = Util::ToString<T>(value);
 	// Edit file data to save to file when Save() is called
 	if (KeyExists(section, key))
 	{

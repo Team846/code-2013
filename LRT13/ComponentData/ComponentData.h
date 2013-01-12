@@ -2,12 +2,17 @@
 #define COMPONENT_DATA_H
 
 #include <WPILib.h>
+//#include "ConfigLoaderData.h"
 
 namespace data
 {
 	namespace drivetrain
 	{
 		class DrivetrainData;
+	}
+	namespace configLoader
+	{
+		class ConfigLoaderData;
 	}
 	
 	/*!
@@ -21,6 +26,7 @@ namespace data
 	
 		
 		drivetrain::DrivetrainData* const drivetrainData;
+		configLoader::ConfigLoaderData* const configLoaderData;
 	
 	protected:
 		ComponentData();
