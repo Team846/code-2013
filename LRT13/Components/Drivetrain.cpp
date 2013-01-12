@@ -40,7 +40,7 @@ double Drivetrain::ComputeOutput(data::drivetrain::ForwardOrTurn axis)
 		m_PIDs[POSITION][axis].setInput(positionSetpoint);
 		m_PIDs[POSITION][axis].setSetpoint(0.0);
 		velocitySetpoint = m_PIDs[POSITION][axis].update( 1.0 / RobotConfig::LOOP_RATE);
-		break;
+		//fall through the switch
 	case data::drivetrain::VELOCITY_CONTROL:
 		if (axis == data::drivetrain::FORWARD)
 			m_PIDs[VELOCITY][axis].setInput(m_driveEncoders.getNormalizedForwardSpeed());
