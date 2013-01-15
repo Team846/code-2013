@@ -15,4 +15,5 @@ std::string Component::GetName()
 list<Component::ComponentWithData> Component::CreateComponents()
 {
 	//TODO writeme!
+	
 }
