@@ -2,19 +2,29 @@
 
 LRTRobotBase::LRTRobotBase()
 {
-	printf("ctor");
 }
 
 LRTRobotBase::~LRTRobotBase()
 {
-	
+	printf("robot destructing\n");
 }
 
 void LRTRobotBase::StartCompetition()
 {
+	//Diagnostic: Print the task name.
+					printf("vxWorks task: %s\n", m_task->GetName());
+			
+					printf("Darn it\n");
+					GetWatchdog().SetEnabled(false);
+			
+					// first and one-time initialization
+					RobotInit();
+		
 	while(true)
 	{
 		Tick();
+		
+		Wait(1.0);
 	}
 }
 

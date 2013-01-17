@@ -19,7 +19,7 @@ public:
 	virtual void RobotInit() = 0;
 	
 	// Inherited from RobotBase, starts the competition
-	void StartCompetition();
+	virtual void StartCompetition();
 	
 	// Function to execute each pass in the loop; similar to a main function, but it gets run multiple times.
 	virtual void Tick();
