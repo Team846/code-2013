@@ -12,13 +12,12 @@ LRTRobotBase::~LRTRobotBase()
 void LRTRobotBase::StartCompetition()
 {
 	//Diagnostic: Print the task name.
-					printf("vxWorks task: %s\n", m_task->GetName());
-			
-					printf("Darn it\n");
-					GetWatchdog().SetEnabled(false);
-			
-					// first and one-time initialization
-					RobotInit();
+	printf("vxWorks task: %s\n", m_task->GetName());
+
+	GetWatchdog().SetEnabled(false);
+
+	// first and one-time initialization
+	RobotInit();
 		
 	while(true)
 	{
