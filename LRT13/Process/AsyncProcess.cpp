@@ -46,6 +46,8 @@ void AsyncProcess::Abort(int code, double waitSeconds)
 
 void AsyncProcess::preTick() { }
 
+INT32 AsyncProcess::Tick() { return 0; }
+
 void AsyncProcess::_TASK_ENTRY(void* asyncProcessInstance)
 {
 	AsyncProcess* _instance = static_cast<AsyncProcess*>(asyncProcessInstance);

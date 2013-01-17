@@ -6,6 +6,8 @@ using namespace data;
 using namespace drivetrain;
 using namespace configLoader;
 
+ComponentData* ComponentData::m_instance = NULL;
+
 ComponentData* ComponentData::GetInstance()
 {
 	if (!m_instance)

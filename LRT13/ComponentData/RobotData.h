@@ -4,6 +4,9 @@
 #warning proposed code
 
 #include <string>
+#include <vector>
+
+using namespace std;
 
 namespace data
 {

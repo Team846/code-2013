@@ -5,6 +5,7 @@
 #include <fstream>
 #include <sstream>
 
+vector<Configurable*> ConfigManager::configurables; // note: static vectors must be declared in the CPP file -TP
 ConfigManager* ConfigManager::m_instance = NULL;
 const string ConfigManager::CONFIG_FILE_PATH = RobotConfig::CONFIG_FILE_PATH;
 const string ConfigManager::COMMENT_DELIMITERS = "#;";
@@ -126,14 +127,14 @@ bool ConfigManager::KeyExists(string section, string key)
 
 void ConfigManager::Register(Configurable* configurable)
 {
-	configures.push_back(configurable);
+	configurables.push_back(configurable);
 }
 
 void ConfigManager::ConfigureAll()
 {
 	AsyncPrinter::Printf("Applying configuration to all configurables\n");
-	for (vector<Configurable*>::iterator it = configures.begin(); it
-			< configures.end(); it++)
+	for (vector<Configurable*>::iterator it = configurables.begin(); it
+			< configurables.end(); it++)
 	{
 		(*it)->Configure();
 	}

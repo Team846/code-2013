@@ -22,3 +22,8 @@ void LRTRobotBase::Tick()
 {
 	printf("LRTRobotBase::Tick(): Override me!");
 }
+
+bool LRTRobotBase::IsRunning()
+{
+	return true;
+}

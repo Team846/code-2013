@@ -1,9 +1,10 @@
 #ifndef PROXIED_CAN_JAGUAR_H_
 #define PROXIED_CAN_JAGUAR_H_
 
-#include "taskLib.h"
+#include <taskLib.h>
 
-#include "WPILib/CANJaguar.h"
+#include <WPILib/CANJaguar.h>
+#include <vector>
 
 #include "../LRTRobotBase.h"
 

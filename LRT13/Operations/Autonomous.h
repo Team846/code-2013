@@ -27,10 +27,7 @@ private:
 	IRobotAction* m_autonActions[1];
 	
 	int m_autonActionCount;
-	
-	void Score();
-	void MoveBack();
-	void Dance();
+
 	data::ComponentData* m_data_ptr;
 	int m_currentState;
 };

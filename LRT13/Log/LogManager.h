@@ -2,6 +2,7 @@
 #define LOG_MANAGER_H_
 
 #include <WPILib.h>
+#include <vector>
 #include "Loggable.h"
 
 /*!

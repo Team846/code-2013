@@ -7,6 +7,7 @@
 #include <unistd.h>
 #include <ctype.h>
 #include <WPILib.h>
+#include <vector>
 #include "Configurable.h"
 
 using namespace std;
@@ -51,7 +52,7 @@ public:
 private:
 	ConfigManager();
 	static ConfigManager* m_instance;
-	static vector<Configurable*> configures;
+	static vector<Configurable*> configurables;
 	
 	/*!
 	 * @brief Loads the config file into memory

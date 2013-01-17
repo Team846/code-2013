@@ -25,8 +25,5 @@ INT32 Autonomous::Tick()
 		m_autonActions[i]->Run();
 	}
 	
-	Score(); // Score
-	MoveBack(); // Move back
-	Dance(); // Do a dance
 	return 0;
 }

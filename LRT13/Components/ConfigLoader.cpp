@@ -1,9 +1,26 @@
 #include "ConfigLoader.h"
 
+#warning needs implementation
+
 ConfigLoader::ConfigLoader()
 : Component("ConfigLoader")
 {
 	m_config = ConfigManager::Instance();
+}
+
+ConfigLoader::~ConfigLoader()
+{
+	
+}
+
+void ConfigLoader::UpdateActionData()
+{
+	
+}
+
+void ConfigLoader::onEnable()
+{
+	
 }
 
 void ConfigLoader::onDisable()

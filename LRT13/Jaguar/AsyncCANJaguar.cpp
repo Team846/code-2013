@@ -6,6 +6,8 @@
 
 #define DISABLE_SETPOINT_CACHING 0
 
+vector<AsyncCANJaguar*> AsyncCANJaguar::jaguar_vector; // note: static vectors must be declared in the CPP file -TP
+
 GameState AsyncCANJaguar::m_game_state = DISABLED;
 
 void AsyncCANJaguar::println(const char * str)

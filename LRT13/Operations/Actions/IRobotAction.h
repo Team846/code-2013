@@ -10,10 +10,10 @@
 class IRobotAction
 {
 public:
-	IRobotAction();
-	virtual ~IRobotAction();
+	IRobotAction() { };
+	virtual ~IRobotAction() { };
 	
-	virtual int Run();
+	virtual int Run() { return 0; };
 };
 
 #endif
