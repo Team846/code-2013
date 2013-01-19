@@ -18,6 +18,7 @@ ConfigManager* ConfigManager::Instance()
 }
 
 ConfigManager::ConfigManager()
+: lastReadTime(0)
 {
 	AsyncPrinter::Printf("Loaded ConfigManager\n");
 }
@@ -117,6 +118,23 @@ template<typename T> void ConfigManager::Set(string section, string key,
 		fileData->insert(sectionLocation, str);
 	}
 	(*configData)[section][key].value = newValue; // Update current config data
+}
+
+void ConfigManager::CheckForFileUpdates()
+{
+	struct stat statistics;
+	stat(CONFIG_FILE_PATH.c_str(), &statistics);
+
+	// reload when the file has been modified
+	if (lastReadTime != statistics.st_mtime)
+	{
+		Load();
+
+		// Load() sometimes saves the configuration,
+		// so get the new modified time.
+		stat(CONFIG_FILE_PATH.c_str(), &statistics);
+		lastReadTime = statistics.st_mtime;
+	}
 }
 
 bool ConfigManager::KeyExists(string section, string key)

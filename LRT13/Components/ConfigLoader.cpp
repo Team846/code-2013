@@ -20,11 +20,6 @@ void ConfigLoader::UpdateActionData()
 
 void ConfigLoader::onEnable()
 {
-	
-}
-
-void ConfigLoader::onDisable()
-{
 	if (m_actionData->configLoaderData->load)
 	{
 		m_config->Load();
@@ -38,4 +33,11 @@ void ConfigLoader::onDisable()
 		m_config->ConfigureAll();
 		m_actionData->configLoaderData->apply = false;
 	}
+}
+
+void ConfigLoader::onDisable()
+{
+	static int e = 0;
+	if (++e % 5 == 0)
+		m_config->CheckForFileUpdates();
 }

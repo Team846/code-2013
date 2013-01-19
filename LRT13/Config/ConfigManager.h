@@ -8,6 +8,8 @@
 #include <ctype.h>
 #include <WPILib.h>
 #include <vector>
+#include <sys/stat.h>
+#include <sys/types.h>
 #include "Configurable.h"
 
 using namespace std;
@@ -48,6 +50,10 @@ public:
 	 * @brief Calls Configure() on all registered configurables
 	 */
 	static void ConfigureAll();
+	/*!
+	 * @brief Checks if file has been changed
+	 */
+	void CheckForFileUpdates();
 	
 private:
 	ConfigManager();
@@ -65,6 +71,7 @@ private:
 	list<string> *fileData;
 	config* configData;
 	map<string, list<string>::iterator> *sectionMap;
+	time_t lastReadTime;
 	bool KeyExists(string section, string key);
 	string Trim(string str);
 	
