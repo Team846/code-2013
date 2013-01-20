@@ -1,21 +1,28 @@
 #ifndef CONFIG_LOADER_H_
 #define CONFIG_LOADER_H_
 
+#include "../ComponentData/RobotData.h"
+
 #include "Component.h"
 #include "../ComponentData/ConfigLoaderData.h"
 #include "../Config/ConfigManager.h"
+
+using namespace data;
 
 class ConfigLoader : public Component
 {
 public:
 	ConfigLoader();
 	~ConfigLoader();
-	
-	virtual void UpdateActionData(); 
+
 	virtual void onEnable(); 
 	virtual void onDisable();
+	
+	virtual void Update();
 private:
 	ConfigManager* m_config;
+	
+	bool m_isEnabled;
 };
 
 #endif

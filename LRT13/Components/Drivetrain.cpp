@@ -24,11 +24,6 @@ Drivetrain::~Drivetrain()
 	
 }
 
-void Drivetrain::UpdateActionData()
-{
-	//TODO update actiondata. This is prolly the place to give sems too.
-}
-
 double Drivetrain::ComputeOutput(data::drivetrain::ForwardOrTurn axis)
 {
 	double positionSetpoint = m_actionData->drivetrainData->getRelativePositionSetpoint(axis); // this will tell you how much further to go
@@ -60,23 +55,39 @@ double Drivetrain::ComputeOutput(data::drivetrain::ForwardOrTurn axis)
 
 void Drivetrain::onEnable()
 {
-	double fwdOutput = ComputeOutput(data::drivetrain::FORWARD); //positive means forward
-	double turnOutput = ComputeOutput(data::drivetrain::TURN);   //positive means turning counter-clockwise. Matches the way driveencoders work.
-	
-	double leftOutput = fwdOutput - turnOutput;
-	double rightOutput = fwdOutput + turnOutput;
-	
-	Util::Clamp<double>(leftOutput, -1.0, 1.0);
-	Util::Clamp<double>(rightOutput, -1.0, 1.0);
-	
-	m_escs[LEFT]->SetDutyCycle(leftOutput);
-	m_escs[LEFT]->SetDutyCycle(rightOutput);
+	m_isEnabled = true;
 }
 
 void Drivetrain::onDisable()
 {
+	m_isEnabled = false;
+	
+	// immediately stop
 	m_escs[LEFT]->SetDutyCycle(0.0);
 	m_escs[LEFT]->SetDutyCycle(0.0);
+}
+
+void Drivetrain::Update()
+{
+	if(RobotData::GetCurrentState() == DISABLED)
+	{
+		m_escs[LEFT]->SetDutyCycle(0.0);
+		m_escs[LEFT]->SetDutyCycle(0.0);
+	}
+	else
+	{
+		double fwdOutput = ComputeOutput(data::drivetrain::FORWARD); //positive means forward
+		double turnOutput = ComputeOutput(data::drivetrain::TURN);   //positive means turning counter-clockwise. Matches the way driveencoders work.
+		
+		double leftOutput = fwdOutput - turnOutput;
+		double rightOutput = fwdOutput + turnOutput;
+		
+		Util::Clamp<double>(leftOutput, -1.0, 1.0);
+		Util::Clamp<double>(rightOutput, -1.0, 1.0);
+		
+		m_escs[LEFT]->SetDutyCycle(leftOutput);
+		m_escs[LEFT]->SetDutyCycle(rightOutput);
+	}
 }
 
 void Drivetrain::Configure()

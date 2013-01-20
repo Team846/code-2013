@@ -21,6 +21,7 @@ namespace data
 		{
 			AUTONOMOUS = 0,
 			TELEOP = 1,
+			DISABLED = 2
 		};
 		
 		static int GetMissedPacketsInLifetime();
@@ -29,7 +30,8 @@ namespace data
 		static int GetCycleCount();
 		static void IncrementCycleCount();
 		
-		static RobotState getCurrentState();
+		static RobotState GetCurrentState();
+		static void SetRobotState(RobotState state);
 		
 		static int AllocateKey();
 		static void AddValue(int key, string type, string serialized);
@@ -37,7 +39,7 @@ namespace data
 	private:
 		static int m_missedPacketsInLifetime;
 		static int m_cycleCount;
-		
+
 		static RobotState m_state;
 		
 #warning rename/refactor me

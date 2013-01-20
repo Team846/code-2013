@@ -19,17 +19,12 @@ void LRTRobotBase::StartCompetition()
 	// first and one-time initialization
 	RobotInit();
 		
-	while(true)
-	{
-		Tick();
-		
-		Wait(1.0);
-	}
+	Run();
 }
 
-void LRTRobotBase::Tick()
+void LRTRobotBase::Run()
 {
-	printf("LRTRobotBase::Tick(): Override me!");
+	printf("LRTRobotBase::Run(): Override me!");
 }
 
 bool LRTRobotBase::IsRunning()

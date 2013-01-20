@@ -6,6 +6,10 @@
 #include <string>
 #include "../ComponentData/ComponentData.h"
 
+/*!
+ * @brief Generic abstract class for components
+ * @author Tony Peng
+ */
 class Component
 {
 public:
@@ -17,24 +21,54 @@ public:
 		Component *component;
 	};
 	
+	/*!
+	 * @brief Constructs a component with a name
+	 */
 	Component(std::string name);
+	/*!
+	 * @brief Frees the resources allocated by the component.
+	 */
 	virtual ~Component();
 
-	virtual void UpdateActionData() = 0;
+	/*!
+	 * @brief Event handler for when the component is enabled.
+	 */
 	virtual void onEnable() = 0;
+	/*!
+	 * @brief Event handler for when the component is disabled.
+	 */
 	virtual void onDisable() = 0;
 	
-	std::string GetName();
+	/*!
+	 * @brief Allows the component to update itself.
+	 */
+	virtual void Update() = 0;
 	
 	/*!
-	 * @brief the Factory method that constructs all the components. This makes it so that the main loop does not have to know about the individual components.
-	 * @return a list structs with components and information about the components. The information about the component includes whether the output method should be called if the robot is disabled as well as which digital io on the driverstation should disable this component. 
+	 * @brief Enables the component.
 	 */
-	static list<ComponentWithData> CreateComponents();
+	void Enable();
+	/*!
+	 * @brief Disables the component.
+	 */
+	void Disable();
+	
+	/*!
+	 * @brief Returns whether or not the component is enabled.
+	 */
+	bool IsEnabled();
+	
+	/*!
+	 * @brief Gets the component's name.
+	 */
+	std::string GetName();
+	
 protected:
 	data::ComponentData * const m_actionData;
 private:
 	std::string m_name;
+	
+	bool m_enabled;
 };
 
 #endif //COMPONENT_H_

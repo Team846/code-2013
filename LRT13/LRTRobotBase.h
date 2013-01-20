@@ -22,7 +22,7 @@ public:
 	virtual void StartCompetition();
 	
 	// Function to execute each pass in the loop; similar to a main function, but it gets run multiple times.
-	virtual void Tick();
+	virtual void Run();
 
 private:
 	static bool m_isRunning;

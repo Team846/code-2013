@@ -30,8 +30,8 @@ ESC::ESC(int channelA, int channelB, LRTEncoder* encoder, string name) :
 
 ESC::~ESC()
 {
-	delete m_jag1;
-	delete m_jag2;
+	DELETE(m_jag1);
+	DELETE(m_jag2);
 }
 
 void ESC::Configure()

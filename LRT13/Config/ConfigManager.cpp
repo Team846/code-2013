@@ -26,13 +26,13 @@ ConfigManager::ConfigManager()
 ConfigManager::~ConfigManager()
 {
 	if (fileData != NULL)
-		delete fileData;
+		DELETE(fileData);
 
 	if (configData != NULL)
-		delete configData;
+		DELETE(fileData);
 
 	if (sectionMap != NULL)
-		delete sectionMap;
+		DELETE(sectionMap);
 }
 
 void ConfigManager::Load()

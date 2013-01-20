@@ -10,7 +10,8 @@ void RobotData::IncrementMissedPacketsInLifetime() { return; }
 int RobotData::GetCycleCount() { return 0; }
 void RobotData::IncrementCycleCount() { return; }
 
-RobotData::RobotState RobotData::getCurrentState() { return AUTONOMOUS; }
+RobotData::RobotState RobotData::GetCurrentState() { return m_state; }
+void RobotData::SetRobotState(RobotData::RobotState state) { m_state = state; }
 
 int RobotData::AllocateKey() { return 0; }
 void RobotData::AddValue(int key, string type, string serialized) { return; }

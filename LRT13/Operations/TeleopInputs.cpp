@@ -37,7 +37,7 @@ INT32 TeleopInputs::Tick()
 
 void TeleopInputs::Update()
 {
-	RobotData::RobotState current_state = RobotData::getCurrentState();
+	RobotData::RobotState current_state = RobotData::GetCurrentState();
 	
 	if(current_state == RobotData::TELEOP)
 	{

@@ -3,9 +3,10 @@
 
 #include "WPILib.h"
 #include "LRTEncoder.h"
-#include "..\ComponentData\DrivetrainData.h"
-#include "..\Config\Configurable.h"
+#include "../ComponentData/DrivetrainData.h"
+#include "../Config/Configurable.h"
 #include "../Log/Loggable.h"
+#include "../Utils/Defines.h"
 
 /*!
  * @brief Class to keep track of drivetrain encoders

@@ -18,8 +18,17 @@ std::string Component::GetName()
 	return m_name;
 }
 
-list<Component::ComponentWithData> Component::CreateComponents()
+void Component::Enable()
 {
-	//TODO writeme!
-	
+	m_enabled = true;
+}
+
+void Component::Disable()
+{
+	m_enabled = false;
+}
+
+bool Component::IsEnabled()
+{
+	return m_enabled;
 }

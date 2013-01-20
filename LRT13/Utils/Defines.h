@@ -5,4 +5,8 @@
 	delete ptr; \
 	ptr = NULL;
 
+#define DELETE_ARR( ptr ) \
+	delete[] ptr; \
+	ptr = NULL;
+
 #endif

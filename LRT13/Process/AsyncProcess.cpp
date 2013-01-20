@@ -11,10 +11,7 @@ AsyncProcess::AsyncProcess(const char * taskName, INT32 priority)
 AsyncProcess::~AsyncProcess()
 {
 	Abort(0);
-	
-	delete m_task;
-	m_task = NULL;
-	
+
 	DELETE(m_task);
 }
 

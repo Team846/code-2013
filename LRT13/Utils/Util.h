@@ -8,11 +8,12 @@
 #include "Defines.h"
 
 /*!
- * @brief Utility class for commonly used mathematical functions
+ * @brief Class containing utility functions
  * @author Robert Ying
  * @author Karthik Viswanathan
  * @author Brian Axelrod
  * @author David Giandomenico
+ * @author Tony Peng
  */
 
 class Util
@@ -197,7 +198,69 @@ public:
 		else
 			return -result;
 	}
-
+	
+	/*!
+	 * @brief Frees the resources pointed to in a map<pointer, object>
+	 */
+	template<class A, class B>
+	static bool DeleteMapFirst(pair<A, B> x)
+	{
+		if(x.first == NULL)
+			return true;
+		
+		DELETE(x.first);
+		
+		return true;
+	}
+	
+	/*!
+	 * @brief Frees the resources pointed to in a map<object, pointer>
+	 */
+	template<class A, class B>
+	static bool DeleteMapSecond(pair<A, B> x)
+	{
+		if(x.second == NULL)
+			return true;
+		
+		DELETE(x.second);
+		
+		return true;
+	}
+	
+	/*!
+	 * @brief Frees the resources pointed to in a map<pointer, pointer>
+	 */
+	template<class A, class B>
+	static bool DeleteMapBoth(pair<A, B> x)
+	{
+		if(x.first != NULL)
+		{
+			DELETE(x.first);
+		}
+		
+		if(x.second != NULL)
+		{
+			DELETE(x.second);
+		}
+		
+		return true;
+	}
+	
+	
+	/*!
+	 * @brief Frees the resources pointed to in a vector<pointer>
+	 */
+	template<class A>
+	static bool DeleteVector(A x)
+	{
+		if(x == NULL)
+			return true;
+		
+		DELETE(x);
+		
+		return true;
+	}
+	
 	/*!
 	 * @brief Kills the current process
 	 */

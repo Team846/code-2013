@@ -38,9 +38,11 @@ DriveEncoders::DriveEncoders() :
 }
 
 DriveEncoders::~DriveEncoders()
-{
-	delete m_encoders[LEFT];
-	delete m_encoders[RIGHT];
+{	
+	DELETE(m_encoders[LEFT]);
+	DELETE(m_encoders[RIGHT]);
+	
+	delete[] m_encoders;
 }
 
 void DriveEncoders::Configure()

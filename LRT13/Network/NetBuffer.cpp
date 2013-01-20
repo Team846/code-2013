@@ -21,8 +21,7 @@ NetBuffer::NetBuffer(char* buff, int len)
 
 NetBuffer::~NetBuffer()
 {
-	delete[] m_internalBuffer;
-	m_internalBuffer = NULL;
+	DELETE_ARR(m_internalBuffer);
 }
 
 void NetBuffer::construct(char* buff, int size)
