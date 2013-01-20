@@ -39,9 +39,6 @@ Component* ComponentManager::GetComponent(string id)
 	return m_components[id];
 }
 
-// the interesting part here is that the component decides if it's enabled or not.
-// this is because sometimes a component will want to update when it's disabled.
-// -tp
 void ComponentManager::EnableComponent(string id)
 {
 	m_components[id]->onEnable();
