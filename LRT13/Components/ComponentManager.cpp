@@ -67,7 +67,6 @@ void ComponentManager::Update()
 		{
 			if(comp->IsEnabled())
 			{
-				comp->onDisable();
 				comp->Disable();
 			}
 		}

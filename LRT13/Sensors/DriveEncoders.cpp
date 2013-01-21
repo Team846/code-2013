@@ -17,11 +17,11 @@ DriveEncoders::DriveEncoders() :
 	m_configsection("DriveEncoders")
 {
 	m_encoders[LEFT] = new LRTEncoder("Left Drive Encoder",
-			RobotConfig::digital_io::LEFT_DRIVE_ENCODER_A,
-			RobotConfig::digital_io::LEFT_DRIVE_ENCODER_B);
+			RobotConfig::digital::LEFT_DRIVE_ENCODER_A,
+			RobotConfig::digital::LEFT_DRIVE_ENCODER_B);
 	m_encoders[RIGHT] = new LRTEncoder("Right Drive Encoder",
-			RobotConfig::digital_io::RIGHT_DRIVE_ENCODER_A,
-			RobotConfig::digital_io::RIGHT_DRIVE_ENCODER_B);
+			RobotConfig::digital::RIGHT_DRIVE_ENCODER_A,
+			RobotConfig::digital::RIGHT_DRIVE_ENCODER_B);
 
 	// want to stay with ticks/second
 	m_encoders[LEFT]->SetDistancePerPulse(1);
