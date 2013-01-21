@@ -6,7 +6,7 @@
 #include <WPILib/CANJaguar.h>
 #include <vector>
 
-#include "../LRTRobotBase.h"
+#include "../ComponentData/RobotData.h"
 
 #include "../Process/AsyncProcess.h"
 
@@ -91,8 +91,8 @@ private:
 	volatile bool m_pwr_cyc;
 	volatile float m_expire;
 
-	static GameState m_game_state;
-	GameState m_last_game_state;
+	static data::RobotData::RobotState m_game_state;
+	data::RobotData::RobotState m_last_game_state;
 
 	int m_index;
 
@@ -413,7 +413,7 @@ public:
 	 * @brief Set the game state
 	 * @param state
 	 */
-	static void SetGameState(GameState state);
+	static void SetGameState(data::RobotData::RobotState state);
 
 	/*!
 	 * @param Clear the cache

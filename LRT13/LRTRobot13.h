@@ -27,6 +27,8 @@ class LRTRobot13 : public LRTRobotBase
 		void Run();
 		
 	private:
+		void DetermineGameState();
+		
 		ComponentManager* m_componentManager;
 		
 		WDOG_ID _watchdog;

@@ -9,15 +9,15 @@ TeleopInputs::TeleopInputs(char * taskName, INT32 priority) :
 	AsyncProcess(taskName, priority)
 {
 	m_actionData = ComponentData::GetInstance();
-	m_driver_stick = new DebouncedJoystick(DriverStationConfig::DRIVER_STICK_PORT,
-			DriverStationConfig::NUM_JOYSTICK_BUTTONS,
-			DriverStationConfig::NUM_JOYSTICK_AXES);
-	m_operator_stick = new DebouncedJoystick(DriverStationConfig::OPERATOR_STICK_PORT,
-			DriverStationConfig::NUM_JOYSTICK_BUTTONS,
-			DriverStationConfig::NUM_JOYSTICK_AXES);
-	m_driver_wheel = new DebouncedJoystick(DriverStationConfig::DRIVER_WHEEL_PORT,
-			DriverStationConfig::NUM_WHEEL_BUTTONS,
-			DriverStationConfig::NUM_WHEEL_AXES);
+	m_driver_stick = new DebouncedJoystick(DriverStationConfig::JoystickConfig::DRIVER_STICK_PORT,
+			DriverStationConfig::JoystickConfig::NUM_JOYSTICK_BUTTONS,
+			DriverStationConfig::JoystickConfig::NUM_JOYSTICK_AXES);
+	m_operator_stick = new DebouncedJoystick(DriverStationConfig::JoystickConfig::OPERATOR_STICK_PORT,
+			DriverStationConfig::JoystickConfig::NUM_JOYSTICK_BUTTONS,
+			DriverStationConfig::JoystickConfig::NUM_JOYSTICK_AXES);
+	m_driver_wheel = new DebouncedJoystick(DriverStationConfig::JoystickConfig::DRIVER_WHEEL_PORT,
+			DriverStationConfig::JoystickConfig::NUM_WHEEL_BUTTONS,
+			DriverStationConfig::JoystickConfig::NUM_WHEEL_AXES);
 }
 
 TeleopInputs::~TeleopInputs()
@@ -41,7 +41,7 @@ void TeleopInputs::Update()
 	
 	if(current_state == RobotData::TELEOP)
 	{
-		if(m_driver_stick->IsButtonDown(DriverStationConfig::RESET_ZERO))
+		if(m_driver_stick->IsButtonDown(DriverStationConfig::JoystickButtons::RESET_ZERO))
 		{
 			m_actionData->drivetrainData->setOpenLoopOutput(FORWARD, 0.0);
 		}
@@ -51,10 +51,10 @@ void TeleopInputs::Update()
 		}
 	}
 	
-	if(m_driver_stick->IsButtonJustPressed(DriverStationConfig::SAVE_CONFIG))
+	if(m_driver_stick->IsButtonJustPressed(DriverStationConfig::JoystickButtons::SAVE_CONFIG))
 		m_actionData->configLoaderData->save = true;
-	if(m_driver_stick->IsButtonJustPressed(DriverStationConfig::LOAD_CONFIG))
+	if(m_driver_stick->IsButtonJustPressed(DriverStationConfig::JoystickButtons::LOAD_CONFIG))
 		m_actionData->configLoaderData->load= true;
-	if(m_driver_stick->IsButtonJustPressed(DriverStationConfig::APPLY_CONFIG))
+	if(m_driver_stick->IsButtonJustPressed(DriverStationConfig::JoystickButtons::APPLY_CONFIG))
 		m_actionData->configLoaderData->apply = true;
 }

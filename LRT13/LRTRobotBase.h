@@ -3,11 +3,6 @@
 
 #include "WPILib.h"
 
-enum GameState
-{
-	DISABLED, AUTONOMOUS, TELEOPERATED
-};
-
 class LRTRobotBase : public RobotBase
 {
 public:

@@ -8,7 +8,7 @@
 
 vector<AsyncCANJaguar*> AsyncCANJaguar::jaguar_vector; // note: static vectors must be declared in the CPP file -TP
 
-GameState AsyncCANJaguar::m_game_state = DISABLED;
+data::RobotData::RobotState AsyncCANJaguar::m_game_state = data::RobotData::DISABLED;
 
 void AsyncCANJaguar::println(const char * str)
 {
@@ -28,7 +28,7 @@ AsyncCANJaguar::AsyncCANJaguar(UINT8 channel, const char* name) :
 	m_should_disable_control = false;
 	m_should_disable_position_limits = false;
 	m_collection_flags = 0;
-	m_last_game_state = DISABLED;
+	m_last_game_state = data::RobotData::DISABLED;
 	next_jaguar_ = jaguar_vector[jaguar_vector.size() - 1];
 	jaguar_vector.push_back(this);
 
@@ -395,7 +395,7 @@ void AsyncCANJaguar::DisableControl()
 	m_should_disable_control = true;
 }
 
-void AsyncCANJaguar::SetGameState(GameState state)
+void AsyncCANJaguar::SetGameState(data::RobotData::RobotState state)
 {
 	m_game_state = state;
 }

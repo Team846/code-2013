@@ -3,7 +3,7 @@
 #warning needs implementation
 
 ConfigLoader::ConfigLoader()
-: Component("ConfigLoader")
+: Component("ConfigLoader", -1, false)
 {
 	m_config = ConfigManager::Instance();
 }

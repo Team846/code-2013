@@ -2,6 +2,7 @@
 #include "../ComponentData/DrivetrainData.h"
 #include "../Config/ConfigManager.h"
 #include "../Config/RobotConfig.h"
+#include "../Config/DriverStationConfig.h"
 #include "../Sensors/DriveEncoders.h"
 #include "../Utils/Util.h"
 #include "../Jaguar/ESC.h"
@@ -10,7 +11,7 @@ using namespace data;
 using namespace drivetrain;
 
 Drivetrain::Drivetrain()
-: Component("Drivetrain")
+: Component("Drivetrain", DriverStationConfig::DigitalIO::DRIVETRAIN, true)
  , m_driveEncoders(DriveEncoders::GetInstance())
 {
 	m_escs[LEFT]  = new ESC(RobotConfig::can::LEFT_DRIVE_A, RobotConfig::can::LEFT_DRIVE_B,
@@ -69,7 +70,7 @@ void Drivetrain::onDisable()
 
 void Drivetrain::Update()
 {
-	if(RobotData::GetCurrentState() == DISABLED)
+	if(RobotData::GetCurrentState() == RobotData::DISABLED)
 	{
 		m_escs[LEFT]->SetDutyCycle(0.0);
 		m_escs[LEFT]->SetDutyCycle(0.0);

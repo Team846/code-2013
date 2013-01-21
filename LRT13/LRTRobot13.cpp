@@ -1,4 +1,7 @@
 #include "LRTRobot13.h"
+#include "ComponentData/RobotData.h"
+
+using namespace data;
 
 LRTRobot13::LRTRobot13()
 {
@@ -11,18 +14,16 @@ LRTRobot13::~LRTRobot13()
 {
 	printf("LRTRobot13 destructing\n");
 	
-	DELETE(m_componentManager)
+	DELETE(m_componentManager);
 }
 
 void LRTRobot13::RobotInit()
 {
-	// add basic components
+	ConfigManager::Instance()->ConfigureAll();
 	
-	//ConfigManager::Instance()->ConfigureAll();
+	CANTester::Instance()->Start();
 	
-	//CANTester::Instance()->Start();
-	
-	m_componentManager = new ComponentManager();
+	ComponentManager::Instance()->CreateComponents();
 }
 
 static int TimeoutCallback(...)
@@ -41,9 +42,25 @@ void LRTRobot13::Run()
 		
 		printf("Hello, world...i'm finally running...%d\n", ++e);
 		
+		DetermineGameState();
+		
 		m_componentManager->Update();
 		
 		wdCancel(_watchdog);
+	}
+}
+
+void LRTRobot13::DetermineGameState()
+{
+	if (IsDisabled())
+	{
+		RobotData::SetRobotState(RobotData::DISABLED);
+	} else if (IsAutonomous())
+	{
+		RobotData::SetRobotState(RobotData::AUTONOMOUS);
+	} else
+	{
+		RobotData::SetRobotState(RobotData::TELEOP);
 	}
 }
 

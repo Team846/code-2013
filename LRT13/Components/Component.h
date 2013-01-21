@@ -6,9 +6,11 @@
 #include <string>
 #include "../ComponentData/ComponentData.h"
 
+class ComponentManager;
+
 /*!
  * @brief Generic abstract class for components
- * @author Tony Peng
+ * @author Tony Peng, Raphael Chang
  */
 class Component
 {
@@ -24,7 +26,7 @@ public:
 	/*!
 	 * @brief Constructs a component with a name
 	 */
-	Component(std::string name);
+	Component(std::string name, int dio, int requiresEnabledState);
 	/*!
 	 * @brief Frees the resources allocated by the component.
 	 */
@@ -67,7 +69,7 @@ protected:
 	data::ComponentData * const m_actionData;
 private:
 	std::string m_name;
-	
+	ComponentManager* m_manager;
 	bool m_enabled;
 };
 

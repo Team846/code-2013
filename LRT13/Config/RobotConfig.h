@@ -5,7 +5,7 @@
  * @brief Contains all constants for robot configuration
  */
 
-#warning "Update robot config"
+#warning Update robot config
 
 #define CHANGEME 0
 
@@ -28,6 +28,7 @@ namespace can
 	const uint32_t LEFT_DRIVE_B = CHANGEME;
 	const uint32_t RIGHT_DRIVE_A = CHANGEME;
 	const uint32_t RIGHT_DRIVE_B = CHANGEME;
+	const uint32_t COLLECTOR = CHANGEME;
 }
 
 }
