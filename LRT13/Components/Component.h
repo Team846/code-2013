@@ -26,7 +26,7 @@ public:
 	/*!
 	 * @brief Constructs a component with a name
 	 */
-	Component(std::string name, int dio, int requiresEnabledState);
+	Component(std::string name, int dio, bool requiresEnabledState);
 	/*!
 	 * @brief Frees the resources allocated by the component.
 	 */
@@ -42,9 +42,14 @@ public:
 	virtual void onDisable() = 0;
 	
 	/*!
-	 * @brief Allows the component to update itself.
+	 * @brief Allows the component to update itself when enabled.
 	 */
-	virtual void Update() = 0;
+	virtual void whenEnabled() = 0;
+	
+	/*!
+	 * @brief Allows the component to execute code when disabled.
+	 */
+	virtual void whenDisabled() = 0;
 	
 	/*!
 	 * @brief Enables the component.
@@ -60,6 +65,10 @@ public:
 	 */
 	bool IsEnabled();
 	
+	bool EnableRequired();
+	
+	int GetDIO();
+	
 	/*!
 	 * @brief Gets the component's name.
 	 */
@@ -69,8 +78,11 @@ protected:
 	data::ComponentData * const m_actionData;
 private:
 	std::string m_name;
-	ComponentManager* m_manager;
 	bool m_enabled;
+	
+	bool m_requiresEnabled;
+	
+	int m_DIO;
 };
 
 #endif //COMPONENT_H_

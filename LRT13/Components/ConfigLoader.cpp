@@ -23,28 +23,26 @@ void ConfigLoader::onDisable()
 	m_isEnabled = false;
 }
 
-void ConfigLoader::Update()
+void ConfigLoader::whenEnabled()
 {
-	if(RobotData::GetCurrentState() == RobotData::DISABLED)
+	if (m_actionData->configLoaderData->load)
 	{
-		static int e = 0;
-		if (++e % 5 == 0)
-			m_config->CheckForFileUpdates();
-	}
-	else
+		m_config->Load();
+		m_actionData->configLoaderData->load = false;
+	} else if (m_actionData->configLoaderData->save)
 	{
-		if (m_actionData->configLoaderData->load)
-		{
-			m_config->Load();
-			m_actionData->configLoaderData->load = false;
-		} else if (m_actionData->configLoaderData->save)
-		{
-			m_config->Save();
-			m_actionData->configLoaderData->save = false;
-		} else if (m_actionData->configLoaderData->apply)
-		{
-			m_config->ConfigureAll();
-			m_actionData->configLoaderData->apply = false;
-		}
-	}
+		m_config->Save();
+		m_actionData->configLoaderData->save = false;
+	} else if (m_actionData->configLoaderData->apply)
+	{
+		m_config->ConfigureAll();
+		m_actionData->configLoaderData->apply = false;
+	}	
+}
+
+void ConfigLoader::whenDisabled()
+{
+	static int e = 0;
+	if (++e % 5 == 0)
+		m_config->CheckForFileUpdates();
 }

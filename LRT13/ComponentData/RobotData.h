@@ -1,10 +1,10 @@
 #ifndef ROBOT_DATA_H_
 #define ROBOT_DATA_H_
 
-#warning proposed code
-
 #include <string>
 #include <vector>
+
+#include "robotdata.pb.h"
 
 using namespace std;
 
@@ -33,8 +33,10 @@ namespace data
 		static RobotState GetCurrentState();
 		static void SetRobotState(RobotState state);
 		
-		static int AllocateKey();
+		static int AllocateKey(string className);
 		static void AddValue(int key, string type, string serialized);
+		
+		static string Serialize();
 		
 	private:
 		static int m_missedPacketsInLifetime;
@@ -42,12 +44,14 @@ namespace data
 
 		static RobotState m_state;
 		
+		static int _id;
+		
 #warning rename/refactor me
 		struct Data
 		{
 			string className;
 			vector<string> indexToTypeMap;
-			vector<string> indexToValueNameMap;
+			vector<string> indexToValueMap;
 		};
 		
 		static vector<Data> m_loggedClasses;

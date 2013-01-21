@@ -1,0 +1,24 @@
+package data;
+
+message DataMessage
+{
+	required string ClassName = 1;
+
+	message IndexToTypeMapMessage
+	{
+		repeated string type = 1;
+	}
+
+	message IndexToValueMapMessage
+	{
+		repeated string value = 1;
+	}
+
+	required IndexToTypeMapMessage IndexToTypeMap = 2;
+	required IndexToValueMapMessage IndexToValueMap = 3;
+}
+
+message CompleteMessage
+{
+	repeated DataMessage Data = 1;
+}

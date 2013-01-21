@@ -27,7 +27,7 @@ class LRTRobot13 : public LRTRobotBase
 		void Run();
 		
 	private:
-		void DetermineGameState();
+		void UpdateGameState();
 		
 		ComponentManager* m_componentManager;
 		

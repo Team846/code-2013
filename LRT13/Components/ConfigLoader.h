@@ -18,7 +18,9 @@ public:
 	virtual void onEnable(); 
 	virtual void onDisable();
 	
-	virtual void Update();
+	virtual void whenEnabled();
+	virtual void whenDisabled();
+	
 private:
 	ConfigManager* m_config;
 	

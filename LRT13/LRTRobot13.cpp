@@ -23,7 +23,7 @@ void LRTRobot13::RobotInit()
 	
 	CANTester::Instance()->Start();
 	
-	ComponentManager::Instance()->CreateComponents();
+	m_componentManager = new ComponentManager();
 }
 
 static int TimeoutCallback(...)
@@ -42,7 +42,7 @@ void LRTRobot13::Run()
 		
 		printf("Hello, world...i'm finally running...%d\n", ++e);
 		
-		DetermineGameState();
+		UpdateGameState();
 		
 		m_componentManager->Update();
 		
@@ -50,15 +50,17 @@ void LRTRobot13::Run()
 	}
 }
 
-void LRTRobot13::DetermineGameState()
+void LRTRobot13::UpdateGameState()
 {
 	if (IsDisabled())
 	{
 		RobotData::SetRobotState(RobotData::DISABLED);
-	} else if (IsAutonomous())
+	} 
+	else if (IsAutonomous())
 	{
 		RobotData::SetRobotState(RobotData::AUTONOMOUS);
-	} else
+	} 
+	else
 	{
 		RobotData::SetRobotState(RobotData::TELEOP);
 	}

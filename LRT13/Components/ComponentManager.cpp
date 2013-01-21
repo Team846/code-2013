@@ -11,91 +11,95 @@ ComponentManager::ComponentManager()
 
 ComponentManager::~ComponentManager()
 {
-	// for_each calls DeleteMapFntor<string, FullComponent>(pair<string, Component*>) for each element
-//	for_each(m_components.begin(),
-//			m_components.end(),
-//			Util::DeleteMapSecond<string, FullComponent>);
+	// for_each calls DeleteMapFntor<string, Component>(pair<string, Component*>) for each element
+	for_each(m_components.begin(),
+			m_components.end(),
+			Util::DeleteMapSecond<string, Component*>);
 	
 	m_components.clear();
 }
 
-ComponentManager* ComponentManager::Instance()
-{
-	if (m_instance == NULL)
-		m_instance = new ComponentManager();
-	return m_instance;
-}
-
 void ComponentManager::Update()
 {
-	for(map<string, FullComponent>::iterator it = m_components.begin(); it != m_components.end(); ++it)
+	for(map<string, Component*>::iterator it = m_components.begin(); it != m_components.end(); ++it)
 	{
-		FullComponent comp = it->second;
+		Component* comp = it->second;
 		
-		if (RobotData::GetCurrentState() != RobotData::DISABLED || !comp.RequiresEnabledState)
+		if(comp == NULL)
+			continue;
+		
+		if(comp->IsEnabled())
 		{
-			if (m_ds->GetDigitalIn(comp.DIO) || comp.DIO == -1)
+			comp->whenEnabled();
+		}
+		else
+		{
+			comp->whenDisabled();
+		}
+		
+		if (RobotData::GetCurrentState() != RobotData::DISABLED || !comp->EnableRequired())
+		{
+			if (m_ds->GetDigitalIn(comp->GetDIO()) || comp->GetDIO() == -1)
 			{
-				if(!comp.component->IsEnabled())
+				if(!comp->IsEnabled())
 				{
-					comp.component->onEnable();
-					comp.component->Enable();
-				}
-			} else
-			{
-				if(comp.component->IsEnabled())
-				{
-					comp.component->onDisable();
-					comp.component->Disable();
+					comp->onEnable();
+					comp->Enable();
 				}
 			}
-			comp.component->Update();
-		} else
-		{
-			if(comp.component->IsEnabled())
+			else
 			{
-				comp.component->onDisable();
-				comp.component->Disable();
+				if(comp->IsEnabled())
+				{
+					comp->onDisable();
+					comp->Disable();
+				}
+			}
+			
+			if(comp->IsEnabled())
+			{
+				comp->whenEnabled();
+			}
+			else
+			{
+				comp->whenDisabled();
+			}
+		} 
+		else
+		{
+			if(comp->IsEnabled())
+			{
+				comp->onDisable();
+				comp->Disable();
 			}
 		}
 	}
 }
 
-void ComponentManager::CreateComponents()
+void ComponentManager::AddComponent(string id, Component* comp)
 {
-	ConfigLoader();
-	Drivetrain();
-	Collector();
-}
-
-void ComponentManager::AddComponent(string id, Component* comp, int dio, bool requiresEnabledState)
-{
-	FullComponent component;
-	component.component = comp;
-	component.DIO = dio;
-	component.RequiresEnabledState = requiresEnabledState;
-	m_components[id] = component;
+	m_components[id] = comp;
 }
 
 Component* ComponentManager::GetComponent(string id)
 {
 #warning should confirm if a component with id exists
-	return m_components[id].component;
+	return m_components[id];
 }
 
 void ComponentManager::EnableComponent(string id)
 {
-	m_components[id].component->onEnable();
-	m_components[id].component->Enable();
+	m_components[id]->onEnable();
+	m_components[id]->Enable();
 }
 
 void ComponentManager::DisableComponent(string id)
 {
-	m_components[id].component->onDisable();
-	m_components[id].component->Disable();
+	m_components[id]->onDisable();
+	m_components[id]->Disable();
 }
 
 bool ComponentManager::IsComponentEnabled(string id)
 {
-	return m_components[id].component->IsEnabled();
+	return m_components[id]->IsEnabled();
 }

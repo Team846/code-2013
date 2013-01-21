@@ -39,6 +39,7 @@
 #include <cstddef>
 #include <string>
 #include <string.h>
+
 #if defined(__osf__)
 // Tru64 lacks stdint.h, but has inttypes.h which defines a superset of
 // what stdint.h would define.
@@ -173,6 +174,8 @@ typedef uint16_t uint16;
 typedef uint32_t uint32;
 typedef uint64_t uint64;
 #endif
+
+typedef int intptr_t;
 
 // long long macros to be used because gcc and vc++ use different suffixes,
 // and different size specifiers in format strings
@@ -687,6 +690,7 @@ class LIBPROTOBUF_EXPORT LogFinisher {
 #undef GOOGLE_CHECK_LE
 #undef GOOGLE_CHECK_GT
 #undef GOOGLE_CHECK_GE
+#undef GOOGLE_CHECK_NOTNULL
 
 #undef GOOGLE_DLOG
 #undef GOOGLE_DCHECK
@@ -712,6 +716,18 @@ class LIBPROTOBUF_EXPORT LogFinisher {
 #define GOOGLE_CHECK_LE(A, B) GOOGLE_CHECK((A) <= (B))
 #define GOOGLE_CHECK_GT(A, B) GOOGLE_CHECK((A) >  (B))
 #define GOOGLE_CHECK_GE(A, B) GOOGLE_CHECK((A) >= (B))
+
+namespace internal {
+template<typename T>
+T* CheckNotNull(const char *file, int line, const char *name, T* val) {
+  if (val == NULL) {
+    GOOGLE_LOG(FATAL) << name;
+  }
+  return val;
+}
+}  // namespace internal
+#define GOOGLE_CHECK_NOTNULL(A) \
+  internal::CheckNotNull(__FILE__, __LINE__, "'" #A "' must not be NULL", (A))
 
 #ifdef NDEBUG
 

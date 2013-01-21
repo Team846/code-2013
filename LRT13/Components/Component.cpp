@@ -3,12 +3,12 @@
 
 #warning needs implementation
 
-Component::Component(std::string name, int dio, int requiresEnabledState)
+Component::Component(std::string name, int dio, bool requiresEnabledState)
 : m_actionData(data::ComponentData::GetInstance()),
-  m_name(name),
-  m_manager(ComponentManager::Instance())
+  m_name(name)
 {
-	m_manager->AddComponent(name, this, dio, requiresEnabledState);
+	m_DIO = dio;
+	m_requiresEnabled = requiresEnabledState;
 }
 
 Component::~Component()
@@ -33,4 +33,14 @@ void Component::Disable()
 bool Component::IsEnabled()
 {
 	return m_enabled;
+}
+
+bool Component::EnableRequired()
+{
+	return m_requiresEnabled;
+}
+
+int Component::GetDIO()
+{
+	return m_DIO;
 }

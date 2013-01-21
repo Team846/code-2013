@@ -23,7 +23,8 @@ public:
 	virtual void onEnable(); 
 	virtual void onDisable();
 	
-	virtual void Update();
+	virtual void whenEnabled();
+	virtual void whenDisabled();
 	
 	virtual void Configure();
 	virtual void Log();
