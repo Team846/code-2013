@@ -29,6 +29,7 @@ namespace can
 	const uint32_t RIGHT_DRIVE_A = CHANGEME;
 	const uint32_t RIGHT_DRIVE_B = CHANGEME;
 	const uint32_t COLLECTOR = CHANGEME;
+	const uint32_t SHOOTER = CHANGEME;
 }
 
 }

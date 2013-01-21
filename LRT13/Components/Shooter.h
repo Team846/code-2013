@@ -1,23 +1,23 @@
-#ifndef COLLECTOR_H_
-#define COLLECTOR_H_
+#ifndef SHOOTER_H_
+#define SHOOTER_H_
 
 #include <string>
 
+#include "ComponentWithJaguar.h"
 #include "../ComponentData/RobotData.h"
 #include "../Config/Configurable.h"
 #include "../Log/Loggable.h"
-#include "ComponentWithJaguar.h"
 #include "../Utils/PID.h"
 #include "../ComponentData/DrivetrainData.h"
 #include "../Jaguar/AsyncCANJaguar.h"
 
 using namespace data;
 
-class Collector : public ComponentWithJaguar, public Configurable, public Loggable
+class Shooter : public ComponentWithJaguar, public Configurable, public Loggable
 {
 public:
-	Collector();
-	~Collector();
+	Shooter();
+	~Shooter();
 	
 	virtual void onEnable(); 
 	virtual void onDisable();
