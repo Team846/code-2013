@@ -1,14 +1,26 @@
-package data;
+/* 
+ * Run as:
+ *	$ protoc -I=./ --cpp_out=./ robotdata.proto
+ *
+ * Author: Tony Peng
+ **/
 
+option optimize_for = LITE_RUNTIME; // compiler flag to use lite runtime
+
+package data; // set the namespace
+
+// DataMessage will be a single "Data" object.
 message DataMessage
 {
 	required string ClassName = 1;
 
+	// Collection of types
 	message IndexToTypeMapMessage
 	{
 		repeated string type = 1;
 	}
 
+	// Collection of values
 	message IndexToValueMapMessage
 	{
 		repeated string value = 1;
@@ -18,6 +30,7 @@ message DataMessage
 	required IndexToValueMapMessage IndexToValueMap = 3;
 }
 
+// CompleteMessage will contain all of the Data objects.
 message CompleteMessage
 {
 	repeated DataMessage Data = 1;

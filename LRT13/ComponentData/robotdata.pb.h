@@ -22,7 +22,7 @@
 #include "../Network/protobuf/generated_message_util.h"
 #include "../Network/protobuf/repeated_field.h"
 #include "../Network/protobuf/extension_set.h"
-#include "../Network/protobuf/generated_message_reflection.h"
+
 // @@protoc_insertion_point(includes)
 
 namespace data {
@@ -39,7 +39,7 @@ class CompleteMessage;
 
 // ===================================================================
 
-class DataMessage_IndexToTypeMapMessage : public ::google::protobuf::Message {
+class DataMessage_IndexToTypeMapMessage : public ::google::protobuf::MessageLite {
  public:
   DataMessage_IndexToTypeMapMessage();
   virtual ~DataMessage_IndexToTypeMapMessage();
@@ -51,15 +51,6 @@ class DataMessage_IndexToTypeMapMessage : public ::google::protobuf::Message {
     return *this;
   }
   
-  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const {
-    return _unknown_fields_;
-  }
-  
-  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields() {
-    return &_unknown_fields_;
-  }
-  
-  static const ::google::protobuf::Descriptor* descriptor();
   static const DataMessage_IndexToTypeMapMessage& default_instance();
   
   void Swap(DataMessage_IndexToTypeMapMessage* other);
@@ -67,8 +58,7 @@ class DataMessage_IndexToTypeMapMessage : public ::google::protobuf::Message {
   // implements Message ----------------------------------------------
   
   DataMessage_IndexToTypeMapMessage* New() const;
-  void CopyFrom(const ::google::protobuf::Message& from);
-  void MergeFrom(const ::google::protobuf::Message& from);
+  void CheckTypeAndMergeFrom(const ::google::protobuf::MessageLite& from);
   void CopyFrom(const DataMessage_IndexToTypeMapMessage& from);
   void MergeFrom(const DataMessage_IndexToTypeMapMessage& from);
   void Clear();
@@ -79,7 +69,6 @@ class DataMessage_IndexToTypeMapMessage : public ::google::protobuf::Message {
       ::google::protobuf::io::CodedInputStream* input);
   void SerializeWithCachedSizes(
       ::google::protobuf::io::CodedOutputStream* output) const;
-  ::google::protobuf::uint8* SerializeWithCachedSizesToArray(::google::protobuf::uint8* output) const;
   int GetCachedSize() const { return _cached_size_; }
   private:
   void SharedCtor();
@@ -87,7 +76,7 @@ class DataMessage_IndexToTypeMapMessage : public ::google::protobuf::Message {
   void SetCachedSize(int size) const;
   public:
   
-  ::google::protobuf::Metadata GetMetadata() const;
+  ::std::string GetTypeName() const;
   
   // nested types ----------------------------------------------------
   
@@ -112,8 +101,6 @@ class DataMessage_IndexToTypeMapMessage : public ::google::protobuf::Message {
   // @@protoc_insertion_point(class_scope:data.DataMessage.IndexToTypeMapMessage)
  private:
   
-  ::google::protobuf::UnknownFieldSet _unknown_fields_;
-  
   ::google::protobuf::RepeatedPtrField< ::std::string> type_;
   
   mutable int _cached_size_;
@@ -128,7 +115,7 @@ class DataMessage_IndexToTypeMapMessage : public ::google::protobuf::Message {
 };
 // -------------------------------------------------------------------
 
-class DataMessage_IndexToValueMapMessage : public ::google::protobuf::Message {
+class DataMessage_IndexToValueMapMessage : public ::google::protobuf::MessageLite {
  public:
   DataMessage_IndexToValueMapMessage();
   virtual ~DataMessage_IndexToValueMapMessage();
@@ -140,15 +127,6 @@ class DataMessage_IndexToValueMapMessage : public ::google::protobuf::Message {
     return *this;
   }
   
-  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const {
-    return _unknown_fields_;
-  }
-  
-  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields() {
-    return &_unknown_fields_;
-  }
-  
-  static const ::google::protobuf::Descriptor* descriptor();
   static const DataMessage_IndexToValueMapMessage& default_instance();
   
   void Swap(DataMessage_IndexToValueMapMessage* other);
@@ -156,8 +134,7 @@ class DataMessage_IndexToValueMapMessage : public ::google::protobuf::Message {
   // implements Message ----------------------------------------------
   
   DataMessage_IndexToValueMapMessage* New() const;
-  void CopyFrom(const ::google::protobuf::Message& from);
-  void MergeFrom(const ::google::protobuf::Message& from);
+  void CheckTypeAndMergeFrom(const ::google::protobuf::MessageLite& from);
   void CopyFrom(const DataMessage_IndexToValueMapMessage& from);
   void MergeFrom(const DataMessage_IndexToValueMapMessage& from);
   void Clear();
@@ -168,7 +145,6 @@ class DataMessage_IndexToValueMapMessage : public ::google::protobuf::Message {
       ::google::protobuf::io::CodedInputStream* input);
   void SerializeWithCachedSizes(
       ::google::protobuf::io::CodedOutputStream* output) const;
-  ::google::protobuf::uint8* SerializeWithCachedSizesToArray(::google::protobuf::uint8* output) const;
   int GetCachedSize() const { return _cached_size_; }
   private:
   void SharedCtor();
@@ -176,7 +152,7 @@ class DataMessage_IndexToValueMapMessage : public ::google::protobuf::Message {
   void SetCachedSize(int size) const;
   public:
   
-  ::google::protobuf::Metadata GetMetadata() const;
+  ::std::string GetTypeName() const;
   
   // nested types ----------------------------------------------------
   
@@ -201,8 +177,6 @@ class DataMessage_IndexToValueMapMessage : public ::google::protobuf::Message {
   // @@protoc_insertion_point(class_scope:data.DataMessage.IndexToValueMapMessage)
  private:
   
-  ::google::protobuf::UnknownFieldSet _unknown_fields_;
-  
   ::google::protobuf::RepeatedPtrField< ::std::string> value_;
   
   mutable int _cached_size_;
@@ -217,7 +191,7 @@ class DataMessage_IndexToValueMapMessage : public ::google::protobuf::Message {
 };
 // -------------------------------------------------------------------
 
-class DataMessage : public ::google::protobuf::Message {
+class DataMessage : public ::google::protobuf::MessageLite {
  public:
   DataMessage();
   virtual ~DataMessage();
@@ -229,15 +203,6 @@ class DataMessage : public ::google::protobuf::Message {
     return *this;
   }
   
-  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const {
-    return _unknown_fields_;
-  }
-  
-  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields() {
-    return &_unknown_fields_;
-  }
-  
-  static const ::google::protobuf::Descriptor* descriptor();
   static const DataMessage& default_instance();
   
   void Swap(DataMessage* other);
@@ -245,8 +210,7 @@ class DataMessage : public ::google::protobuf::Message {
   // implements Message ----------------------------------------------
   
   DataMessage* New() const;
-  void CopyFrom(const ::google::protobuf::Message& from);
-  void MergeFrom(const ::google::protobuf::Message& from);
+  void CheckTypeAndMergeFrom(const ::google::protobuf::MessageLite& from);
   void CopyFrom(const DataMessage& from);
   void MergeFrom(const DataMessage& from);
   void Clear();
@@ -257,7 +221,6 @@ class DataMessage : public ::google::protobuf::Message {
       ::google::protobuf::io::CodedInputStream* input);
   void SerializeWithCachedSizes(
       ::google::protobuf::io::CodedOutputStream* output) const;
-  ::google::protobuf::uint8* SerializeWithCachedSizesToArray(::google::protobuf::uint8* output) const;
   int GetCachedSize() const { return _cached_size_; }
   private:
   void SharedCtor();
@@ -265,7 +228,7 @@ class DataMessage : public ::google::protobuf::Message {
   void SetCachedSize(int size) const;
   public:
   
-  ::google::protobuf::Metadata GetMetadata() const;
+  ::std::string GetTypeName() const;
   
   // nested types ----------------------------------------------------
   
@@ -310,8 +273,6 @@ class DataMessage : public ::google::protobuf::Message {
   inline void set_has_indextovaluemap();
   inline void clear_has_indextovaluemap();
   
-  ::google::protobuf::UnknownFieldSet _unknown_fields_;
-  
   ::std::string* classname_;
   ::data::DataMessage_IndexToTypeMapMessage* indextotypemap_;
   ::data::DataMessage_IndexToValueMapMessage* indextovaluemap_;
@@ -328,7 +289,7 @@ class DataMessage : public ::google::protobuf::Message {
 };
 // -------------------------------------------------------------------
 
-class CompleteMessage : public ::google::protobuf::Message {
+class CompleteMessage : public ::google::protobuf::MessageLite {
  public:
   CompleteMessage();
   virtual ~CompleteMessage();
@@ -340,15 +301,6 @@ class CompleteMessage : public ::google::protobuf::Message {
     return *this;
   }
   
-  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const {
-    return _unknown_fields_;
-  }
-  
-  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields() {
-    return &_unknown_fields_;
-  }
-  
-  static const ::google::protobuf::Descriptor* descriptor();
   static const CompleteMessage& default_instance();
   
   void Swap(CompleteMessage* other);
@@ -356,8 +308,7 @@ class CompleteMessage : public ::google::protobuf::Message {
   // implements Message ----------------------------------------------
   
   CompleteMessage* New() const;
-  void CopyFrom(const ::google::protobuf::Message& from);
-  void MergeFrom(const ::google::protobuf::Message& from);
+  void CheckTypeAndMergeFrom(const ::google::protobuf::MessageLite& from);
   void CopyFrom(const CompleteMessage& from);
   void MergeFrom(const CompleteMessage& from);
   void Clear();
@@ -368,7 +319,6 @@ class CompleteMessage : public ::google::protobuf::Message {
       ::google::protobuf::io::CodedInputStream* input);
   void SerializeWithCachedSizes(
       ::google::protobuf::io::CodedOutputStream* output) const;
-  ::google::protobuf::uint8* SerializeWithCachedSizesToArray(::google::protobuf::uint8* output) const;
   int GetCachedSize() const { return _cached_size_; }
   private:
   void SharedCtor();
@@ -376,7 +326,7 @@ class CompleteMessage : public ::google::protobuf::Message {
   void SetCachedSize(int size) const;
   public:
   
-  ::google::protobuf::Metadata GetMetadata() const;
+  ::std::string GetTypeName() const;
   
   // nested types ----------------------------------------------------
   
@@ -396,8 +346,6 @@ class CompleteMessage : public ::google::protobuf::Message {
   
   // @@protoc_insertion_point(class_scope:data.CompleteMessage)
  private:
-  
-  ::google::protobuf::UnknownFieldSet _unknown_fields_;
   
   ::google::protobuf::RepeatedPtrField< ::data::DataMessage > data_;
   
@@ -663,15 +611,6 @@ CompleteMessage::mutable_data() {
 // @@protoc_insertion_point(namespace_scope)
 
 }  // namespace data
-
-#ifndef SWIG
-namespace google {
-namespace protobuf {
-
-
-}  // namespace google
-}  // namespace protobuf
-#endif  // SWIG
 
 // @@protoc_insertion_point(global_scope)
 

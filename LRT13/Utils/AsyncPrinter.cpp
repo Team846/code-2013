@@ -7,6 +7,11 @@ AsyncPrinter* AsyncPrinter::Instance()
 	return _instance;
 }
 
+void AsyncPrinter::Finalize()
+{
+	DELETE(_instance);
+}
+
 AsyncPrinter::AsyncPrinter()
 	: AsyncProcess("AsyncProcess")
 {

@@ -4,16 +4,19 @@
 #include <WPILib.h>
 #include <vector>
 #include "Loggable.h"
+#include "../Utils/Defines.h"
 
 /*!
- * @brief Singleton for handling logging
- * @author Raphael Chang
+ * @brief Manages all instances of Loggable.
+ * @author Raphael Chang, Tony Peng
  */
 
 class LogManager
 {
 public:
 	static LogManager* Instance();
+	static void Finalize();
+	
 	~LogManager();
 	static void Register(Loggable* loggable);
 	static void LogAll();

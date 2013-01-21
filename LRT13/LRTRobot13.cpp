@@ -15,6 +15,13 @@ LRTRobot13::~LRTRobot13()
 	printf("LRTRobot13 destructing\n");
 	
 	DELETE(m_componentManager);
+	
+	// finalize all singletons
+	ComponentData::Finalize();
+	AsyncPrinter::Finalize();
+	ConfigManager::Finalize();
+	LogManager::Finalize();
+	CANTester::Finalize();
 }
 
 void LRTRobot13::RobotInit()
@@ -24,6 +31,8 @@ void LRTRobot13::RobotInit()
 	CANTester::Instance()->Start();
 	
 	m_componentManager = new ComponentManager();
+	
+	m_componentManager->AddComponent(new ComponentSystemUnitTest());
 }
 
 static int TimeoutCallback(...)
@@ -40,11 +49,11 @@ void LRTRobot13::Run()
 		wdStart(_watchdog, sysClkRateGet() / 50,
 				TimeoutCallback, 0);
 		
-		printf("Hello, world...i'm finally running...%d\n", ++e);
-		
 		UpdateGameState();
 		
 		m_componentManager->Update();
+		
+		printf("Hello, world...i'm finally running...%d\n", ++e);
 		
 		wdCancel(_watchdog);
 	}

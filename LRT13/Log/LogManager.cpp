@@ -10,6 +10,11 @@ LogManager* LogManager::Instance()
 	return m_instance;
 }
 
+void LogManager::Finalize()
+{
+	DELETE(m_instance);
+}
+
 LogManager::LogManager()
 { }
 

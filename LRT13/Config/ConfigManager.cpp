@@ -17,6 +17,11 @@ ConfigManager* ConfigManager::Instance()
 	return m_instance;
 }
 
+void ConfigManager::Finalize()
+{
+	DELETE(m_instance);
+}
+
 ConfigManager::ConfigManager()
 : lastReadTime(0)
 {

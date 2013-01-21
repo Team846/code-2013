@@ -43,7 +43,6 @@ void ComponentManager::Update()
 			{
 				if(!comp->IsEnabled())
 				{
-					comp->onEnable();
 					comp->Enable();
 				}
 			}
@@ -51,7 +50,6 @@ void ComponentManager::Update()
 			{
 				if(comp->IsEnabled())
 				{
-					comp->onDisable();
 					comp->Disable();
 				}
 			}
@@ -74,6 +72,11 @@ void ComponentManager::Update()
 			}
 		}
 	}
+}
+
+void ComponentManager::AddComponent(Component* comp)
+{
+	AddComponent(comp->GetName(), comp);
 }
 
 void ComponentManager::AddComponent(string id, Component* comp)

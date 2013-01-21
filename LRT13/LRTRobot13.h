@@ -12,6 +12,9 @@
 #include "ComponentData/RobotData.h"
 
 #include "Components/ComponentManager.h"
+#include "Components/ComponentSystemUnitTest.h"
+
+#include "Log/LogManager.h"
 
 #include "Utils/CANTester.h"
 

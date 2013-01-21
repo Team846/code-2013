@@ -1,5 +1,4 @@
 #include "Component.h"
-#include "ComponentManager.h"
 
 #warning needs implementation
 
@@ -22,11 +21,15 @@ std::string Component::GetName()
 
 void Component::Enable()
 {
+	onEnable();
+	
 	m_enabled = true;
 }
 
 void Component::Disable()
 {
+	onDisable();
+	
 	m_enabled = false;
 }
 

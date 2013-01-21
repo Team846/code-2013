@@ -12,7 +12,13 @@ ComponentData* ComponentData::GetInstance()
 {
 	if (!m_instance)
 		m_instance = new ComponentData();
+	
 	return m_instance;
+}
+
+void ComponentData::Finalize()
+{
+	DELETE(m_instance);
 }
 
 ComponentData::ComponentData()

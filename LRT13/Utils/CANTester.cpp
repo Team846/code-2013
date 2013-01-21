@@ -12,6 +12,11 @@ CANTester* CANTester::Instance()
 	return m_instance;
 }
 
+void CANTester::Finalize()
+{
+	DELETE(m_instance);
+}
+
 CANTester::CANTester()
 	: AsyncProcess("CANTester")
 {

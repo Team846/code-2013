@@ -2,7 +2,7 @@
 #define COMPONENT_DATA_H
 
 #include <WPILib.h>
-//#include "ConfigLoaderData.h"
+#include "../Utils/Defines.h"
 
 namespace data
 {
@@ -23,6 +23,7 @@ namespace data
 	{
 	public:
 		static ComponentData* GetInstance();
+		static void Finalize();
 	
 		
 		drivetrain::DrivetrainData* const drivetrainData;

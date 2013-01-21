@@ -18,6 +18,7 @@ class CANTester : public AsyncProcess, public Configurable
 {
 public:
 	static CANTester* Instance();
+	static void Finalize();
 	
 	CANTester();
 	~CANTester();

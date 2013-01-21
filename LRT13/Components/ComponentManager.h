@@ -19,6 +19,7 @@ public:
 
 	void CreateComponents();
 
+	void AddComponent(Component* comp);
 	void AddComponent(string id, Component* comp);
 	Component* GetComponent(string id);
 

@@ -30,6 +30,8 @@ class ConfigManager
 {
 public:
 	static ConfigManager* Instance();
+	static void Finalize();
+	
 	~ConfigManager();
 	
 	void Load();

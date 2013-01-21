@@ -14,6 +14,7 @@ namespace RobotConfig
 const uint32_t LOOP_RATE = 50; //hertz
 const string CONFIG_FILE_PATH = "/LRT13.conf";
 
+#warning conflicts with DriverStationConfig::DigitalIO
 namespace digital_io
 {
 	const uint32_t LEFT_DRIVE_ENCODER_A = CHANGEME;

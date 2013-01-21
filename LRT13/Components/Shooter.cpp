@@ -7,9 +7,7 @@
 Shooter::Shooter()
 : ComponentWithJaguar("Shooter", DriverStationConfig::DigitalIO::SHOOTER, true, RobotConfig::can::SHOOTER, "Shooter"),
   m_configSection("Shooter")
-{
-	m_jaguar = new AsyncCANJaguar(RobotConfig::can::SHOOTER, "Shooter");
-}
+{ }
 
 Shooter::~Shooter()
 {
