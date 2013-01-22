@@ -3,6 +3,8 @@
 using namespace data;
 
 int RobotData::_id = -1;
+RobotData::RobotState RobotData::m_state = RobotData::DISABLED;
+vector<RobotData::Data> RobotData::m_loggedClasses;
 
 int RobotData::GetMissedPacketsInLifetime() { return 0; }
 void RobotData::IncrementMissedPacketsInLifetime() { return; }

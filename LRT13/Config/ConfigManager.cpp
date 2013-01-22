@@ -54,6 +54,8 @@ void ConfigManager::Save()
 
 template bool ConfigManager::Get<bool>(string section, string key,
 		bool defaultValue);
+template float ConfigManager::Get<float>(string section, string key,
+		float defaultValue);
 template double ConfigManager::Get<double>(string section, string key,
 		double defaultValue);
 template string ConfigManager::Get<string>(string section, string key,
@@ -78,6 +80,7 @@ template<typename T> T ConfigManager::Get(string section, string key,
 }
 
 template void ConfigManager::Set<bool>(string section, string key, bool val);
+template void ConfigManager::Set<float>(string section, string key, float val);
 template void ConfigManager::Set<int>(string section, string key, int val);
 template void
 		ConfigManager::Set<double>(string section, string key, double val);

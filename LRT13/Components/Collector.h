@@ -13,6 +13,10 @@
 
 using namespace data;
 
+/*!
+ * @brief Provides control over the collector component.
+ * @author Raphael Chang, Tony Peng
+ */
 class Collector : public ComponentWithJaguar, public Configurable, public Loggable
 {
 public:

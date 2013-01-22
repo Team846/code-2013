@@ -13,6 +13,10 @@
 
 using namespace data;
 
+/*!
+ * @brief Provides control over the shooter component.
+ * @author Tony Peng
+ */
 class Shooter : public ComponentWithJaguar, public Configurable, public Loggable
 {
 public:

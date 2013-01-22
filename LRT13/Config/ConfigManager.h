@@ -15,8 +15,8 @@
 using namespace std;
 
 /*!
- * @brief Singleton for loading, reading, and saving configuration files
- * @author Raphael Chang
+ * @brief Provides an interface for accessing robot configuration.
+ * @author Raphael Chang, Tony Peng
  */
 
 struct Config

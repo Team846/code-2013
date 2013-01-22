@@ -28,7 +28,7 @@ void LRTRobot13::RobotInit()
 {
 	ConfigManager::Instance()->ConfigureAll();
 	
-	CANTester::Instance()->Start();
+	//CANTester::Instance()->Start();
 	
 	m_componentManager = new ComponentManager();
 	
@@ -46,14 +46,15 @@ void LRTRobot13::Run()
 	{
 		static int e = -1;
 		
-		wdStart(_watchdog, sysClkRateGet() / 50,
+		wdStart(_watchdog, sysClkRateGet() / RobotConfig::LOOP_RATE,
 				TimeoutCallback, 0);
 		
 		UpdateGameState();
 		
 		m_componentManager->Update();
 		
-		printf("Hello, world...i'm finally running...%d\n", ++e);
+		if(e++ % (RobotConfig::LOOP_RATE * 2) == 0)
+			printf("Hello, world...i'm finally running...%d\n", e);
 		
 		wdCancel(_watchdog);
 	}
@@ -74,5 +75,3 @@ void LRTRobot13::UpdateGameState()
 		RobotData::SetRobotState(RobotData::TELEOP);
 	}
 }
-
-START_ROBOT_CLASS(LRTRobot13);

@@ -39,7 +39,7 @@ void ComponentManager::Update()
 		
 		if (RobotData::GetCurrentState() != RobotData::DISABLED || !comp->EnableRequired())
 		{
-			if (m_ds->GetDigitalIn(comp->GetDIO()) || comp->GetDIO() == -1)
+			if (DriverStation::GetInstance()->GetDigitalIn(comp->GetDIO()) || comp->GetDIO() == -1)
 			{
 				if(!comp->IsEnabled())
 				{
@@ -91,13 +91,11 @@ Component* ComponentManager::GetComponent(string id)
 
 void ComponentManager::EnableComponent(string id)
 {
-	m_components[id]->onEnable();
 	m_components[id]->Enable();
 }
 
 void ComponentManager::DisableComponent(string id)
 {
-	m_components[id]->onDisable();
 	m_components[id]->Disable();
 }
 

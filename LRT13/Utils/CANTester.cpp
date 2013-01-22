@@ -30,6 +30,8 @@ CANTester::~CANTester()
 
 INT32 CANTester::Tick()
 {
+	return 0; // causing a mysterious crash...fix later
+	
 	bool isAlive = false;
 	for(unsigned int i = 0; i < AsyncCANJaguar::jaguar_vector.size(); i++)
 	{
@@ -52,5 +54,5 @@ INT32 CANTester::Tick()
 void CANTester::Configure()
 {
 	ConfigManager* config = ConfigManager::Instance();
-	m_interval = config->Get("CANTester", "waitInterval", 5.0);
+	m_interval = config->Get<double>("CANTester", "waitInterval", 5.0);
 }

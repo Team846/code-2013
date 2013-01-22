@@ -14,6 +14,10 @@ class ESC;
 
 class DriveEncoders;
 
+/*!
+ * @brief Provides control over the drivetrain component.
+ * @author Brian Axelrod, Tony Peng, Raphael Chang
+ */
 class Drivetrain : public Component, public Configurable, public Loggable
 {
 public:

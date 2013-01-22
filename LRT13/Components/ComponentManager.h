@@ -9,6 +9,10 @@
 
 using namespace std;
 
+/*!
+ * @brief Provides an interface to manage components
+ * @author Tony Peng
+ */
 class ComponentManager
 {
 public:
@@ -32,8 +36,6 @@ private:
 	static bool deleteAllComponents(Component* comp);
 
 	map<string, Component*> m_components;
-	
-	DriverStation* m_ds;
 };
 
 #endif

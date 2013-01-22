@@ -1,7 +1,7 @@
 #ifndef LRT_ROBOT_BASE_
 #define LRT_ROBOT_BASE_
 
-#include "WPILib.h"
+#include <WPILib.h>
 
 class LRTRobotBase : public RobotBase
 {
