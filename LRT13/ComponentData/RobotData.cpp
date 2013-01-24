@@ -57,6 +57,7 @@ void RobotData::AddValue(int key, string type, string serialized)
 #warning Check me
 string RobotData::Serialize()
 {
+	/*
 	CompleteMessage cm;
 	
 	for(vector<Data>::iterator it = m_loggedClasses.begin(); it != m_loggedClasses.end(); ++it)
@@ -82,5 +83,7 @@ string RobotData::Serialize()
 		}
 	}
 	
-	return cm.SerializeAsString();
+	return cm.SerializeAsString();*/
+	
+	return "";
 }
