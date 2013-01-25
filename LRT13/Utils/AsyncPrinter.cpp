@@ -1,10 +1,21 @@
 #include "AsyncPrinter.h"
 
-AsyncPrinter* AsyncPrinter::_instance = new AsyncPrinter();
+AsyncPrinter* AsyncPrinter::_instance = NULL;
 
 AsyncPrinter* AsyncPrinter::Instance()
 {
+	if(!_instance)
+	{
+		printf("null pointer at AsyncPrinter::Instance() -- did you call Initialize()?");
+	}
+	
 	return _instance;
+}
+
+void AsyncPrinter::Initialize()
+{
+	_instance = new AsyncPrinter();
+	_instance->Start();
 }
 
 void AsyncPrinter::Finalize()

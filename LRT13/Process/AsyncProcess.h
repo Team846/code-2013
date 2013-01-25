@@ -17,7 +17,7 @@ public:
 	AsyncProcess(const char * taskName, INT32 priority=Task::kDefaultPriority);
 	virtual ~AsyncProcess();
 	
-	void Start(UINT32 arg0 = 0);
+	void Start();
 	void Abort(int code=0, double waitSeconds=0);
 	
 	bool IsRunning();

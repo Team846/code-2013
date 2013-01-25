@@ -1,11 +1,13 @@
 #ifndef UNIT_TEST_H_
 #define UNIT_TEST_H_
 
+#include <WPILib.h>
+
 /*!
  * @brief Provides a unit test.
  * @author Tony Peng
  */
-class UnitTest
+class UnitTest : public RobotBase
 {
 public:
 	UnitTest();

@@ -26,6 +26,8 @@ LRTRobot13::~LRTRobot13()
 
 void LRTRobot13::RobotInit()
 {
+	AsyncPrinter::Initialize();
+	
 	ConfigManager::Instance()->ConfigureAll();
 	
 	//CANTester::Instance()->Start();
@@ -42,8 +44,12 @@ static int TimeoutCallback(...)
 
 void LRTRobot13::Run()
 {	
+	double lastUpdate = 0.0;
+	
 	while(true)
 	{
+		lastUpdate = Timer::GetFPGATimestamp();
+		
 		static int e = -1;
 		
 		wdStart(_watchdog, sysClkRateGet() / RobotConfig::LOOP_RATE,
@@ -53,10 +59,17 @@ void LRTRobot13::Run()
 		
 		m_componentManager->Update();
 		
-		if(e++ % (RobotConfig::LOOP_RATE * 2) == 0)
-			printf("Hello, world...i'm finally running...%d\n", e);
-		
 		wdCancel(_watchdog);
+		
+		double now = Timer::GetFPGATimestamp();
+		double timeSpent = (now - lastUpdate) / 1000;
+		
+		double toSleep = (int)((1000.0 / RobotConfig::LOOP_RATE) - timeSpent) / 1000.0;
+
+		if(e++ % (RobotConfig::LOOP_RATE * 10) == 0)
+			AsyncPrinter::Println("Tick: %d", e);
+		
+		Wait(toSleep);
 	}
 }
 

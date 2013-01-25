@@ -15,9 +15,9 @@ AsyncProcess::~AsyncProcess()
 	DELETE(m_task);
 }
 
-void AsyncProcess::Start(UINT32 arg0)
+void AsyncProcess::Start()
 {
-	m_task->Start(arg0);
+	m_task->Start((UINT32)this);
 }
 
 bool AsyncProcess::IsRunning()

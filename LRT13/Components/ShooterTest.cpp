@@ -3,7 +3,7 @@
 ShooterTest::ShooterTest()
 	: UnitTest()
 {
-	m_shooterComponent = new Shooter();
+	//m_shooterComponent = new Shooter();
 }
 
 ShooterTest::~ShooterTest()
