@@ -84,7 +84,7 @@ public:
 	std::string GetName();
 	
 protected:
-	data::ComponentData * const m_actionData;
+	data::ComponentData * const m_componentData;
 private:
 	std::string m_name;
 	bool m_enabled;

@@ -27,10 +27,10 @@ Drivetrain::~Drivetrain()
 
 double Drivetrain::ComputeOutput(data::drivetrain::ForwardOrTurn axis)
 {
-	double positionSetpoint = m_actionData->drivetrainData->getRelativePositionSetpoint(axis); // this will tell you how much further to go
-	double velocitySetpoint = m_actionData->drivetrainData->getVelocitySetpoint(axis);
-	double rawOutput = m_actionData->drivetrainData->getOpenLoopOutput(axis);
-	switch (m_actionData->drivetrainData->getControlMode(axis))
+	double positionSetpoint = m_componentData->drivetrainData->getRelativePositionSetpoint(axis); // this will tell you how much further to go
+	double velocitySetpoint = m_componentData->drivetrainData->getVelocitySetpoint(axis);
+	double rawOutput = m_componentData->drivetrainData->getOpenLoopOutput(axis);
+	switch (m_componentData->drivetrainData->getControlMode(axis))
 	{
 	case data::drivetrain::POSITION_CONTROL:
 		m_PIDs[POSITION][axis].setInput(positionSetpoint);

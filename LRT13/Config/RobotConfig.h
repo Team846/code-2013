@@ -14,20 +14,28 @@ namespace RobotConfig
 const uint32_t LOOP_RATE = 50; //hertz
 const string CONFIG_FILE_PATH = "/LRT13.conf";
 
+namespace drive
+{
+	const uint32_t THROTTLE_COEFFICIENT = CHANGEME; // TODO: anurag, change this
+	const uint32_t THROTTLE_EXPONENT = 1; // TODO: anurag, change this
+	const uint32_t BLEND_COEFFICIENT = CHANGEME; // TODO: anurag, change this
+	const uint32_t BLEND_EXPONENT = 3; // TODO: anurag, change this
+}
+
 namespace digital
 {
-	const uint32_t LEFT_DRIVE_ENCODER_A = CHANGEME;
-	const uint32_t LEFT_DRIVE_ENCODER_B = CHANGEME;
-	const uint32_t RIGHT_DRIVE_ENCODER_A = CHANGEME;
-	const uint32_t RIGHT_DRIVE_ENCODER_B = CHANGEME;
+	const uint32_t LEFT_DRIVE_ENCODER_A = 4;
+	const uint32_t LEFT_DRIVE_ENCODER_B = 3;
+	const uint32_t RIGHT_DRIVE_ENCODER_A = 1;
+	const uint32_t RIGHT_DRIVE_ENCODER_B = 2;
 }
 
 namespace can
 {
-	const uint32_t LEFT_DRIVE_A = CHANGEME;
-	const uint32_t LEFT_DRIVE_B = CHANGEME;
-	const uint32_t RIGHT_DRIVE_A = CHANGEME;
-	const uint32_t RIGHT_DRIVE_B = CHANGEME;
+	const uint32_t LEFT_DRIVE_A = 2;
+	const uint32_t LEFT_DRIVE_B = 3;
+	const uint32_t RIGHT_DRIVE_A = 4;
+	const uint32_t RIGHT_DRIVE_B = 5;
 	const uint32_t COLLECTOR = CHANGEME;
 	const uint32_t SHOOTER = CHANGEME;
 }

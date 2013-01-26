@@ -36,7 +36,7 @@ protected:
 private:
 	void Update();
 	
-	data::ComponentData* m_actionData;
+	data::ComponentData* m_componentData;
 	DebouncedJoystick* m_driver_stick;
 	DebouncedJoystick* m_operator_stick;
 	DebouncedJoystick* m_driver_wheel;

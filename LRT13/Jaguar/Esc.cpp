@@ -3,6 +3,7 @@
 
 #include "Esc.h"
 
+#warning Overloaded constructors should chain to one master constructor/function
 /************************** Esc Class ********************/
 ESC::ESC(int channel, LRTEncoder *encoder, string name) :
 	m_name(name)
@@ -19,11 +20,13 @@ ESC::ESC(int channelA, int channelB, LRTEncoder* encoder, string name) :
 	m_encoder = encoder;
 	namea = name + "A";
 	nameb = name + "B";
+
 	m_jag1 = new AsyncCANJaguar(channelA, namea.c_str());
 	m_jag2 = new AsyncCANJaguar(channelB, nameb.c_str());
 
 	m_jag1->ConfigNeutralMode(AsyncCANJaguar::kNeutralMode_Coast);
 	m_jag2->ConfigNeutralMode(AsyncCANJaguar::kNeutralMode_Coast);
+
 	m_cycle_count = 0;
 	printf("Constructed ESC: %s\n", name.c_str());
 }

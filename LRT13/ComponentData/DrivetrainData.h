@@ -43,6 +43,7 @@ namespace drivetrain
 		void setVelocitySetpoint(ForwardOrTurn mode, double setpoint);
 		void setRelativePositionSetpoint(ForwardOrTurn mode, double setpoint,
 				double maxspeed);
+		void setControlMode(ForwardOrTurn mode, ControlMode control);
 	
 		SEM_ID positionOperationSemaphore(ForwardOrTurn mode, double errorThreshold);
 		bool isDesiredPositionOperationComplete(ForwardOrTurn mode,

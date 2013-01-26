@@ -14,10 +14,13 @@
 
 #include "Components/ComponentManager.h"
 #include "Components/ComponentSystemUnitTest.h"
+#include "Components/Drivetrain.h"
 
 #include "Log/LogManager.h"
 
 #include "Utils/CANTester.h"
+
+#define DANGER_CLOSE 1
 
 class LRTRobot13 : public LRTRobotBase
 {

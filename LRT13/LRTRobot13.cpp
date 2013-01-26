@@ -35,6 +35,10 @@ void LRTRobot13::RobotInit()
 	m_componentManager = new ComponentManager();
 	
 	m_componentManager->AddComponent(new ComponentSystemUnitTest());
+	
+#if DANGER_CLOSE
+	m_componentManager->AddComponent(new Drivetrain());
+#endif
 }
 
 static int TimeoutCallback(...)

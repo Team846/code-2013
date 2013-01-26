@@ -25,18 +25,18 @@ void ConfigLoader::onDisable()
 
 void ConfigLoader::whenEnabled()
 {
-	if (m_actionData->configLoaderData->load)
+	if (m_componentData->configLoaderData->load)
 	{
 		m_config->Load();
-		m_actionData->configLoaderData->load = false;
-	} else if (m_actionData->configLoaderData->save)
+		m_componentData->configLoaderData->load = false;
+	} else if (m_componentData->configLoaderData->save)
 	{
 		m_config->Save();
-		m_actionData->configLoaderData->save = false;
-	} else if (m_actionData->configLoaderData->apply)
+		m_componentData->configLoaderData->save = false;
+	} else if (m_componentData->configLoaderData->apply)
 	{
 		m_config->ConfigureAll();
-		m_actionData->configLoaderData->apply = false;
+		m_componentData->configLoaderData->apply = false;
 	}	
 }
 
