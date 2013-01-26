@@ -7,7 +7,9 @@
 Collector::Collector()
 : ComponentWithJaguar("Collector", DriverStationConfig::DigitalIO::COLLECTOR, true, RobotConfig::can::COLLECTOR, "Collector"),
   m_configSection("collector")
-{ }
+{
+	
+}
 
 Collector::~Collector()
 {
@@ -27,7 +29,7 @@ void Collector::onDisable()
 
 void Collector::whenEnabled()
 {
-	
+	m_jaguar->SetDutyCycle(m_dutyCycle);
 }
 
 void Collector::whenDisabled()

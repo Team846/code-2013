@@ -20,6 +20,8 @@
 
 #include "Utils/CANTester.h"
 
+#include "Sensors/DriveEncoders.h"
+
 #define DANGER_CLOSE 1
 
 class LRTRobot13 : public LRTRobotBase

@@ -35,6 +35,11 @@ public:
 	static DriveEncoders& GetInstance();
 
 	/*!
+	 * @brief Destruct instance
+	 */
+	static void Finalize();
+	
+	/*!
 	 * @brief Destructor
 	 */
 	virtual ~DriveEncoders();

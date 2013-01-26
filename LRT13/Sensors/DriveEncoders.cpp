@@ -13,6 +13,11 @@ DriveEncoders& DriveEncoders::GetInstance()
 	return *m_instance;
 }
 
+void DriveEncoders::Finalize()
+{
+	DELETE(m_instance);
+}
+
 DriveEncoders::DriveEncoders() :
 	m_configsection("DriveEncoders")
 {

@@ -41,6 +41,8 @@ void TeleopInputs::Update()
 {
 	RobotData::RobotState current_state = RobotData::GetCurrentState();
 	
+	/************************Drivetrain************************/
+	
 	m_componentData->drivetrainData->setControlMode(FORWARD, VELOCITY_CONTROL);
 	m_componentData->drivetrainData->setControlMode(TURN, VELOCITY_CONTROL);
 	if(current_state == RobotData::TELEOP)
@@ -72,6 +74,8 @@ void TeleopInputs::Update()
 			m_componentData->drivetrainData->setVelocitySetpoint(TURN, forward);
 		}
 	}
+	
+	/************************Config************************/
 	
 	if(m_driver_stick->IsButtonJustPressed(DriverStationConfig::JoystickButtons::SAVE_CONFIG))
 		m_componentData->configLoaderData->save = true;

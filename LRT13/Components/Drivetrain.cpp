@@ -65,7 +65,7 @@ void Drivetrain::onDisable()
 	
 	// immediately stop
 	m_escs[LEFT]->SetDutyCycle(0.0);
-	m_escs[LEFT]->SetDutyCycle(0.0);
+	m_escs[RIGHT]->SetDutyCycle(0.0);
 }
 
 void Drivetrain::whenEnabled()
@@ -80,13 +80,13 @@ void Drivetrain::whenEnabled()
 	Util::Clamp<double>(rightOutput, -1.0, 1.0);
 	
 	m_escs[LEFT]->SetDutyCycle(leftOutput);
-	m_escs[LEFT]->SetDutyCycle(rightOutput);
+	m_escs[RIGHT]->SetDutyCycle(rightOutput);
 }
 
 void Drivetrain::whenDisabled()
 {
 	m_escs[LEFT]->SetDutyCycle(0.0);
-	m_escs[LEFT]->SetDutyCycle(0.0);
+	m_escs[RIGHT]->SetDutyCycle(0.0);
 }
 
 void Drivetrain::Configure()

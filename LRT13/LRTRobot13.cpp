@@ -21,6 +21,7 @@ LRTRobot13::~LRTRobot13()
 	AsyncPrinter::Finalize();
 	ConfigManager::Finalize();
 	LogManager::Finalize();
+	DriveEncoders::Finalize();
 	CANTester::Finalize();
 }
 
