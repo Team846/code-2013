@@ -25,7 +25,11 @@ void ConfigManager::Finalize()
 ConfigManager::ConfigManager()
 : lastReadTime(0)
 {
+	fileData = NULL;
+	configData = NULL;
+	sectionMap = NULL;
 	AsyncPrinter::Printf("Loaded ConfigManager\n");
+	Load();
 }
 
 ConfigManager::~ConfigManager()
@@ -160,7 +164,7 @@ void ConfigManager::ConfigureAll()
 {
 	AsyncPrinter::Printf("Applying configuration to all configurables\n");
 	for (vector<Configurable*>::iterator it = configurables.begin(); it
-			< configurables.end(); it++)
+			!= configurables.end(); it++)
 	{
 		(*it)->Configure();
 	}
@@ -178,14 +182,21 @@ void ConfigManager::LoadConfig(string path)
 	}
 
 	// Clear previous data
-	if (!fileData->empty())
+	if (fileData != NULL)
 	{
-		fileData->clear();
+		delete fileData;
 	}
-	if (!sectionMap->empty())
+	fileData = new list<string>();
+	if (configData != NULL)
 	{
-		sectionMap->clear();
+		delete configData;
 	}
+	configData = new config();
+	if (sectionMap != NULL)
+	{
+		delete sectionMap;
+	}
+	sectionMap = new map<string, list<string>::iterator>();
 
 	// Read lines into list
 	while (!fin.eof())

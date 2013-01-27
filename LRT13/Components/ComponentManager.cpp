@@ -3,6 +3,7 @@
 #include "Drivetrain.h"
 #include "Collector.h"
 #include "../ComponentData/RobotData.h"
+#include "../Utils/AsyncPrinter.h"
 
 ComponentManager::ComponentManager()
 {
@@ -27,15 +28,6 @@ void ComponentManager::Update()
 		
 		if(comp == NULL)
 			continue;
-		
-		if(comp->IsEnabled())
-		{
-			comp->whenEnabled();
-		}
-		else
-		{
-			comp->whenDisabled();
-		}
 		
 		if (RobotData::GetCurrentState() != RobotData::DISABLED || !comp->EnableRequired())
 		{
@@ -70,11 +62,21 @@ void ComponentManager::Update()
 				comp->Disable();
 			}
 		}
+		
+		if(comp->IsEnabled())
+		{
+			comp->whenEnabled();
+		}
+		else
+		{
+			comp->whenDisabled();
+		}
 	}
 }
 
 void ComponentManager::AddComponent(Component* comp)
 {
+	AsyncPrinter::Printf("Adding component: %s\n", comp->GetName().c_str());
 	AddComponent(comp->GetName(), comp);
 }
 

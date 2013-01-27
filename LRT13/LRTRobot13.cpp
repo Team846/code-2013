@@ -29,8 +29,6 @@ void LRTRobot13::RobotInit()
 {
 	AsyncPrinter::Initialize();
 	
-	ConfigManager::Instance()->ConfigureAll();
-	
 	//CANTester::Instance()->Start();
 	
 	m_componentManager = new ComponentManager();
@@ -40,6 +38,8 @@ void LRTRobot13::RobotInit()
 #if DANGER_CLOSE
 	m_componentManager->AddComponent(new Drivetrain());
 #endif
+	
+	ConfigManager::Instance()->ConfigureAll();
 }
 
 static int TimeoutCallback(...)

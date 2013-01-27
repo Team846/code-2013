@@ -5,6 +5,7 @@
 #include "../Config/DriverStationConfig.h"
 #include "../Sensors/DriveEncoders.h"
 #include "../Utils/Util.h"
+#include "../Utils/AsyncPrinter.h"
 #include "../Jaguar/ESC.h"
 
 using namespace data;

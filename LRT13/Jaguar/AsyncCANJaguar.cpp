@@ -29,7 +29,7 @@ AsyncCANJaguar::AsyncCANJaguar(UINT8 channel, const char* name) :
 	m_should_disable_position_limits = false;
 	m_collection_flags = 0;
 	m_last_game_state = data::RobotData::DISABLED;
-	next_jaguar_ = jaguar_vector[jaguar_vector.size() - 1];
+	next_jaguar_ = jaguar_vector.size() ? jaguar_vector[jaguar_vector.size() - 1] : NULL;
 	jaguar_vector.push_back(this);
 
 	if (name == NULL)
@@ -45,7 +45,7 @@ AsyncCANJaguar::AsyncCANJaguar(UINT8 channel, const char* name) :
 	//	m_control_mode.disableCaching();
 	//	m_setpoint.disableCaching();
 
-	printf("Created Jaguar %2d: %s\n", channel, m_name);
+	printf("Constructed Jaguar %2d: %s\n", channel, m_name);
 }
 
 AsyncCANJaguar::~AsyncCANJaguar()
