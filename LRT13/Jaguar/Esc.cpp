@@ -90,7 +90,7 @@ ESC::brakeAndDutyCycle ESC::CalculateBrakeAndDutyCycle(float desired_speed,
 void ESC::SetDutyCycle(float dutyCycle)
 {
 	double speed = m_encoder->GetRate()
-			/ DriveEncoders::GetInstance().getMaxEncoderRate();
+			/ DriveEncoders::GetInstance()->getMaxEncoderRate();
 	speed = Util::Clamp<double>(speed, -1, 1);
 	brakeAndDutyCycle command = CalculateBrakeAndDutyCycle(dutyCycle, speed);
 

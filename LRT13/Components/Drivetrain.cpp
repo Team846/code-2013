@@ -16,9 +16,9 @@ Drivetrain::Drivetrain()
  , m_driveEncoders(DriveEncoders::GetInstance())
 {
 	m_escs[LEFT]  = new ESC(RobotConfig::can::LEFT_DRIVE_A, RobotConfig::can::LEFT_DRIVE_B,
-		m_driveEncoders.getEncoder(data::drivetrain::LEFT), "left");
+		m_driveEncoders->getEncoder(data::drivetrain::LEFT), "left");
 	m_escs[RIGHT] = new ESC(RobotConfig::can::RIGHT_DRIVE_A, RobotConfig::can::RIGHT_DRIVE_B ,
-		m_driveEncoders.getEncoder(data::drivetrain::RIGHT), "right");
+		m_driveEncoders->getEncoder(data::drivetrain::RIGHT), "right");
 }
 
 Drivetrain::~Drivetrain()
@@ -40,9 +40,9 @@ double Drivetrain::ComputeOutput(data::drivetrain::ForwardOrTurn axis)
 		//fall through the switch
 	case data::drivetrain::VELOCITY_CONTROL:
 		if (axis == data::drivetrain::FORWARD)
-			m_PIDs[VELOCITY][axis].setInput(m_driveEncoders.getNormalizedForwardSpeed());
+			m_PIDs[VELOCITY][axis].setInput(m_driveEncoders->getNormalizedForwardSpeed());
 		else
-			m_PIDs[VELOCITY][axis].setInput(m_driveEncoders.getNormalizedTurningSpeed());
+			m_PIDs[VELOCITY][axis].setInput(m_driveEncoders->getNormalizedTurningSpeed());
 			
 		m_PIDs[VELOCITY][axis].setSetpoint(velocitySetpoint);
 		

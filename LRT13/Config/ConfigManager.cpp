@@ -184,17 +184,17 @@ void ConfigManager::LoadConfig(string path)
 	// Clear previous data
 	if (fileData != NULL)
 	{
-		delete fileData;
+		DELETE(fileData);
 	}
 	fileData = new list<string>();
 	if (configData != NULL)
 	{
-		delete configData;
+		DELETE(configData);
 	}
 	configData = new config();
 	if (sectionMap != NULL)
 	{
-		delete sectionMap;
+		DELETE(sectionMap);
 	}
 	sectionMap = new map<string, list<string>::iterator>();
 

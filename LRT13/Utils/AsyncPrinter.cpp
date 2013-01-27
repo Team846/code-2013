@@ -85,6 +85,18 @@ int AsyncPrinter::Println(const char * msg, ...)
 	return returned;
 }
 
+void AsyncPrinter::DbgPrint(const char* msg, ...)
+{
+#ifdef DEBUG
+	va_list args;
+	va_start(args, msg);
+	
+	printf(msg, args);
+	
+	va_end(args);
+#endif
+}
+
 INT32 AsyncPrinter::Tick()
 {
 	UINT32 printed = 0;

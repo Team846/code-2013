@@ -1,6 +1,8 @@
 #ifndef DEFINES_H_
 #define DEFINES_H_
 
+#define DEBUG
+
 #define DELETE( ptr ) \
 	delete ptr; \
 	ptr = NULL;

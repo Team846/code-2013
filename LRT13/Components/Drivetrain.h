@@ -37,7 +37,7 @@ private:
 	const static int VELOCITY = 1;
 	PID m_PIDs[2][2];
 	
-	DriveEncoders &m_driveEncoders;
+	DriveEncoders* m_driveEncoders;
 	ESC *m_escs[2];
 	
 	bool m_isEnabled;

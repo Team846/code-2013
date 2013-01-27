@@ -6,11 +6,12 @@ DriveEncoders* DriveEncoders::m_instance = NULL;
 
 using namespace data::drivetrain;
 
-DriveEncoders& DriveEncoders::GetInstance()
+DriveEncoders* DriveEncoders::GetInstance()
 {
 	if (m_instance == NULL)
 		m_instance = new DriveEncoders();
-	return *m_instance;
+	
+	return m_instance;
 }
 
 void DriveEncoders::Finalize()
@@ -32,8 +33,8 @@ DriveEncoders::DriveEncoders() :
 	m_encoders[LEFT]->SetDistancePerPulse(1);
 	m_encoders[RIGHT]->SetDistancePerPulse(1);
 
-	m_encoders[LEFT]->Start();
-	m_encoders[RIGHT]->Start();
+	//m_encoders[LEFT]->Start();
+	//m_encoders[RIGHT]->Start();
 	printf("Construct Drive Encoders\n");
 
 	MAX_ENCODER_RATE = MAX_TURNING_RATE

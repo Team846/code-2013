@@ -76,7 +76,7 @@ void ComponentManager::Update()
 
 void ComponentManager::AddComponent(Component* comp)
 {
-	AsyncPrinter::Printf("Adding component: %s\n", comp->GetName().c_str());
+	AsyncPrinter::DbgPrint("Adding component: %s\n", comp->GetName().c_str());
 	AddComponent(comp->GetName(), comp);
 }
 

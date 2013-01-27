@@ -32,7 +32,7 @@ public:
 	 * @brief Gets the singleton instance
 	 * @return the instance
 	 */
-	static DriveEncoders& GetInstance();
+	static DriveEncoders* GetInstance();
 
 	/*!
 	 * @brief Destruct instance

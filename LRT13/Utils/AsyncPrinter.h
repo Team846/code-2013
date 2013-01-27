@@ -1,11 +1,11 @@
 #ifndef ASYNC_PRINTER_H_
 #define ASYNC_PRINTER_H_
 
-#include "../Process/AsyncProcess.h"
-
-#include "WPILib.h"
+#include <WPILib.h>
 #include <queue>
 #include <string>
+
+#include "../Process/AsyncProcess.h"
 
 /*!
  * @brief Asynchronous process for non-blocking printf
@@ -19,8 +19,9 @@ public:
 	static void Initialize();
 	static void Finalize();
 	
-	static int Printf(const char * msg, ...);
-	static int Println(const char * msg, ...);
+	static int Printf(const char* msg, ...);
+	static int Println(const char* msg, ...);
+	static void DbgPrint(const char* msg, ...);
 	
 	AsyncPrinter();
 	~AsyncPrinter();
