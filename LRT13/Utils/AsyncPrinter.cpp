@@ -91,7 +91,11 @@ void AsyncPrinter::DbgPrint(const char* msg, ...)
 	va_list args;
 	va_start(args, msg);
 	
-	printf(msg, args);
+	char res[256];
+	strcpy(res, msg);
+	strcat(res, "\n");
+		
+	printf(res, args);
 	
 	va_end(args);
 #endif

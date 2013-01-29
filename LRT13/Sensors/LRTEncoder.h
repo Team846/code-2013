@@ -3,6 +3,7 @@
 
 #include "WPILib.h"
 #include "../Log/Loggable.h"
+#include "../Utils/AsyncPrinter.h"
 
 /*!
  * @brief LRTEncoder patches bugs in WPILib's Encoder class.

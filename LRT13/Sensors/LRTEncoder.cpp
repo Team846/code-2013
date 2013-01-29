@@ -22,6 +22,12 @@ void LRTEncoder::Start()
 
 double LRTEncoder::GetRate()
 {
+	AsyncPrinter::DbgPrint("getrate");
+	AsyncPrinter::DbgPrint("%s", m_error.GetFilename()); // crashes
+	if(StatusIsFatal()) // crashes
+		AsyncPrinter::DbgPrint("status fatal");
+	AsyncPrinter::DbgPrint("i'm still alive");
+	
 	// WPILib's GetRate() returns NaN if the rate is 0
 	// Karthik Viswanathan and Brian Axelrod, January 29th, 2011
 	double rate = Encoder::GetRate();

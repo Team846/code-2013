@@ -89,9 +89,17 @@ ESC::brakeAndDutyCycle ESC::CalculateBrakeAndDutyCycle(float desired_speed,
 
 void ESC::SetDutyCycle(float dutyCycle)
 {
+	AsyncPrinter::DbgPrint("Setting duty cycle");
+	
 	double speed = m_encoder->GetRate()
 			/ DriveEncoders::GetInstance()->getMaxEncoderRate();
+	
+	AsyncPrinter::DbgPrint("Got the speed: %lf", speed);
+	
 	speed = Util::Clamp<double>(speed, -1, 1);
+	
+	AsyncPrinter::DbgPrint("Clampeds the speed: %lf", speed);
+	
 	brakeAndDutyCycle command = CalculateBrakeAndDutyCycle(dutyCycle, speed);
 
 	//	static int e = 0; 

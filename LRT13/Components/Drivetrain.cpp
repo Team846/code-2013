@@ -81,11 +81,12 @@ void Drivetrain::whenEnabled()
 	Util::Clamp<double>(rightOutput, -1.0, 1.0);
 	
 	m_escs[LEFT]->SetDutyCycle(leftOutput);
-	m_escs[RIGHT]->SetDutyCycle(rightOutput);
+	//m_escs[RIGHT]->SetDutyCycle(rightOutput);
 }
 
 void Drivetrain::whenDisabled()
 {
+	AsyncPrinter::Printf("Drivetrain is disabled\n");
 	m_escs[LEFT]->SetDutyCycle(0.0);
 	m_escs[RIGHT]->SetDutyCycle(0.0);
 }
