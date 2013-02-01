@@ -40,6 +40,8 @@ void LRTRobot13::RobotInit()
 #endif
 	
 	ConfigManager::Instance()->ConfigureAll();
+	
+	m_teleop = new TeleopInputs("TeleopInputs", 1);
 }
 
 static int TimeoutCallback(...)
@@ -51,14 +53,16 @@ void LRTRobot13::Run()
 {	
 	double lastUpdate = 0.0;
 	
+	int e = -1;
+	
 	while(true)
 	{
 		lastUpdate = Timer::GetFPGATimestamp();
 		
-		static int e = -1;
-		
 		wdStart(_watchdog, sysClkRateGet() / RobotConfig::LOOP_RATE,
 				TimeoutCallback, 0);
+		
+		m_teleop->RunOneCycle();
 		
 		UpdateGameState();
 		
@@ -71,8 +75,8 @@ void LRTRobot13::Run()
 		
 		double toSleep = (int)((1000.0 / RobotConfig::LOOP_RATE) - timeSpent) / 1000.0;
 
-		if(e++ % (RobotConfig::LOOP_RATE * 10) == 0)
-			AsyncPrinter::Println("Tick: %d", e);
+		if(e++ % (RobotConfig::LOOP_RATE) == 0)
+			AsyncPrinter::DbgPrint("Tick: %d", e);
 		
 		Wait(toSleep);
 	}

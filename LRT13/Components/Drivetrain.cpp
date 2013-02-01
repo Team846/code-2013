@@ -46,8 +46,8 @@ double Drivetrain::ComputeOutput(data::drivetrain::ForwardOrTurn axis)
 			
 		m_PIDs[VELOCITY][axis].setSetpoint(velocitySetpoint);
 		
-		
 		rawOutput = m_PIDs[VELOCITY][axis].update(1.0 / RobotConfig::LOOP_RATE);
+		printf("setpoint: %lf\n", rawOutput);
 		break;
 	case data::drivetrain::OPEN_LOOP:
 		break;
@@ -57,19 +57,16 @@ double Drivetrain::ComputeOutput(data::drivetrain::ForwardOrTurn axis)
 
 void Drivetrain::onEnable()
 {
-	m_isEnabled = true;
 }
 
 void Drivetrain::onDisable()
 {
-	m_isEnabled = false;
-	
 	// immediately stop
 	m_escs[LEFT]->SetDutyCycle(0.0);
 	m_escs[RIGHT]->SetDutyCycle(0.0);
 }
 
-void Drivetrain::whenEnabled()
+void Drivetrain::enabledPeriodic()
 {
 	double fwdOutput = ComputeOutput(data::drivetrain::FORWARD); //positive means forward
 	double turnOutput = ComputeOutput(data::drivetrain::TURN);   //positive means turning counter-clockwise. Matches the way driveencoders work.
@@ -79,14 +76,13 @@ void Drivetrain::whenEnabled()
 	
 	Util::Clamp<double>(leftOutput, -1.0, 1.0);
 	Util::Clamp<double>(rightOutput, -1.0, 1.0);
-	
+
 	m_escs[LEFT]->SetDutyCycle(leftOutput);
-	//m_escs[RIGHT]->SetDutyCycle(rightOutput);
+	m_escs[RIGHT]->SetDutyCycle(rightOutput);
 }
 
-void Drivetrain::whenDisabled()
+void Drivetrain::disabledPeriodic()
 {
-	AsyncPrinter::Printf("Drivetrain is disabled\n");
 	m_escs[LEFT]->SetDutyCycle(0.0);
 	m_escs[RIGHT]->SetDutyCycle(0.0);
 }

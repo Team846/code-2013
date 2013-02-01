@@ -18,7 +18,7 @@ void LRTRobotBase::StartCompetition()
 
 	// first and one-time initialization
 	RobotInit();
-		
+	
 	Run();
 }
 

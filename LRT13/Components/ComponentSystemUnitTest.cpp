@@ -22,7 +22,7 @@ void ComponentSystemUnitTest::onDisable()
 	AsyncPrinter::Println("ComponentSystemUnitTest::onDisable()");
 }
 
-void ComponentSystemUnitTest::whenEnabled()
+void ComponentSystemUnitTest::enabledPeriodic()
 {
 	static int e = 0;
 	
@@ -32,7 +32,7 @@ void ComponentSystemUnitTest::whenEnabled()
 	}
 }
 
-void ComponentSystemUnitTest::whenDisabled()
+void ComponentSystemUnitTest::disabledPeriodic()
 {
 	static int e = 0;
 	

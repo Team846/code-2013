@@ -33,10 +33,10 @@ public:
 	/*!
 	 * @brief Allows the component to update itself when enabled.
 	 */
-	virtual void whenEnabled();
+	virtual void enabledPeriodic();
 	
 	/*!
 	 * @brief Allows the component to execute code when disabled.
 	 */
-	virtual void whenDisabled();
+	virtual void disabledPeriodic();
 };

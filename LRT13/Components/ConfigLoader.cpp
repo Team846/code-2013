@@ -23,7 +23,7 @@ void ConfigLoader::onDisable()
 	m_isEnabled = false;
 }
 
-void ConfigLoader::whenEnabled()
+void ConfigLoader::enabledPeriodic()
 {
 	if (m_componentData->configLoaderData->load)
 	{
@@ -40,7 +40,7 @@ void ConfigLoader::whenEnabled()
 	}	
 }
 
-void ConfigLoader::whenDisabled()
+void ConfigLoader::disabledPeriodic()
 {
 	static int e = 0;
 	if (++e % 5 == 0)

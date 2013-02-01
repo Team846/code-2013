@@ -48,11 +48,11 @@ void ComponentManager::Update()
 			
 			if(comp->IsEnabled())
 			{
-				comp->whenEnabled();
+				comp->enabledPeriodic();
 			}
 			else
 			{
-				comp->whenDisabled();
+				comp->disabledPeriodic();
 			}
 		} 
 		else
@@ -65,11 +65,11 @@ void ComponentManager::Update()
 		
 		if(comp->IsEnabled())
 		{
-			comp->whenEnabled();
+			comp->enabledPeriodic();
 		}
 		else
 		{
-			comp->whenDisabled();
+			comp->disabledPeriodic();
 		}
 	}
 }

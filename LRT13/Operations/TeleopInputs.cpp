@@ -8,7 +8,7 @@
 using namespace data;
 
 TeleopInputs::TeleopInputs(char * taskName, INT32 priority) :
-	AsyncProcess(taskName, priority)
+	SynchronizedProcess(taskName, priority)
 {
 	m_componentData = ComponentData::GetInstance();
 	m_driver_stick = new DebouncedJoystick(DriverStationConfig::JoystickConfig::DRIVER_STICK_PORT,
@@ -20,6 +20,7 @@ TeleopInputs::TeleopInputs(char * taskName, INT32 priority) :
 	m_driver_wheel = new DebouncedJoystick(DriverStationConfig::JoystickConfig::DRIVER_WHEEL_PORT,
 			DriverStationConfig::JoystickConfig::NUM_WHEEL_BUTTONS,
 			DriverStationConfig::JoystickConfig::NUM_WHEEL_AXES);
+	Start();
 }
 
 TeleopInputs::~TeleopInputs()
@@ -31,7 +32,7 @@ INT32 TeleopInputs::Tick()
 {
 	m_driver_stick->Update();
 	m_operator_stick->Update();
-	
+	m_driver_wheel->Update();
 	Update();
 	
 	return 0;
@@ -69,9 +70,8 @@ void TeleopInputs::Update()
 			const double turnConstantRadius = turn * absForward;
 			turnComposite = turnInPlace * (blend) + turnConstantRadius * (1
 					- blend);
-
 			m_componentData->drivetrainData->setVelocitySetpoint(FORWARD, forward);
-			m_componentData->drivetrainData->setVelocitySetpoint(TURN, forward);
+			m_componentData->drivetrainData->setVelocitySetpoint(TURN, turnComposite);
 		}
 	}
 	

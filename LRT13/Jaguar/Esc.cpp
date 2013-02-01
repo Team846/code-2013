@@ -20,7 +20,7 @@ ESC::ESC(int channelA, int channelB, LRTEncoder* encoder, string name) :
 	m_encoder = encoder;
 	namea = name + "A";
 	nameb = name + "B";
-
+	
 	m_jag1 = new AsyncCANJaguar(channelA, namea.c_str());
 	m_jag2 = new AsyncCANJaguar(channelB, nameb.c_str());
 
@@ -89,16 +89,10 @@ ESC::brakeAndDutyCycle ESC::CalculateBrakeAndDutyCycle(float desired_speed,
 
 void ESC::SetDutyCycle(float dutyCycle)
 {
-	AsyncPrinter::DbgPrint("Setting duty cycle");
-	
 	double speed = m_encoder->GetRate()
 			/ DriveEncoders::GetInstance()->getMaxEncoderRate();
-	
-	AsyncPrinter::DbgPrint("Got the speed: %lf", speed);
-	
+
 	speed = Util::Clamp<double>(speed, -1, 1);
-	
-	AsyncPrinter::DbgPrint("Clampeds the speed: %lf", speed);
 	
 	brakeAndDutyCycle command = CalculateBrakeAndDutyCycle(dutyCycle, speed);
 

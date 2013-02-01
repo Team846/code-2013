@@ -26,8 +26,8 @@ public:
 	virtual void onEnable(); 
 	virtual void onDisable();
 	
-	virtual void whenEnabled();
-	virtual void whenDisabled();
+	virtual void enabledPeriodic();
+	virtual void disabledPeriodic();
 	
 	virtual void Configure();
 	virtual void Log();

@@ -25,12 +25,12 @@ void Shooter::onDisable()
 	m_jaguar->SetDutyCycle(0.0F);
 }
 
-void Shooter::whenEnabled()
+void Shooter::enabledPeriodic()
 {
 	
 }
 
-void Shooter::whenDisabled()
+void Shooter::disabledPeriodic()
 {
 	m_jaguar->SetDutyCycle(0.0F);
 }

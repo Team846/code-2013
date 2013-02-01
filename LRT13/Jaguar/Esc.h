@@ -53,13 +53,13 @@ public:
 	void ResetCache();
 
 	void Disable();
+	LRTEncoder* m_encoder;
 private:
 	AsyncCANJaguar *m_jag1, *m_jag2;
 	std::string namea, nameb;
 	//	CANJaguar *m_jag1, *m_jag2;
 
-	LRTEncoder* m_encoder;
-
+	
 	string m_name;
 	int m_cycle_count;
 

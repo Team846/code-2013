@@ -27,12 +27,12 @@ void Collector::onDisable()
 	m_jaguar->SetDutyCycle(0.0F);
 }
 
-void Collector::whenEnabled()
+void Collector::enabledPeriodic()
 {
 	m_jaguar->SetDutyCycle(m_dutyCycle);
 }
 
-void Collector::whenDisabled()
+void Collector::disabledPeriodic()
 {
 	m_jaguar->SetDutyCycle(0.0F);
 }

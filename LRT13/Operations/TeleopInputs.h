@@ -3,7 +3,7 @@
 
 #include <WPILib.h>
 
-#include "../Process/AsyncProcess.h"
+#include "../Process/SynchronizedProcess.h"
 #include "../ComponentData/RobotData.h"
 #include "../ComponentData/DrivetrainData.h"
 #include "../ComponentData/ConfigLoaderData.h"
@@ -23,7 +23,7 @@ class DebouncedJoystick;
  * @brief Processes driver station inputs in teleoperated mode
  * @author Raphael Chang
  */
-class TeleopInputs : public AsyncProcess
+class TeleopInputs : public SynchronizedProcess
 {
 public:
 	TeleopInputs(char * taskName, INT32 priority=Task::kDefaultPriority);

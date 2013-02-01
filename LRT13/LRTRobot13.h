@@ -18,6 +18,8 @@
 
 #include "Log/LogManager.h"
 
+#include "Operations/TeleopInputs.h"
+
 #include "Utils/CANTester.h"
 
 #include "Sensors/DriveEncoders.h"
@@ -39,6 +41,7 @@ class LRTRobot13 : public LRTRobotBase
 		void UpdateGameState();
 		
 		ComponentManager* m_componentManager;
+		TeleopInputs* m_teleop;
 		
 		WDOG_ID _watchdog;
 

@@ -27,8 +27,8 @@ public:
 	virtual void onEnable(); 
 	virtual void onDisable();
 	
-	virtual void whenEnabled();
-	virtual void whenDisabled();
+	virtual void enabledPeriodic();
+	virtual void disabledPeriodic();
 	
 	virtual void Configure();
 	virtual void Log();
@@ -38,9 +38,7 @@ private:
 	PID m_PIDs[2][2];
 	
 	DriveEncoders* m_driveEncoders;
-	ESC *m_escs[2];
-	
-	bool m_isEnabled;
+	ESC *m_escs[4];
 	
 	void ConfigurePIDObject(PID *pid, std::string objName, bool feedForward);
 	double ComputeOutput(data::drivetrain::ForwardOrTurn axis);
