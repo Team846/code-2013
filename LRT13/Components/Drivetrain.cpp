@@ -47,7 +47,6 @@ double Drivetrain::ComputeOutput(data::drivetrain::ForwardOrTurn axis)
 		m_PIDs[VELOCITY][axis].setSetpoint(velocitySetpoint);
 		
 		rawOutput = m_PIDs[VELOCITY][axis].update(1.0 / RobotConfig::LOOP_RATE);
-		printf("setpoint: %lf\n", rawOutput);
 		break;
 	case data::drivetrain::OPEN_LOOP:
 		break;

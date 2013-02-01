@@ -55,7 +55,7 @@ namespace Network
 		 */
 		void Write(INT32 i);
 		/*!
-		 * @brief Writes a two-byte valueto the buffer.
+		 * @brief Writes a two-byte value to the buffer.
 		 */
 		void Write(INT16 s);
 		/*!

@@ -16,7 +16,7 @@ void AsyncCANJaguar::println(const char * str)
 }
 
 AsyncCANJaguar::AsyncCANJaguar(UINT8 channel, const char* name) :
-			AsyncProcess(
+			SynchronizedProcess(
 					(std::string("JAG#") + Util::ToString<int>(channel)).c_str()),
 			CANJaguar(channel),
 			Loggable(),
@@ -46,6 +46,7 @@ AsyncCANJaguar::AsyncCANJaguar(UINT8 channel, const char* name) :
 	//	m_setpoint.disableCaching();
 
 	printf("Constructed Jaguar %2d: %s\n", channel, m_name);
+	Start();
 }
 
 AsyncCANJaguar::~AsyncCANJaguar()
@@ -60,7 +61,7 @@ AsyncCANJaguar::~AsyncCANJaguar()
 	m_name = NULL;
 }
 
-void AsyncCANJaguar::work()
+INT32 AsyncCANJaguar::Tick()
 {
 	if (m_channel != 0)
 	{
@@ -329,6 +330,7 @@ void AsyncCANJaguar::work()
 	{
 		AsyncPrinter::Printf("Jaguar on channel 0!\r\n");
 	}
+	return 0;
 }
 
 //Set() is ambiguous, since it doesn't include the mode.

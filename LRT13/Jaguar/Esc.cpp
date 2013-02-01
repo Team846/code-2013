@@ -150,6 +150,8 @@ void ESC::SetDutyCycle(float dutyCycle)
 
 #define LINEARIZE 1
 #if LINEARIZE
+	AsyncPrinter::Printf("%lf\n", command.dutyCycle);
+	AsyncPrinter::Printf("%lf\n", speed);
 	m_jag1->SetDutyCycle(command.dutyCycle);
 	m_jag2->SetDutyCycle(command.dutyCycle);
 #else

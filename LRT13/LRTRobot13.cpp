@@ -53,7 +53,7 @@ void LRTRobot13::Run()
 {	
 	double lastUpdate = 0.0;
 	
-	int e = -1;
+//	int e = -1;
 	
 	while(true)
 	{
@@ -68,6 +68,11 @@ void LRTRobot13::Run()
 		
 		m_componentManager->Update();
 		
+		for (vector<AsyncCANJaguar*>::iterator it = AsyncCANJaguar::jaguar_vector.begin(); it < AsyncCANJaguar::jaguar_vector.end(); it++)
+		{
+			(*it)->RunOneCycle();
+		}
+		
 		wdCancel(_watchdog);
 		
 		double now = Timer::GetFPGATimestamp();
@@ -75,8 +80,8 @@ void LRTRobot13::Run()
 		
 		double toSleep = (int)((1000.0 / RobotConfig::LOOP_RATE) - timeSpent) / 1000.0;
 
-		if(e++ % (RobotConfig::LOOP_RATE) == 0)
-			AsyncPrinter::DbgPrint("Tick: %d", e);
+//		if(e++ % (RobotConfig::LOOP_RATE) == 0)
+//			AsyncPrinter::DbgPrint("Tick: %d", e);
 		
 		Wait(toSleep);
 	}

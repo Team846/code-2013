@@ -1,12 +1,12 @@
 #include "SynchronizedProcess.h"
 
-SynchronizedProcess::SynchronizedProcess(char * taskName, INT32 priority)
+SynchronizedProcess::SynchronizedProcess(const char * taskName, INT32 priority)
 	: AsyncProcess(taskName, priority)
 {
 	m_syncSem = semBCreate(SEM_Q_PRIORITY, SEM_EMPTY);
 }
 
-SynchronizedProcess::SynchronizedProcess(char * taskName, SEM_ID syncSem, INT32 priority)
+SynchronizedProcess::SynchronizedProcess(const char * taskName, SEM_ID syncSem, INT32 priority)
 	: AsyncProcess(taskName, priority)
 {
 	m_syncSem = syncSem;

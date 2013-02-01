@@ -14,8 +14,8 @@
 class SynchronizedProcess : public AsyncProcess
 {
 public:
-	SynchronizedProcess(char * taskName, INT32 priority=Task::kDefaultPriority);
-	SynchronizedProcess(char * taskName, SEM_ID syncSem, INT32 priority=Task::kDefaultPriority);
+	SynchronizedProcess(const char * taskName, INT32 priority=Task::kDefaultPriority);
+	SynchronizedProcess(const char * taskName, SEM_ID syncSem, INT32 priority=Task::kDefaultPriority);
 	virtual ~SynchronizedProcess();
 	/*!
 	 * @brief Gives a semaphore which allows Tick() to be called

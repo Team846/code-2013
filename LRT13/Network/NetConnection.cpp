@@ -82,7 +82,6 @@ int NetConnection::Open(int options, ...)
 
 int NetConnection::Close()
 {
-	
 	return close(m_socket);
 }
 

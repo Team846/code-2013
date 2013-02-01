@@ -8,7 +8,7 @@
 
 #include "../ComponentData/RobotData.h"
 
-#include "../Process/AsyncProcess.h"
+#include "../Process/SynchronizedProcess.h"
 
 #include "../Utils/Util.h"
 #include "../Utils/PrintInConstructor.h"
@@ -26,7 +26,7 @@
  * @author Karthik Viswanathan
  * @author David Giandomenico
  */
-class AsyncCANJaguar: public AsyncProcess, public CANJaguar, public Loggable
+class AsyncCANJaguar : public SynchronizedProcess, public CANJaguar, public Loggable
 {
 public:
 	// collection flags
@@ -138,7 +138,11 @@ public:
 	 * @param velocity
 	 */
 	void SetVelocity(float velocity);
-
+protected:
+	/*!
+	 * @brief Does the actual CommTask communication, not including timing
+	 */
+	INT32 Tick();
 private:
 	//don't let external objects control the ESC with the ambiguous Set() cmd
 	void Set(float setpoint, UINT8 syncGroup = 0);
@@ -397,11 +401,6 @@ public:
 	{
 		return m_expire;
 	}
-
-	/*!
-	 * @brief Does the actual CommTask communication, not including timing
-	 */
-	void work();
 
 	/*!
 	 * Simple wrapper for GetFaults() == 0
