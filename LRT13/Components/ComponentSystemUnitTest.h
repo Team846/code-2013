@@ -3,6 +3,11 @@
 #include "../Config/RobotConfig.h"
 #include "../Utils/AsyncPrinter.h"
 
+#include "../Network/NetConnection.h"
+#include "../Network/NetBuffer.h"
+
+using namespace Network;
+
 /*!
  * @brief Test component for the Component system
  * @author Tony Peng
@@ -39,4 +44,8 @@ public:
 	 * @brief Allows the component to execute code when disabled.
 	 */
 	virtual void disabledPeriodic();
+	
+private:
+	NetBuffer* m_netBuffer;
+	NetConnection* m_netConnection;
 };

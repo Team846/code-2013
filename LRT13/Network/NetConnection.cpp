@@ -13,6 +13,20 @@ NetConnection::~NetConnection()
 	Close();
 }
 
+void NetConnection::Update()
+{
+	int received;
+	char rcv_buffer[MAX_RECEIVE_BUFFER_SIZE];
+	int addr_size = sizeof(m_remote_spec);
+	
+	while((received = recvfrom(m_socket, rcv_buffer, MAX_RECEIVE_BUFFER_SIZE, 0, (struct sockaddr*)&m_remote_spec, &addr_size)) > 0)
+	{
+		NetBuffer* buff = new NetBuffer(rcv_buffer, received);
+		
+		m_receivedMessages.push(buff);
+	}
+}
+
 int NetConnection::Open(int options, ...)
 {
 	m_socket = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
@@ -68,6 +82,7 @@ int NetConnection::Open(int options, ...)
 
 int NetConnection::Close()
 {
+	
 	return close(m_socket);
 }
 

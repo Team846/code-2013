@@ -11,6 +11,7 @@
 //#include <arpa/inet.h> // <-- BLACK MAGIC
 
 #include <iostream>
+#include <queue>
 
 #include <WPILib.h>
 
@@ -20,6 +21,8 @@
 #define SEND_FAILED_BUFFER_ALREADY_SENT -1000000000
 #define SEND_FAILED_BUFFER_INVALID -1000000001
 #define SEND_FAILED_UNKNOWN_ERROR -10000000002
+
+#define MAX_RECEIVE_BUFFER_SIZE 1024
 
 using namespace std;
 using namespace Network;
@@ -54,10 +57,15 @@ namespace Network
 		int Close();
 		
 		int Send(NetBuffer buff);
-		
+	protected:
+		INT32 Tick();
 	private:
+		void Update();
+		
 		char* m_ip;
 		int m_port;
+		
+		queue<NetBuffer*> m_receivedMessages;
 		
 		NetConnectionType m_connType;
 		

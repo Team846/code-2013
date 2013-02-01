@@ -4,6 +4,9 @@ ComponentSystemUnitTest::ComponentSystemUnitTest()
 	: Component("ComponentSystemUnitTest", DriverStationConfig::DigitalIO::COMP_UNIT_TEST, true)
 {
 	AsyncPrinter::Println("ComponentSystemUnitTest::ctor()");
+	
+	m_netConnection = new NetConnection(INADDR_ANY, 1337, Network::SERVER);
+	m_netBuffer = new NetBuffer();
 }
 
 ComponentSystemUnitTest::~ComponentSystemUnitTest()
