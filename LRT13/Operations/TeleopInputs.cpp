@@ -20,7 +20,6 @@ TeleopInputs::TeleopInputs(char * taskName, INT32 priority) :
 	m_driver_wheel = new DebouncedJoystick(DriverStationConfig::JoystickConfig::DRIVER_WHEEL_PORT,
 			DriverStationConfig::JoystickConfig::NUM_WHEEL_BUTTONS,
 			DriverStationConfig::JoystickConfig::NUM_WHEEL_AXES);
-	Start();
 }
 
 TeleopInputs::~TeleopInputs()

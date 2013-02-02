@@ -15,12 +15,10 @@ ConfigLoader::~ConfigLoader()
 
 void ConfigLoader::onEnable()
 {
-	m_isEnabled = true;
 }
 
 void ConfigLoader::onDisable()
 {
-	m_isEnabled = false;
 }
 
 void ConfigLoader::enabledPeriodic()

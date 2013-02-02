@@ -7,12 +7,12 @@ LRTRobot13::LRTRobot13()
 {
 	_watchdog = wdCreate();
 	
-	printf("LRTRobot13 constructor\n");
+	printf("LRTRobot13 Constructed\n");
 }
 
 LRTRobot13::~LRTRobot13()
 {
-	printf("LRTRobot13 destructing\n");
+	printf("LRTRobot13 Destructing\n");
 	
 	DELETE(m_componentManager);
 	
@@ -30,22 +30,28 @@ void LRTRobot13::RobotInit()
 	AsyncPrinter::Initialize();
 	
 	//CANTester::Instance()->Start();
-	
+
+	AsyncPrinter::Printf("Creating Components\n");
 	m_componentManager = new ComponentManager();
-	
 //	m_componentManager->AddComponent(new ComponentSystemUnitTest());
-	
-#if DANGER_CLOSE
 	m_componentManager->AddComponent(new Drivetrain());
-#endif
+
+	AsyncPrinter::Printf("Starting TeleopInputs Task\n");
+	m_teleop = new TeleopInputs("TeleopInputs", 1);
+	m_teleop->Start();
+	
+	AsyncPrinter::Printf("Starting Jaguar Tasks\n");
+	for (vector<AsyncCANJaguar*>::iterator it = AsyncCANJaguar::jaguar_vector.begin(); it < AsyncCANJaguar::jaguar_vector.end(); it++)
+	{
+		(*it)->Start();
+	}
 	
 	ConfigManager::Instance()->ConfigureAll();
-	
-	m_teleop = new TeleopInputs("TeleopInputs", 1);
 }
 
 static int TimeoutCallback(...)
 {
+	printf("Main loop execution time > 20ms\r\n");
 	return 0;
 }
 
@@ -62,9 +68,9 @@ void LRTRobot13::Run()
 		wdStart(_watchdog, sysClkRateGet() / RobotConfig::LOOP_RATE,
 				TimeoutCallback, 0);
 		
-		m_teleop->RunOneCycle();
-		
 		UpdateGameState();
+
+		m_teleop->RunOneCycle();
 		
 		m_componentManager->Update();
 		
@@ -92,11 +98,11 @@ void LRTRobot13::UpdateGameState()
 	if (IsDisabled())
 	{
 		RobotData::SetRobotState(RobotData::DISABLED);
-	} 
+	}
 	else if (IsAutonomous())
 	{
 		RobotData::SetRobotState(RobotData::AUTONOMOUS);
-	} 
+	}
 	else
 	{
 		RobotData::SetRobotState(RobotData::TELEOP);

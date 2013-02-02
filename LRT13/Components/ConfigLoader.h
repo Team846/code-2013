@@ -23,8 +23,6 @@ public:
 	
 private:
 	ConfigManager* m_config;
-	
-	bool m_isEnabled;
 };
 
 #endif

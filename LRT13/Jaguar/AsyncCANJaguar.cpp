@@ -46,7 +46,6 @@ AsyncCANJaguar::AsyncCANJaguar(UINT8 channel, const char* name) :
 	//	m_setpoint.disableCaching();
 
 	printf("Constructed Jaguar %2d: %s\n", channel, m_name);
-	Start();
 }
 
 AsyncCANJaguar::~AsyncCANJaguar()

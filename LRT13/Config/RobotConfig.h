@@ -22,15 +22,21 @@ namespace drive
 	const uint32_t BLEND_EXPONENT = 3; // TODO: anurag, change this
 }
 
-namespace digital
+namespace analog // Ports 1-7
 {
-	const uint32_t LEFT_DRIVE_ENCODER_A = 4;
-	const uint32_t LEFT_DRIVE_ENCODER_B = 3;
-	const uint32_t RIGHT_DRIVE_ENCODER_A = 1;
-	const uint32_t RIGHT_DRIVE_ENCODER_B = 2;
+
 }
 
-namespace can
+namespace digital // Ports 1-14
+{
+	const uint32_t RIGHT_DRIVE_ENCODER_A = 1;
+	const uint32_t RIGHT_DRIVE_ENCODER_B = 2;
+	const uint32_t LEFT_DRIVE_ENCODER_A = 4;
+	const uint32_t LEFT_DRIVE_ENCODER_B = 3;
+	const uint32_t HALL_EFFECT = CHANGEME;
+}
+
+namespace can // Ports 1-16 (2CAN limitation)
 {
 	const uint32_t LEFT_DRIVE_A = 2;
 	const uint32_t LEFT_DRIVE_B = 3;
