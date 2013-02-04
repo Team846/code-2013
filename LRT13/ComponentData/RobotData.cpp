@@ -12,8 +12,15 @@ void RobotData::IncrementMissedPacketsInLifetime() { return; }
 int RobotData::GetCycleCount() { return 0; }
 void RobotData::IncrementCycleCount() { return; }
 
-RobotData::RobotState RobotData::GetCurrentState() { return m_state; }
-void RobotData::SetRobotState(RobotData::RobotState state) { m_state = state; }
+RobotData::RobotState RobotData::GetCurrentState()
+{
+	return m_state;
+}
+
+void RobotData::SetRobotState(RobotData::RobotState state)
+{
+	m_state = state;
+}
 
 int RobotData::AllocateKey(string className)
 {

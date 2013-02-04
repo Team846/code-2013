@@ -18,13 +18,12 @@
 
 #include "Log/LogManager.h"
 
+#include "Operations/AutonomousRoutines.h"
 #include "Operations/TeleopInputs.h"
 
 #include "Utils/CANTester.h"
 
 #include "Sensors/DriveEncoders.h"
-
-#define DANGER_CLOSE 1
 
 class LRTRobot13 : public LRTRobotBase
 {
@@ -42,6 +41,7 @@ class LRTRobot13 : public LRTRobotBase
 		
 		ComponentManager* m_componentManager;
 		TeleopInputs* m_teleop;
+		AutonomousRoutines* m_auton;
 		
 		WDOG_ID _watchdog;
 

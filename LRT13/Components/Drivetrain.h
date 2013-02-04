@@ -30,6 +30,8 @@ public:
 	virtual void enabledPeriodic();
 	virtual void disabledPeriodic();
 	
+	virtual void updateData();
+	
 	virtual void Configure();
 	virtual void Log();
 private:
@@ -39,6 +41,9 @@ private:
 	
 	DriveEncoders* m_driveEncoders;
 	ESC *m_escs[4];
+	
+	double lastPositionSetpoint[2];
+	double lastTravelledDistance;
 	
 	void ConfigurePIDObject(PID *pid, std::string objName, bool feedForward);
 	double ComputeOutput(data::drivetrain::ForwardOrTurn axis);

@@ -1,7 +1,7 @@
 #include "ComponentSystemUnitTest.h"
 
 ComponentSystemUnitTest::ComponentSystemUnitTest()
-	: Component("ComponentSystemUnitTest", DriverStationConfig::DigitalIO::COMP_UNIT_TEST, true)
+	: Component("ComponentSystemUnitTest", DriverStationConfig::DigitalIns::COMP_UNIT_TEST, true)
 {
 	AsyncPrinter::Println("ComponentSystemUnitTest::ctor()");
 	

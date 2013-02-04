@@ -3,6 +3,7 @@
 #include "../ComponentData/ComponentData.h"
 #include "../Config/DriverStationConfig.h"
 #include "../Config/RobotConfig.h"
+#include "AutoActions.h"
 #include <cmath>
 
 using namespace data;
@@ -20,6 +21,8 @@ TeleopInputs::TeleopInputs(char * taskName, INT32 priority) :
 	m_driver_wheel = new DebouncedJoystick(DriverStationConfig::JoystickConfig::DRIVER_WHEEL_PORT,
 			DriverStationConfig::JoystickConfig::NUM_WHEEL_BUTTONS,
 			DriverStationConfig::JoystickConfig::NUM_WHEEL_AXES);
+	
+	m_autoActions = new AutoActions();
 }
 
 TeleopInputs::~TeleopInputs()
@@ -43,6 +46,7 @@ void TeleopInputs::Update()
 	
 	/************************Drivetrain************************/
 	
+	// Use velocity control in teleoperated mode
 	m_componentData->drivetrainData->setControlMode(FORWARD, VELOCITY_CONTROL);
 	m_componentData->drivetrainData->setControlMode(TURN, VELOCITY_CONTROL);
 	if(current_state == RobotData::TELEOP)
@@ -55,9 +59,9 @@ void TeleopInputs::Update()
 		{
 			double turn = 0.0;
 			turn = -m_driver_wheel->GetAxis(Joystick::kXAxis);
-			turn = pow(turn, RobotConfig::drive::BLEND_EXPONENT);
+			turn = pow(turn, RobotConfig::Drive::BLEND_EXPONENT);
 
-			double forward = pow(-m_driver_stick->GetAxis(Joystick::kYAxis), RobotConfig::drive::THROTTLE_EXPONENT);
+			double forward = pow(-m_driver_stick->GetAxis(Joystick::kYAxis), RobotConfig::Drive::THROTTLE_EXPONENT);
 
 			double turnComposite = 0.0;
 
@@ -72,6 +76,21 @@ void TeleopInputs::Update()
 			m_componentData->drivetrainData->setVelocitySetpoint(FORWARD, forward);
 			m_componentData->drivetrainData->setVelocitySetpoint(TURN, turnComposite);
 		}
+	}
+	
+	/************************Automatic Functions************************/
+
+	if(m_driver_stick->IsButtonDown(DriverStationConfig::JoystickButtons::AUTO_AIM))
+	{
+		m_autoActions->AutoAim();
+	}
+	else if (m_driver_stick->IsButtonDown(DriverStationConfig::JoystickButtons::AUTO_CLIMB))
+	{
+		m_autoActions->AutoClimb();
+	}
+	else if (m_driver_stick->IsButtonDown(DriverStationConfig::JoystickButtons::DISC_TRACK))
+	{
+		m_autoActions->DiscTrack();
 	}
 	
 	/************************Config************************/

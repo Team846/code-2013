@@ -12,13 +12,16 @@ using namespace data;
 using namespace drivetrain;
 
 Drivetrain::Drivetrain()
-: Component("Drivetrain", DriverStationConfig::DigitalIO::DRIVETRAIN, true)
+: Component("Drivetrain", DriverStationConfig::DigitalIns::DRIVETRAIN, true)
  , m_driveEncoders(DriveEncoders::GetInstance())
 {
-	m_escs[LEFT]  = new ESC(RobotConfig::can::LEFT_DRIVE_A, RobotConfig::can::LEFT_DRIVE_B,
+	m_escs[LEFT]  = new ESC(RobotConfig::CAN::LEFT_DRIVE_A, RobotConfig::CAN::LEFT_DRIVE_B,
 		m_driveEncoders->getEncoder(data::drivetrain::LEFT), "left");
-	m_escs[RIGHT] = new ESC(RobotConfig::can::RIGHT_DRIVE_A, RobotConfig::can::RIGHT_DRIVE_B ,
+	m_escs[RIGHT] = new ESC(RobotConfig::CAN::RIGHT_DRIVE_A, RobotConfig::CAN::RIGHT_DRIVE_B ,
 		m_driveEncoders->getEncoder(data::drivetrain::RIGHT), "right");
+	lastPositionSetpoint[FORWARD] = m_componentData->drivetrainData->getRelativePositionSetpoint(FORWARD);
+	lastPositionSetpoint[TURN] = m_componentData->drivetrainData->getRelativePositionSetpoint(TURN);
+	lastTravelledDistance = m_driveEncoders->getRobotDist();
 }
 
 Drivetrain::~Drivetrain()
@@ -26,19 +29,33 @@ Drivetrain::~Drivetrain()
 	
 }
 
-double Drivetrain::ComputeOutput(data::drivetrain::ForwardOrTurn axis)
+double Drivetrain::ComputeOutput(ForwardOrTurn axis)
 {
+	// TODO: Add turn position control
 	double positionSetpoint = m_componentData->drivetrainData->getRelativePositionSetpoint(axis); // this will tell you how much further to go
+	if (axis == FORWARD)
+	{
+		if (lastPositionSetpoint[axis] != positionSetpoint)
+		{
+			lastTravelledDistance = m_driveEncoders->getRobotDist();
+			lastPositionSetpoint[axis] = positionSetpoint;
+		}
+	}
 	double velocitySetpoint = m_componentData->drivetrainData->getVelocitySetpoint(axis);
 	double rawOutput = m_componentData->drivetrainData->getOpenLoopOutput(axis);
 	switch (m_componentData->drivetrainData->getControlMode(axis))
 	{
-	case data::drivetrain::POSITION_CONTROL:
-		m_PIDs[POSITION][axis].setInput(positionSetpoint);
-		m_PIDs[POSITION][axis].setSetpoint(0.0);
-		velocitySetpoint = m_PIDs[POSITION][axis].update( 1.0 / RobotConfig::LOOP_RATE);
-		//fall through the switch
-	case data::drivetrain::VELOCITY_CONTROL:
+	case POSITION_CONTROL:
+		if (axis == FORWARD)
+		{
+			m_PIDs[POSITION][axis].setInput(m_driveEncoders->getRobotDist());
+			m_PIDs[POSITION][axis].setSetpoint(lastTravelledDistance + positionSetpoint);
+			velocitySetpoint = Util::Clamp<double>(m_PIDs[POSITION][axis].update(1.0 / RobotConfig::LOOP_RATE),
+					m_componentData->drivetrainData->getPositionControlMaxSpeed(axis),
+					-m_componentData->drivetrainData->getPositionControlMaxSpeed(axis));
+		}
+		// Fall through the switch
+	case VELOCITY_CONTROL:
 		if (axis == data::drivetrain::FORWARD)
 			m_PIDs[VELOCITY][axis].setInput(m_driveEncoders->getNormalizedForwardSpeed());
 		else
@@ -48,7 +65,7 @@ double Drivetrain::ComputeOutput(data::drivetrain::ForwardOrTurn axis)
 		
 		rawOutput = m_PIDs[VELOCITY][axis].update(1.0 / RobotConfig::LOOP_RATE);
 		break;
-	case data::drivetrain::OPEN_LOOP:
+	case OPEN_LOOP:
 		break;
 	}
 	return rawOutput;
@@ -60,15 +77,14 @@ void Drivetrain::onEnable()
 
 void Drivetrain::onDisable()
 {
-	// immediately stop
 	m_escs[LEFT]->SetDutyCycle(0.0);
 	m_escs[RIGHT]->SetDutyCycle(0.0);
 }
 
 void Drivetrain::enabledPeriodic()
 {
-	double fwdOutput = ComputeOutput(data::drivetrain::FORWARD); //positive means forward
-	double turnOutput = ComputeOutput(data::drivetrain::TURN);   //positive means turning counter-clockwise. Matches the way driveencoders work.
+	double fwdOutput = ComputeOutput(FORWARD); //positive means forward
+	double turnOutput = ComputeOutput(TURN);   //positive means turning counter-clockwise. Matches the way DriveEncoders work.
 	
 	double leftOutput = fwdOutput - turnOutput;
 	double rightOutput = fwdOutput + turnOutput;
@@ -84,6 +100,15 @@ void Drivetrain::disabledPeriodic()
 {
 	m_escs[LEFT]->SetDutyCycle(0.0);
 	m_escs[RIGHT]->SetDutyCycle(0.0);
+}
+
+void Drivetrain::updateData()
+{
+	// TODO: Add error threshold
+	if (lastTravelledDistance + m_componentData->drivetrainData->getRelativePositionSetpoint(FORWARD) == m_driveEncoders->getRobotDist())
+	{
+		semGive(m_componentData->drivetrainData->positionOperationSemaphore(FORWARD, 0));
+	}
 }
 
 void Drivetrain::Configure()
@@ -108,5 +133,5 @@ void Drivetrain::ConfigurePIDObject(PID *pid, std::string objName, bool feedForw
 	double i = m_config->Get<double>(Component::GetName(), objName + "_I", 0.0);
 	double d = m_config->Get<double>(Component::GetName(), objName + "_D", 0.0);
 	
-	pid->setParameters(p, i, d, 1.0, 0.87, feedForward);//super high decay, this makes it just like a filter. If you want it to act more like an integral you reduce the decay. This must be tuned. 
+	pid->setParameters(p, i, d, 1.0, 0.87, feedForward); // Super high decay, this makes it just like a filter. If you want it to act more like an integral you reduce the decay. This must be tuned. 
 }

@@ -54,6 +54,11 @@ public:
 	virtual void onDisable() = 0;
 	
 	/*!
+	 * @brief Updates ComponentData for the component. Allows for giving operation complete semaphores.
+	 */
+	virtual void updateData() = 0;
+	
+	/*!
 	 * @brief Enables the component.
 	 */
 	void Enable();

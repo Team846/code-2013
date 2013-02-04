@@ -40,6 +40,10 @@ void LRTRobot13::RobotInit()
 	m_teleop = new TeleopInputs("TeleopInputs", 1);
 	m_teleop->Start();
 	
+	AsyncPrinter::Printf("Starting AutonomousRoutines Task\n");
+	m_auton = new AutonomousRoutines("AutonomousRoutines", 1);
+	m_auton->Start();
+	
 	AsyncPrinter::Printf("Starting Jaguar Tasks\n");
 	for (vector<AsyncCANJaguar*>::iterator it = AsyncCANJaguar::jaguar_vector.begin(); it < AsyncCANJaguar::jaguar_vector.end(); it++)
 	{
@@ -68,12 +72,34 @@ void LRTRobot13::Run()
 		wdStart(_watchdog, sysClkRateGet() / RobotConfig::LOOP_RATE,
 				TimeoutCallback, 0);
 		
+		// Update current game state
 		UpdateGameState();
 
-		m_teleop->RunOneCycle();
+		// Update appropriate operation controllers
+		if (RobotData::GetCurrentState() == RobotData::AUTONOMOUS)
+		{
+			m_auton->RunOneCycle(); // Called every loop, but Tick() is only called the first time when autonomous mode is entered.
+		}
+		else if (RobotData::GetCurrentState() == RobotData::TELEOP)
+		{
+			if (m_auton->IsRunning())
+			{
+				m_auton->Stop();
+			}
+			m_teleop->RunOneCycle();
+		}
+		else // Disabled
+		{
+			if (m_auton->IsRunning())
+			{
+				m_auton->Stop();
+			}
+		}
 		
+		// Update all components
 		m_componentManager->Update();
 		
+		// Update all jaguars
 		for (vector<AsyncCANJaguar*>::iterator it = AsyncCANJaguar::jaguar_vector.begin(); it < AsyncCANJaguar::jaguar_vector.end(); it++)
 		{
 			(*it)->RunOneCycle();

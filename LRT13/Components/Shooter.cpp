@@ -5,7 +5,7 @@
 #include "../Config/DriverStationConfig.h"
 
 Shooter::Shooter()
-: ComponentWithJaguar("Shooter", DriverStationConfig::DigitalIO::SHOOTER, true, RobotConfig::can::SHOOTER, "Shooter"),
+: ComponentWithJaguar("Shooter", DriverStationConfig::DigitalIns::SHOOTER, true, RobotConfig::CAN::SHOOTER, "Shooter"),
   m_configSection("Shooter")
 { }
 

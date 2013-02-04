@@ -5,7 +5,7 @@
 #include "../Config/DriverStationConfig.h"
 
 Collector::Collector()
-: ComponentWithJaguar("Collector", DriverStationConfig::DigitalIO::COLLECTOR, true, RobotConfig::can::COLLECTOR, "Collector"),
+: ComponentWithJaguar("Collector", DriverStationConfig::DigitalIns::COLLECTOR, true, RobotConfig::CAN::COLLECTOR, "Collector"),
   m_configSection("collector")
 {
 	

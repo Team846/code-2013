@@ -18,6 +18,7 @@ namespace data
 class ComponentData;
 }
 class DebouncedJoystick;
+class AutoActions;
 
 /*!
  * @brief Processes driver station inputs in teleoperated mode
@@ -40,6 +41,8 @@ private:
 	DebouncedJoystick* m_driver_stick;
 	DebouncedJoystick* m_operator_stick;
 	DebouncedJoystick* m_driver_wheel;
+	
+	AutoActions* m_autoActions;
 };
 
 #endif

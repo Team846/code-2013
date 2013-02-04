@@ -37,6 +37,8 @@ namespace drivetrain
 	class DrivetrainData
 	{
 	public:
+		DrivetrainData();
+		
 		ControlMode getControlMode(ForwardOrTurn mode);
 	
 		void setOpenLoopOutput(ForwardOrTurn mode, double setpoint);
@@ -57,7 +59,9 @@ namespace drivetrain
 	private:
 		ControlMode m_controlModes[2];
 		double m_desiredRates[2];
-	
+		double m_desiredPositions[2];
+		double m_maxSpeeds[2];
+		SEM_ID m_positionSemaphore;
 	};
 }
 }
