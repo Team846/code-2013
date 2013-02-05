@@ -31,16 +31,9 @@ Drivetrain::~Drivetrain()
 
 double Drivetrain::ComputeOutput(ForwardOrTurn axis)
 {
-	// TODO: Add turn position control
 	double positionSetpoint = m_componentData->drivetrainData->getRelativePositionSetpoint(axis); // this will tell you how much further to go
-	if (axis == FORWARD)
-	{
-		if (lastPositionSetpoint[axis] != positionSetpoint)
-		{
-			lastTravelledDistance = m_driveEncoders->getRobotDist();
-			lastPositionSetpoint[axis] = positionSetpoint;
-		}
-	}
+	
+	// TODO: Add turn position control
 	double velocitySetpoint = m_componentData->drivetrainData->getVelocitySetpoint(axis);
 	double rawOutput = m_componentData->drivetrainData->getOpenLoopOutput(axis);
 	switch (m_componentData->drivetrainData->getControlMode(axis))
@@ -83,6 +76,20 @@ void Drivetrain::onDisable()
 
 void Drivetrain::enabledPeriodic()
 {
+	//TODO: turn
+	double positionSetpoint = m_componentData->drivetrainData->getRelativePositionSetpoint(FORWARD); // this will tell you how much further to go
+
+	if (lastPositionSetpoint[FORWARD] != positionSetpoint)
+	{
+		lastTravelledDistance = m_driveEncoders->getRobotDist();
+		lastPositionSetpoint[FORWARD] = positionSetpoint;
+	}
+	
+	if (fabs(lastTravelledDistance + m_componentData->drivetrainData->getRelativePositionSetpoint(FORWARD) - m_driveEncoders->getRobotDist()) <= m_errorThreshold)
+	{
+		semGive(m_componentData->drivetrainData->positionOperationSemaphore(FORWARD, 0));
+	}
+	
 	double fwdOutput = ComputeOutput(FORWARD); //positive means forward
 	double turnOutput = ComputeOutput(TURN);   //positive means turning counter-clockwise. Matches the way DriveEncoders work.
 	
@@ -102,15 +109,6 @@ void Drivetrain::disabledPeriodic()
 	m_escs[RIGHT]->SetDutyCycle(0.0);
 }
 
-void Drivetrain::updateData()
-{
-	// TODO: Add error threshold
-	if (lastTravelledDistance + m_componentData->drivetrainData->getRelativePositionSetpoint(FORWARD) == m_driveEncoders->getRobotDist())
-	{
-		semGive(m_componentData->drivetrainData->positionOperationSemaphore(FORWARD, 0));
-	}
-}
-
 void Drivetrain::Configure()
 {
 	ConfigurePIDObject(&m_PIDs[VELOCITY][TURN], "velocity_turn", true);
@@ -120,6 +118,8 @@ void Drivetrain::Configure()
 
 	ConfigurePIDObject(&m_PIDs[POSITION][TURN], "position_turn", false);
 	ConfigurePIDObject(&m_PIDs[POSITION][FORWARD], "position_fwd", false);
+	
+	m_errorThreshold = m_config->Get<double>(Component::GetName(), "position_fwd_error", 1.0);
 }
 
 void Drivetrain::Log()

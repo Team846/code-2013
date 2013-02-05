@@ -11,7 +11,8 @@ DrivetrainData::DrivetrainData()
 	memset(m_desiredRates, 0, sizeof(m_desiredRates));
 	memset(m_desiredPositions, 0, sizeof(m_desiredPositions));
 	memset(m_maxSpeeds, 0, sizeof(m_maxSpeeds));
-	m_positionSemaphore = semBCreate(SEM_Q_PRIORITY, SEM_FULL);
+	m_positionFwdSemaphore = semBCreate(SEM_Q_PRIORITY, SEM_FULL);
+	m_positionTurnSemaphore = semBCreate(SEM_Q_PRIORITY, SEM_FULL);
 }
 
 ControlMode DrivetrainData::getControlMode(ForwardOrTurn mode)
@@ -22,6 +23,7 @@ ControlMode DrivetrainData::getControlMode(ForwardOrTurn mode)
 void DrivetrainData::setOpenLoopOutput(ForwardOrTurn mode, double setpoint)
 {
 }
+
 void DrivetrainData::setVelocitySetpoint(ForwardOrTurn mode, double setpoint)
 {
 	m_desiredRates[mode] = setpoint;
@@ -31,8 +33,9 @@ void DrivetrainData::setRelativePositionSetpoint(ForwardOrTurn mode,
 {
 	if (setpoint != m_desiredPositions[mode])
 	{
-		semTake(m_positionSemaphore, WAIT_FOREVER);
+		semTake(m_positionFwdSemaphore, WAIT_FOREVER);
 	}
+	
 	m_desiredPositions[mode] = setpoint;
 	m_maxSpeeds[mode] = maxspeed;
 }
@@ -45,7 +48,7 @@ void DrivetrainData::setControlMode(ForwardOrTurn mode, ControlMode control)
 SEM_ID DrivetrainData::positionOperationSemaphore(ForwardOrTurn mode,
 		double errorThreshold)
 {
-	return m_positionSemaphore;
+	return mode == drivetrain::FORWARD ? m_positionFwdSemaphore : m_positionTurnSemaphore;
 }
 bool DrivetrainData::isDesiredPositionOperationComplete(ForwardOrTurn mode,
 		double errorThreshold)

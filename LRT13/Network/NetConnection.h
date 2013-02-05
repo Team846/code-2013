@@ -11,9 +11,14 @@
 //#include <arpa/inet.h> // <-- BLACK MAGIC
 
 #include <iostream>
+#include <sstream>
 #include <queue>
 
 #include <WPILib.h>
+
+#ifdef __VXWORKS__
+#include <Task.h>
+#endif
 
 //#include "NetBuffer.h"
 #include "NetConnectionType.h"
@@ -57,17 +62,37 @@ namespace Network
 		int Close();
 		
 		int Send(NetBuffer buff);
+		
+		NetBuffer* GetMessage();
 	protected:
 		INT32 Tick();
 	private:
+#ifdef __VXWORKS__
+		static INT32 InternalPlatformUpdateTaskWrapper(UINT32 instance);
+#endif
+		
+		void InternalPlatformQueueSynchronizationCreate();
+		void InternalPlatformQueueSynchronizationEnter();
 		void Update();
+		void InternalPlatformQueueSynchronizationLeave();
+		
+		void InternalPlatformCreateUpdateTask();
+		void InternalPlatformRunUpdateTask();
+		void InternalPlatformDestroyUpdateTask();
 		
 		char* m_ip;
 		int m_port;
 		
+#ifdef __VXWORKS__
+		SEM_ID m_msgQueueMutex;
+		
+		Task* m_internalUpdateTask;
+#endif
 		queue<NetBuffer*> m_receivedMessages;
 		
 		NetConnectionType m_connType;
+		
+		bool m_isRunning;
 		
 		int m_socket;
 		struct sockaddr_in m_remote_spec;

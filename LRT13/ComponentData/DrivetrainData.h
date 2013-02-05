@@ -48,6 +48,7 @@ namespace drivetrain
 		void setControlMode(ForwardOrTurn mode, ControlMode control);
 	
 		SEM_ID positionOperationSemaphore(ForwardOrTurn mode, double errorThreshold);
+		
 		bool isDesiredPositionOperationComplete(ForwardOrTurn mode,
 				double errorThreshold);
 	
@@ -61,7 +62,8 @@ namespace drivetrain
 		double m_desiredRates[2];
 		double m_desiredPositions[2];
 		double m_maxSpeeds[2];
-		SEM_ID m_positionSemaphore;
+		SEM_ID m_positionFwdSemaphore;
+		SEM_ID m_positionTurnSemaphore;
 	};
 }
 }

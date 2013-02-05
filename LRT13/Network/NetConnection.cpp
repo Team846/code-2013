@@ -6,11 +6,39 @@ NetConnection::NetConnection(char * ip, int port, NetConnectionType connType)
 	this->m_ip = ip;
 	this->m_port = port;
 	this->m_connType = connType;
+	
+	InternalPlatformQueueSynchronizationCreate();
 }
 
 NetConnection::~NetConnection()
 {
 	Close();
+}
+
+#ifdef __VXWORKS__
+INT32 NetConnection:: InternalPlatformUpdateTaskWrapper(UINT32 instance)
+{
+	NetConnection* conn = (NetConnection*)instance;
+	
+	while(conn->m_isRunning)
+	{
+		conn->Update();
+	}
+}
+#endif
+
+void NetConnection::InternalPlatformQueueSynchronizationCreate()
+{
+#ifdef __VXWORKS__
+	m_msgQueueMutex = semBCreate(SEM_Q_PRIORITY, SEM_FULL);
+#endif
+}
+
+void NetConnection::InternalPlatformQueueSynchronizationEnter()
+{
+#ifdef __VXWORKS__
+	semTake(m_msgQueueMutex, WAIT_FOREVER);
+#endif
 }
 
 void NetConnection::Update()
@@ -23,8 +51,47 @@ void NetConnection::Update()
 	{
 		NetBuffer* buff = new NetBuffer(rcv_buffer, received);
 		
+		// synchronize on the semaphore so that we make sure we're safely accessing the internal message queue
+		InternalPlatformQueueSynchronizationEnter();
 		m_receivedMessages.push(buff);
+		InternalPlatformQueueSynchronizationLeave(); // release the lock on the queue
 	}
+}
+
+void NetConnection::InternalPlatformQueueSynchronizationLeave()
+{
+#ifdef __VXWORKS__
+	semGive(m_msgQueueMutex);
+#endif
+}
+
+void NetConnection::InternalPlatformCreateUpdateTask()
+{
+	static int counter = 0;
+	
+	stringstream s;
+	
+	s << "NetConnection" << counter;
+	
+#ifdef __VXWORKS__
+	m_internalUpdateTask = new Task(s.str().c_str(), (FUNCPTR)InternalPlatformUpdateTaskWrapper);
+#endif
+}
+
+void NetConnection::InternalPlatformRunUpdateTask()
+{
+#ifdef __VXWORKS__
+	m_internalUpdateTask->Start((UINT32)this);
+#endif
+}
+
+void NetConnection::InternalPlatformDestroyUpdateTask()
+{
+#ifdef __VXWORKS__
+	m_internalUpdateTask->Stop();
+	
+	DELETE(m_internalUpdateTask);
+#endif
 }
 
 int NetConnection::Open(int options, ...)
@@ -77,11 +144,21 @@ int NetConnection::Open(int options, ...)
 			break;
 	}
 	
+	m_isRunning = true;
+	
+	InternalPlatformCreateUpdateTask();
+	InternalPlatformRunUpdateTask();
+	
 	return 0;
 }
 
 int NetConnection::Close()
 {
+	m_isRunning = false;
+	
+#warning this function is potentially bad because we might be killing the thread while it's waiting for a message. -tp
+	InternalPlatformDestroyUpdateTask();
+	
 	return close(m_socket);
 }
 
@@ -102,4 +179,25 @@ int NetConnection::Send(NetBuffer buff)
 	int iResult = sendto(m_socket, buff.m_internalBuffer, buff.GetBytePos(), 0, (struct sockaddr*) &m_remote_spec, sizeof(m_remote_spec));
 	
 	return iResult;
+}
+
+NetBuffer* NetConnection::GetMessage()
+{
+	NetBuffer* buff;
+	
+	InternalPlatformQueueSynchronizationEnter();
+	
+	if(m_receivedMessages.size() > 0)
+	{
+		buff = m_receivedMessages.front();
+		m_receivedMessages.pop();
+	}
+	else
+	{
+		buff = NULL;
+	}
+	
+	InternalPlatformQueueSynchronizationLeave();
+	
+	return buff;
 }

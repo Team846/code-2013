@@ -30,8 +30,6 @@ public:
 	virtual void enabledPeriodic();
 	virtual void disabledPeriodic();
 	
-	virtual void updateData();
-	
 	virtual void Configure();
 	virtual void Log();
 private:
@@ -44,6 +42,8 @@ private:
 	
 	double lastPositionSetpoint[2];
 	double lastTravelledDistance;
+	
+	double m_errorThreshold;
 	
 	void ConfigurePIDObject(PID *pid, std::string objName, bool feedForward);
 	double ComputeOutput(data::drivetrain::ForwardOrTurn axis);

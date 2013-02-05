@@ -7,7 +7,7 @@
 #include "AsyncProcess.h"
 
 /*!
- * @brief Base class for synchronized processes. Synchronized processes wait for RunOneCycle() to be called before looping.
+ * @brief Base class for synchronized processes. Synchronized processes wait for a signal before running a tick.
  * @author Tony Peng, Raphael Chang
  */
 

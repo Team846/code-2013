@@ -34,6 +34,8 @@ public:
 private:
 	string m_configSection;
 	
+	PID m_pid;
+	
 	float m_dutyCycle;
 	
 	bool m_isEnabled;
