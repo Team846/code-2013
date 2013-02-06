@@ -47,6 +47,9 @@ namespace drivetrain
 				double maxspeed);
 		void setControlMode(ForwardOrTurn mode, ControlMode control);
 	
+		void updatePositions(double forward, double turn);
+		void updateVelocities(double forward, double turn);
+		
 		SEM_ID positionOperationSemaphore(ForwardOrTurn mode, double errorThreshold);
 		
 		bool isDesiredPositionOperationComplete(ForwardOrTurn mode,
@@ -56,12 +59,15 @@ namespace drivetrain
 		double getVelocitySetpoint(ForwardOrTurn mode);
 		double getRelativePositionSetpoint(ForwardOrTurn mode);
 		double getPositionControlMaxSpeed(ForwardOrTurn mode);
+		double getPositionControlStartingPosition(ForwardOrTurn mode);
 	
 	private:
 		ControlMode m_controlModes[2];
 		double m_desiredRates[2];
 		double m_desiredPositions[2];
 		double m_maxSpeeds[2];
+		double m_lastPosition[2];
+		DrivetrainStatus m_status;
 		SEM_ID m_positionFwdSemaphore;
 		SEM_ID m_positionTurnSemaphore;
 	};

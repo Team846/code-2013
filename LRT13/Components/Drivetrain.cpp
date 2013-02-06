@@ -19,9 +19,6 @@ Drivetrain::Drivetrain()
 		m_driveEncoders->getEncoder(data::drivetrain::LEFT), "left");
 	m_escs[RIGHT] = new ESC(RobotConfig::CAN::RIGHT_DRIVE_A, RobotConfig::CAN::RIGHT_DRIVE_B ,
 		m_driveEncoders->getEncoder(data::drivetrain::RIGHT), "right");
-	lastPositionSetpoint[FORWARD] = m_componentData->drivetrainData->getRelativePositionSetpoint(FORWARD);
-	lastPositionSetpoint[TURN] = m_componentData->drivetrainData->getRelativePositionSetpoint(TURN);
-	lastTravelledDistance = m_driveEncoders->getRobotDist();
 }
 
 Drivetrain::~Drivetrain()
@@ -42,7 +39,7 @@ double Drivetrain::ComputeOutput(ForwardOrTurn axis)
 		if (axis == FORWARD)
 		{
 			m_PIDs[POSITION][axis].setInput(m_driveEncoders->getRobotDist());
-			m_PIDs[POSITION][axis].setSetpoint(lastTravelledDistance + positionSetpoint);
+			m_PIDs[POSITION][axis].setSetpoint(m_componentData->drivetrainData->getPositionControlStartingPosition(axis) + positionSetpoint);
 			velocitySetpoint = Util::Clamp<double>(m_PIDs[POSITION][axis].update(1.0 / RobotConfig::LOOP_RATE),
 					-m_componentData->drivetrainData->getPositionControlMaxSpeed(axis),
 					m_componentData->drivetrainData->getPositionControlMaxSpeed(axis));
@@ -77,17 +74,10 @@ void Drivetrain::onDisable()
 void Drivetrain::enabledPeriodic()
 {
 	//TODO: turn
-	double positionSetpoint = m_componentData->drivetrainData->getRelativePositionSetpoint(FORWARD); // this will tell you how much further to go
-
-	if (lastPositionSetpoint[FORWARD] != positionSetpoint)
-	{
-		lastTravelledDistance = m_driveEncoders->getRobotDist();
-		lastPositionSetpoint[FORWARD] = positionSetpoint;
-	}
-	AsyncPrinter::Printf("Last setpoint: %lf\n", lastPositionSetpoint[FORWARD]);
-	AsyncPrinter::Printf("Last travelled distance: %lf\n", lastTravelledDistance);
-	
-	if (fabs(lastTravelledDistance + m_componentData->drivetrainData->getRelativePositionSetpoint(FORWARD) - m_driveEncoders->getRobotDist()) <= m_errorThreshold)
+	m_componentData->drivetrainData->updatePositions(m_driveEncoders->getRobotDist(), m_driveEncoders->getTurnAngle());
+	m_componentData->drivetrainData->updateVelocities(m_driveEncoders->getNormalizedForwardSpeed(), m_driveEncoders->getNormalizedTurningSpeed());
+	// Check if position has been achieved and release the operation semaphore
+	if (fabs(m_componentData->drivetrainData->getPositionControlStartingPosition(FORWARD) + m_componentData->drivetrainData->getRelativePositionSetpoint(FORWARD) - m_driveEncoders->getRobotDist()) <= m_errorThreshold)
 	{
 		semGive(m_componentData->drivetrainData->positionOperationSemaphore(FORWARD, 0));
 	}

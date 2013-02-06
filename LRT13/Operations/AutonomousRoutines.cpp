@@ -2,6 +2,7 @@
 #include "../ComponentData/ComponentData.h"
 #include "AutoActions.h"
 #include "../Config/DriverStationConfig.h"
+#include "../Utils/AsyncPrinter.h"
 
 using namespace data;
 using namespace data::drivetrain;
@@ -36,7 +37,6 @@ INT32 AutonomousRoutines::Tick()
 	// Use position control in autonomous mode
 	m_componentData->drivetrainData->setControlMode(FORWARD, POSITION_CONTROL);
 	m_componentData->drivetrainData->setControlMode(TURN, POSITION_CONTROL);
-	AsyncPrinter::Printf("isRunning: %d", m_isRunning);
 	if (!m_isRunning) // Does not run again (even after routine is completed) until game state is changed and changed back (Stop() is called).
 	{
 		LoadQueue();
@@ -47,7 +47,7 @@ INT32 AutonomousRoutines::Tick()
 }
 
 void AutonomousRoutines::Autonomous()
-{	
+{
 	m_isRunning = true;
 	while (!m_routine.empty() && m_isRunning)
 	{
@@ -57,18 +57,14 @@ void AutonomousRoutines::Autonomous()
 		case INIT:
 			break;
 		case DRIVE_FORWARD:
-			m_componentData->drivetrainData->setRelativePositionSetpoint(FORWARD, 25.0, 0.1);
+			m_componentData->drivetrainData->setRelativePositionSetpoint(FORWARD, 25.0, 0.2);
 			m_componentData->drivetrainData->setRelativePositionSetpoint(TURN, 0.0, 0.0);
 			// Take semaphore to wait until operation completes
 			semTake(m_componentData->drivetrainData->positionOperationSemaphore(FORWARD, 0), WAIT_FOREVER);
 			semGive(m_componentData->drivetrainData->positionOperationSemaphore(FORWARD, 0));
-			
-			AsyncPrinter::DbgPrint("Drive forward operation completed.");
 			break;
 		case AUTO_AIM:
 			while(!m_autoActions->AutoAim());
-			
-			AsyncPrinter::DbgPrint("Autoaim done");
 			break;
 		case SHOOT:
 			break;
@@ -77,8 +73,6 @@ void AutonomousRoutines::Autonomous()
 			break;
 		}
 		m_routine.pop();
-		
-		Wait(0.1);
 	}
 	// Routine complete. Keep m_isRunning as true to prevent routine from running again when Tick() is called while still in autonomous mode.
 }
@@ -92,7 +86,7 @@ void AutonomousRoutines::LoadQueue()
 	uint8_t selected = (uint8_t) DriverStation::GetInstance()->GetAnalogIn(DriverStationConfig::AnalogIns::AUTONOMOUS_SELECT);
 	switch(selected)
 	{
-	case 1:
+	case 0:
 		stages = DRIVE_FORWARD_AND_SHOOT;
 		break;
 	}

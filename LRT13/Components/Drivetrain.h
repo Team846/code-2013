@@ -40,9 +40,6 @@ private:
 	DriveEncoders* m_driveEncoders;
 	ESC *m_escs[4];
 	
-	double lastPositionSetpoint[2];
-	double lastTravelledDistance;
-	
 	double m_errorThreshold;
 	
 	void ConfigurePIDObject(PID *pid, std::string objName, bool feedForward);
