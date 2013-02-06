@@ -16,7 +16,7 @@ class ComponentSystemUnitTest : public Component
 {
 public:
 	/*!
-	 * @brief Constructs a component with a name
+	 * @brief Constructs a component with a name.
 	 */
 	ComponentSystemUnitTest();
 	

@@ -31,20 +31,20 @@ void LRTRobot13::RobotInit()
 	
 	//CANTester::Instance()->Start();
 
-	AsyncPrinter::Printf("Creating Components\n");
+	AsyncPrinter::Println("Creating Components");
 	m_componentManager = new ComponentManager();
 //	m_componentManager->AddComponent(new ComponentSystemUnitTest());
 	m_componentManager->AddComponent(new Drivetrain());
 
-	AsyncPrinter::Printf("Starting TeleopInputs Task\n");
+	AsyncPrinter::Println("Starting TeleopInputs Task");
 	m_teleop = new TeleopInputs("TeleopInputs", 1);
 	m_teleop->Start();
 	
-	AsyncPrinter::Printf("Starting AutonomousRoutines Task\n");
+	AsyncPrinter::Println("Starting AutonomousRoutines Task");
 	m_auton = new AutonomousRoutines("AutonomousRoutines", 1);
 	m_auton->Start();
 	
-	AsyncPrinter::Printf("Starting Jaguar Tasks\n");
+	AsyncPrinter::Println("Starting Jaguar Tasks");
 	for (vector<AsyncCANJaguar*>::iterator it = AsyncCANJaguar::jaguar_vector.begin(); it < AsyncCANJaguar::jaguar_vector.end(); it++)
 	{
 		(*it)->Start();
@@ -63,7 +63,7 @@ void LRTRobot13::Run()
 {	
 	double lastUpdate = 0.0;
 	
-//	int e = -1;
+	int e = -1;
 	
 	while(true)
 	{
@@ -112,8 +112,8 @@ void LRTRobot13::Run()
 		
 		double toSleep = (int)((1000.0 / RobotConfig::LOOP_RATE) - timeSpent) / 1000.0;
 
-//		if(e++ % (RobotConfig::LOOP_RATE) == 0)
-//			AsyncPrinter::DbgPrint("Tick: %d", e);
+		if(e++ % (RobotConfig::LOOP_RATE) == 0)
+			AsyncPrinter::DbgPrint("Tick: %d", e);
 		
 		Wait(toSleep);
 	}

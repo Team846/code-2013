@@ -44,8 +44,8 @@ double Drivetrain::ComputeOutput(ForwardOrTurn axis)
 			m_PIDs[POSITION][axis].setInput(m_driveEncoders->getRobotDist());
 			m_PIDs[POSITION][axis].setSetpoint(lastTravelledDistance + positionSetpoint);
 			velocitySetpoint = Util::Clamp<double>(m_PIDs[POSITION][axis].update(1.0 / RobotConfig::LOOP_RATE),
-					m_componentData->drivetrainData->getPositionControlMaxSpeed(axis),
-					-m_componentData->drivetrainData->getPositionControlMaxSpeed(axis));
+					-m_componentData->drivetrainData->getPositionControlMaxSpeed(axis),
+					m_componentData->drivetrainData->getPositionControlMaxSpeed(axis));
 		}
 		// Fall through the switch
 	case VELOCITY_CONTROL:
@@ -84,6 +84,8 @@ void Drivetrain::enabledPeriodic()
 		lastTravelledDistance = m_driveEncoders->getRobotDist();
 		lastPositionSetpoint[FORWARD] = positionSetpoint;
 	}
+	AsyncPrinter::Printf("Last setpoint: %lf\n", lastPositionSetpoint[FORWARD]);
+	AsyncPrinter::Printf("Last travelled distance: %lf\n", lastTravelledDistance);
 	
 	if (fabs(lastTravelledDistance + m_componentData->drivetrainData->getRelativePositionSetpoint(FORWARD) - m_driveEncoders->getRobotDist()) <= m_errorThreshold)
 	{
