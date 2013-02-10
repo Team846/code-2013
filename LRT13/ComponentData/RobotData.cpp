@@ -94,3 +94,16 @@ string RobotData::Serialize()
 	
 	return "";
 }
+
+void RobotData::IncrementFrisbeeCounter()
+{
+	m_frisbees++;
+}
+void RobotData::DecrementFrisbeeCounter()
+{
+	m_frisbees--;
+}
+int RobotData::GetFrisbeeCounter()
+{
+	return m_frisbees;
+}

@@ -40,6 +40,8 @@ namespace Digital // Ports 1-14
 	const uint32_t LEFT_DRIVE_ENCODER_B = 3;
 	const uint32_t HALL_EFFECT = CHANGEME;
 	const uint32_t COMPRESSOR_PRESSURE_SENSOR_PIN = CHANGEME;
+	const uint32_t PROXIMITY_A = CHANGEME;
+	const uint32_t PROXIMITY_B = CHANGEME;
 }
 
 namespace Solenoid // Ports 1-8

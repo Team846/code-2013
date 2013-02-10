@@ -6,18 +6,20 @@
 #include "../ComponentData/RobotData.h"
 #include "../Config/Configurable.h"
 #include "../Log/Loggable.h"
-#include "ComponentWithJaguar.h"
 #include "../Utils/PID.h"
 #include "../ComponentData/DrivetrainData.h"
 #include "../Jaguar/AsyncCANJaguar.h"
+#include "../Components/Component.h"
+#include "DigitalInput.h"
+#include "../ComponentData/RobotData.h"
 
 using namespace data;
 
 /*!
  * @brief Provides control over the collector component.
- * @author Raphael Chang, Tony Peng
+ * @author Raphael Chang, Tony Peng, Manoj Vasishta
  */
-class Collector : public ComponentWithJaguar, public Configurable, public Loggable
+class Collector : public Component, public Configurable, public Loggable
 {
 public:
 	Collector();
@@ -32,8 +34,15 @@ public:
 	virtual void Configure();
 	virtual void Log();
 private:
-	string m_configSection;
+	AsyncCANJaguar* m_jaguar;
+	//Proximity Sensors
+	DigitalInput* m_proximityA; 
+	DigitalInput* m_proximityB;
 	
+	int m_upCount;
+	int m_downCount;
+	int m_errCount;
+	string m_configSection;
 	float m_dutyCycle;
 	
 	bool m_isEnabled;
