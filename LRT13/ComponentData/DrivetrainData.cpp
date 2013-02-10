@@ -64,6 +64,7 @@ SEM_ID DrivetrainData::positionOperationSemaphore(ForwardOrTurn mode,
 {
 	return mode == drivetrain::FORWARD ? m_positionFwdSemaphore : m_positionTurnSemaphore;
 }
+
 bool DrivetrainData::isDesiredPositionOperationComplete(ForwardOrTurn mode,
 		double errorThreshold)
 {

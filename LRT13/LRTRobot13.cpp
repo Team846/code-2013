@@ -14,13 +14,24 @@ LRTRobot13::~LRTRobot13()
 {
 	printf("LRTRobot13 Destructing\n");
 	
+	// Stop all tasks
+	m_auton->Abort();
+	m_teleop->Abort();
+	for (vector<AsyncCANJaguar*>::iterator it = AsyncCANJaguar::jaguar_vector.begin(); it < AsyncCANJaguar::jaguar_vector.end(); it++)
+	{
+		(*it)->Abort();
+	}
+	Pneumatics::Instance()->Abort();
+	LogManager::Instance()->Abort();
+	
 	DELETE(m_componentManager);
 	
-	// finalize all singletons
+	// Finalize all singletons
 	ComponentData::Finalize();
 	AsyncPrinter::Finalize();
 	ConfigManager::Finalize();
 	LogManager::Finalize();
+	Pneumatics::Finalize();
 	DriveEncoders::Finalize();
 	CANTester::Finalize();
 }
@@ -37,11 +48,11 @@ void LRTRobot13::RobotInit()
 	m_componentManager->AddComponent(new Drivetrain());
 
 	AsyncPrinter::Println("Starting TeleopInputs Task");
-	m_teleop = new TeleopInputs("TeleopInputs", 1);
+	m_teleop = new TeleopInputs("TeleopInputs");
 	m_teleop->Start();
 	
 	AsyncPrinter::Println("Starting AutonomousRoutines Task");
-	m_auton = new AutonomousRoutines("AutonomousRoutines", 1);
+	m_auton = new AutonomousRoutines("AutonomousRoutines");
 	m_auton->Start();
 	
 	AsyncPrinter::Println("Starting Jaguar Tasks");
@@ -49,6 +60,12 @@ void LRTRobot13::RobotInit()
 	{
 		(*it)->Start();
 	}
+	
+	AsyncPrinter::Println("Starting Pneumatics Task");
+	Pneumatics::Instance()->Start();
+	
+	AsyncPrinter::Println("Starting LogManager Task");
+	LogManager::Instance()->Start();
 	
 	ConfigManager::Instance()->ConfigureAll();
 }
@@ -78,7 +95,7 @@ void LRTRobot13::Run()
 		// Update appropriate operation controllers
 		if (RobotData::GetCurrentState() == RobotData::AUTONOMOUS)
 		{
-			m_auton->RunOneCycle(); // Called every loop, but Tick() is only called the first time when autonomous mode is entered.
+			m_auton->RunOneCycle(); // Called every loop, but Tick() is only called again when the entire autonomous routine is complete.
 		}
 		else if (RobotData::GetCurrentState() == RobotData::TELEOP)
 		{
@@ -104,6 +121,12 @@ void LRTRobot13::Run()
 		{
 			(*it)->RunOneCycle();
 		}
+		
+		// Update pneumatics
+		Pneumatics::Instance()->RunOneCycle();
+		
+		// Update LogManager
+		LogManager::Instance()->RunOneCycle();
 		
 		wdCancel(_watchdog);
 		

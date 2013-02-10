@@ -23,7 +23,7 @@ class AutoActions;
 class AutonomousRoutines : public SynchronizedProcess
 {
 public:
-	AutonomousRoutines(char * taskName, INT32 priority);
+	AutonomousRoutines(char * taskName, INT32 priority=Task::kDefaultPriority);
 	~AutonomousRoutines();
 	
 	/*
@@ -49,7 +49,7 @@ private:
 	void Autonomous();
 	
 	/*
-	 * @brief Creates a queue of actions to run
+	 * @brief Creates a queue of actions to run based on selected routine
 	 */
 	void LoadQueue();
 	

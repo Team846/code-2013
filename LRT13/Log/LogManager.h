@@ -5,13 +5,14 @@
 #include <vector>
 #include "Loggable.h"
 #include "../Utils/Defines.h"
+#include "../Process/SynchronizedProcess.h"
 
 /*!
  * @brief Manages all instances of Loggable.
  * @author Raphael Chang, Tony Peng
  */
 
-class LogManager
+class LogManager : public SynchronizedProcess
 {
 public:
 	static LogManager* Instance();
@@ -20,6 +21,8 @@ public:
 	~LogManager();
 	static void Register(Loggable* loggable);
 	static void LogAll();
+protected:
+	INT32 Tick();
 private:
 	LogManager();
 	static LogManager* m_instance;

@@ -7,7 +7,7 @@
 using namespace data;
 using namespace data::drivetrain;
 
-const AutonomousRoutines::autonStage AutonomousRoutines::DRIVE_FORWARD_AND_SHOOT[] = {INIT, DRIVE_FORWARD, AUTO_AIM, SHOOT, COMPLETED};
+const AutonomousRoutines::autonStage AutonomousRoutines::DRIVE_FORWARD_AND_SHOOT[5] = {INIT, DRIVE_FORWARD, AUTO_AIM, SHOOT, COMPLETED};
 
 AutonomousRoutines::AutonomousRoutines(char * taskName, INT32 priority) :
 	SynchronizedProcess(taskName, priority)
@@ -61,7 +61,6 @@ void AutonomousRoutines::Autonomous()
 			m_componentData->drivetrainData->setRelativePositionSetpoint(TURN, 0.0, 0.0);
 			// Take semaphore to wait until operation completes
 			semTake(m_componentData->drivetrainData->positionOperationSemaphore(FORWARD, 0), WAIT_FOREVER);
-			semGive(m_componentData->drivetrainData->positionOperationSemaphore(FORWARD, 0));
 			break;
 		case AUTO_AIM:
 			while(!m_autoActions->AutoAim());

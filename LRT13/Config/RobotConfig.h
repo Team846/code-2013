@@ -24,12 +24,12 @@ namespace Drive
 
 namespace AutoActions
 {
-	const uint32_t AUTO_AIM_TIMEOUT = 500;
+	const uint32_t AUTO_AIM_TIMEOUT = 500; //cycles
 }
 
 namespace Analog // Ports 1-7
 {
-
+	const uint32_t COLLECTOR_POT = CHANGEME;
 }
 
 namespace Digital // Ports 1-14
@@ -39,6 +39,24 @@ namespace Digital // Ports 1-14
 	const uint32_t LEFT_DRIVE_ENCODER_A = 4;
 	const uint32_t LEFT_DRIVE_ENCODER_B = 3;
 	const uint32_t HALL_EFFECT = CHANGEME;
+	const uint32_t COMPRESSOR_PRESSURE_SENSOR_PIN = CHANGEME;
+}
+
+namespace Solenoid // Ports 1-8
+{
+	const uint32_t COLLECTOR_LEFT_A = CHANGEME;
+	const uint32_t COLLECTOR_LEFT_B = CHANGEME;
+	const uint32_t COLLECTOR_RIGHT_A = CHANGEME;
+	const uint32_t COLLECTOR_RIGHT_B = CHANGEME;
+	const uint32_t CLIMBER_LEFT_A = CHANGEME;
+	const uint32_t CLIMBER_LEFT_B = CHANGEME;
+	const uint32_t CLIMBER_RIGHT_A = CHANGEME;
+	const uint32_t CLIMBER_RIGHT_B = CHANGEME;
+}
+
+namespace Relay // Ports 1-8
+{
+const uint32_t COMPRESSOR_RELAY = CHANGEME;
 }
 
 namespace CAN // Ports 1-16 (2CAN limitation)

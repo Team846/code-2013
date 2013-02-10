@@ -15,11 +15,21 @@ void LogManager::Finalize()
 	DELETE(m_instance);
 }
 
-LogManager::LogManager()
-{ }
+LogManager::LogManager() :
+	SynchronizedProcess("LogManager")
+{
+	
+}
 
 LogManager::~LogManager()
-{ }
+{
+	
+}
+
+INT32 LogManager::Tick()
+{
+	LogAll();
+}
 
 void LogManager::Register(Loggable* loggable)
 {
