@@ -37,6 +37,7 @@ const uint32_t MOTORS = 1;
 const uint32_t DRIVETRAIN = 2;
 const uint32_t COLLECTOR = 3;
 const uint32_t SHOOTER = 4;
+const uint32_t CLIMBER = 5;
 const uint32_t COMP_UNIT_TEST = 8;
 }
 namespace AnalogIns
