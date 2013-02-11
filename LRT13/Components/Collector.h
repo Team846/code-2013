@@ -13,6 +13,9 @@
 #include "DigitalInput.h"
 #include "../ComponentData/RobotData.h"
 
+#define SAMPLES_THRESHOLD 4 //needs tweaking
+
+
 using namespace data;
 
 /*!
@@ -35,13 +38,16 @@ public:
 	virtual void Log();
 private:
 	AsyncCANJaguar* m_jaguar;
+	
 	//Proximity Sensors
 	DigitalInput* m_proximityA; 
 	DigitalInput* m_proximityB;
 	
+	//Frisbee Counters
 	int m_upCount;
 	int m_downCount;
 	int m_errCount;
+	
 	string m_configSection;
 	float m_dutyCycle;
 	

@@ -95,15 +95,15 @@ string RobotData::Serialize()
 	return "";
 }
 
-void RobotData::IncrementFrisbeeCounter()
+void RobotData::IncrementFrisbeeCounter(ORIENTATION b)
 {
-	m_frisbees++;
+	m_frisbees[b]++;
 }
-void RobotData::DecrementFrisbeeCounter()
+void RobotData::DecrementFrisbeeCounter(ORIENTATION b)
 {
-	m_frisbees--;
+	m_frisbees[b]--;
 }
 int RobotData::GetFrisbeeCounter()
 {
-	return m_frisbees;
+	return m_frisbees[UP] + m_frisbees[DOWN];
 }

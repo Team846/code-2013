@@ -33,7 +33,9 @@ void Collector::onDisable()
 void Collector::enabledPeriodic()
 {
 	m_jaguar->SetDutyCycle(m_dutyCycle);
+	
 	//Increments Orientation + Error Counters
+	
 	if (m_proximityA->Get() == 1 && m_proximityB->Get() == 0)
 	{
 		m_upCount++;
@@ -60,9 +62,14 @@ void Collector::enabledPeriodic()
 	}
 	
 	//Operating on assupmtion that frisbees aren't flush against each other
-	if(m_downCount == 4 || m_upCount == 4)
+	if(m_downCount == SAMPLES_THRESHOLD || m_upCount == SAMPLES_THRESHOLD)
 	{
-		RobotData::IncrementFrisbeeCounter();	
+		
+		RobotData::IncrementFrisbeeCounter(RobotData::UP);	
+	}
+	if(m_errCount == SAMPLES_THRESHOLD)
+	{
+		; //Add ErrLog; Extreme Noise or Weird Sensor Config
 	}
 }
 
@@ -78,5 +85,5 @@ void Collector::Configure()
 
 void Collector::Log()
 {
-	
+
 }
