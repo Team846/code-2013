@@ -16,7 +16,7 @@ using namespace data;
 
 /*!
  * @brief Provides control over the shooter component.
- * @author Tony Peng
+ * @author Tony Peng, Varun Parthasarathy
  */
 class Shooter : public Component, public Configurable, public Loggable
 {

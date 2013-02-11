@@ -4,10 +4,6 @@
 using namespace data;
 using namespace data::shooter;
 
-/*
- * @author Varun Parthasarathy
- */
-
 ShooterData::ShooterData()
 {
 	

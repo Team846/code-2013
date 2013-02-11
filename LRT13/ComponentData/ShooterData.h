@@ -7,7 +7,7 @@ namespace data
 {
 	/*!
 	 * @brief Contains methods and data to access shooter data.
-	 * @author Tony Peng
+	 * @author Tony Peng, Varun Parthasarathy
 	 */
 	namespace shooter
 	{
@@ -19,7 +19,7 @@ namespace data
 		
 		enum shooterConfiguration
 		{
-			SLOW, LESSSLOW
+			SLOW = 0, LESSSLOW = 1
 		};
 	
 		class ShooterData
