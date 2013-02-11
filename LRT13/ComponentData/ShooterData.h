@@ -11,11 +11,33 @@ namespace data
 	 */
 	namespace shooter
 	{
+	
+		enum shooterState
+		{
+			DISABLED, RUNNING
+		};
+		
+		enum shooterConfiguration
+		{
+			SLOW, LESSSLOW
+		};
+	
 		class ShooterData
 		{
-		
+			public:
+				ShooterData();
+				data::shooter::shooterConfiguration desiredTarget;
+				data::shooter::shooterState state;
+				double speed;
+			private:
+				bool atSpeed;
+				
+				
 		};
 	}
+	
+	
+	
 }
 
 #endif

@@ -3,13 +3,14 @@
 
 #include <string>
 
-#include "ComponentWithJaguar.h"
+#include "Component.h"
 #include "../ComponentData/RobotData.h"
 #include "../Config/Configurable.h"
 #include "../Log/Loggable.h"
 #include "../Utils/PID.h"
 #include "../ComponentData/DrivetrainData.h"
 #include "../Jaguar/AsyncCANJaguar.h"
+#include "../ComponentData/ShooterData.h"
 
 using namespace data;
 
@@ -17,7 +18,7 @@ using namespace data;
  * @brief Provides control over the shooter component.
  * @author Tony Peng
  */
-class Shooter : public ComponentWithJaguar, public Configurable, public Loggable
+class Shooter : public Component, public Configurable, public Loggable
 {
 public:
 	Shooter();
@@ -33,12 +34,21 @@ public:
 	virtual void Log();
 private:
 	string m_configSection;
+
+	AsyncCANJaguar* m_jaguar;
+	Counter* m_enc;
 	
 	PID m_pid;
+
+	int wrongSpeedCounter;
 	
 	float m_dutyCycle;
 	
-	bool m_isEnabled;
+	double m_speed;
+	double m_max_speed;
+
+	data::shooter::shooterConfiguration m_shooterConfiguration;
+	
 };
 
 #endif
