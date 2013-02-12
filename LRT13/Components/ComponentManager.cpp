@@ -87,53 +87,60 @@ void ComponentManager::AddComponent(string id, Component* comp)
 
 Component* ComponentManager::GetComponent(string id)
 {
-	if(ValidComponentCheck(id)==true)
+	if(ValidComponentCheck(id))
 	{
 		return m_components[id];
 	}
 	else
 	{
-		return NULL; //This WILL immediately crash the robot. 
+		AsyncPrinter::Printf("ComponentManager::GetComponent(): Invalid Reference to Component: %s\n", id.c_str());
+		return NULL;
 	}
 }
 
 void ComponentManager::EnableComponent(string id)
 {
-	if(ValidComponentCheck(id)==true)
+	if(ValidComponentCheck(id))
 	{
 		m_components[id]->Enable();
+	}
+	else
+	{
+		AsyncPrinter::Printf("ComponentManager::EnableComponent(): Invalid Reference to Component: %s\n", id.c_str());
 	}
 }
 
 void ComponentManager::DisableComponent(string id)
 {
-	if(ValidComponentCheck(id)==true)
+	if(ValidComponentCheck(id))
 	{
 		m_components[id]->Disable();
+	}
+	else
+	{
+		AsyncPrinter::Printf("ComponentManager::DisableComponent(): Invalid Reference to Component: %s\n", id.c_str());
 	}
 }
 
 bool ComponentManager::IsComponentEnabled(string id)
 {
-	if(ValidComponentCheck(id)==true)
-		{
-			return m_components[id]->IsEnabled();
-		}
+	if(ValidComponentCheck(id))
+	{
+		return m_components[id]->IsEnabled();
+	}
+	else
+	{
+		AsyncPrinter::Printf("ComponentManager::IsComponentEnabled(): Invalid Reference to Component: %s\n", id.c_str());
+	}
 	return false;
 }
 
 bool ComponentManager::ValidComponentCheck(string id)
 {
-	
 	map<string, Component*>::iterator it = m_components.find(id);
 	if(it == m_components.end())
 	{
-		AsyncPrinter::DbgPrint("Invalid Reference to Component: %s", id.c_str());//Debug Message
 		return false;
 	}
-	else
-	{
-		return true;
-	}
-	
+	return true;
 }
