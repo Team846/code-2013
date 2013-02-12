@@ -87,21 +87,53 @@ void ComponentManager::AddComponent(string id, Component* comp)
 
 Component* ComponentManager::GetComponent(string id)
 {
-#warning should confirm if a component with id exists
-	return m_components[id];
+	if(ValidComponentCheck(id)==true)
+	{
+		return m_components[id];
+	}
+	else
+	{
+		return NULL; //This WILL immediately crash the robot. 
+	}
 }
 
 void ComponentManager::EnableComponent(string id)
 {
-	m_components[id]->Enable();
+	if(ValidComponentCheck(id)==true)
+	{
+		m_components[id]->Enable();
+	}
 }
 
 void ComponentManager::DisableComponent(string id)
 {
-	m_components[id]->Disable();
+	if(ValidComponentCheck(id)==true)
+	{
+		m_components[id]->Disable();
+	}
 }
 
 bool ComponentManager::IsComponentEnabled(string id)
 {
-	return m_components[id]->IsEnabled();
+	if(ValidComponentCheck(id)==true)
+		{
+			return m_components[id]->IsEnabled();
+		}
+	return false;
+}
+
+bool ComponentManager::ValidComponentCheck(string id)
+{
+	
+	map<string, Component*>::iterator it = m_components.find(id);
+	if(it == m_components.end())
+	{
+		AsyncPrinter::DbgPrint("Invalid Reference to Component: %s", id.c_str());//Debug Message
+		return false;
+	}
+	else
+	{
+		return true;
+	}
+	
 }

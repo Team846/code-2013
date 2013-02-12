@@ -31,6 +31,7 @@ public:
 	void DisableComponent(string id);
 
 	bool IsComponentEnabled(string id);
+	bool ValidComponentCheck(string id);
 
 private:
 	static bool deleteAllComponents(Component* comp);
