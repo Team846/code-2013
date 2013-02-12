@@ -21,7 +21,7 @@ LRTRobot13::~LRTRobot13()
 	{
 		(*it)->Abort();
 	}
-	Pneumatics::Instance()->Abort();
+	//Pneumatics::Instance()->Abort();
 	LogManager::Instance()->Abort();
 	
 	DELETE(m_componentManager);
@@ -31,7 +31,7 @@ LRTRobot13::~LRTRobot13()
 	AsyncPrinter::Finalize();
 	ConfigManager::Finalize();
 	LogManager::Finalize();
-	Pneumatics::Finalize();
+	//Pneumatics::Finalize();
 	DriveEncoders::Finalize();
 	CANTester::Finalize();
 }
@@ -62,7 +62,7 @@ void LRTRobot13::RobotInit()
 	}
 	
 	AsyncPrinter::Println("Starting Pneumatics Task");
-	Pneumatics::Instance()->Start();
+	//Pneumatics::Instance()->Start();
 	
 	AsyncPrinter::Println("Starting LogManager Task");
 	LogManager::Instance()->Start();
@@ -123,7 +123,7 @@ void LRTRobot13::Run()
 		}
 		
 		// Update pneumatics
-		Pneumatics::Instance()->RunOneCycle();
+		//Pneumatics::Instance()->RunOneCycle();
 		
 		// Update LogManager
 		LogManager::Instance()->RunOneCycle();

@@ -7,13 +7,23 @@ namespace data
 {
 	/*!
 	 * @brief Contains methods and data to access frisbee storage component.
-	 * @author Raphael Chang
+	 * @author Tony Peng, Raphael Chang
 	 */
+
 	namespace storage
 	{
 		class StorageData
 		{
+		public:
+			StorageData();
+			~StorageData();
 			
+			void IncrementFrisbeeCount();
+			void DecrementFrisbeeCount();
+			
+			int GetFrisbeeCount();
+		private:
+			int m_frisbeeCount;
 		};
 	}
 	

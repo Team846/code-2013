@@ -13,6 +13,8 @@ AsyncProcess::~AsyncProcess()
 	Abort(0);
 
 	DELETE(m_task);
+	
+	semDelete(m_quittingSem);
 }
 
 void AsyncProcess::Start()

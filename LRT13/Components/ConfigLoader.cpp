@@ -23,18 +23,20 @@ void ConfigLoader::onDisable()
 
 void ConfigLoader::enabledPeriodic()
 {
-	if (m_componentData->configLoaderData->load)
+	if (m_componentData->configLoaderData->IsLoadRequested())
 	{
 		m_config->Load();
-		m_componentData->configLoaderData->load = false;
-	} else if (m_componentData->configLoaderData->save)
+		m_componentData->configLoaderData->RemoveLoadRequest();
+	}
+	else if (m_componentData->configLoaderData->IsSaveRequested())
 	{
 		m_config->Save();
-		m_componentData->configLoaderData->save = false;
-	} else if (m_componentData->configLoaderData->apply)
+		m_componentData->configLoaderData->RemoveSaveRequest();
+	}
+	else if (m_componentData->configLoaderData->IsApplyRequested())
 	{
 		m_config->ConfigureAll();
-		m_componentData->configLoaderData->apply = false;
+		m_componentData->configLoaderData->RemoveApplyRequest();
 	}	
 }
 

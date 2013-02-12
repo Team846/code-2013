@@ -6,7 +6,7 @@
 using namespace data;
 using namespace drivetrain;
 using namespace shooter;
-using namespace configLoader;
+using namespace configloader;
 
 ComponentData* ComponentData::m_instance = NULL;
 

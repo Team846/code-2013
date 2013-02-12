@@ -96,9 +96,9 @@ void TeleopInputs::Update()
 	/************************Config************************/
 	
 	if(m_driver_stick->IsButtonJustPressed(DriverStationConfig::JoystickButtons::SAVE_CONFIG))
-		m_componentData->configLoaderData->save = true;
+		m_componentData->configLoaderData->RequestSave();
 	if(m_driver_stick->IsButtonJustPressed(DriverStationConfig::JoystickButtons::LOAD_CONFIG))
-		m_componentData->configLoaderData->load= true;
+		m_componentData->configLoaderData->RequestLoad();
 	if(m_driver_stick->IsButtonJustPressed(DriverStationConfig::JoystickButtons::APPLY_CONFIG))
-		m_componentData->configLoaderData->apply = true;
+		m_componentData->configLoaderData->RequestApply();
 }

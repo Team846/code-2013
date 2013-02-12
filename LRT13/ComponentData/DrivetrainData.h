@@ -38,6 +38,7 @@ namespace drivetrain
 	{
 	public:
 		DrivetrainData();
+		~DrivetrainData();
 		
 		ControlMode getControlMode(ForwardOrTurn mode);
 	

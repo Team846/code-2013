@@ -61,8 +61,14 @@ namespace Network
 		 */
 		int Close();
 		
+		/*!
+		 * @brief Sends the contents of the NetBuffer over the network connection.
+		 */
 		int Send(NetBuffer buff);
 		
+		/*!
+		 * @brief Returns the next message in the message queue.
+		 */
 		NetBuffer* GetMessage();
 	protected:
 		INT32 Tick();

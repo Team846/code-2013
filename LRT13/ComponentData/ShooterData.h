@@ -21,10 +21,10 @@ namespace data
 		{
 			public:
 				ShooterData();
-				void setDesiredSpeed(double desiredSpeed, Roller roller);
-				double getDesiredSpeed(Roller roller);
-				void setAtSpeed(bool value, Roller roller);
-				bool isAtSpeed(Roller roller);
+				void SetDesiredSpeed(double desiredSpeed, Roller roller);
+				double GetDesiredSpeed(Roller roller);
+				void SetAtSpeed(bool value, Roller roller);
+				bool IsAtSpeed(Roller roller);
 			private:
 				double speed[2];
 				bool atSpeed[2];

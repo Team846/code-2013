@@ -28,36 +28,67 @@ Drivetrain::~Drivetrain()
 
 double Drivetrain::ComputeOutput(ForwardOrTurn axis)
 {
-	double positionSetpoint = m_componentData->drivetrainData->getRelativePositionSetpoint(axis); // this will tell you how much further to go
-	
+	double positionSetpoint = m_componentData->drivetrainData->getRelativePositionSetpoint(axis);
+		
 	// TODO: Add turn position control
 	double velocitySetpoint = m_componentData->drivetrainData->getVelocitySetpoint(axis);
 	double rawOutput = m_componentData->drivetrainData->getOpenLoopOutput(axis);
-	switch (m_componentData->drivetrainData->getControlMode(axis))
+	
+	if(axis == FORWARD)
 	{
-	case POSITION_CONTROL:
-		if (axis == FORWARD)
+		switch (m_componentData->drivetrainData->getControlMode(axis))
 		{
+		case POSITION_CONTROL:
 			m_PIDs[POSITION][axis].setInput(m_driveEncoders->getRobotDist());
 			m_PIDs[POSITION][axis].setSetpoint(m_componentData->drivetrainData->getPositionControlStartingPosition(axis) + positionSetpoint);
 			velocitySetpoint = Util::Clamp<double>(m_PIDs[POSITION][axis].update(1.0 / RobotConfig::LOOP_RATE),
 					-m_componentData->drivetrainData->getPositionControlMaxSpeed(axis),
 					m_componentData->drivetrainData->getPositionControlMaxSpeed(axis));
-		}
 		// Fall through the switch
-	case VELOCITY_CONTROL:
-		if (axis == data::drivetrain::FORWARD)
+		case VELOCITY_CONTROL:
 			m_PIDs[VELOCITY][axis].setInput(m_driveEncoders->getNormalizedForwardSpeed());
-		else
-			m_PIDs[VELOCITY][axis].setInput(m_driveEncoders->getNormalizedTurningSpeed());
+				
+			m_PIDs[VELOCITY][axis].setSetpoint(velocitySetpoint);
 			
-		m_PIDs[VELOCITY][axis].setSetpoint(velocitySetpoint);
-		
-		rawOutput = m_PIDs[VELOCITY][axis].update(1.0 / RobotConfig::LOOP_RATE);
-		break;
-	case OPEN_LOOP:
-		break;
+			rawOutput = m_PIDs[VELOCITY][axis].update(1.0 / RobotConfig::LOOP_RATE);
+			break;
+		case OPEN_LOOP:
+			break;
+		}
 	}
+	else if(axis == TURN)
+	{
+		// TODO: check/test me
+		switch (m_componentData->drivetrainData->getControlMode(axis))
+		{
+		case POSITION_CONTROL:
+			m_PIDs[POSITION][axis].setInput(fmod(m_driveEncoders->getTurnAngle(), 360.0)); // where we are (mod by 360 to wrap angles to (-360, 360))
+			
+			// efficient turning
+			double toTurn = positionSetpoint - m_PIDs[POSITION][axis].getInput();
+			toTurn = fmod(toTurn, 360.0);
+			
+			// limit to the range (-180, 180)
+			toTurn = Util::MinAbs(toTurn, toTurn - Util::Sign(toTurn) * 360);
+
+			m_PIDs[POSITION][axis].setSetpoint(m_PIDs[POSITION][axis].getInput() + toTurn);
+			
+			velocitySetpoint = Util::Clamp<double>(m_PIDs[POSITION][axis].update(1.0 / RobotConfig::LOOP_RATE),
+								-m_componentData->drivetrainData->getPositionControlMaxSpeed(axis),
+								m_componentData->drivetrainData->getPositionControlMaxSpeed(axis));
+			// Fall through the switch
+		case VELOCITY_CONTROL:
+			m_PIDs[VELOCITY][axis].setInput(m_driveEncoders->getNormalizedTurningSpeed());
+				
+			m_PIDs[VELOCITY][axis].setSetpoint(velocitySetpoint);
+			
+			rawOutput = m_PIDs[VELOCITY][axis].update(1.0 / RobotConfig::LOOP_RATE);
+			break;
+		case OPEN_LOOP:
+			break;
+		}
+	}
+	
 	return rawOutput;
 }
 

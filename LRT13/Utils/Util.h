@@ -182,6 +182,20 @@ public:
 			return val1;
 		return val2;
 	}
+	
+	/*!
+	 * @brief Returns the value with the lesser absolute value.
+	 * @param val1 first value to compare
+	 * @param val2 second value to compare
+	 * @return the lower value
+	 */
+	template<typename T>
+	static inline T MinAbs(T val1, T val2)
+	{
+		if (fabs(val1) < fabs(val2))
+			return val1;
+		return val2;
+	}
 
 	/*!
 	 * @brief Takes the exponent without changing the sign

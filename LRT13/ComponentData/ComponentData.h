@@ -14,7 +14,7 @@ namespace data
 	{
 		class ShooterData;
 	}
-	namespace configLoader
+	namespace configloader
 	{
 		class ConfigLoaderData;
 	}
@@ -32,7 +32,7 @@ namespace data
 		
 		drivetrain::DrivetrainData* const drivetrainData;
 		shooter::ShooterData* const shooterData;
-		configLoader::ConfigLoaderData* const configLoaderData;
+		configloader::ConfigLoaderData* const configLoaderData;
 	
 	protected:
 		ComponentData();

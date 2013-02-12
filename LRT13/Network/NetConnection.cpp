@@ -18,6 +18,8 @@ NetConnection::~NetConnection()
 #ifdef __VXWORKS__
 INT32 NetConnection:: InternalPlatformUpdateTaskWrapper(UINT32 instance)
 {
+	// vxworks specific code
+	
 	NetConnection* conn = (NetConnection*)instance;
 	
 	while(conn->m_isRunning)
@@ -30,6 +32,7 @@ INT32 NetConnection:: InternalPlatformUpdateTaskWrapper(UINT32 instance)
 void NetConnection::InternalPlatformQueueSynchronizationCreate()
 {
 #ifdef __VXWORKS__
+	// vxworks specific code
 	m_msgQueueMutex = semBCreate(SEM_Q_PRIORITY, SEM_FULL);
 #endif
 }
@@ -37,6 +40,7 @@ void NetConnection::InternalPlatformQueueSynchronizationCreate()
 void NetConnection::InternalPlatformQueueSynchronizationEnter()
 {
 #ifdef __VXWORKS__
+	// vxworks specific code
 	semTake(m_msgQueueMutex, WAIT_FOREVER);
 #endif
 }
@@ -61,6 +65,7 @@ void NetConnection::Update()
 void NetConnection::InternalPlatformQueueSynchronizationLeave()
 {
 #ifdef __VXWORKS__
+	// vxworks specific code
 	semGive(m_msgQueueMutex);
 #endif
 }
@@ -74,6 +79,7 @@ void NetConnection::InternalPlatformCreateUpdateTask()
 	s << "NetConnection" << counter;
 	
 #ifdef __VXWORKS__
+	// vxworks specific code
 	m_internalUpdateTask = new Task(s.str().c_str(), (FUNCPTR)InternalPlatformUpdateTaskWrapper);
 #endif
 }
@@ -81,6 +87,7 @@ void NetConnection::InternalPlatformCreateUpdateTask()
 void NetConnection::InternalPlatformRunUpdateTask()
 {
 #ifdef __VXWORKS__
+	// vxworks specific code
 	m_internalUpdateTask->Start((UINT32)this);
 #endif
 }
@@ -88,6 +95,7 @@ void NetConnection::InternalPlatformRunUpdateTask()
 void NetConnection::InternalPlatformDestroyUpdateTask()
 {
 #ifdef __VXWORKS__
+	// vxworks specific code
 	m_internalUpdateTask->Stop();
 	
 	DELETE(m_internalUpdateTask);

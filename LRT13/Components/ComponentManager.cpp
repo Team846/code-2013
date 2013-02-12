@@ -87,7 +87,7 @@ void ComponentManager::AddComponent(string id, Component* comp)
 
 Component* ComponentManager::GetComponent(string id)
 {
-	if(ValidComponentCheck(id))
+	if(HasComponent(id))
 	{
 		return m_components[id];
 	}
@@ -100,7 +100,7 @@ Component* ComponentManager::GetComponent(string id)
 
 void ComponentManager::EnableComponent(string id)
 {
-	if(ValidComponentCheck(id))
+	if(HasComponent(id))
 	{
 		m_components[id]->Enable();
 	}
@@ -112,7 +112,7 @@ void ComponentManager::EnableComponent(string id)
 
 void ComponentManager::DisableComponent(string id)
 {
-	if(ValidComponentCheck(id))
+	if(HasComponent(id))
 	{
 		m_components[id]->Disable();
 	}
@@ -124,7 +124,7 @@ void ComponentManager::DisableComponent(string id)
 
 bool ComponentManager::IsComponentEnabled(string id)
 {
-	if(ValidComponentCheck(id))
+	if(HasComponent(id))
 	{
 		return m_components[id]->IsEnabled();
 	}
@@ -135,7 +135,7 @@ bool ComponentManager::IsComponentEnabled(string id)
 	return false;
 }
 
-bool ComponentManager::ValidComponentCheck(string id)
+bool ComponentManager::HasComponent(string id)
 {
 	map<string, Component*>::iterator it = m_components.find(id);
 	if(it == m_components.end())

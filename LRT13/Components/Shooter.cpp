@@ -46,7 +46,7 @@ void Shooter::enabledPeriodic()
 	m_speed_back = (m_enc_back->GetStopped()) ? 0.0 : (60.0 / 2.0 / m_enc_back->GetPeriod());
 	m_speed_back = Util::Clamp<double>(m_speed_back, 0, m_max_speed * 1.3);
 	
-	if(m_speed_front < m_componentData->shooterData->getDesiredSpeed(FRONT)) 
+	if(m_speed_front < m_componentData->shooterData->GetDesiredSpeed(FRONT)) 
 	{
 		wrongSpeedCounter++;
 		if(wrongSpeedCounter > 9) 
