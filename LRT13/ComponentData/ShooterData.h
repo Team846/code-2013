@@ -7,32 +7,27 @@ namespace data
 {
 	/*!
 	 * @brief Contains methods and data to access shooter data.
-	 * @author Tony Peng, Varun Parthasarathy
+	 * @author Tony Peng, Varun Parthasarathy, Raphael Chang
 	 */
 	namespace shooter
 	{
-	
-		enum shooterState
+		enum Roller
 		{
-			DISABLED, RUNNING
+			FRONT = 0,
+			BACK = 1
 		};
 		
-		enum shooterConfiguration
-		{
-			SLOW = 0, LESSSLOW = 1
-		};
-	
 		class ShooterData
 		{
 			public:
 				ShooterData();
-				data::shooter::shooterConfiguration desiredTarget;
-				data::shooter::shooterState state;
-				double speed;
+				void setDesiredSpeed(double desiredSpeed, Roller roller);
+				double getDesiredSpeed(Roller roller);
+				void setAtSpeed(bool value, Roller roller);
+				bool isAtSpeed(Roller roller);
 			private:
-				bool atSpeed;
-				
-				
+				double speed[2];
+				bool atSpeed[2];
 		};
 	}
 	

@@ -24,14 +24,15 @@ namespace data
 			DISABLED = 2
 		};
 		
-		enum ORIENTATION
+		enum Orientation
 		{
 			UP = 0,
 			DOWN = 1
 		};
-		static void IncrementFrisbeeCounter(ORIENTATION);
-		static void DecrementFrisbeeCounter(ORIENTATION);
+		static void IncrementFrisbeeCounter(Orientation);
+		static void DecrementFrisbeeCounter(Orientation);
 		static int GetFrisbeeCounter();
+		static int GetFrisbeeCounter(Orientation);
 		
 		static int GetMissedPacketsInLifetime();
 		static void IncrementMissedPacketsInLifetime();
@@ -49,7 +50,6 @@ namespace data
 		
 	private:
 		static int m_missedPacketsInLifetime;
-		static int m_cycleCount;
 
 		static RobotState m_state;
 		static int _id;

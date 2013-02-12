@@ -13,7 +13,7 @@ namespace collector
 {
 	class CollectorData
 	{
-	
+		
 	};
 }
 }

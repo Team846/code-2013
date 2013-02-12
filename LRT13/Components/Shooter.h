@@ -16,7 +16,7 @@ using namespace data;
 
 /*!
  * @brief Provides control over the shooter component.
- * @author Tony Peng, Varun Parthasarathy
+ * @author Tony Peng, Varun Parthasarathy, Raphael Chang
  */
 class Shooter : public Component, public Configurable, public Loggable
 {
@@ -35,8 +35,10 @@ public:
 private:
 	string m_configSection;
 
-	AsyncCANJaguar* m_jaguar;
-	Counter* m_enc;
+	AsyncCANJaguar* m_jaguar_front;
+	AsyncCANJaguar* m_jaguar_back;
+	Counter* m_enc_front;
+	Counter* m_enc_back;
 	
 	PID m_pid;
 
@@ -44,11 +46,9 @@ private:
 	
 	float m_dutyCycle;
 	
-	double m_speed;
+	double m_speed_front;
+	double m_speed_back;
 	double m_max_speed;
-
-	data::shooter::shooterConfiguration m_shooterConfiguration;
-	
 };
 
 #endif

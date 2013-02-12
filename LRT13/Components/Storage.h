@@ -7,23 +7,22 @@
 #include "../Config/Configurable.h"
 #include "../Log/Loggable.h"
 #include "../Utils/PID.h"
-#include "../ComponentData/CollectorData.h"
+#include "../ComponentData/StorageData.h"
 #include "../Jaguar/AsyncCANJaguar.h"
 #include "../Components/Component.h"
-#include "DigitalInput.h"
 #include "../ComponentData/RobotData.h"
 
 using namespace data;
 
 /*!
  * @brief Provides control over the collector component.
- * @author Raphael Chang, Tony Peng, Manoj Vasishta
+ * @author Raphael Chang
  */
-class Collector : public Component, public Configurable, public Loggable
+class Storage : public Component, public Configurable, public Loggable
 {
 public:
-	Collector();
-	~Collector();
+	Storage();
+	~Storage();
 	
 	virtual void onEnable(); 
 	virtual void onDisable();
@@ -36,20 +35,7 @@ public:
 private:
 	AsyncCANJaguar* m_jaguar;
 	
-	// Proximity Sensors
-	DigitalInput* m_proximityA; 
-	DigitalInput* m_proximityB;
-	
-	// Frisbee Counters
-	int m_upCount;
-	int m_downCount;
-	int m_errCount;
-	
-	int m_errors;
-	
-	int m_samplesThreshold;
-	
-	float m_dutyCycle;
+	double m_dutyCycle;
 	
 	string m_configSection;
 };

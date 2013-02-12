@@ -11,6 +11,12 @@ Collector::Collector()
 	m_jaguar = new AsyncCANJaguar(RobotConfig::CAN::COLLECTOR, "Collector");
 	m_proximityA = new DigitalInput(RobotConfig::Digital::PROXIMITY_A);
 	m_proximityB = new DigitalInput(RobotConfig::Digital::PROXIMITY_B);
+	m_dutyCycle = 0.0;
+	m_upCount = 0;
+	m_downCount = 0;
+	m_errCount = 0;
+	m_errors = 0;
+	m_samplesThreshold = 0;
 }
 
 Collector::~Collector()
@@ -34,8 +40,7 @@ void Collector::enabledPeriodic()
 {
 	m_jaguar->SetDutyCycle(m_dutyCycle);
 	
-	//Increments Orientation + Error Counters
-	
+	// Increment Orientation and Error Counters
 	if (m_proximityA->Get() == 1 && m_proximityB->Get() == 0)
 	{
 		m_upCount++;
@@ -61,15 +66,18 @@ void Collector::enabledPeriodic()
 		m_errCount = 0;
 	}
 	
-	//Operating on assupmtion that frisbees aren't flush against each other
-	if(m_downCount == SAMPLES_THRESHOLD || m_upCount == SAMPLES_THRESHOLD)
+	// Frisbees aren't flush against each other
+	if (m_upCount == m_samplesThreshold)
 	{
-		
-		RobotData::IncrementFrisbeeCounter(RobotData::UP);	
+		RobotData::IncrementFrisbeeCounter(RobotData::UP);
 	}
-	if(m_errCount == SAMPLES_THRESHOLD)
+	if (m_downCount == m_samplesThreshold)
 	{
-		; //Add ErrLog; Extreme Noise or Weird Sensor Config
+		RobotData::IncrementFrisbeeCounter(RobotData::DOWN);	
+	}
+	if (m_errCount == m_samplesThreshold)
+	{
+		m_errors++;
 	}
 }
 
@@ -81,9 +89,10 @@ void Collector::disabledPeriodic()
 void Collector::Configure()
 {
 	m_dutyCycle = ConfigManager::Instance()->Get<float> (m_configSection, "speed", 0.3F);
+	m_samplesThreshold = ConfigManager::Instance()->Get<int> (m_configSection, "samplesThreshold", 4);
 }
 
 void Collector::Log()
 {
-
+	// Log m_errors
 }

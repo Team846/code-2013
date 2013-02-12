@@ -6,15 +6,14 @@
 
 Climber::Climber()
 : Component("Climber", DriverStationConfig::DigitalIns::CLIMBER, true)
-,m_configSection("climber")
+, m_configSection("climber")
 {
 	
 }
 
 Climber::~Climber()
 {
-	// m_jaguar is deleted in base class
-	//DELETE(m_jaguar);
+	
 }
 
 void Climber::onEnable()
