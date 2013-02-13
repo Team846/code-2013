@@ -71,7 +71,7 @@ namespace CAN // Ports 1-16 (2CAN limitation)
 	const uint32_t COLLECTOR = CHANGEME;
 	const uint32_t SHOOTER_A = CHANGEME;
 	const uint32_t SHOOTER_B = CHANGEME;
-	const uint32_t STORAGE = CHANGEME;
+	const uint32_t SHOOTER_ROLLER = CHANGEME;
 }
 
 }

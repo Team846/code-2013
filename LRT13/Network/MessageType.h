@@ -12,8 +12,13 @@ namespace Network
 	{
 		enum Enum
 		{
+			// in
 			AUTO_AIM_DATA = 0x00,
 			DISC_LOCATOR_DATA = 0x10,
+			
+			// out
+			DASHBOARD_DATA = 0x20,
+			ROBOTDATA_DATA = 0x21,
 		};
 	};
 };

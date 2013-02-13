@@ -33,6 +33,14 @@ public:
 	virtual void Configure();
 	virtual void Log();
 	
+	/*!
+	 * @brief Returns the status of the current to the roller.  This can be used to determine if the roller has grabbed a frisbee.
+	 * 
+	 * @returns True, if the current is over the specified normal current.
+	 * @returns False, if the current is under or equal to the specified normal current.
+	 */
+	bool IsOverCurrent();
+	
 private:
 	string m_configSection;
 
@@ -41,12 +49,22 @@ private:
 	Counter* m_enc_front;
 	Counter* m_enc_back;
 	
+	AsyncCANJaguar* m_roller_jaguar;
+	
+	double m_dutyCycle;
+	double m_roller_currentThreshold;
+	
+	int m_overCurrentCounter;
+	int m_underCurrentCounter;
+	
+	int m_maxCounterDifference;
+	
+	string m_configSection;
+	
 	PID m_pid;
 
 	int front_atSpeedCounter;
 	int back_atSpeedCounter;
-	
-	float m_dutyCycle;
 	
 	double m_speed_front;
 	double m_speed_back;

@@ -182,6 +182,11 @@ int NetConnection::Send(NetBuffer buff)
 		return SEND_FAILED_BUFFER_INVALID;
 	}
 	
+	//TODO: implement reliable UDP
+	//NetBuffer* localBuff = new NetBuffer();
+
+	//localBuff->Write(buff.m_internalBuffer);
+	
 	buff.m_sent = true;
 	
 	int iResult = sendto(m_socket, buff.m_internalBuffer, buff.GetBytePos(), 0, (struct sockaddr*) &m_remote_spec, sizeof(m_remote_spec));

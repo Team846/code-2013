@@ -25,12 +25,20 @@ Shooter::Shooter()
 	front_atSpeed = false;
 	back_atSpeed = false;
 	
+	m_roller_jaguar = new AsyncCANJaguar(RobotConfig::CAN::SHOOTER_ROLLER, "Shooter Roller");
+	m_dutyCycle = 0.0;
+	
+	m_roller_jaguar->addCollectionFlags(AsyncCANJaguar::OUTCURR);
+	
+	m_overCurrentCounter = 0;
+	m_underCurrentCounter = 0;
 }
 
 Shooter::~Shooter()
 {
 	DELETE(m_jaguar_front);
 	DELETE(m_jaguar_back);
+	DELETE(m_roller_jaguar);
 }
 
 void Shooter::onEnable()
@@ -42,10 +50,27 @@ void Shooter::onDisable()
 {
 	m_jaguar_front->SetDutyCycle(0.0F);
 	m_jaguar_back->SetDutyCycle(0.0F);
+	
+	m_roller_jaguar->SetDutyCycle(0.0F);
 }
 
 void Shooter::enabledPeriodic()
 {
+	m_roller_jaguar->SetDutyCycle(m_dutyCycle);
+	
+	/*
+	if(m_roller_jaguar->GetOutputCurrent() > m_normalCurrent)
+	{
+		if(m_overCurrentCounter - m_underCurrentCounter < m_maxCounterDifference)
+			++m_overCurrentCounter;
+	}
+	else
+	{
+		if(m_underCurrentCounter - m_overCurrentCounter < m_maxCounterDifference)
+			++m_underCurrentCounter;
+	}*/
+	
+	
 	
 	m_speed_front = (m_enc_front->GetStopped()) ? 0.0 : (60.0 / 2.0 / m_enc_front->GetPeriod());
 	m_speed_front = Util::Clamp<double>(m_speed_front, 0, m_max_speed * 1.3);
@@ -82,19 +107,31 @@ void Shooter::enabledPeriodic()
 	
 }
 
+Shooter::IsOverCurrent()
+{
+	//return m_overCurrentCounter > m_underCurrentCounter;
+	return m_roller_jaguar->GetOutputCurrent() > m_roller_currentThreshold;
+}
+
 void Shooter::disabledPeriodic()
 {
 	m_jaguar_front->SetDutyCycle(0.0F);
 	m_jaguar_back->SetDutyCycle(0.0F);
+	
+	m_roller_jaguar->SetDutyCycle(0.0F);
 }
 
 void Shooter::Configure()
 {
-	m_dutyCycle = ConfigManager::Instance()->Get<float> (m_configSection, "speed", 0.3F);
-
 	ConfigManager * c = ConfigManager::Instance();
 	m_max_speed = c->Get<double> (m_configSection, "maxSpeed", 5180);
 	
+	m_dutyCycle = ConfigManager::Instance()->Get<double> (m_configSection, "speed", 0.3F);
+	
+#warning change me
+	m_roller_currentThreshold = ConfigManager::Instance()->Get<double>(m_configSection, "normal_current", 10);
+	
+	m_maxCounterDifference = ConfigManager::Instance()->Get<double>(m_configSection, "max_counter_difference", 2);
 }
 
 void Shooter::Log()
