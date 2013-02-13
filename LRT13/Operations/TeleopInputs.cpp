@@ -47,7 +47,7 @@ void TeleopInputs::Update()
 	
 	/************************Drivetrain************************/
 	
-#define USEOPENLOOP
+//#define USEOPENLOOP
 	// Use velocity control in teleoperated mode
 #ifdef USEOPENLOOP
 	m_componentData->drivetrainData->setControlMode(FORWARD, OPEN_LOOP);
@@ -65,7 +65,8 @@ void TeleopInputs::Update()
 		else
 		{
 			double turn = 0.0;
-			turn = -m_driver_wheel->GetAxis(Joystick::kXAxis);
+//			turn = -m_driver_wheel->GetAxis(Joystick::kXAxis);
+			turn = -m_driver_stick->GetAxis(Joystick::kZAxis);
 
 			double forward = pow(-m_driver_stick->GetAxis(Joystick::kYAxis), RobotConfig::Drive::THROTTLE_EXPONENT);
 #ifdef USEOPENLOOP

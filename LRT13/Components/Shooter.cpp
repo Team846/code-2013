@@ -107,7 +107,7 @@ void Shooter::enabledPeriodic()
 	
 }
 
-Shooter::IsOverCurrent()
+bool Shooter::IsOverCurrent()
 {
 	//return m_overCurrentCounter > m_underCurrentCounter;
 	return m_roller_jaguar->GetOutputCurrent() > m_roller_currentThreshold;

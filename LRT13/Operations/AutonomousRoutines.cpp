@@ -57,10 +57,11 @@ void AutonomousRoutines::Autonomous()
 		case INIT:
 			break;
 		case DRIVE_FORWARD:
-			m_componentData->drivetrainData->setRelativePositionSetpoint(FORWARD, 25.0, 0.2);
+			m_componentData->drivetrainData->setRelativePositionSetpoint(FORWARD, 5.0, 0.1);
 			m_componentData->drivetrainData->setRelativePositionSetpoint(TURN, 0.0, 0.0);
 			// Take semaphore to wait until operation completes
-			semTake(m_componentData->drivetrainData->positionOperationSemaphore(FORWARD, 0), WAIT_FOREVER);
+			Wait(60.0);
+//			semTake(m_componentData->drivetrainData->positionOperationSemaphore(FORWARD, 0), WAIT_FOREVER);
 			break;
 		case AUTO_AIM:
 			while(!m_autoActions->AutoAim());

@@ -37,6 +37,8 @@ double Drivetrain::ComputeOutput(data::drivetrain::ForwardOrTurn axis)
 		m_PIDs[POSITION][axis].setInput(0.0);//we're always at our current position! :D -BA
 		m_PIDs[POSITION][axis].setSetpoint(positionSetpoint);
 		velocitySetpoint = m_PIDs[POSITION][axis].update( 1.0 / RobotConfig::LOOP_RATE);
+//		if (fabs(velocitySetpoint) > m_componentData->drivetrainData->getPositionControlMaxSpeed(axis))
+//			velocitySetpoint = Util::Sign()
 		//fall through the switch
 	case data::drivetrain::VELOCITY_CONTROL:
 		//1.0e-2

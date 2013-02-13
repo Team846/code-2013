@@ -59,8 +59,6 @@ private:
 	
 	int m_maxCounterDifference;
 	
-	string m_configSection;
-	
 	PID m_pid;
 
 	int front_atSpeedCounter;
