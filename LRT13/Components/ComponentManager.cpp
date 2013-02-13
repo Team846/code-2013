@@ -31,7 +31,7 @@ void ComponentManager::Update()
 		
 		if (RobotData::GetCurrentState() != RobotData::DISABLED || !comp->EnableRequired())
 		{
-			if (DriverStation::GetInstance()->GetDigitalIn(comp->GetDIO()) || comp->GetDIO() == -1)
+			if (comp->GetDIO() == -1 || DriverStation::GetInstance()->GetDigitalIn(comp->GetDIO()))
 			{
 				if(!comp->IsEnabled())
 				{

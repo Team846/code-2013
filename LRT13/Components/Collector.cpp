@@ -69,11 +69,12 @@ void Collector::enabledPeriodic()
 	// Frisbees aren't flush against each other
 	if (m_upCount == m_samplesThreshold)
 	{
-		RobotData::IncrementFrisbeeCounter(RobotData::UP);
+#warning FIXME OR ELSE I WILL ANNOY YOU
+//		RobotData::IncrementFrisbeeCounter(RobotData::UP);
 	}
 	if (m_downCount == m_samplesThreshold)
 	{
-		RobotData::IncrementFrisbeeCounter(RobotData::DOWN);	
+//		RobotData::IncrementFrisbeeCounter(RobotData::DOWN);	
 	}
 	if (m_errCount == m_samplesThreshold)
 	{

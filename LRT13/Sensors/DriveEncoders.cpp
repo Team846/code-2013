@@ -60,7 +60,7 @@ void DriveEncoders::Configure()
 	TICKS_PER_FULL_TURN = m_config->Get<double> (m_configsection,
 			"ticks_per_full_turn", 2288.3 * 180.0 / 165.0 * 2.0);
 	WHEEL_DIAMETER = m_config->Get<double> (m_configsection, "wheel_diameter",
-			4.0); // inches
+			6.0); // inches
 	
 	m_encoders[LEFT]->Start();
 	m_encoders[RIGHT]->Start();

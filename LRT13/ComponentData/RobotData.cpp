@@ -3,6 +3,8 @@
 using namespace data;
 
 int RobotData::_id = -1;
+int RobotData::m_frisbees = 0;
+
 RobotData::RobotState RobotData::m_state = RobotData::DISABLED;
 vector<RobotData::Data> RobotData::m_loggedClasses;
 
@@ -95,22 +97,17 @@ string RobotData::Serialize()
 	return "";
 }
 
-void RobotData::IncrementFrisbeeCounter(Orientation orientation)
+void RobotData::IncrementFrisbeeCounter()
 {
-	m_frisbees[orientation]++;
+	m_frisbees++;
 }
 
-void RobotData::DecrementFrisbeeCounter(Orientation orientation)
+void RobotData::DecrementFrisbeeCounter()
 {
-	m_frisbees[orientation]--;
+	m_frisbees--;
 }
 
 int RobotData::GetFrisbeeCounter()
 {
-	return GetFrisbeeCounter(UP) + GetFrisbeeCounter(DOWN);
-}
-
-int RobotData::GetFrisbeeCounter(Orientation orientation)
-{
-	return m_frisbees[orientation];
+	return m_frisbees;
 }

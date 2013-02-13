@@ -3,6 +3,7 @@
 #include "../ComponentData/ComponentData.h"
 #include "../Config/DriverStationConfig.h"
 #include "../Config/RobotConfig.h"
+#include "../Utils/AsyncPrinter.h"
 #include "AutoActions.h"
 #include <cmath>
 
@@ -46,9 +47,15 @@ void TeleopInputs::Update()
 	
 	/************************Drivetrain************************/
 	
+#define USEOPENLOOP
 	// Use velocity control in teleoperated mode
+#ifdef USEOPENLOOP
+	m_componentData->drivetrainData->setControlMode(FORWARD, OPEN_LOOP);
+	m_componentData->drivetrainData->setControlMode(TURN, OPEN_LOOP);
+#else
 	m_componentData->drivetrainData->setControlMode(FORWARD, VELOCITY_CONTROL);
 	m_componentData->drivetrainData->setControlMode(TURN, VELOCITY_CONTROL);
+#endif
 	if(current_state == RobotData::TELEOP)
 	{
 		if(m_driver_stick->IsButtonDown(DriverStationConfig::JoystickButtons::RESET_ZERO))
@@ -59,22 +66,15 @@ void TeleopInputs::Update()
 		{
 			double turn = 0.0;
 			turn = -m_driver_wheel->GetAxis(Joystick::kXAxis);
-			turn = pow(turn, RobotConfig::Drive::BLEND_EXPONENT);
 
 			double forward = pow(-m_driver_stick->GetAxis(Joystick::kYAxis), RobotConfig::Drive::THROTTLE_EXPONENT);
-
-			double turnComposite = 0.0;
-
-			double absForward = fabs(forward);
-			double blend = (1 - absForward);
-			blend = pow(blend, 2);
-
-			const double turnInPlace = turn;
-			const double turnConstantRadius = turn * absForward;
-			turnComposite = turnInPlace * (blend) + turnConstantRadius * (1
-					- blend);
+#ifdef USEOPENLOOP
+			m_componentData->drivetrainData->setOpenLoopOutput(FORWARD, forward);
+			m_componentData->drivetrainData->setOpenLoopOutput(TURN, turn);
+#else
 			m_componentData->drivetrainData->setVelocitySetpoint(FORWARD, forward);
-			m_componentData->drivetrainData->setVelocitySetpoint(TURN, turnComposite);
+			m_componentData->drivetrainData->setVelocitySetpoint(TURN, turn);
+#endif
 		}
 	}
 	

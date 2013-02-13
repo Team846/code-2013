@@ -4,6 +4,9 @@
 #include "ComponentData.h"
 #include <semLib.h>
 
+
+class DriveEncoders;
+
 namespace data
 {
 /*!
@@ -27,48 +30,43 @@ namespace drivetrain
 		LEFT = 2, RIGHT = 3
 	};
 
-	struct DrivetrainStatus
-	{
-		double velocity[4];
-		double position[4];
-		double output[4];
-	};
-
 	class DrivetrainData
 	{
 	public:
 		DrivetrainData();
 		~DrivetrainData();
 		
-		ControlMode getControlMode(ForwardOrTurn mode);
+		ControlMode getControlMode(ForwardOrTurn axis);
 	
-		void setOpenLoopOutput(ForwardOrTurn mode, double setpoint);
-		void setVelocitySetpoint(ForwardOrTurn mode, double setpoint);
-		void setRelativePositionSetpoint(ForwardOrTurn mode, double setpoint,
-				double maxspeed);
-		void setControlMode(ForwardOrTurn mode, ControlMode control);
+		void setOpenLoopOutput(ForwardOrTurn axis, double setpoint);
+		void setVelocitySetpoint(ForwardOrTurn axis, double setpoint);
+		
+		void setRelativePositionSetpoint(ForwardOrTurn axis, double setpoint,
+				double maxSpeed);
+		void setMaxPositionControlSpeed(ForwardOrTurn axis, double maxSpeed);
+		
+		void setControlMode(ForwardOrTurn axis, ControlMode control);
 	
-		void updatePositions(double forward, double turn);
-		void updateVelocities(double forward, double turn);
+
+		SEM_ID positionOperationSemaphore(ForwardOrTurn axis, double errorThreshold);
 		
-		SEM_ID positionOperationSemaphore(ForwardOrTurn mode, double errorThreshold);
-		
-		bool isDesiredPositionOperationComplete(ForwardOrTurn mode,
+		bool isDesiredPositionOperationComplete(ForwardOrTurn axis,
 				double errorThreshold);
 	
-		double getOpenLoopOutput(ForwardOrTurn mode);
-		double getVelocitySetpoint(ForwardOrTurn mode);
-		double getRelativePositionSetpoint(ForwardOrTurn mode);
-		double getPositionControlMaxSpeed(ForwardOrTurn mode);
-		double getPositionControlStartingPosition(ForwardOrTurn mode);
+		double getOpenLoopOutput(ForwardOrTurn axis);
+		double getVelocitySetpoint(ForwardOrTurn axis);
+		double getRelativePositionSetpoint(ForwardOrTurn axis);
+		double getPositionControlMaxSpeed(ForwardOrTurn axis);
 	
 	private:
+		double getCurrentPos(ForwardOrTurn axis);
+		
+		DriveEncoders *m_driveEncoders;
 		ControlMode m_controlModes[2];
+		double m_desiredOpenLoopOutputs[2];
 		double m_desiredRates[2];
-		double m_desiredPositions[2];
+		double m_positionSetpoints[2];
 		double m_maxSpeeds[2];
-		double m_lastPosition[2];
-		DrivetrainStatus m_status;
 		SEM_ID m_positionFwdSemaphore;
 		SEM_ID m_positionTurnSemaphore;
 	};

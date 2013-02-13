@@ -29,10 +29,9 @@ namespace data
 			UP = 0,
 			DOWN = 1
 		};
-		static void IncrementFrisbeeCounter(Orientation);
-		static void DecrementFrisbeeCounter(Orientation);
+		static void IncrementFrisbeeCounter();
+		static void DecrementFrisbeeCounter();
 		static int GetFrisbeeCounter();
-		static int GetFrisbeeCounter(Orientation);
 		
 		static int GetMissedPacketsInLifetime();
 		static void IncrementMissedPacketsInLifetime();
@@ -53,7 +52,7 @@ namespace data
 
 		static RobotState m_state;
 		static int _id;
-		static int m_frisbees[2];
+		static int m_frisbees;
 		
 #warning rename/refactor me
 		struct Data

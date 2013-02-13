@@ -34,6 +34,7 @@ class LRTRobot13 : public LRTRobotBase
 		~LRTRobot13();
 		
 		void RobotInit();
+		void CreateComponents();
 	
 		// Function to start execution; basically a main function
 		void Run();

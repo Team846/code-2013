@@ -338,6 +338,10 @@ void AsyncCANJaguar::SetDutyCycle(float duty_cycle)
 {
 	m_control_mode.setValue(kPercentVbus);
 	m_setpoint.setValue(duty_cycle);
+	
+//	static int e = 0;
+//	if (++e % 15 == 0)
+//		AsyncPrinter::Printf("o:%.2f\n", duty_cycle);
 }
 
 void AsyncCANJaguar::SetPosition(float position)

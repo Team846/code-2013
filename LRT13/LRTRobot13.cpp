@@ -1,6 +1,6 @@
 #include "LRTRobot13.h"
 #include "ComponentData/RobotData.h"
-
+#include "Components/ConfigLoader.h"
 using namespace data;
 
 LRTRobot13::LRTRobot13()
@@ -41,11 +41,7 @@ void LRTRobot13::RobotInit()
 	AsyncPrinter::Initialize();
 	
 	//CANTester::Instance()->Start();
-
-	AsyncPrinter::Println("Creating Components");
-	m_componentManager = new ComponentManager();
-//	m_componentManager->AddComponent(new ComponentSystemUnitTest());
-	m_componentManager->AddComponent(new Drivetrain());
+	CreateComponents();
 
 	AsyncPrinter::Println("Starting TeleopInputs Task");
 	m_teleop = new TeleopInputs("TeleopInputs");
@@ -68,6 +64,14 @@ void LRTRobot13::RobotInit()
 	LogManager::Instance()->Start();
 	
 	ConfigManager::Instance()->ConfigureAll();
+}
+
+void LRTRobot13::CreateComponents()
+{
+	AsyncPrinter::Println("Creating Components");
+	m_componentManager = new ComponentManager();
+	m_componentManager->AddComponent(new Drivetrain());
+	m_componentManager->AddComponent(new ConfigLoader());
 }
 
 static int TimeoutCallback(...)
@@ -107,6 +111,7 @@ void LRTRobot13::Run()
 		}
 		else // Disabled
 		{
+			m_teleop->RunOneCycle();
 			if (m_auton->IsRunning())
 			{
 				m_auton->Stop();
@@ -136,7 +141,7 @@ void LRTRobot13::Run()
 		double toSleep = (int)((1000.0 / RobotConfig::LOOP_RATE) - timeSpent) / 1000.0;
 
 		if(e++ % (RobotConfig::LOOP_RATE) == 0)
-			AsyncPrinter::DbgPrint("Tick: %d", e);
+			AsyncPrinter::Printf("Tick: %d\n", e);
 		
 		Wait(toSleep);
 	}

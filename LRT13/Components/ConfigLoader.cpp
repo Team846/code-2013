@@ -1,4 +1,5 @@
 #include "ConfigLoader.h"
+#include "../Utils/AsyncPrinter.h"
 
 #warning needs implementation
 
@@ -23,26 +24,34 @@ void ConfigLoader::onDisable()
 
 void ConfigLoader::enabledPeriodic()
 {
-	if (m_componentData->configLoaderData->IsLoadRequested())
+	if(RobotData::GetCurrentState() != RobotData::DISABLED)
 	{
-		m_config->Load();
-		m_componentData->configLoaderData->RemoveLoadRequest();
+		if (m_componentData->configLoaderData->IsLoadRequested())
+		{
+			m_config->Load();
+			m_componentData->configLoaderData->RemoveLoadRequest();
+		}
+		else if (m_componentData->configLoaderData->IsSaveRequested())
+		{
+			m_config->Save();
+			AsyncPrinter::Printf("Saving Config\n");
+			m_componentData->configLoaderData->RemoveSaveRequest();
+		}
+		else if (m_componentData->configLoaderData->IsApplyRequested())
+		{
+			m_config->ConfigureAll();
+			m_componentData->configLoaderData->RemoveApplyRequest();
+		}	
 	}
-	else if (m_componentData->configLoaderData->IsSaveRequested())
+	else
 	{
-		m_config->Save();
-		m_componentData->configLoaderData->RemoveSaveRequest();
+		static int e = 0;
+		if (++e % 5 == 0)
+			m_config->CheckForFileUpdates();
 	}
-	else if (m_componentData->configLoaderData->IsApplyRequested())
-	{
-		m_config->ConfigureAll();
-		m_componentData->configLoaderData->RemoveApplyRequest();
-	}	
 }
 
 void ConfigLoader::disabledPeriodic()
 {
-	static int e = 0;
-	if (++e % 5 == 0)
-		m_config->CheckForFileUpdates();
+
 }

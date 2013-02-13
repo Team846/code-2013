@@ -40,7 +40,7 @@ namespace Digital // Ports 1-14
 	const uint32_t LEFT_DRIVE_ENCODER_B = 3;
 	const uint32_t HALL_EFFECT_A = CHANGEME;
 	const uint32_t HALL_EFFECT_B = CHANGEME;
-	const uint32_t COMPRESSOR_PRESSURE_SENSOR_PIN = CHANGEME;
+	const uint32_t COMPRESSOR_PRESSURE_SENSOR_PIN = 14;
 	const uint32_t PROXIMITY_A = CHANGEME;
 	const uint32_t PROXIMITY_B = CHANGEME;
 }
@@ -59,7 +59,7 @@ namespace Solenoid // Ports 1-8
 
 namespace Relay // Ports 1-8
 {
-const uint32_t COMPRESSOR_RELAY = CHANGEME;
+const uint32_t COMPRESSOR_RELAY = 1;
 }
 
 namespace CAN // Ports 1-16 (2CAN limitation)

@@ -79,6 +79,7 @@ template<typename T> T ConfigManager::Get(string section, string key,
 	}
 	else
 	{
+		Set<T>(section, key, defaultValue);
 		return defaultValue;
 	}
 }
@@ -137,6 +138,7 @@ void ConfigManager::CheckForFileUpdates()
 	struct stat statistics;
 	stat(CONFIG_FILE_PATH.c_str(), &statistics);
 
+	AsyncPrinter::Printf("Checking for file updates\n");
 	// reload when the file has been modified
 	if (lastReadTime != statistics.st_mtime)
 	{

@@ -1,19 +1,20 @@
 #include "DrivetrainData.h"
+#include "../Sensors/DriveEncoders.h"
 
 using namespace data;
 using namespace data::drivetrain;
 
 DrivetrainData::DrivetrainData()
 {
+	m_driveEncoders = DriveEncoders::GetInstance();
+	
 	// these arrays are statically allocated and thus cannot be deallocated... -tp
+	// These arrays are not statically allocated shoudl still nto be deallocated since they will be cleaned up upon destruction. 
+	
 	memset(m_controlModes, OPEN_LOOP, sizeof(m_controlModes));
 	memset(m_desiredRates, 0, sizeof(m_desiredRates));
-	memset(m_desiredPositions, 0, sizeof(m_desiredPositions));
+	memset(m_positionSetpoints, 0, sizeof(m_positionSetpoints));
 	memset(m_maxSpeeds, 0, sizeof(m_maxSpeeds));
-	memset(m_status.output, 0, sizeof(m_status.output));
-	memset(m_status.position, 0, sizeof(m_status.position));
-	memset(m_status.velocity, 0, sizeof(m_status.velocity));
-	memset(m_lastPosition, 0, sizeof(m_lastPosition));
 	m_positionFwdSemaphore = semBCreate(SEM_Q_PRIORITY, SEM_FULL);
 	m_positionTurnSemaphore = semBCreate(SEM_Q_PRIORITY, SEM_FULL);
 }
@@ -24,76 +25,74 @@ DrivetrainData::~DrivetrainData()
 	semDelete(m_positionTurnSemaphore);
 }
 
-ControlMode DrivetrainData::getControlMode(ForwardOrTurn mode)
+ControlMode DrivetrainData::getControlMode(ForwardOrTurn axis)
 {
-	return m_controlModes[mode];
+	return m_controlModes[axis];
 }
 
-void DrivetrainData::setOpenLoopOutput(ForwardOrTurn mode, double setpoint)
+void DrivetrainData::setOpenLoopOutput(ForwardOrTurn axis, double setpoint)
 {
+	m_desiredOpenLoopOutputs[axis] = setpoint;
 }
 
-void DrivetrainData::setVelocitySetpoint(ForwardOrTurn mode, double setpoint)
+void DrivetrainData::setVelocitySetpoint(ForwardOrTurn axis, double setpoint)
 {
-	m_desiredRates[mode] = setpoint;
+	m_desiredRates[axis] = setpoint;
 }
 
-void DrivetrainData::setRelativePositionSetpoint(ForwardOrTurn mode,
+void DrivetrainData::setRelativePositionSetpoint(ForwardOrTurn axis,
 		double setpoint, double maxspeed)
 {
-	semTake(mode == drivetrain::FORWARD ? m_positionFwdSemaphore : m_positionTurnSemaphore, NO_WAIT); // If this cannot take a semaphore another operation is still in progress. Ignore and update the desired position.
-	
-	m_lastPosition[mode] = m_status.position[mode];
-	m_desiredPositions[mode] = setpoint;
-	m_maxSpeeds[mode] = maxspeed;
+	m_positionSetpoints[axis] = setpoint + getCurrentPos(axis);
+	m_maxSpeeds[axis] = maxspeed;
 }
 
-void DrivetrainData::setControlMode(ForwardOrTurn mode, ControlMode control)
+double DrivetrainData::getCurrentPos(ForwardOrTurn axis)
 {
-	m_controlModes[mode] = control;
+	double currentPos;
+	if (axis == FORWARD)
+		currentPos = m_driveEncoders->getRobotDist();
+	else if (axis == TURN)
+		currentPos = m_driveEncoders->getTurnAngle();
+	return currentPos;
 }
 
-void DrivetrainData::updatePositions(double forward, double turn)
+void DrivetrainData::setMaxPositionControlSpeed(ForwardOrTurn axis, double maxSpeed)
 {
-	m_status.position[FORWARD] = forward;
-	m_status.position[TURN] = turn;
-}
-void DrivetrainData::updateVelocities(double forward, double turn)
-{
-	m_status.velocity[FORWARD] = forward;
-	m_status.velocity[TURN] = turn;
+	m_maxSpeeds[axis] = maxSpeed;
 }
 
-SEM_ID DrivetrainData::positionOperationSemaphore(ForwardOrTurn mode,
+void DrivetrainData::setControlMode(ForwardOrTurn axis, ControlMode control)
+{
+	m_controlModes[axis] = control;
+}
+
+SEM_ID DrivetrainData::positionOperationSemaphore(ForwardOrTurn axis,
 		double errorThreshold)
 {
-	return mode == drivetrain::FORWARD ? m_positionFwdSemaphore : m_positionTurnSemaphore;
+	return axis == drivetrain::FORWARD ? m_positionFwdSemaphore : m_positionTurnSemaphore;
 }
 
-bool DrivetrainData::isDesiredPositionOperationComplete(ForwardOrTurn mode,
+bool DrivetrainData::isDesiredPositionOperationComplete(ForwardOrTurn axis,
 		double errorThreshold)
 {
 	return false;
 }
 
-double DrivetrainData::getOpenLoopOutput(ForwardOrTurn mode)
+double DrivetrainData::getOpenLoopOutput(ForwardOrTurn axis)
 {
-	return 0.0;
+	return m_desiredOpenLoopOutputs[axis];
 }
-double DrivetrainData::getVelocitySetpoint(ForwardOrTurn mode)
+double DrivetrainData::getVelocitySetpoint(ForwardOrTurn axis)
 {
-	return m_desiredRates[mode];
+	return m_desiredRates[axis];
 }
-double DrivetrainData::getRelativePositionSetpoint(ForwardOrTurn mode)
+double DrivetrainData::getRelativePositionSetpoint(ForwardOrTurn axis)
 {
-	return m_desiredPositions[mode];
+	return m_positionSetpoints[axis] - getCurrentPos(axis);
 }
-double DrivetrainData::getPositionControlMaxSpeed(ForwardOrTurn mode)
+double DrivetrainData::getPositionControlMaxSpeed(ForwardOrTurn axis)
 {
-	return m_maxSpeeds[mode];
+	return m_maxSpeeds[axis];
 }
 
-double DrivetrainData::getPositionControlStartingPosition(ForwardOrTurn mode)
-{
-	return m_lastPosition[mode];
-}
