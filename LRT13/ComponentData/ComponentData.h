@@ -18,6 +18,10 @@ namespace data
 	{
 		class ConfigLoaderData;
 	}
+	namespace shooter
+	{
+		class ShooterData;
+	}
 	
 	/*!
 	 * @brief Provides a central hub for data access.

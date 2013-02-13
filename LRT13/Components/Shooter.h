@@ -32,6 +32,7 @@ public:
 	
 	virtual void Configure();
 	virtual void Log();
+	
 private:
 	string m_configSection;
 
@@ -42,13 +43,18 @@ private:
 	
 	PID m_pid;
 
-	int wrongSpeedCounter;
+	int front_atSpeedCounter;
+	int back_atSpeedCounter;
 	
 	float m_dutyCycle;
 	
 	double m_speed_front;
 	double m_speed_back;
 	double m_max_speed;
+	
+	bool front_atSpeed;
+	bool back_atSpeed;
+	
 };
 
 #endif

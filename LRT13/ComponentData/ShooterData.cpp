@@ -30,3 +30,13 @@ bool ShooterData::IsAtSpeed(Roller roller)
 {
 	return atSpeed[roller];
 }
+
+void ShooterData::SetAcceptableSpeedError(double error, int roller)
+{
+	acceptableSpeedError[roller] = error;
+}
+
+double ShooterData::GetAcceptableSpeedError(int roller)
+{
+	return acceptableSpeedError[roller];
+}

@@ -19,7 +19,12 @@ Shooter::Shooter()
 	
 	m_speed_front = 0;
 	m_speed_back = 0;
-	wrongSpeedCounter = 0;
+	front_atSpeedCounter = 0;
+	back_atSpeedCounter = 0;
+	
+	front_atSpeed = false;
+	back_atSpeed = false;
+	
 }
 
 Shooter::~Shooter()
@@ -41,22 +46,40 @@ void Shooter::onDisable()
 
 void Shooter::enabledPeriodic()
 {
+	
 	m_speed_front = (m_enc_front->GetStopped()) ? 0.0 : (60.0 / 2.0 / m_enc_front->GetPeriod());
 	m_speed_front = Util::Clamp<double>(m_speed_front, 0, m_max_speed * 1.3);
 	m_speed_back = (m_enc_back->GetStopped()) ? 0.0 : (60.0 / 2.0 / m_enc_back->GetPeriod());
 	m_speed_back = Util::Clamp<double>(m_speed_back, 0, m_max_speed * 1.3);
 	
-	if(m_speed_front < m_componentData->shooterData->GetDesiredSpeed(FRONT)) 
+	if(fabs(m_speed_front - m_componentData->shooterData->GetDesiredSpeed(FRONT)) > 
+		m_componentData->shooterData->GetAcceptableSpeedError(FRONT)) 
 	{
-		wrongSpeedCounter++;
-		if(wrongSpeedCounter > 9) 
-		{	
-			//FIX IT
-		}
-	} else
+		front_atSpeedCounter = 0;
+		front_atSpeed = false;
+		
+	} else {
+		front_atSpeedCounter++;
+		front_atSpeed = true;
+	}	
+	
+	if(fabs(m_speed_back - m_componentData->shooterData->GetDesiredSpeed(BACK)) > 
+		m_componentData->shooterData->GetAcceptableSpeedError(BACK)) 
 	{
-		wrongSpeedCounter = 0;
+		
+		back_atSpeedCounter = 0;
+		back_atSpeed = false;
+		
+	} else {
+		back_atSpeedCounter++;
+		back_atSpeed = true;
 	}
+	
+	if(!front_atSpeed || !back_atSpeed)
+	{
+		//Don't shoot
+	}
+	
 }
 
 void Shooter::disabledPeriodic()
@@ -71,6 +94,7 @@ void Shooter::Configure()
 
 	ConfigManager * c = ConfigManager::Instance();
 	m_max_speed = c->Get<double> (m_configSection, "maxSpeed", 5180);
+	
 }
 
 void Shooter::Log()

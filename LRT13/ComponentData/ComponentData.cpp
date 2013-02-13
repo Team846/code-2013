@@ -2,6 +2,7 @@
 #include "DrivetrainData.h"
 #include "ShooterData.h"
 #include "ConfigLoaderData.h"
+#include "ShooterData.h"
 
 using namespace data;
 using namespace drivetrain;
