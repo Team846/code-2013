@@ -22,6 +22,10 @@ namespace data
 	{
 		class ShooterData;
 	}
+	namespace collector
+	{
+		class CollectorData;
+	}
 	
 	/*!
 	 * @brief Provides a central hub for data access.
@@ -36,6 +40,7 @@ namespace data
 		
 		drivetrain::DrivetrainData* const drivetrainData;
 		shooter::ShooterData* const shooterData;
+		collector::CollectorData* const collectorData;
 		configloader::ConfigLoaderData* const configLoaderData;
 	
 	protected:

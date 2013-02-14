@@ -11,7 +11,7 @@ Collector::Collector()
 	m_jaguar = new AsyncCANJaguar(RobotConfig::CAN::COLLECTOR, "Collector");
 	m_proximity = new DigitalInput(RobotConfig::Digital::PROXIMITY_A);
 	m_dutyCycle = 0.0;
-	m_upCount = 0;
+	m_count = 0;
 	m_samplesThreshold = 0;
 }
 
@@ -33,19 +33,31 @@ void Collector::onDisable()
 
 void Collector::enabledPeriodic()
 {
-	m_jaguar->SetDutyCycle(m_dutyCycle);
-
-	if (m_proximity->Get() == 0)
+	if (m_componentData->collectorData->ShouldRunRollers())
 	{
-		m_upCount++;
+		m_jaguar->SetDutyCycle(m_dutyCycle);
+	}
+	
+	if (m_componentData->collectorData->IsDown())
+	{
+		// Slide down
 	}
 	else
 	{
-		m_upCount = 0;
+		// Slide up
+	}
+	
+	if (m_proximity->Get() == 0)
+	{
+		m_count++;
+	}
+	else
+	{
+		m_count = 0;
 	}
 	
 	// Frisbees aren't flush against each other
-	if (m_upCount == m_samplesThreshold)
+	if (m_count == m_samplesThreshold)
 	{
 		RobotData::IncrementFrisbeeCounter();
 	}

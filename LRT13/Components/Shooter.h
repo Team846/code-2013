@@ -51,15 +51,12 @@ private:
 	Counter* m_enc_back;
 	
 	PID m_PIDs[2];
-	AsyncCANJaguar* m_roller_jaguar;
 	
-	double m_dutyCycle;
-	double m_roller_currentThreshold;
+	double m_dutyCycleFront;
+	double m_dutyCycleBack;
 	
 	int m_overCurrentCounter;
 	int m_underCurrentCounter;
-	
-	int m_maxCounterDifference;
 
 	int front_atSpeedCounter;
 	int back_atSpeedCounter;

@@ -40,7 +40,7 @@ private:
 	DigitalInput* m_proximity;
 	
 	// Frisbee Counters
-	int m_upCount;
+	int m_count;
 	int m_samplesThreshold;
 	
 	float m_dutyCycle;

@@ -25,12 +25,16 @@ namespace data
 				double GetDesiredSpeed(Roller roller);
 				void SetAtSpeed(bool value, Roller roller);
 				bool IsAtSpeed(Roller roller);
-				double acceptableSpeedError[2];
 				void SetAcceptableSpeedError(double error, int roller);
 				double GetAcceptableSpeedError(int roller);
+				void ExtendLauncher();
+				void RetractLauncher();
+				bool ShouldExtendLauncher();
 			private:
+				double acceptableSpeedError[2];
 				double speed[2];
 				bool atSpeed[2];
+				bool extendLauncher;
 		};
 	}
 	

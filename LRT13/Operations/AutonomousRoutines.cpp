@@ -64,7 +64,9 @@ void AutonomousRoutines::Autonomous()
 				m_componentData->drivetrainData->setRelativePositionSetpoint(TURN, 0.0, 0.0);
 				// Take semaphore to wait until operation completes
 				while (!m_componentData->drivetrainData->cleanWaitForSem(m_componentData->drivetrainData->createPositionOperationSemaphore(FORWARD, 0.05), 0.2))
-					m_componentData->drivetrainData->DebugPrintPosition(FORWARD);
+				{
+//					m_componentData->drivetrainData->DebugPrintPosition(FORWARD);
+				}
 				AsyncPrinter::Printf("Done\n");
 //				m_componentData->drivetrainData->DebugPrintPosition(FORWARD);
 				
@@ -72,7 +74,9 @@ void AutonomousRoutines::Autonomous()
 				m_componentData->drivetrainData->setRelativePositionSetpoint(TURN, 0.0, 0.0);
 				// Take semaphore to wait until operation completes
 				while (!m_componentData->drivetrainData->cleanWaitForSem(m_componentData->drivetrainData->createPositionOperationSemaphore(FORWARD, 0.05), 0.2))
-					m_componentData->drivetrainData->DebugPrintPosition(FORWARD);
+				{
+//					m_componentData->drivetrainData->DebugPrintPosition(FORWARD);
+				}
 			}
 			break;
 		case AUTO_AIM:

@@ -3,10 +3,12 @@
 #include "ShooterData.h"
 #include "ConfigLoaderData.h"
 #include "ShooterData.h"
+#include "CollectorData.h"
 
 using namespace data;
 using namespace drivetrain;
 using namespace shooter;
+using namespace collector;
 using namespace configloader;
 
 ComponentData* ComponentData::m_instance = NULL;
@@ -25,7 +27,10 @@ void ComponentData::Finalize()
 }
 
 ComponentData::ComponentData()
-: drivetrainData(new DrivetrainData()), shooterData(new ShooterData()), configLoaderData(new ConfigLoaderData())
+: drivetrainData(new DrivetrainData()),
+  shooterData(new ShooterData()),
+  collectorData(new CollectorData()),
+  configLoaderData(new ConfigLoaderData())
 {
 	
 }

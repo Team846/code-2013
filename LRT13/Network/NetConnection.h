@@ -44,6 +44,12 @@ namespace Network
 		USER_DATA = 0x01,
 	};
 	
+	struct MessageAwaitingACK
+	{
+		NetBuffer* buff;
+		double sentTime;
+	};
+	
 	/*!
 	 * @brief Represents a network connection.
 	 * @author Tony Peng
@@ -111,16 +117,17 @@ namespace Network
 		int m_socket;
 		struct sockaddr_in m_remote_spec;
 		
-		NetBuffer** m_reliableUnordered;
-		NetBuffer** m_reliableSequenced;
-		NetBuffer** m_reliableOrdered;
+		MessageAwaitingACK* m_reliableUnordered[16]; // NetBuffer array - one for each subchannel
+		MessageAwaitingACK* m_reliableSequenced[16]; // NetBuffer array - one for each subchannel
+		MessageAwaitingACK* m_reliableOrdered[16]; // NetBuffer array - one for each subchannel
 		
-		int* m_lastUnreliableSequenced;
-		int* m_lastReliableSequenced;
+		int* m_lastUnreliableSequenced; // int array of length 16 ints - one for each channel 
+		int* m_lastReliableSequenced; // int array of length 16 ints - one for each channel
 		
 		int m_currentReliableUnorderedCounter;
 		int m_currentReliableSequencedCounter;
-		int m_curerntReliableOrderedCounter;
+		int m_currentReliableOrderedCounter;
+		int m_currentUnreliableSequencedCounter;
 	};
 };
 

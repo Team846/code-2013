@@ -4,6 +4,9 @@
 #include <string>
 #include <vector>
 
+#include "../Network/NetConnection.h"
+#include "../Network/NetBuffer.h"
+
 //#include "robotdata.pb.h"
 
 using namespace std;
@@ -24,11 +27,6 @@ namespace data
 			DISABLED = 2
 		};
 		
-		enum Orientation
-		{
-			UP = 0,
-			DOWN = 1
-		};
 		static void IncrementFrisbeeCounter();
 		static void DecrementFrisbeeCounter();
 		static int GetFrisbeeCounter();

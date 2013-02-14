@@ -29,7 +29,6 @@ namespace AutoActions
 
 namespace Analog // Ports 1-7
 {
-	const uint32_t COLLECTOR_POT = CHANGEME;
 }
 
 namespace Digital // Ports 1-14
@@ -56,6 +55,7 @@ namespace Solenoid // Ports 1-8
 	const uint32_t CLIMBER_LEFT_B = CHANGEME;
 	const uint32_t CLIMBER_RIGHT_A = CHANGEME;
 	const uint32_t CLIMBER_RIGHT_B = CHANGEME;
+	const uint32_t STORAGE_LAUNCHER = CHANGEME;
 }
 
 namespace Relay // Ports 1-8
@@ -72,6 +72,12 @@ namespace CAN // Ports 1-16 (2CAN limitation)
 	const uint32_t COLLECTOR = CHANGEME;
 	const uint32_t SHOOTER_A = CHANGEME;
 	const uint32_t SHOOTER_B = CHANGEME;
+}
+
+namespace PWM
+{
+	const uint32_t LEFT_GEARBOX_SERVO = CHANGEME;
+	const uint32_t RIGHT_GEARBOX_SERVO = CHANGEME;
 }
 
 }

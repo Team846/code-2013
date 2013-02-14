@@ -7,17 +7,46 @@ namespace data
 {
 /*!
  * @brief Namespace containing data pertaining to the collector
- * @author Raphael Chang
+ * @author Raphael Chang, Tony Peng
  */
 namespace collector
 {
+	/*!
+	 * @brief Describes the state of the collector.
+	 * 
+	 * @author Tony Peng
+	 */
+	namespace CollectorState
+	{
+		enum Enum
+		{
+			UP = 0,
+			DOWN = 1,
+		};
+	}
+	
 	class CollectorData
 	{
 	public:
 		CollectorData();
-		void run();
+		
+		void RunRollers();
+		void StopRollers();
+		
+		bool ShouldRunRollers();
+		
+		void Slide(CollectorState::Enum position);
+		
+		void SlideDown();
+		void SlideUp();
+	
+		CollectorState::Enum GetCollectorPosition();
+		
+		bool IsDown();
+		bool IsUp();
 	private:
 		bool m_running;
+		CollectorState::Enum m_collectorState;
 	};
 }
 }

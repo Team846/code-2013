@@ -112,7 +112,7 @@ namespace Network
 		 */
 		void SkipPadBits();
 		
-		friend int NetConnection::Send(NetBuffer buff);
+		friend int NetConnection::Send(NetBuffer buff, NetChannel::Enum method, int channel);
 	private:
 		void construct(char* buff, int size);
 		

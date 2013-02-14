@@ -40,3 +40,18 @@ double ShooterData::GetAcceptableSpeedError(int roller)
 {
 		return acceptableSpeedError[roller];
 }
+
+void ShooterData::ExtendLauncher()
+{
+	extendLauncher = true;
+}
+
+void ShooterData::RetractLauncher()
+{
+	extendLauncher = false;
+}
+
+bool ShooterData::ShouldExtendLauncher()
+{
+	return extendLauncher;
+}

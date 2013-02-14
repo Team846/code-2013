@@ -9,7 +9,7 @@ using namespace data;
 using namespace data::shooter;
 
 Shooter::Shooter()
-: Component("Shooter", DriverStationConfig::DigitalIns::SHOOTER, true),
+: Component("Shooter", DriverStationConfig::DigitalIns::SHOOTER, true), 
   m_configSection("Shooter")   
 { 
 	m_jaguar_front = new AsyncCANJaguar(RobotConfig::CAN::SHOOTER_A, "ShooterFront");
@@ -27,11 +27,9 @@ Shooter::Shooter()
 	
 	m_switch = new DigitalInput(RobotConfig::Digital::STORAGE_SWITCH);
 	frisbee_detected = false;
-	
-	m_roller_jaguar = new AsyncCANJaguar(RobotConfig::CAN::SHOOTER_ROLLER, "Shooter Roller");
-	m_dutyCycle = 0.0;
-	
-	m_roller_jaguar->addCollectionFlags(AsyncCANJaguar::OUTCURR);
+
+	m_dutyCycleFront = 0.0;
+	m_dutyCycleBack = 0.0;
 	
 	m_overCurrentCounter = 0;
 	m_underCurrentCounter = 0;
@@ -42,7 +40,6 @@ Shooter::~Shooter()
 {
 	DELETE(m_jaguar_front);
 	DELETE(m_jaguar_back);
-	DELETE(m_roller_jaguar);
 }
 
 void Shooter::onEnable()
@@ -54,14 +51,10 @@ void Shooter::onDisable()
 {
 	m_jaguar_front->SetDutyCycle(0.0F);
 	m_jaguar_back->SetDutyCycle(0.0F);
-	
-	m_roller_jaguar->SetDutyCycle(0.0F);
 }
 
 void Shooter::enabledPeriodic()
 {
-	m_roller_jaguar->SetDutyCycle(m_dutyCycle);
-	
 	m_PIDs[FRONT].setSetpoint(m_componentData->shooterData->GetDesiredSpeed(FRONT));
 	m_PIDs[BACK].setSetpoint(m_componentData->shooterData->GetDesiredSpeed(BACK));
 	
@@ -90,7 +83,8 @@ void Shooter::enabledPeriodic()
 		front_atSpeedCounter = 0;
 		front_atSpeed = false;
 		
-	} else {
+	}
+	else {
 		front_atSpeedCounter++;
 		front_atSpeed = true;
 	}	
@@ -102,38 +96,33 @@ void Shooter::enabledPeriodic()
 		back_atSpeedCounter = 0;
 		back_atSpeed = false;
 		
-	} else {
+	}
+	else {
 		back_atSpeedCounter++;
 		back_atSpeed = true;
 	}
 	
 	//TODO: write piston code when pneumatics code is fixed
-	if(!front_atSpeed || !back_atSpeed)
+	if(front_atSpeed && back_atSpeed)
 	{
-		//Don't shoot
-	} else {
 		if(front_atSpeedCounter > 9 && back_atSpeedCounter > 9 && frisbee_detected) 
 		{
-			//shoot
+			if (m_componentData->shooterData->ShouldExtendLauncher())
+			{
+				// Shoot
+			}
 		}
 	}
-	
-	
-	
-}
-
-bool Shooter::IsOverCurrent()
-{
-	//return m_overCurrentCounter > m_underCurrentCounter;
-	return m_roller_jaguar->GetOutputCurrent() > m_roller_currentThreshold;
+	m_PIDs[FRONT].setInput(m_speed_front);
+	m_PIDs[BACK].setInput(m_speed_back);
+	m_jaguar_front->SetDutyCycle(m_PIDs[FRONT].update(1.0 / RobotConfig::LOOP_RATE));
+	m_jaguar_back->SetDutyCycle(m_PIDs[BACK].update(1.0 / RobotConfig::LOOP_RATE));
 }
 
 void Shooter::disabledPeriodic()
 {
 	m_jaguar_front->SetDutyCycle(0.0F);
 	m_jaguar_back->SetDutyCycle(0.0F);
-	
-	m_roller_jaguar->SetDutyCycle(0.0F);
 }
 
 void Shooter::Configure()
@@ -141,12 +130,8 @@ void Shooter::Configure()
 	ConfigManager * c = ConfigManager::Instance();
 	m_max_speed = c->Get<double> (m_configSection, "maxSpeed", 5180);
 	
-	m_dutyCycle = ConfigManager::Instance()->Get<double> (m_configSection, "speed", 0.3F);
-	
-#warning change me
-	m_roller_currentThreshold = ConfigManager::Instance()->Get<double>(m_configSection, "normal_current", 10);
-	
-	m_maxCounterDifference = ConfigManager::Instance()->Get<double>(m_configSection, "max_counter_difference", 2);
+	m_dutyCycleFront = ConfigManager::Instance()->Get<double> (m_configSection, "frontSpeed", 0.3F);
+	m_dutyCycleBack = ConfigManager::Instance()->Get<double> (m_configSection, "backSpeed", 0.3F);
 }
 
 void Shooter::Log()

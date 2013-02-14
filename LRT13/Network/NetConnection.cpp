@@ -1,5 +1,5 @@
-#include "NetConnection.h"
 #include "NetBuffer.h"
+#include "NetConnection.h"
 
 NetConnection::NetConnection(char * ip, int port, NetConnectionType connType)
 {
@@ -7,16 +7,20 @@ NetConnection::NetConnection(char * ip, int port, NetConnectionType connType)
 	this->m_port = port;
 	this->m_connType = connType;
 	
-	this->m_reliableUnordered = new NetBuffer[16][MAX_MESSAGE_TRACK];
-	this->m_reliableSequenced = new NetBuffer[16][MAX_MESSAGE_TRACK];
-	this->m_reliableOrdered   = new NetBuffer[16][MAX_MESSAGE_TRACK];
+	for(int i = 0; i < 16; i++)
+	{
+		m_reliableOrdered[i] = new MessageAwaitingACK[MAX_MESSAGE_TRACK];
+		m_reliableSequenced[i] = new MessageAwaitingACK[MAX_MESSAGE_TRACK];
+		m_reliableOrdered[i] = new MessageAwaitingACK[MAX_MESSAGE_TRACK];
+	}
 	
-	this->m_lastUnreliableSequenced = new NetBuffer[MAX_MESSAGE_TRACK];
-	this->m_lastReliableSequenced 	= new NetBuffer[MAX_MESSAGE_TRACK];
+	this->m_lastUnreliableSequenced = new int[MAX_MESSAGE_TRACK];
+	this->m_lastReliableSequenced 	= new int[MAX_MESSAGE_TRACK];
 	
 	this->m_currentReliableUnorderedCounter = 0;
 	this->m_currentReliableSequencedCounter = 0;
 	this->m_currentReliableOrderedCounter = 0;
+	this->m_currentUnreliableSequencedCounter = 0;
 	
 	InternalPlatformQueueSynchronizationCreate();
 }
@@ -193,15 +197,47 @@ int NetConnection::Send(NetBuffer buff, NetChannel::Enum method, int channel)
 		return SEND_FAILED_BUFFER_INVALID;
 	}
 	
+	int netchannel = method + channel;
+	
+	MessageAwaitingACK maack;
+	
+	maack.buff = &buff;
+	maack.sentTime = Timer::GetFPGATimestamp();
+	
+	NetBuffer* localBuff = new NetBuffer();
+	localBuff->Write((char)USER_DATA);
+	localBuff->Write((char)method);
+	
 	switch(method)
 	{
 		// TODO: specific handlers for different methods
+	case NetChannel::NET_RELIABLE:
+		localBuff->Write(m_currentReliableUnorderedCounter);
+		m_reliableUnordered[channel][m_currentReliableUnorderedCounter++] = maack;
+		break;
+	case NetChannel::NET_RELIABLE_IN_ORDER:
+		localBuff->Write(m_currentReliableOrderedCounter);
+		m_reliableOrdered[channel][m_currentReliableOrderedCounter++] = maack;
+		break;
+	case NetChannel::NET_RELIABLE_SEQUENCED:
+		localBuff->Write(m_currentReliableSequencedCounter);
+		m_reliableSequenced[channel][m_currentReliableSequencedCounter++] = maack;
+		break;
+	case NetChannel::NET_UNRELIABLE:
+		 break;
+	case NetChannel::NET_UNRELIABLE_SEQUENCED:
+		localBuff->Write(m_currentUnreliableSequencedCounter++);
+		break;
+	default:
+
+		break;
 	}
 	
 	//TODO: implement reliable UDP
 	//NetBuffer* localBuff = new NetBuffer();
 
 	//localBuff->Write(buff.m_internalBuffer);
+	localBuff->Write(buff.m_internalBuffer);
 	
 	buff.m_sent = true;
 	
