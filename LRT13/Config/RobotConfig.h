@@ -43,6 +43,7 @@ namespace Digital // Ports 1-14
 	const uint32_t COMPRESSOR_PRESSURE_SENSOR_PIN = 14;
 	const uint32_t PROXIMITY_A = CHANGEME;
 	const uint32_t PROXIMITY_B = CHANGEME;
+	const uint32_t STORAGE_SWITCH = CHANGEME;
 }
 
 namespace Solenoid // Ports 1-8

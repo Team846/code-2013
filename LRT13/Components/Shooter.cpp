@@ -25,6 +25,9 @@ Shooter::Shooter()
 	front_atSpeed = false;
 	back_atSpeed = false;
 	
+	m_switch = new DigitalInput(RobotConfig::Digital::STORAGE_SWITCH);
+	frisbee_detected = false;
+	
 	m_roller_jaguar = new AsyncCANJaguar(RobotConfig::CAN::SHOOTER_ROLLER, "Shooter Roller");
 	m_dutyCycle = 0.0;
 	
@@ -32,6 +35,7 @@ Shooter::Shooter()
 	
 	m_overCurrentCounter = 0;
 	m_underCurrentCounter = 0;
+	
 }
 
 Shooter::~Shooter()
@@ -58,6 +62,9 @@ void Shooter::enabledPeriodic()
 {
 	m_roller_jaguar->SetDutyCycle(m_dutyCycle);
 	
+	m_PIDs[FRONT].setSetpoint(m_componentData->shooterData->GetDesiredSpeed(FRONT));
+	m_PIDs[BACK].setSetpoint(m_componentData->shooterData->GetDesiredSpeed(BACK));
+	
 	/*
 	if(m_roller_jaguar->GetOutputCurrent() > m_normalCurrent)
 	{
@@ -70,12 +77,12 @@ void Shooter::enabledPeriodic()
 			++m_underCurrentCounter;
 	}*/
 	
-	
-	
 	m_speed_front = (m_enc_front->GetStopped()) ? 0.0 : (60.0 / 2.0 / m_enc_front->GetPeriod());
 	m_speed_front = Util::Clamp<double>(m_speed_front, 0, m_max_speed * 1.3);
 	m_speed_back = (m_enc_back->GetStopped()) ? 0.0 : (60.0 / 2.0 / m_enc_back->GetPeriod());
 	m_speed_back = Util::Clamp<double>(m_speed_back, 0, m_max_speed * 1.3);
+	
+	frisbee_detected = m_switch->Get() == 1;
 	
 	if(fabs(m_speed_front - m_componentData->shooterData->GetDesiredSpeed(FRONT)) > 
 		m_componentData->shooterData->GetAcceptableSpeedError(FRONT)) 
@@ -100,10 +107,18 @@ void Shooter::enabledPeriodic()
 		back_atSpeed = true;
 	}
 	
+	//TODO: write piston code when pneumatics code is fixed
 	if(!front_atSpeed || !back_atSpeed)
 	{
 		//Don't shoot
+	} else {
+		if(front_atSpeedCounter > 9 && back_atSpeedCounter > 9 && frisbee_detected) 
+		{
+			//shoot
+		}
 	}
+	
+	
 	
 }
 
