@@ -7,6 +7,17 @@ NetConnection::NetConnection(char * ip, int port, NetConnectionType connType)
 	this->m_port = port;
 	this->m_connType = connType;
 	
+	this->m_reliableUnordered = new NetBuffer[16][MAX_MESSAGE_TRACK];
+	this->m_reliableSequenced = new NetBuffer[16][MAX_MESSAGE_TRACK];
+	this->m_reliableOrdered   = new NetBuffer[16][MAX_MESSAGE_TRACK];
+	
+	this->m_lastUnreliableSequenced = new NetBuffer[MAX_MESSAGE_TRACK];
+	this->m_lastReliableSequenced 	= new NetBuffer[MAX_MESSAGE_TRACK];
+	
+	this->m_currentReliableUnorderedCounter = 0;
+	this->m_currentReliableSequencedCounter = 0;
+	this->m_currentReliableOrderedCounter = 0;
+	
 	InternalPlatformQueueSynchronizationCreate();
 }
 
@@ -170,7 +181,7 @@ int NetConnection::Close()
 	return close(m_socket);
 }
 
-int NetConnection::Send(NetBuffer buff)
+int NetConnection::Send(NetBuffer buff, NetChannel::Enum method, int channel)
 {
 	if(buff.m_sent)
 	{
@@ -180,6 +191,11 @@ int NetConnection::Send(NetBuffer buff)
 	if(buff.m_internalBuffer == NULL)
 	{
 		return SEND_FAILED_BUFFER_INVALID;
+	}
+	
+	switch(method)
+	{
+		// TODO: specific handlers for different methods
 	}
 	
 	//TODO: implement reliable UDP

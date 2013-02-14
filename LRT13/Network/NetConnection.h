@@ -22,12 +22,14 @@
 
 //#include "NetBuffer.h"
 #include "NetConnectionType.h"
+#include "NetChannel.h"
 
 #define SEND_FAILED_BUFFER_ALREADY_SENT -1000000000
 #define SEND_FAILED_BUFFER_INVALID -1000000001
 #define SEND_FAILED_UNKNOWN_ERROR -10000000002
 
 #define MAX_RECEIVE_BUFFER_SIZE 1024
+#define MAX_MESSAGE_TRACK 256 // 256 gives us ample time to wait for an ACK. ~ 5 messages per frame * 50 frames per second gives us 6 extra packets.
 
 using namespace std;
 using namespace Network;
@@ -36,6 +38,12 @@ namespace Network
 {
 	class NetBuffer;
 
+	enum LibraryMessageType
+	{
+		LIBRARY_DATA = 0x00,
+		USER_DATA = 0x01,
+	};
+	
 	/*!
 	 * @brief Represents a network connection.
 	 * @author Tony Peng
@@ -64,7 +72,7 @@ namespace Network
 		/*!
 		 * @brief Sends the contents of the NetBuffer over the network connection.
 		 */
-		int Send(NetBuffer buff);
+		int Send(NetBuffer buff, NetChannel::Enum method, int channel);
 		
 		/*!
 		 * @brief Returns the next message in the message queue.
@@ -102,6 +110,17 @@ namespace Network
 		
 		int m_socket;
 		struct sockaddr_in m_remote_spec;
+		
+		NetBuffer** m_reliableUnordered;
+		NetBuffer** m_reliableSequenced;
+		NetBuffer** m_reliableOrdered;
+		
+		int* m_lastUnreliableSequenced;
+		int* m_lastReliableSequenced;
+		
+		int m_currentReliableUnorderedCounter;
+		int m_currentReliableSequencedCounter;
+		int m_curerntReliableOrderedCounter;
 	};
 };
 

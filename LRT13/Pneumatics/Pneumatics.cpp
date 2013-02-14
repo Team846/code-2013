@@ -172,9 +172,6 @@ INT32 Pneumatics::Tick()
 	pulse(&m_ballcollector);
 	pulse(&m_trajectory);
 	pulse(&m_shared);
-	static int e = 0;
-	if (++e % 15 == 0)
-	AsyncPrinter::Printf("Pneumatics %d\n", m_pulse_length);
 	return 0;
 }
 

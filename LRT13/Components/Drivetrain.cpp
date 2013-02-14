@@ -37,8 +37,8 @@ double Drivetrain::ComputeOutput(data::drivetrain::ForwardOrTurn axis)
 		m_PIDs[POSITION][axis].setInput(0.0);//we're always at our current position! :D -BA
 		m_PIDs[POSITION][axis].setSetpoint(positionSetpoint);
 		velocitySetpoint = m_PIDs[POSITION][axis].update( 1.0 / RobotConfig::LOOP_RATE);
-//		if (fabs(velocitySetpoint) > m_componentData->drivetrainData->getPositionControlMaxSpeed(axis))
-//			velocitySetpoint = Util::Sign()
+		if (fabs(velocitySetpoint) > m_componentData->drivetrainData->getPositionControlMaxSpeed(axis))
+			velocitySetpoint = Util::Sign(velocitySetpoint) * m_componentData->drivetrainData->getPositionControlMaxSpeed(axis);
 		//fall through the switch
 	case data::drivetrain::VELOCITY_CONTROL:
 		//1.0e-2
@@ -74,14 +74,16 @@ void Drivetrain::enabledPeriodic()
 	Util::Clamp<double>(leftOutput, -1.0, 1.0);
 	Util::Clamp<double>(rightOutput, -1.0, 1.0);
 	
-	static int e = 0;
-	if (++e % 15 == 0)
-	{
-		AsyncPrinter::Printf("fwdin: %.4f fwdRead:%.4f turnRead:%.4f\n",fwdOutput , m_driveEncoders->getNormalizedForwardSpeed(), m_driveEncoders->getNormalizedTurningSpeed());
-	}
+//	static int e = 0;
+//	if (++e % 15 == 0)
+//	{
+//		AsyncPrinter::Printf("fwdin: %.4f fwdRead:%.4f turnRead:%.4f\n",fwdOutput , m_driveEncoders->getNormalizedForwardSpeed(), m_driveEncoders->getNormalizedTurningSpeed());
+//	}
 	
 	m_escs[LEFT]->SetDutyCycle(leftOutput);
 	m_escs[RIGHT]->SetDutyCycle(rightOutput);
+	
+	m_componentData->drivetrainData->serviceOperationSemaphores();
 }
 
 

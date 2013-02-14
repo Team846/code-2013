@@ -140,8 +140,8 @@ void LRTRobot13::Run()
 		
 		double toSleep = (int)((1000.0 / RobotConfig::LOOP_RATE) - timeSpent) / 1000.0;
 
-		if(e++ % (RobotConfig::LOOP_RATE) == 0)
-			AsyncPrinter::Printf("Tick: %d\n", e);
+//		if(e++ % (RobotConfig::LOOP_RATE) == 0)
+//			AsyncPrinter::Printf("Tick: %d\n", e);
 		
 		Wait(toSleep);
 	}

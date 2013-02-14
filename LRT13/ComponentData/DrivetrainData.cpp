@@ -1,5 +1,7 @@
 #include "DrivetrainData.h"
 #include "../Sensors/DriveEncoders.h"
+#include <math.h>
+
 
 using namespace data;
 using namespace data::drivetrain;
@@ -15,14 +17,10 @@ DrivetrainData::DrivetrainData()
 	memset(m_desiredRates, 0, sizeof(m_desiredRates));
 	memset(m_positionSetpoints, 0, sizeof(m_positionSetpoints));
 	memset(m_maxSpeeds, 0, sizeof(m_maxSpeeds));
-	m_positionFwdSemaphore = semBCreate(SEM_Q_PRIORITY, SEM_FULL);
-	m_positionTurnSemaphore = semBCreate(SEM_Q_PRIORITY, SEM_FULL);
 }
 
 DrivetrainData::~DrivetrainData()
 {
-	semDelete(m_positionFwdSemaphore);
-	semDelete(m_positionTurnSemaphore);
 }
 
 ControlMode DrivetrainData::getControlMode(ForwardOrTurn axis)
@@ -47,6 +45,11 @@ void DrivetrainData::setRelativePositionSetpoint(ForwardOrTurn axis,
 	m_maxSpeeds[axis] = maxspeed;
 }
 
+void DrivetrainData::DebugPrintPosition(ForwardOrTurn axis)
+{
+	AsyncPrinter::Printf("Curr: %.4f, desired %.4f\n",getCurrentPos(axis), m_positionSetpoints[axis] );
+}
+
 double DrivetrainData::getCurrentPos(ForwardOrTurn axis)
 {
 	double currentPos;
@@ -67,11 +70,53 @@ void DrivetrainData::setControlMode(ForwardOrTurn axis, ControlMode control)
 	m_controlModes[axis] = control;
 }
 
-SEM_ID DrivetrainData::positionOperationSemaphore(ForwardOrTurn axis,
+SEM_ID DrivetrainData::createPositionOperationSemaphore(ForwardOrTurn axis,
 		double errorThreshold)
 {
-	return axis == drivetrain::FORWARD ? m_positionFwdSemaphore : m_positionTurnSemaphore;
+	drivetrainOpSem sem;
+	sem.sem = semBCreate(SEM_Q_PRIORITY, SEM_FULL);
+	semTake(sem.sem, WAIT_FOREVER);
+	sem.axis = axis;
+	sem.errorThreshold = errorThreshold;
+	operationSems.push_back(sem);
+	return sem.sem;
 }
+
+void DrivetrainData::cleanWaitForSem(SEM_ID sem)
+{
+	semTake(sem, WAIT_FOREVER);
+	semDelete(sem);
+}
+bool DrivetrainData::cleanWaitForSem(SEM_ID sem, double timeout)
+{
+	STATUS s = semTake(sem, (int) (sysClkRateGet() * timeout));
+	if (s == OK)
+	{
+		semDelete(sem);
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
+
+void DrivetrainData::serviceOperationSemaphores()
+{
+	list<drivetrainOpSem>::iterator iterator;
+	for (iterator = operationSems.begin(); iterator != operationSems.end(); ++iterator) 
+	{
+		double error = getRelativePositionSetpoint(iterator->axis);
+		if (fabs(error) < iterator->errorThreshold)
+		{
+			semGive(iterator->sem);
+			iterator = operationSems.erase(iterator);
+			iterator--; //it is up to the auton routine to delete 
+		}
+	}
+}
+
+
 
 bool DrivetrainData::isDesiredPositionOperationComplete(ForwardOrTurn axis,
 		double errorThreshold)

@@ -13,7 +13,11 @@ namespace collector
 {
 	class CollectorData
 	{
-		
+	public:
+		CollectorData();
+		void run();
+	private:
+		bool m_running;
 	};
 }
 }

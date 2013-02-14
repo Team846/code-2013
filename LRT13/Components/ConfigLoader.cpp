@@ -1,8 +1,6 @@
 #include "ConfigLoader.h"
 #include "../Utils/AsyncPrinter.h"
 
-#warning needs implementation
-
 ConfigLoader::ConfigLoader()
 : Component("ConfigLoader", -1, false)
 {
@@ -34,7 +32,6 @@ void ConfigLoader::enabledPeriodic()
 		else if (m_componentData->configLoaderData->IsSaveRequested())
 		{
 			m_config->Save();
-			AsyncPrinter::Printf("Saving Config\n");
 			m_componentData->configLoaderData->RemoveSaveRequest();
 		}
 		else if (m_componentData->configLoaderData->IsApplyRequested())

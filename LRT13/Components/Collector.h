@@ -37,16 +37,10 @@ private:
 	AsyncCANJaguar* m_jaguar;
 	
 	// Proximity Sensors
-	DigitalInput* m_proximityA; 
-	DigitalInput* m_proximityB;
+	DigitalInput* m_proximity;
 	
 	// Frisbee Counters
 	int m_upCount;
-	int m_downCount;
-	int m_errCount;
-	
-	int m_errors;
-	
 	int m_samplesThreshold;
 	
 	float m_dutyCycle;

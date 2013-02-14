@@ -48,7 +48,7 @@ namespace drivetrain
 		void setControlMode(ForwardOrTurn axis, ControlMode control);
 	
 
-		SEM_ID positionOperationSemaphore(ForwardOrTurn axis, double errorThreshold);
+		SEM_ID createPositionOperationSemaphore(ForwardOrTurn axis, double errorThreshold);
 		
 		bool isDesiredPositionOperationComplete(ForwardOrTurn axis,
 				double errorThreshold);
@@ -57,6 +57,12 @@ namespace drivetrain
 		double getVelocitySetpoint(ForwardOrTurn axis);
 		double getRelativePositionSetpoint(ForwardOrTurn axis);
 		double getPositionControlMaxSpeed(ForwardOrTurn axis);
+		
+		void serviceOperationSemaphores();
+		void cleanWaitForSem(SEM_ID sem);
+		bool cleanWaitForSem(SEM_ID sem, double timeout);
+		
+		void DebugPrintPosition(ForwardOrTurn axis);
 	
 	private:
 		double getCurrentPos(ForwardOrTurn axis);
@@ -67,8 +73,14 @@ namespace drivetrain
 		double m_desiredRates[2];
 		double m_positionSetpoints[2];
 		double m_maxSpeeds[2];
-		SEM_ID m_positionFwdSemaphore;
-		SEM_ID m_positionTurnSemaphore;
+		
+		typedef struct drivetrainOpSem
+		{
+			SEM_ID sem;
+			ForwardOrTurn axis;
+			double errorThreshold;
+		};
+		list<drivetrainOpSem> operationSems;
 	};
 }
 }
