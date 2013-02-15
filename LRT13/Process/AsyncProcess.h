@@ -1,8 +1,8 @@
 #ifndef ASYNC_PROCESS_H_
 #define ASYNC_PROCESS_H_
 
-#include "WPILib.h"
-#include "sysLib.h"
+#include <WPILib.h>
+#include <sysLib.h>
 
 #include "../Utils/Defines.h"
 

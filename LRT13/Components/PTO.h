@@ -1,12 +1,13 @@
 #ifndef PTO_H_
 #define PTO_H_
 
+#include <Servo.h>
+
 #include "../ComponentData/RobotData.h"
 #include "../Config/Configurable.h"
 #include "../Log/Loggable.h"
 #include "Component.h"
 #include "../ComponentData/PTOData.h"
-#include "Servo.h"
 
 using namespace data;
 

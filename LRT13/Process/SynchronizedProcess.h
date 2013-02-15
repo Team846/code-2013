@@ -2,8 +2,8 @@
 #define SYNC_PROCESS_H_
 
 #include <WPILib.h>
+#include <semLib.h>
 
-#include "semLib.h"
 #include "AsyncProcess.h"
 
 /*!

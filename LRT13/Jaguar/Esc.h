@@ -1,15 +1,17 @@
 #ifndef ESC_H_
 #define ESC_H_
 
+#include <WPILib.h>
+#include <utility>
+#include <string>
+
 #include "AsyncCANJaguar.h"
-#include "WPILib.h"
 #include "..\Config\ConfigManager.h"
 #include "..\Config\Configurable.h"
 #include "..\Utils\AsyncPrinter.h"
 #include "..\Sensors\DriveEncoders.h"
 #include "..\Utils\RunningSum.h"
-#include <utility>
-#include <string>
+
 using namespace std;
 
 class ESC: public Configurable

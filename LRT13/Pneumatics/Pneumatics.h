@@ -1,13 +1,16 @@
 #ifndef PNEUMATICS_H_
 #define PNEUMATICS_H_
 
-#include "WPILib.h"
-#include "DoubleSolenoid.h"
-#include "Compressor.h"
+#include <WPILib.h>
+#include <DoubleSolenoid.h>
+#include <Compressor.h>
+
 #include "../Config/RobotConfig.h"
 #include "../Config/Configurable.h"
 #include "../Log/Loggable.h"
 #include "../Process/SynchronizedProcess.h"
+#include "../Config/ConfigManager.h"
+#include "../Utils/AsyncPrinter.h"
 
 typedef struct
 {
@@ -31,6 +34,11 @@ public:
 	 */
 	static Pneumatics* Instance();
 
+	/*!
+	 * Deletes instance
+	 */
+	static void Finalize();
+	
 	void setCollector(bool on, bool force = false);
 
 	void setClimberLowerInner(bool on, bool force = false);
@@ -58,11 +66,6 @@ public:
 	 * Logs value
 	 */
 	virtual void Log();
-	
-	/*!
-	 * Deletes instance
-	 */
-	static void Finalize();
 
 protected:
 	INT32 Tick();

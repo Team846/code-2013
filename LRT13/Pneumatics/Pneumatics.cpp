@@ -1,6 +1,4 @@
 #include "Pneumatics.h"
-#include "../Config/ConfigManager.h"
-#include "../Utils/AsyncPrinter.h"
 
 Pneumatics* Pneumatics::m_instance = NULL;
 
@@ -157,12 +155,12 @@ void Pneumatics::setCompressor(bool on)
 
 Pneumatics::~Pneumatics()
 {
-	delete m_collector.solenoid;
-	delete m_climberLowerInner.solenoid;
-	delete m_climberLowerOuter.solenoid;
-	delete m_climberMiddle.solenoid;
+	DELETE(m_collector.solenoid);
+	DELETE(m_climberLowerInner.solenoid);
+	DELETE(m_climberLowerOuter.solenoid);
+	DELETE(m_climberMiddle.solenoid);
 	m_compressor->Stop();
-	delete m_compressor;
+	DELETE(m_compressor);
 }
 
 INT32 Pneumatics::Tick()
@@ -179,17 +177,6 @@ INT32 Pneumatics::Tick()
 void Pneumatics::Finalize()
 {
 	DELETE(m_instance);
-}
-
-void Pneumatics::Configure()
-{
-	ConfigManager* c = ConfigManager::Instance();
-	m_pulse_length = c->Get<int> (m_configSection, "pulseLength", 25);
-}
-
-void Pneumatics::Log()
-{
-	
 }
 
 void Pneumatics::Configure()

@@ -1,9 +1,11 @@
 #ifndef COMPONENT_H_
 #define COMPONENT_H_
 
-#include "WPILib.h"
+#include <WPILib.h>
+
 #include <list>
 #include <string>
+
 #include "../ComponentData/ComponentData.h"
 
 class ComponentManager;
