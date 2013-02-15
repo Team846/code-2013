@@ -31,35 +31,17 @@ public:
 	 */
 	static Pneumatics* Instance();
 
-	/*!
-	 * Sets the shifter solenoids
-	 * @param on
-	 */
-	void setShifter(bool on, bool force = false);
+	void setCollector(bool on, bool force = false);
 
-	/*!
-	 * Sets the ball collector arm
-	 */
-	void setBallCollector(bool on, bool force = false);
+	void setClimberLowerInner(bool on, bool force = false);
 
-	/*!
-	 * Sets the trajectory selection
-	 */
-	void setTrajectory(bool on, bool force = false);
+	void setClimberLowerOuter(bool on, bool force = false);
 
-	/*!
-	 * Sets the status of the latch
-	 * interlocked with setPressurePlate
-	 * @param on
-	 */
-	void setLatch(bool on, bool force = false);
+	void setClimberMiddle(bool on, bool force = false);
 
-	/*!
-	 * Sets the status of the pressure plate
-	 * interlocked with setLatch
-	 * @param on
-	 */
-	void setPressurePlate(bool on, bool force = false);
+	void setClimberUpper(bool on, bool force = false);
+
+	void setStorageExit(bool on, bool force = false);
 	
 	/*!
 	 * Sets the state of the compressor
@@ -97,11 +79,11 @@ private:
 	 */
 	void pulse(PulsedSolenoid * ptr);
 
-	PulsedSolenoid m_shifter, m_ballcollector, m_trajectory, m_shared;
+	PulsedSolenoid m_collector, m_climberLowerInner, m_climberLowerOuter, m_climberMiddle, m_climberUpper, m_storageExit;
 
 	static Pneumatics* m_instance;
 
-	std::string m_name;
+	std::string m_configSection;
 
 	int m_pulse_length;
 	bool m_mutex;

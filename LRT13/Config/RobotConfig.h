@@ -47,15 +47,18 @@ namespace Digital // Ports 1-14
 
 namespace Solenoid // Ports 1-8
 {
-	const uint32_t COLLECTOR_LEFT_A = CHANGEME;
-	const uint32_t COLLECTOR_LEFT_B = CHANGEME;
-	const uint32_t COLLECTOR_RIGHT_A = CHANGEME;
-	const uint32_t COLLECTOR_RIGHT_B = CHANGEME;
-	const uint32_t CLIMBER_LEFT_A = CHANGEME;
-	const uint32_t CLIMBER_LEFT_B = CHANGEME;
-	const uint32_t CLIMBER_RIGHT_A = CHANGEME;
-	const uint32_t CLIMBER_RIGHT_B = CHANGEME;
-	const uint32_t STORAGE_LAUNCHER = CHANGEME;
+	const uint32_t COLLECTOR_A = CHANGEME;
+	const uint32_t COLLECTOR_B = CHANGEME;
+	const uint32_t CLIMBER_LOWER_INNER_A = CHANGEME;
+	const uint32_t CLIMBER_LOWER_INNER_B = CHANGEME;
+	const uint32_t CLIMBER_LOWER_OUTER_A = CHANGEME;
+	const uint32_t CLIMBER_LOWER_OUTER_B = CHANGEME;
+	const uint32_t CLIMBER_MIDDLE_A = CHANGEME;
+	const uint32_t CLIMBER_MIDDLE_B = CHANGEME;
+	const uint32_t CLIMBER_UPPER_A = CHANGEME;
+	const uint32_t CLIMBER_UPPER_B = CHANGEME;
+	const uint32_t STORAGE_EXIT_A = CHANGEME;
+	const uint32_t STORAGE_EXIT_B = CHANGEME;
 }
 
 namespace Relay // Ports 1-8
