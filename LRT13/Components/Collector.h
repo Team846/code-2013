@@ -19,7 +19,7 @@ using namespace data;
  * @brief Provides control over the collector component.
  * @author Raphael Chang, Tony Peng, Manoj Vasishta
  */
-class Collector : public Component, public Configurable, public Loggable
+class Collector : public Component, public Configurable, public Loggable//,public Pneumatic
 {
 public:
 	Collector();

@@ -26,6 +26,10 @@ namespace data
 	{
 		class CollectorData;
 	}
+	namespace pto
+	{
+		class PTOData;
+	}
 	
 	/*!
 	 * @brief Provides a central hub for data access.
@@ -41,6 +45,7 @@ namespace data
 		drivetrain::DrivetrainData* const drivetrainData;
 		shooter::ShooterData* const shooterData;
 		collector::CollectorData* const collectorData;
+		pto::PTOData* const ptoData;
 		configloader::ConfigLoaderData* const configLoaderData;
 	
 	protected:

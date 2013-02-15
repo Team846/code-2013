@@ -60,7 +60,7 @@ namespace Solenoid // Ports 1-8
 
 namespace Relay // Ports 1-8
 {
-const uint32_t COMPRESSOR_RELAY = 1;
+	const uint32_t COMPRESSOR_RELAY = 1;
 }
 
 namespace CAN // Ports 1-16 (2CAN limitation)
@@ -76,8 +76,8 @@ namespace CAN // Ports 1-16 (2CAN limitation)
 
 namespace PWM
 {
-	const uint32_t LEFT_GEARBOX_SERVO = CHANGEME;
-	const uint32_t RIGHT_GEARBOX_SERVO = CHANGEME;
+	const uint32_t LEFT_PTO_SERVO = CHANGEME;
+	const uint32_t RIGHT_PTO_SERVO = CHANGEME;
 }
 
 }

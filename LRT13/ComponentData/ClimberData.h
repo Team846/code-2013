@@ -1,7 +1,7 @@
 #ifndef CLIMBER_DATA_H
 #define CLIMBER_DATA_H
 
-#include "ClimberData.h"
+#include "ComponentData.h"
 
 namespace data
 {
@@ -11,7 +11,7 @@ namespace data
  */
 namespace climber
 {
-	class ClimberData : public ComponentData
+	class ClimberData
 	{
 		//Define desired state (what part of climb im working on)
 		//Keep track of current state (what part of climb im working on: done, in progress; starting)

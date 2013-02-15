@@ -2,16 +2,12 @@
 #include "../Sensors/DriveEncoders.h"
 #include <math.h>
 
-
 using namespace data;
 using namespace data::drivetrain;
 
 DrivetrainData::DrivetrainData()
 {
 	m_driveEncoders = DriveEncoders::GetInstance();
-	
-	// these arrays are statically allocated and thus cannot be deallocated... -tp
-	// These arrays are not statically allocated shoudl still nto be deallocated since they will be cleaned up upon destruction. 
 	
 	memset(m_controlModes, OPEN_LOOP, sizeof(m_controlModes));
 	memset(m_desiredRates, 0, sizeof(m_desiredRates));
@@ -115,8 +111,6 @@ void DrivetrainData::serviceOperationSemaphores()
 		}
 	}
 }
-
-
 
 bool DrivetrainData::isDesiredPositionOperationComplete(ForwardOrTurn axis,
 		double errorThreshold)
