@@ -9,6 +9,7 @@ ShooterData::ShooterData()
 	// these arrays are statically allocated and thus cannot be deallocated... -tp
 	memset(atSpeed, false, sizeof(atSpeed));
 	memset(speed, 0, sizeof(speed));
+	
 }
 
 void ShooterData::SetDesiredSpeed(double desiredSpeed, Roller roller)
@@ -18,7 +19,7 @@ void ShooterData::SetDesiredSpeed(double desiredSpeed, Roller roller)
 
 double ShooterData::GetDesiredSpeed(Roller roller)
 {
-		return speed[roller];
+	return speed[roller];
 }
 
 void ShooterData::SetAtSpeed(bool value, Roller roller)
@@ -38,7 +39,7 @@ void ShooterData::SetAcceptableSpeedError(double error, int roller)
 
 double ShooterData::GetAcceptableSpeedError(int roller)
 {
-		return acceptableSpeedError[roller];
+	return acceptableSpeedError[roller];
 }
 
 void ShooterData::ExtendLauncher()

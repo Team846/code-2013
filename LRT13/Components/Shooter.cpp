@@ -130,8 +130,9 @@ void Shooter::Configure()
 	ConfigManager * c = ConfigManager::Instance();
 	m_max_speed = c->Get<double> (m_configSection, "maxSpeed", 5180);
 	
-	m_dutyCycleFront = ConfigManager::Instance()->Get<double> (m_configSection, "frontSpeed", 0.3F);
-	m_dutyCycleBack = ConfigManager::Instance()->Get<double> (m_configSection, "backSpeed", 0.3F);
+	m_dutyCycleFront = c->Get<double> (m_configSection, "frontSpeed", 0.3F);
+	m_dutyCycleBack = c->Get<double> (m_configSection, "backSpeed", 0.3F);
+	
 }
 
 void Shooter::Log()
