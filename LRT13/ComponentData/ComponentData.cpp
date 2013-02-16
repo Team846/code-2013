@@ -1,5 +1,6 @@
 #include "ComponentData.h"
 #include "DrivetrainData.h"
+#include "ClimberData.h"
 #include "ShooterData.h"
 #include "ConfigLoaderData.h"
 #include "ShooterData.h"
@@ -10,6 +11,7 @@ using namespace data;
 using namespace drivetrain;
 using namespace shooter;
 using namespace collector;
+using namespace climber;
 using namespace pto;
 using namespace configloader;
 
@@ -32,6 +34,7 @@ ComponentData::ComponentData()
 : drivetrainData(new DrivetrainData()),
   shooterData(new ShooterData()),
   collectorData(new CollectorData()),
+  climberData(new ClimberData()),
   ptoData(new PTOData()),
   configLoaderData(new ConfigLoaderData())
 {

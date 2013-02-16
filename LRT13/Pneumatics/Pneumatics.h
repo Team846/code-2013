@@ -41,15 +41,11 @@ public:
 	
 	void setCollector(bool on, bool force = false);
 
-	void setClimberLowerInner(bool on, bool force = false);
-
-	void setClimberLowerOuter(bool on, bool force = false);
-
-	void setClimberMiddle(bool on, bool force = false);
-
-	void setClimberUpper(bool on, bool force = false);
+	void setClimberArm(bool on, bool force = false);
 
 	void setStorageExit(bool on, bool force = false);
+	
+	void setHookPosition(bool on, bool force = false);
 	
 	/*!
 	 * Sets the state of the compressor
@@ -82,7 +78,7 @@ private:
 	 */
 	void pulse(PulsedSolenoid * ptr);
 
-	PulsedSolenoid m_collector, m_climberLowerInner, m_climberLowerOuter, m_climberMiddle, m_climberUpper, m_storageExit;
+	PulsedSolenoid m_collector, m_climber, m_storageExit, m_hook;
 
 	static Pneumatics* m_instance;
 

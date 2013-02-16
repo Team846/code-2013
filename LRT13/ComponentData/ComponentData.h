@@ -26,6 +26,10 @@ namespace data
 	{
 		class CollectorData;
 	}
+	namespace climber
+	{
+		class ClimberData;
+	}
 	namespace pto
 	{
 		class PTOData;
@@ -45,6 +49,7 @@ namespace data
 		drivetrain::DrivetrainData* const drivetrainData;
 		shooter::ShooterData* const shooterData;
 		collector::CollectorData* const collectorData;
+		climber::ClimberData* const climberData;
 		pto::PTOData* const ptoData;
 		configloader::ConfigLoaderData* const configLoaderData;
 	

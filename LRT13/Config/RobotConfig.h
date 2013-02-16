@@ -49,14 +49,12 @@ namespace Solenoid // Ports 1-8
 {
 	const uint32_t COLLECTOR_A = CHANGEME;
 	const uint32_t COLLECTOR_B = CHANGEME;
-	const uint32_t CLIMBER_LOWER_INNER_A = CHANGEME;
-	const uint32_t CLIMBER_LOWER_INNER_B = CHANGEME;
-	const uint32_t CLIMBER_LOWER_OUTER_A = CHANGEME;
-	const uint32_t CLIMBER_LOWER_OUTER_B = CHANGEME;
-	const uint32_t CLIMBER_MIDDLE_A = CHANGEME;
-	const uint32_t CLIMBER_MIDDLE_B = CHANGEME;
-	const uint32_t CLIMBER_UPPER_A = CHANGEME;
-	const uint32_t CLIMBER_UPPER_B = CHANGEME;
+	const uint32_t CLIMBER_A = CHANGEME;
+	const uint32_t CLIMBER_B = CHANGEME;
+	
+	const uint32_t HOOKS_A  = CHANGEME;
+	const uint32_t HOOKS_B = CHANGEME;
+	
 	const uint32_t STORAGE_EXIT_A = CHANGEME;
 	const uint32_t STORAGE_EXIT_B = CHANGEME;
 	const uint32_t STORAGE_EXIT = CHANGEME;
@@ -76,6 +74,7 @@ namespace CAN // Ports 1-16 (2CAN limitation)
 	const uint32_t COLLECTOR = CHANGEME;
 	const uint32_t SHOOTER_A = CHANGEME;
 	const uint32_t SHOOTER_B = CHANGEME;
+	const uint32_t WINCH_WORM = CHANGEME;
 }
 
 namespace PWM

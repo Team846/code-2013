@@ -15,21 +15,13 @@ Pneumatics::Pneumatics() :
 					RobotConfig::Solenoid::COLLECTOR_A,
 					RobotConfig::Solenoid::COLLECTOR_B));
 
-	INIT_PULSED_SOLENOID(m_climberLowerInner, new DoubleSolenoid(
-					RobotConfig::Solenoid::CLIMBER_LOWER_INNER_A,
-					RobotConfig::Solenoid::CLIMBER_LOWER_INNER_B));
-
-	INIT_PULSED_SOLENOID(m_climberLowerOuter, new DoubleSolenoid(
-					RobotConfig::Solenoid::CLIMBER_LOWER_OUTER_A,
-					RobotConfig::Solenoid::CLIMBER_LOWER_OUTER_B));
-
-	INIT_PULSED_SOLENOID(m_climberMiddle, new DoubleSolenoid(
-					RobotConfig::Solenoid::CLIMBER_MIDDLE_A,
-					RobotConfig::Solenoid::CLIMBER_MIDDLE_B));
-
-	INIT_PULSED_SOLENOID(m_climberUpper, new DoubleSolenoid(
-					RobotConfig::Solenoid::CLIMBER_UPPER_A,
-					RobotConfig::Solenoid::CLIMBER_UPPER_B));
+	INIT_PULSED_SOLENOID(m_climber, new DoubleSolenoid(
+					RobotConfig::Solenoid::CLIMBER_A,
+					RobotConfig::Solenoid::CLIMBER_B));
+	
+	INIT_PULSED_SOLENOID(m_hook, new DoubleSolenoid(
+					RobotConfig::Solenoid::HOOKS_A,
+					RobotConfig::Solenoid::HOOKS_B));
 
 	INIT_PULSED_SOLENOID(m_storageExit, new DoubleSolenoid(
 					RobotConfig::Solenoid::STORAGE_EXIT,
@@ -52,39 +44,12 @@ Pneumatics* Pneumatics::Instance()
 	return m_instance;
 }
 
-void Pneumatics::setClimberLowerInner(bool on, bool force)
+void Pneumatics::setClimberArm(bool on, bool force)
 {
-	if (on != m_climberLowerInner.state || force)
+	if (on != m_climber.state || force)
 	{
-		m_climberLowerInner.state = on;
-		m_climberLowerInner.counter = m_pulse_length;
-	}
-}
-
-void Pneumatics::setClimberLowerOuter(bool on, bool force)
-{
-	if (on != m_climberLowerOuter.state || force)
-	{
-		m_climberLowerOuter.state = on;
-		m_climberLowerOuter.counter = m_pulse_length;
-	}
-}
-
-void Pneumatics::setClimberMiddle(bool on, bool force)
-{
-	if (on != m_climberMiddle.state || force)
-	{
-		m_climberMiddle.state = on;
-		m_climberMiddle.counter = m_pulse_length;
-	}
-}
-
-void Pneumatics::setClimberUpper(bool on, bool force)
-{
-	if (on != m_climberUpper.state || force)
-	{
-		m_climberUpper.state = on;
-		m_climberUpper.counter = m_pulse_length;
+		m_climber.state = on;
+		m_climber.counter = m_pulse_length;
 	}
 }
 
@@ -94,6 +59,15 @@ void Pneumatics::setCollector(bool on, bool force)
 	{
 		m_collector.state = on;
 		m_collector.counter = m_pulse_length;
+	}
+}
+
+void Pneumatics::setHookPosition(bool on, bool force)
+{
+	if (on != m_hook.state || force)
+	{
+		m_hook.state = on;
+		m_hook.counter = m_pulse_length;
 	}
 }
 
@@ -156,9 +130,8 @@ void Pneumatics::setCompressor(bool on)
 Pneumatics::~Pneumatics()
 {
 	DELETE(m_collector.solenoid);
-	DELETE(m_climberLowerInner.solenoid);
-	DELETE(m_climberLowerOuter.solenoid);
-	DELETE(m_climberMiddle.solenoid);
+	DELETE(m_hook.solenoid);
+	DELETE(m_climber.solenoid);
 	m_compressor->Stop();
 	DELETE(m_compressor);
 }
@@ -166,10 +139,8 @@ Pneumatics::~Pneumatics()
 INT32 Pneumatics::Tick()
 {
 	pulse(&m_collector);
-	pulse(&m_climberLowerInner);
-	pulse(&m_climberLowerOuter);
-	pulse(&m_climberMiddle);
-	pulse(&m_climberUpper);
+	pulse(&m_hook);
+	pulse(&m_climber);
 	pulse(&m_storageExit);
 	return 0;
 }
