@@ -11,6 +11,8 @@
 #include "../Jaguar/AsyncCANJaguar.h"
 #include "../Pneumatics/Pneumatics.h"
 #include "../ComponentData/ClimberData.h"
+#include "../Sensors/DriveEncoders.h"
+#include "../Servo/LRTServo.h"
 
 
 #include "Component.h"
@@ -45,8 +47,21 @@ private:
 	double m_winch_engage_duty_cycle;
 	int m_timer;
 	int m_timer_threshold;
+	int m_side_engaged;
+	DigitalInput m_digital_input_left, m_digital_input_right;
+	bool m_hasStartedEngaging;
 	bool m_isEnabled;
+	double m_drive_train_position;
+	double  m_drive_train_position_threshold;
+	DriveEncoders* m_driving_encoders;
+	LRTServo m_servo_left;
+	LRTServo m_servo_right;
+	int m_servo_left_engaged_position;
+	int m_servo_right_engaged_position;
+	int m_servo_left_disengaged_position;
+	int m_servo_right_disengaged_position;
 	
+	GearTooth m_winch_gear_tooth;
 	
 	data::climber::state m_state;
 };

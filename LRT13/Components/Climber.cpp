@@ -5,40 +5,58 @@
 #include "../Config/DriverStationConfig.h"
 
 using namespace data::climber;
+using namespace data;
+using namespace drivetrain;
 
 Climber::Climber() :
 	Component("Climber", DriverStationConfig::DigitalIns::CLIMBER, true),
+			m_configSection("climber"),
 			m_winch_worm(RobotConfig::CAN::WINCH_WORM, "WinchWorm"),
-			m_configSection("climber") {
+			m_digital_input_left(RobotConfig::Digital::PTO_SWITCH_LEFT),
+			m_digital_input_right(RobotConfig::Digital::PTO_SWITCH_RIGHT),
+			m_servo_left(RobotConfig::PWM::LEFT_PTO_SERVO, "leftServo"),
+			m_servo_right(RobotConfig::PWM::RIGHT_PTO_SERVO, "rightServo")
+
+{
 	m_pneumatics = Pneumatics::Instance();
 	m_state = IDLE;
+	m_driving_encoders = DriveEncoders::GetInstance(); 
 }
 
-Climber::~Climber() {
+Climber::~Climber()
+{
 
 }
 
-void Climber::onEnable() {
+void Climber::onEnable()
+{
 
 }
 
-void Climber::onDisable() {
+void Climber::onDisable()
+{
 }
 
-void Climber::enabledPeriodic() {
-	switch (m_state) {
+void Climber::enabledPeriodic()
+{
+	switch (m_state)
+	{
 	case IDLE:
 		if (m_componentData->climberData->getDesiredClimbingStep()
-				== INTENDED_ARM_UP) {
+				== INTENDED_ARM_UP)
+		{
 			m_state = ARM_UP_INITIAL;
 		}
+		m_servo_left.SetMicroseconds(m_servo_left_disengaged_position);
+        m_servo_right.SetMicroseconds(m_servo_right_disengaged_position);
 		break;
 	case ARM_UP_INITIAL:
 		m_pneumatics->setClimberArm(true);
 		break;
 	case WAIT:
 		if (m_componentData->climberData->getDesiredClimbingStep()
-				== INTENDED_CLIMBING) {
+				== INTENDED_CLIMBING)
+		{
 			m_state = ARM_DOWN;
 			m_winch_worm.setCollectionFlags(AsyncCANJaguar::OUTCURR);
 		}
@@ -46,22 +64,80 @@ void Climber::enabledPeriodic() {
 	case ARM_DOWN:
 		m_pneumatics->setClimberArm(false);
 		m_winch_worm.SetDutyCycle(-1.0);
-		if (m_winch_worm.GetOutputCurrent() > m_winch_current_threshold) {
-			m_winch_worm.SetDutyCycle(m_winch_engage_duty_cycle);
+		if (m_winch_worm.GetOutputCurrent() > m_winch_current_threshold)
+		{
+			m_winch_worm.SetDutyCycle(m_winch_engage_duty_cycle);			
 			m_state = ENGAGE_PTO;
+			m_hasStartedEngaging = false;
 		}
 		break;
 	case ENGAGE_PTO:
+		m_winch_worm.SetDutyCycle(m_winch_engage_duty_cycle);
+		if (m_digital_input_left.Get() ^ m_digital_input_right.Get()) // only one side engaged
+		{
+			if (m_digital_input_left.Get()) // left side engaged
+				m_side_engaged = 1;
+			else // right side engaged
+				m_side_engaged = -1;
+			
+			if (m_winch_worm.GetOutputCurrent() > m_winch_current_threshold)
+			{
+				m_hasStartedEngaging = true;
+			}
+			else if (m_hasStartedEngaging)
+			{
+				m_componentData->drivetrainData->setControlMode(FORWARD, VELOCITY_CONTROL);
+				m_componentData->drivetrainData->setControlMode(TURN, VELOCITY_CONTROL);
+				m_componentData->drivetrainData->setVelocitySetpoint(FORWARD,0.0);
+				m_componentData->drivetrainData->setVelocitySetpoint(TURN, 0.03 * m_side_engaged);
+			}
+		}
+		else if (!m_digital_input_left.Get() && !m_digital_input_left.Get()) // both engaged
+		{
+			m_state = WINCH_UP;
+			m_drive_train_position = m_driving_encoders->getRobotDist(); //awk units (2/3 in)
+		}
+		else
+		{
+			m_hasStartedEngaging = false;
+		}
+		m_servo_left.SetMicroseconds(m_servo_left_engaged_position);
+        m_servo_right.SetMicroseconds(m_servo_right_engaged_position);
+		
 		break;
 	case WINCH_UP:
-		m_timer=0;
+		m_timer = 0;
+		m_componentData->drivetrainData->setControlMode(FORWARD, VELOCITY_CONTROL);
+		m_componentData->drivetrainData->setControlMode(TURN, VELOCITY_CONTROL);
+		m_componentData->drivetrainData->setVelocitySetpoint(FORWARD, 1.0);
+		m_componentData->drivetrainData->setVelocitySetpoint(TURN, 0.0);
+		if (fabs( m_driving_encoders->getRobotDist() - m_drive_train_position) > m_drive_train_position_threshold)
+			m_state = ENGAGE_HOOKS;
 		break;
 	case ENGAGE_HOOKS:
 		m_pneumatics->setHookPosition(true);
+		m_componentData->drivetrainData->setControlMode(FORWARD, VELOCITY_CONTROL);
+		m_componentData->drivetrainData->setControlMode(TURN, VELOCITY_CONTROL);
+		m_componentData->drivetrainData->setVelocitySetpoint(FORWARD, 0.0);
+		m_componentData->drivetrainData->setVelocitySetpoint(TURN, 0.0);
 		if (++m_timer > m_timer_threshold)
-			m_state=DISENGAGE_PTO;
+		{
+			m_state = DISENGAGE_PTO;
+			m_timer = 0;
+		}
 		break;
-	case DISENGAGE_PTO:
+	case DISENGAGE_PTO:		
+		m_componentData->drivetrainData->setControlMode(FORWARD, OPEN_LOOP);
+		m_componentData->drivetrainData->setControlMode(TURN, OPEN_LOOP);
+		m_componentData->drivetrainData->setOpenLoopOutput(FORWARD, 0.0);
+		m_componentData->drivetrainData->setOpenLoopOutput(TURN, 0.0);
+		m_servo_left.SetMicroseconds(m_servo_left_disengaged_position);
+        m_servo_right.SetMicroseconds(m_servo_right_disengaged_position);
+        if (++m_timer > m_disengageTimer_threshold)
+        {
+        	m_state = ARM_UP_FINAL;
+        	m_timer = 0;
+        }
 		break;
 	case ARM_UP_FINAL:
 		m_pneumatics->setClimberArm(true);
@@ -70,18 +146,26 @@ void Climber::enabledPeriodic() {
 	}
 }
 
-void Climber::disabledPeriodic() {
+void Climber::disabledPeriodic()
+{
 }
 
-void Climber::Configure() {
+void Climber::Configure()
+{
 	m_winch_current_threshold = m_config->Get<double> (m_configSection,
 			"winchCurrentThreshold", 15.0);
 	m_winch_engage_duty_cycle = m_config->Get<double> (m_configSection,
 			"winchEngageDutyCycle", 0.05);
-	m_timer_threshold = m_config->Get<int> (m_configSection,
-			"timerThreshold", 25);
+	m_timer_threshold = m_config->Get<int> (m_configSection, "timerThreshold",
+			25);
+	m_drive_train_position_threshold = m_config->Get<double> (m_configSection, "driveTrainPositionThreshold", 42);
+	m_servo_left_engaged_position = m_config->Get<int> (m_configSection, "leftServoEngaged", 1514);
+	m_servo_right_engaged_position = m_config->Get<int> (m_configSection, "rightServoEngaged", 1514);
+	m_servo_left_disengaged_position = m_config->Get<int> (m_configSection, "leftServoDisengaged", 905);
+	m_servo_right_disengaged_position = m_config->Get<int> (m_configSection, "rightServoDisengaged", 905);
 }
 
-void Climber::Log() {
+void Climber::Log()
+{
 
 }
