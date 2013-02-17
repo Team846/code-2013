@@ -15,7 +15,8 @@ Climber::Climber() :
 			m_digital_input_left(RobotConfig::Digital::PTO_SWITCH_LEFT),
 			m_digital_input_right(RobotConfig::Digital::PTO_SWITCH_RIGHT),
 			m_servo_left(RobotConfig::PWM::LEFT_PTO_SERVO, "leftServo"),
-			m_servo_right(RobotConfig::PWM::RIGHT_PTO_SERVO, "rightServo")
+			m_servo_right(RobotConfig::PWM::RIGHT_PTO_SERVO, "rightServo"),
+			m_winch_gear_tooth((UINT32)RobotConfig::Digital::GEAR_TOOTH)
 
 {
 	m_pneumatics = Pneumatics::Instance();
@@ -133,7 +134,7 @@ void Climber::enabledPeriodic()
 		m_componentData->drivetrainData->setOpenLoopOutput(TURN, 0.0);
 		m_servo_left.SetMicroseconds(m_servo_left_disengaged_position);
         m_servo_right.SetMicroseconds(m_servo_right_disengaged_position);
-        if (++m_timer > m_disengageTimer_threshold)
+        if (++m_timer > m_timer_threshold)
         {
         	m_state = ARM_UP_FINAL;
         	m_timer = 0;
