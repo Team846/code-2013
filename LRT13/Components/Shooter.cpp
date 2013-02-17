@@ -18,8 +18,8 @@ Shooter::Shooter()
 	m_enc_back = new Counter((UINT32) RobotConfig::Digital::HALL_EFFECT_B);
 	m_pneumatics = Pneumatics::Instance();
 	
-	m_speed_front = 0;
-	m_speed_back = 0;
+	m_speed[FRONT] = 0;
+	m_speed[BACK] = 0;
 	atSpeedCounter[FRONT] = 0;
 	atSpeedCounter[BACK] = 0;
 	
@@ -38,6 +38,13 @@ Shooter::Shooter()
 	requiredCycles = 0;
 	acceptableSpeedError[FRONT] = 0;
 	acceptableSpeedError[BACK] = 0;
+	
+	maxDeltaDutyCycle = .75;
+	max_output[FRONT] = 1;
+	max_output[BACK] = 1;
+	m_duty_cycle_delta = .25;
+	m_output[FRONT] = 0;
+	m_output[BACK] = 0;
 	
 }
 
@@ -75,9 +82,9 @@ void Shooter::enabledPeriodic()
 			++m_underCurrentCounter;
 	}*/
 	
-	m_speed_front = (m_enc_front->GetStopped()) ? 0.0 : (60.0 / 2.0 / m_enc_front->GetPeriod());
+	m_speed[FRONT] = (m_enc_front->GetStopped()) ? 0.0 : (60.0 / 2.0 / m_enc_front->GetPeriod());
 	//m_speed_front = Util::Clamp<double>(m_speed_front, 0, m_max_speed * 1.3);
-	m_speed_back = (m_enc_back->GetStopped()) ? 0.0 : (60.0 / 2.0 / m_enc_back->GetPeriod());
+	m_speed[BACK] = (m_enc_back->GetStopped()) ? 0.0 : (60.0 / 2.0 / m_enc_back->GetPeriod());
 	//m_speed_back = Util::Clamp<double>(m_speed_back, 0, m_max_speed * 1.3);
 	
 	frisbee_detected = m_proximity->Get() == 0;
@@ -98,8 +105,11 @@ void Shooter::enabledPeriodic()
 			m_pneumatics->setStorageExit(false);
 		}
 	}
-	m_PIDs[FRONT].setInput(m_speed_front);
-	m_PIDs[BACK].setInput(m_speed_back);
+	m_PIDs[FRONT].setInput(m_speed[FRONT]);
+	m_PIDs[BACK].setInput(m_speed[BACK]);
+	
+	//
+	
 	m_jaguar_front->SetDutyCycle(m_PIDs[FRONT].update(1.0 / RobotConfig::LOOP_RATE));
 	m_jaguar_back->SetDutyCycle(m_PIDs[BACK].update(1.0 / RobotConfig::LOOP_RATE));
 }
@@ -113,7 +123,8 @@ void Shooter::disabledPeriodic()
 void Shooter::Configure()
 {
 	ConfigManager * c = ConfigManager::Instance();
-	m_max_speed = c->Get<double> (m_configSection, "maxSpeed", 5180);
+	m_max_speed[FRONT] = c->Get<double> (m_configSection, "front_maxSpeed", 5180);
+	m_max_speed[BACK] = c->Get<double> (m_configSection, "back_maxSpeed", 5180);
 	
 	m_dutyCycleFront = c->Get<double> (m_configSection, "frontSpeed", 0.3F);
 	m_dutyCycleBack = c->Get<double> (m_configSection, "backSpeed", 0.3F);
@@ -122,6 +133,9 @@ void Shooter::Configure()
 	requiredCycles = c->Get<int>(m_configSection, "requiredCycles", 9);
 	acceptableSpeedError[FRONT] = c->Get<double>(m_configSection, "front_acceptableSpeedError", 0);
 	acceptableSpeedError[BACK] = c->Get<double>(m_configSection, "back_acceptableSpeedError", 0);
+	
+	maxDeltaDutyCycle = c->Get<double>(m_configSection, "maxDeltaDutyCycle", .75);
+	m_duty_cycle_delta = c->Get<double>(m_configSection, "m_duty_cycle_delta", .25);
 	
 }
 
@@ -133,7 +147,7 @@ void Shooter::Log()
 void Shooter::CheckError(int roller) 
 {
 	
-	if(m_PIDs[roller].getError() > acceptableSpeedError[roller]) 
+	if(fabs(m_PIDs[roller].getError()) > acceptableSpeedError[roller]) 
 	{
 		atSpeedCounter[roller] = 0;
 		atSpeed[roller] = false;
@@ -147,4 +161,14 @@ void Shooter::CheckError(int roller)
 		}
 	}
 	
+}
+
+void Shooter::LimitCurrent(int roller) 
+{	
+	m_output[roller] = m_PIDs[roller].getOutput() / m_max_speed[roller];
+	if(m_speed[roller] < (m_PIDs[roller].getSetpoint() * maxDeltaDutyCycle)) {
+		max_output[roller] = m_speed[roller] / m_max_speed[roller] + m_duty_cycle_delta;
+		m_output[roller] = min(max_output[roller], m_output[roller]);
+		m_output[roller] = Util::Clamp<double>(m_output[roller], -1.0, 1.0);
+	}
 }
