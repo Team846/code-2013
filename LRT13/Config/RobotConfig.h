@@ -57,7 +57,6 @@ namespace Solenoid // Ports 1-8
 	
 	const uint32_t STORAGE_EXIT_A = CHANGEME;
 	const uint32_t STORAGE_EXIT_B = CHANGEME;
-	const uint32_t STORAGE_EXIT = CHANGEME;
 }
 
 namespace Relay // Ports 1-8

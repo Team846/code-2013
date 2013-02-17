@@ -10,6 +10,7 @@ Collector::Collector()
 {
 	m_jaguar = new AsyncCANJaguar(RobotConfig::CAN::COLLECTOR, "Collector");
 	m_proximity = new DigitalInput(RobotConfig::Digital::PROXIMITY_A);
+	m_pneumatics = Pneumatics::Instance();
 	m_dutyCycle = 0.0;
 	m_count = 0;
 	m_samplesThreshold = 0;
@@ -40,11 +41,11 @@ void Collector::enabledPeriodic()
 	
 	if (m_componentData->collectorData->IsDown())
 	{
-		// Slide down
+		m_pneumatics->setCollector(true);
 	}
 	else
 	{
-		// Slide up
+		m_pneumatics->setCollector(false);
 	}
 	
 	if (m_proximity->Get() == 0)

@@ -11,6 +11,7 @@
 #include "../Jaguar/AsyncCANJaguar.h"
 #include "../Components/Component.h"
 #include "DigitalInput.h"
+#include "../Pneumatics/Pneumatics.h"
 #include "../ComponentData/RobotData.h"
 
 using namespace data;
@@ -38,6 +39,7 @@ private:
 	
 	// Proximity Sensors
 	DigitalInput* m_proximity;
+	Pneumatics* m_pneumatics;
 	
 	// Frisbee Counters
 	int m_count;

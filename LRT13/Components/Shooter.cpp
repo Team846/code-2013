@@ -16,6 +16,7 @@ Shooter::Shooter()
 	m_jaguar_back = new AsyncCANJaguar(RobotConfig::CAN::SHOOTER_B, "ShooterBack");
 	m_enc_front = new Counter((UINT32) RobotConfig::Digital::HALL_EFFECT_A);
 	m_enc_back = new Counter((UINT32) RobotConfig::Digital::HALL_EFFECT_B);
+	m_pneumatics = Pneumatics::Instance();
 	
 	m_speed_front = 0;
 	m_speed_back = 0;
@@ -25,7 +26,7 @@ Shooter::Shooter()
 	front_atSpeed = false;
 	back_atSpeed = false;
 	
-	m_switch = new DigitalInput(RobotConfig::Digital::STORAGE_SWITCH);
+	m_proximity = new DigitalInput(RobotConfig::Digital::PROXIMITY_B);
 	frisbee_detected = false;
 
 	m_dutyCycleFront = 0.0;
@@ -75,7 +76,8 @@ void Shooter::enabledPeriodic()
 	m_speed_back = (m_enc_back->GetStopped()) ? 0.0 : (60.0 / 2.0 / m_enc_back->GetPeriod());
 	m_speed_back = Util::Clamp<double>(m_speed_back, 0, m_max_speed * 1.3);
 	
-	frisbee_detected = m_switch->Get() == 1;
+	frisbee_detected = m_proximity->Get() == 0;
+	// TODO: change shooter speed based on orientation
 	
 	if(fabs(m_speed_front - m_componentData->shooterData->GetDesiredSpeed(FRONT)) > 
 		m_componentData->shooterData->GetAcceptableSpeedError(FRONT)) 
@@ -109,7 +111,11 @@ void Shooter::enabledPeriodic()
 		{
 			if (m_componentData->shooterData->ShouldExtendLauncher())
 			{
-				// Shoot
+				m_pneumatics->setStorageExit(true);
+			}
+			else
+			{
+				m_pneumatics->setStorageExit(false);
 			}
 		}
 	}

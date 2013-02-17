@@ -11,6 +11,7 @@
 #include "../ComponentData/DrivetrainData.h"
 #include "../Jaguar/AsyncCANJaguar.h"
 #include "../ComponentData/ShooterData.h"
+#include "../Pneumatics/Pneumatics.h"
 #include "DigitalInput.h"
 
 using namespace data;
@@ -49,6 +50,8 @@ private:
 	AsyncCANJaguar* m_jaguar_back;
 	Counter* m_enc_front;
 	Counter* m_enc_back;
+	Pneumatics* m_pneumatics;
+	DigitalInput* m_proximity;
 	
 	PID m_PIDs[2];
 	
@@ -68,8 +71,6 @@ private:
 	bool front_atSpeed;
 	bool back_atSpeed;
 	bool frisbee_detected;
-	
-	DigitalInput* m_switch;
 	
 };
 
