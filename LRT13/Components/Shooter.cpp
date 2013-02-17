@@ -20,11 +20,11 @@ Shooter::Shooter()
 	
 	m_speed_front = 0;
 	m_speed_back = 0;
-	front_atSpeedCounter = 0;
-	back_atSpeedCounter = 0;
+	atSpeedCounter[FRONT] = 0;
+	atSpeedCounter[BACK] = 0;
 	
-	front_atSpeed = false;
-	back_atSpeed = false;
+	atSpeed[FRONT] = false;
+	atSpeed[BACK] = false;
 	
 	m_proximity = new DigitalInput(RobotConfig::Digital::PROXIMITY_B);
 	frisbee_detected = false;
@@ -34,6 +34,11 @@ Shooter::Shooter()
 	
 	m_overCurrentCounter = 0;
 	m_underCurrentCounter = 0;
+	
+	requiredCycles = 0;
+	front_acceptableSpeedError = 0;
+	back_acceptableSpeedError = 0;
+	temp_acceptableSpeedError = 0;
 	
 }
 
@@ -72,51 +77,26 @@ void Shooter::enabledPeriodic()
 	}*/
 	
 	m_speed_front = (m_enc_front->GetStopped()) ? 0.0 : (60.0 / 2.0 / m_enc_front->GetPeriod());
-	m_speed_front = Util::Clamp<double>(m_speed_front, 0, m_max_speed * 1.3);
+	//m_speed_front = Util::Clamp<double>(m_speed_front, 0, m_max_speed * 1.3);
 	m_speed_back = (m_enc_back->GetStopped()) ? 0.0 : (60.0 / 2.0 / m_enc_back->GetPeriod());
-	m_speed_back = Util::Clamp<double>(m_speed_back, 0, m_max_speed * 1.3);
+	//m_speed_back = Util::Clamp<double>(m_speed_back, 0, m_max_speed * 1.3);
 	
 	frisbee_detected = m_proximity->Get() == 0;
 	// TODO: change shooter speed based on orientation
 	
-	if(fabs(m_speed_front - m_componentData->shooterData->GetDesiredSpeed(FRONT)) > 
-		m_componentData->shooterData->GetAcceptableSpeedError(FRONT)) 
-	{
-		front_atSpeedCounter = 0;
-		front_atSpeed = false;
-		
-	}
-	else {
-		front_atSpeedCounter++;
-		front_atSpeed = true;
-	}	
-	
-	if(fabs(m_speed_back - m_componentData->shooterData->GetDesiredSpeed(BACK)) > 
-		m_componentData->shooterData->GetAcceptableSpeedError(BACK)) 
-	{
-		
-		back_atSpeedCounter = 0;
-		back_atSpeed = false;
-		
-	}
-	else {
-		back_atSpeedCounter++;
-		back_atSpeed = true;
-	}
+	CheckError(FRONT);
+	CheckError(BACK);
 	
 	//TODO: write piston code when pneumatics code is fixed
-	if(front_atSpeed && back_atSpeed)
+	if(atSpeed[FRONT] && atSpeed[BACK])
 	{
-		if(front_atSpeedCounter > 9 && back_atSpeedCounter > 9 && frisbee_detected) 
+		if (m_componentData->shooterData->ShouldExtendLauncher())
 		{
-			if (m_componentData->shooterData->ShouldExtendLauncher())
-			{
-				m_pneumatics->setStorageExit(true);
-			}
-			else
-			{
-				m_pneumatics->setStorageExit(false);
-			}
+			m_pneumatics->setStorageExit(true);
+		}
+		else
+		{
+			m_pneumatics->setStorageExit(false);
 		}
 	}
 	m_PIDs[FRONT].setInput(m_speed_front);
@@ -139,9 +119,39 @@ void Shooter::Configure()
 	m_dutyCycleFront = c->Get<double> (m_configSection, "frontSpeed", 0.3F);
 	m_dutyCycleBack = c->Get<double> (m_configSection, "backSpeed", 0.3F);
 	
+	//TODO: Change default values.
+	requiredCycles = c->Get<int>(m_configSection, "requiredCycles", 9);
+	front_acceptableSpeedError = c->Get<double>(m_configSection, "front_acceptableSpeedError", 0);
+	back_acceptableSpeedError = c->Get<double>(m_configSection, "back_acceptableSpeedError", 0);
+	
 }
 
 void Shooter::Log()
 {
 	
+}
+
+void Shooter::CheckError(int roller) 
+{
+	
+	if(roller == FRONT) 
+	{
+		temp_acceptableSpeedError = front_acceptableSpeedError;
+	} else if(roller == BACK) 
+	{
+		temp_acceptableSpeedError = back_acceptableSpeedError;
+	}
+	
+	if(m_PIDs[roller].getError() > temp_acceptableSpeedError) 
+		{
+			atSpeedCounter[roller] = 0;
+			atSpeed[roller] = false;
+			
+		}
+		else {
+			atSpeedCounter[roller]++;
+			if(atSpeedCounter[roller] > requiredCycles) {
+				atSpeed[roller] = true;
+			}
+		}	
 }

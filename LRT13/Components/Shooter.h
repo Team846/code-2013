@@ -35,6 +35,8 @@ public:
 	virtual void Configure();
 	virtual void Log();
 	
+	void CheckError(int roller);
+	
 	/*!
 	 * @brief Returns the status of the current to the roller.  This can be used to determine if the roller has grabbed a frisbee.
 	 * 
@@ -61,16 +63,17 @@ private:
 	int m_overCurrentCounter;
 	int m_underCurrentCounter;
 
-	int front_atSpeedCounter;
-	int back_atSpeedCounter;
+	int atSpeedCounter[2];
 	
 	double m_speed_front;
 	double m_speed_back;
 	double m_max_speed;
 	
-	bool front_atSpeed;
-	bool back_atSpeed;
+	bool atSpeed[2];
 	bool frisbee_detected;
+	
+	int requiredCycles;
+	double front_acceptableSpeedError, back_acceptableSpeedError, temp_acceptableSpeedError;
 	
 };
 
