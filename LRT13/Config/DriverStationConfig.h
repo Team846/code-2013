@@ -26,6 +26,7 @@ namespace JoystickButtons
 const uint32_t AUTO_AIM = 1;
 const uint32_t AUTO_CLIMB = 2;
 const uint32_t DISC_TRACK = 3;
+const uint32_t CONTINUE_CLIMB = 4;
 const uint32_t APPLY_CONFIG = 5;
 const uint32_t LOAD_CONFIG = 6;
 const uint32_t SAVE_CONFIG = 7;

@@ -35,10 +35,14 @@ typedef enum humanState
 		//Define desired state (what part of climb im working on)
 		//Keep track of current state (what part of climb im working on: done, in progress; starting)
 	public:
+		ClimberData();
 		humanState getDesiredClimbingStep();
 		void setDesiredClimbingStep(humanState newState);
-	
-	
+		bool shouldContinueClimbing();
+		void setShouldContinueClimbing(bool shouldContinue);
+	private:
+		humanState m_desiredClimbingStep;
+		bool m_shouldContinueClimbing;
 	};
 }
 }
