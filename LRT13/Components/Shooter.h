@@ -73,7 +73,7 @@ private:
 	bool frisbee_detected;
 	
 	int requiredCycles;
-	double front_acceptableSpeedError, back_acceptableSpeedError, temp_acceptableSpeedError;
+	double acceptableSpeedError[2];
 	
 };
 

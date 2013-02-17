@@ -36,9 +36,8 @@ Shooter::Shooter()
 	m_underCurrentCounter = 0;
 	
 	requiredCycles = 0;
-	front_acceptableSpeedError = 0;
-	back_acceptableSpeedError = 0;
-	temp_acceptableSpeedError = 0;
+	acceptableSpeedError[FRONT] = 0;
+	acceptableSpeedError[BACK] = 0;
 	
 }
 
@@ -121,8 +120,8 @@ void Shooter::Configure()
 	
 	//TODO: Change default values.
 	requiredCycles = c->Get<int>(m_configSection, "requiredCycles", 9);
-	front_acceptableSpeedError = c->Get<double>(m_configSection, "front_acceptableSpeedError", 0);
-	back_acceptableSpeedError = c->Get<double>(m_configSection, "back_acceptableSpeedError", 0);
+	acceptableSpeedError[FRONT] = c->Get<double>(m_configSection, "front_acceptableSpeedError", 0);
+	acceptableSpeedError[BACK] = c->Get<double>(m_configSection, "back_acceptableSpeedError", 0);
 	
 }
 
@@ -134,24 +133,18 @@ void Shooter::Log()
 void Shooter::CheckError(int roller) 
 {
 	
-	if(roller == FRONT) 
+	if(m_PIDs[roller].getError() > acceptableSpeedError[roller]) 
 	{
-		temp_acceptableSpeedError = front_acceptableSpeedError;
-	} else if(roller == BACK) 
+		atSpeedCounter[roller] = 0;
+		atSpeed[roller] = false;
+			
+	}
+	else 
 	{
-		temp_acceptableSpeedError = back_acceptableSpeedError;
+		atSpeedCounter[roller]++;
+		if(atSpeedCounter[roller] > requiredCycles) {
+			atSpeed[roller] = true;
+		}
 	}
 	
-	if(m_PIDs[roller].getError() > temp_acceptableSpeedError) 
-		{
-			atSpeedCounter[roller] = 0;
-			atSpeed[roller] = false;
-			
-		}
-		else {
-			atSpeedCounter[roller]++;
-			if(atSpeedCounter[roller] > requiredCycles) {
-				atSpeed[roller] = true;
-			}
-		}	
 }
