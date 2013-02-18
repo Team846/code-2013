@@ -41,7 +41,6 @@ namespace Digital // Ports 1-14
 	const uint32_t HALL_EFFECT_B = CHANGEME;
 	const uint32_t PROXIMITY_A = CHANGEME;
 	const uint32_t PROXIMITY_B = CHANGEME;
-	const uint32_t STORAGE_SWITCH = CHANGEME;
 	const uint32_t PTO_SWITCH_LEFT = CHANGEME;
 	const uint32_t PTO_SWITCH_RIGHT = CHANGEME;
 	const uint32_t WINCH_GEAR_TOOTH = CHANGEME;
@@ -54,10 +53,8 @@ namespace Solenoid // Ports 1-8
 	const uint32_t COLLECTOR_B = CHANGEME;
 	const uint32_t CLIMBER_A = CHANGEME;
 	const uint32_t CLIMBER_B = CHANGEME;
-	
 	const uint32_t HOOKS_A  = CHANGEME;
 	const uint32_t HOOKS_B = CHANGEME;
-	
 	const uint32_t STORAGE_EXIT_A = CHANGEME;
 	const uint32_t STORAGE_EXIT_B = CHANGEME;
 }
