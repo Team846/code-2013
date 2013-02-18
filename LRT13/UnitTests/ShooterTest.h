@@ -2,7 +2,7 @@
 #define SHOOTER_TEST_H_
 
 #include "../Utils/UnitTest.h"
-#include "Shooter.h"
+#include "../Components/Shooter.h"
 
 class ShooterTest : public UnitTest
 {

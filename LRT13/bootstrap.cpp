@@ -1,6 +1,8 @@
 #include "LRTRobot13.h"
 #include "Utils/UnitTest.h"
-#include "Components/ShooterTest.h"
+#include "UnitTests/ShooterTest.h"
+#include "UnitTests/EncodersUnitTest.h"
+#include "UnitTests/GearToothTest.h"
 
 /* ----- BOOTSTRAPPER ----- */
 /* This file is very important.
