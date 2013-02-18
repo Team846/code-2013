@@ -44,7 +44,6 @@ namespace Digital // Ports 1-14
 	const uint32_t STORAGE_SWITCH = CHANGEME;
 	const uint32_t PTO_SWITCH_LEFT = CHANGEME;
 	const uint32_t PTO_SWITCH_RIGHT = CHANGEME;
-	const uint32_t WINCH_GEAR_BOX = CHANGEME;
 	const uint32_t WINCH_GEAR_TOOTH = CHANGEME;
 	const uint32_t COMPRESSOR_PRESSURE_SENSOR_PIN = CHANGEME;
 }
