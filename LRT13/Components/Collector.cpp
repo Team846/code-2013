@@ -36,7 +36,10 @@ void Collector::enabledPeriodic()
 {
 	if (m_componentData->collectorData->ShouldRunRollers())
 	{
-		m_jaguar->SetDutyCycle(m_dutyCycle);
+		if (RobotData::GetFrisbeeCounter() < RobotConfig::MAX_GAME_PIECES)
+			m_jaguar->SetDutyCycle(m_dutyCycle);
+		else
+			m_jaguar->SetDutyCycle(-m_dutyCycle);
 	}
 	
 	if (m_componentData->collectorData->IsDown())

@@ -96,13 +96,17 @@ void Shooter::enabledPeriodic()
 	//TODO: write piston code when pneumatics code is fixed
 	if(atSpeed[FRONT] && atSpeed[BACK])
 	{
-		if (m_componentData->shooterData->ShouldExtendLauncher())
+		if (m_componentData->shooterData->ShouldExtendLauncher()) // Don't shoot
 		{
 			m_pneumatics->setStorageExit(true);
 		}
-		else
+		else // Shoot
 		{
 			m_pneumatics->setStorageExit(false);
+			if (frisbee_detected)
+			{
+				RobotData::DecrementFrisbeeCounter();
+			}
 		}
 	}
 	m_PIDs[FRONT].setInput(m_speed[FRONT]);
