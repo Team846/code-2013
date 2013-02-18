@@ -11,7 +11,7 @@ private:
     float previous_value_; //use for detecting changes.
 
 public:
-    char* name_; //user supplied name of servo for diagnostics
+    char* m_name; //user supplied name of servo for diagnostics
     LRTServo(UINT32 channel, char* name);
     ~LRTServo();
 

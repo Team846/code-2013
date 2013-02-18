@@ -121,9 +121,11 @@ void Climber::enabledPeriodic()
 			m_componentData->drivetrainData->setVelocitySetpoint(FORWARD, 0.0);
 			m_componentData->drivetrainData->setVelocitySetpoint(TURN, 0.0);
 		}
+		m_servo_left.SetEnabled(true);
+		m_servo_right.SetEnabled(true);
 		m_servo_left.SetMicroseconds(m_servo_left_engaged_position);
 		m_servo_right.SetMicroseconds(m_servo_right_engaged_position);
-
+		// TODO: disable servo afterwards
 		break;
 	case WINCH_UP:
 		m_timer = 0;
@@ -166,6 +168,8 @@ void Climber::enabledPeriodic()
 		m_componentData->drivetrainData->setControlMode(TURN, OPEN_LOOP);
 		m_componentData->drivetrainData->setOpenLoopOutput(FORWARD, 0.0);
 		m_componentData->drivetrainData->setOpenLoopOutput(TURN, 0.0);
+		m_servo_left.SetEnabled(true);
+		m_servo_right.SetEnabled(true);
 		m_servo_left.SetMicroseconds(m_servo_left_disengaged_position);
 		m_servo_right.SetMicroseconds(m_servo_right_disengaged_position);
 		if (++m_timer > m_disengageTimer_threshold)

@@ -6,10 +6,10 @@ LRTServo::LRTServo(UINT32 channel, char* name)
     : Servo(channel)
     , enabled(true)
     , previous_value_(999.0) //an out of range value
-    , name_(name)
+    , m_name(name)
 {
-    if(!name_) name_ = "servo";
-    printf("Created %s on channel %d\n", name_, channel);
+    if(!m_name) m_name = "servo";
+    printf("Created %s on channel %d\n", m_name, channel);
 }
 
 LRTServo::~LRTServo()
@@ -19,9 +19,6 @@ LRTServo::~LRTServo()
 
 void LRTServo::SetEnabled(bool enabled)
 {
-    if(this->enabled != enabled)  //state change; TODO delete this.
-        printf("Servo: %d\n", enabled);
-
     this->enabled = enabled;
     if(!enabled)
         this->SetOffline();
@@ -37,7 +34,7 @@ void LRTServo::Set(float value)
     if(enabled)
     {
         if(previous_value_ != value)
-            AsyncPrinter::Printf("%s set: %4f\n", name_, previous_value_ = value);
+            AsyncPrinter::Printf("%s set: %4f\n", m_name, previous_value_ = value);
 
         Servo::Set(value);
     }
