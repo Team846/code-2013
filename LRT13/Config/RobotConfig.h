@@ -1,5 +1,6 @@
 #ifndef ROBOT_CONFIG_H_
 #define ROBOT_CONFIG_H_
+#include <string>
 
 /*!
  * @brief Contains all constants for robot configuration
@@ -12,7 +13,7 @@
 namespace RobotConfig
 {
 const uint32_t LOOP_RATE = 50; //hertz
-const string CONFIG_FILE_PATH = "/LRT13.conf";
+const std::string CONFIG_FILE_PATH = "/LRT13.conf";
 const uint32_t MAX_GAME_PIECES = 4;
 
 namespace Drive
@@ -45,7 +46,8 @@ namespace Digital // Ports 1-14
 	const uint32_t PTO_SWITCH_LEFT = CHANGEME;
 	const uint32_t PTO_SWITCH_RIGHT = CHANGEME;
 	const uint32_t WINCH_GEAR_TOOTH = CHANGEME;
-	const uint32_t COMPRESSOR_PRESSURE_SENSOR_PIN = CHANGEME;
+	const uint32_t COMPRESSOR_PRESSURE_SENSOR_PIN = 14;
+	const uint32_t TWOCAN_MOSFET = CHANGEME;
 }
 
 namespace Solenoid // Ports 1-8
