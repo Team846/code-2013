@@ -5,14 +5,12 @@
 #include "ConfigLoaderData.h"
 #include "ShooterData.h"
 #include "CollectorData.h"
-#include "PTOData.h"
 
 using namespace data;
 using namespace drivetrain;
 using namespace shooter;
 using namespace collector;
 using namespace climber;
-using namespace pto;
 using namespace configloader;
 
 ComponentData* ComponentData::m_instance = NULL;
@@ -35,7 +33,6 @@ ComponentData::ComponentData()
   shooterData(new ShooterData()),
   collectorData(new CollectorData()),
   climberData(new ClimberData()),
-  ptoData(new PTOData()),
   configLoaderData(new ConfigLoaderData())
 {
 	

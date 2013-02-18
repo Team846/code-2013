@@ -30,10 +30,6 @@ namespace data
 	{
 		class ClimberData;
 	}
-	namespace pto
-	{
-		class PTOData;
-	}
 	
 	/*!
 	 * @brief Provides a central hub for data access.
@@ -50,7 +46,6 @@ namespace data
 		shooter::ShooterData* const shooterData;
 		collector::CollectorData* const collectorData;
 		climber::ClimberData* const climberData;
-		pto::PTOData* const ptoData;
 		configloader::ConfigLoaderData* const configLoaderData;
 	
 	protected:
