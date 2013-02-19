@@ -23,6 +23,7 @@ Climber::Climber() :
 	m_climbing_level = 0;
 	m_paused = false;
 	m_previous_state = IDLE;
+	m_winch_gear_tooth.Start();
 }
 
 Climber::~Climber()

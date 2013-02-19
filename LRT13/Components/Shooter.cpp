@@ -15,7 +15,9 @@ Shooter::Shooter()
 	m_jaguar_front = new AsyncCANJaguar(RobotConfig::CAN::SHOOTER_A, "ShooterFront");
 	m_jaguar_back = new AsyncCANJaguar(RobotConfig::CAN::SHOOTER_B, "ShooterBack");
 	m_enc_front = new Counter((UINT32) RobotConfig::Digital::HALL_EFFECT_A);
+	m_enc_front->Start();
 	m_enc_back = new Counter((UINT32) RobotConfig::Digital::HALL_EFFECT_B);
+	m_enc_back->Start();
 	m_pneumatics = Pneumatics::Instance();
 	
 	m_speed[FRONT] = 0;
