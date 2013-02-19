@@ -26,7 +26,7 @@ m_twocanMosfet(RobotConfig::Digital::TWOCAN_MOSFET)
 	} 
 };
 
-void wasteTimeUntil( unsigned int FPGATargetTime)
+void CANTester::wasteTimeUntil( unsigned int FPGATargetTime)
 {
 	int useless = 0;
 	while (GetFPGATime() < FPGATargetTime)

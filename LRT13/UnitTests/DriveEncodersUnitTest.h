@@ -1,7 +1,7 @@
 #ifndef DRIVE_ENCODERS_UNIT_TEST_H_
 #define DRIVE_ENCODERS_UNIT_TEST_H_
 
-#include "../Utils/UnitTest.h"
+#include "../UnitTests/UnitTest.h"
 
 #include "../ComponentData/DrivetrainData.h"
 #include "../Sensors/DriveEncoders.h"

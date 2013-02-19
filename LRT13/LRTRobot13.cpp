@@ -33,14 +33,12 @@ LRTRobot13::~LRTRobot13()
 	LogManager::Finalize();
 	Pneumatics::Finalize();
 	DriveEncoders::Finalize();
-	CANTester::Finalize();
 }
 
 void LRTRobot13::RobotInit()
 {
 	AsyncPrinter::Initialize();
 	
-	//CANTester::Instance()->Start();
 	CreateComponents();
 
 	AsyncPrinter::Println("Starting TeleopInputs Task");

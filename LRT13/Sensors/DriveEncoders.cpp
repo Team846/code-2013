@@ -54,7 +54,7 @@ void DriveEncoders::Configure()
 	PULSES_PER_REVOLUTION = m_config->Get<double> (m_configsection,
 			"pulses_per_revolution", 360.0);
 	MAX_ENCODER_RATE = m_config->Get<double> (m_configsection,
-			"high_gear_encoder_rate", 6100.0);
+			"max_encoder_rate", 3355.704698);
 	MAX_TURNING_RATE = m_config->Get<double> (m_configsection,
 			"max_turning_rate", 6100.0);
 	TICKS_PER_FULL_TURN = m_config->Get<double> (m_configsection,

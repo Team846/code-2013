@@ -20,10 +20,9 @@
 
 #include "Operations/AutonomousRoutines.h"
 #include "Operations/TeleopInputs.h"
+#include "Jaguar/AsyncCANJaguar.h"
 
 #include "Pneumatics/Pneumatics.h"
-
-#include "Utils/CANTester.h"
 
 #include "Sensors/DriveEncoders.h"
 

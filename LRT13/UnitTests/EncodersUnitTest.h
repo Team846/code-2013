@@ -1,7 +1,7 @@
 #ifndef ENCODER_UNIT_TEST_H_
 #define ENCODER_UNIT_TEST_H_
 
-#include "../Utils/UnitTest.h"
+#include "../UnitTests/UnitTest.h"
 #include "../Config/RobotConfig.h"
 #include "../Config/ConfigManager.h"
 
