@@ -8,5 +8,7 @@ UnitTest::~UnitTest()
 
 void UnitTest::StartCompetition()
 {
+	GetWatchdog().SetEnabled(false);
+	
 	Run();
 }

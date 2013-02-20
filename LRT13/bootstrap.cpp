@@ -3,6 +3,7 @@
 #include "UnitTests/ShooterTest.h"
 #include "UnitTests/EncodersUnitTest.h"
 #include "UnitTests/GearToothTest.h"
+#include "UnitTests/InputUnitTest.h"
 
 /* ----- BOOTSTRAPPER ----- */
 /* This file is very important.
@@ -19,7 +20,7 @@
  */
 RobotBase* FRC_userClassFactory()
 {
-	return new LRTRobot13();
+	return new InputUnitTest();
 }
 
 extern "C"

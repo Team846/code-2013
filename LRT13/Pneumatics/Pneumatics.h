@@ -40,6 +40,8 @@ public:
 	static void Finalize();
 	
 	void setCollector(bool on, bool force = false);
+	
+	void setShooterAngler(bool on, bool force = false);
 
 	void setClimberArm(bool on, bool force = false);
 
@@ -78,7 +80,7 @@ private:
 	 */
 	void pulse(PulsedSolenoid * ptr);
 
-	PulsedSolenoid m_collector, m_climber, m_storageExit, m_hook;
+	PulsedSolenoid m_collector, m_climber, m_storageExit, m_hook, m_shooterAngler;
 
 	static Pneumatics* m_instance;
 

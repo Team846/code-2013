@@ -26,6 +26,10 @@ Pneumatics::Pneumatics() :
 	INIT_PULSED_SOLENOID(m_storageExit, new DoubleSolenoid(
 					RobotConfig::Solenoid::STORAGE_EXIT_A,
 					RobotConfig::Solenoid::STORAGE_EXIT_B));
+	
+	INIT_PULSED_SOLENOID(m_shooterAngler, new DoubleSolenoid(
+					RobotConfig::Solenoid::STORAGE_EXIT_A,
+					RobotConfig::Solenoid::STORAGE_EXIT_B));
 
 	m_compressor = new Compressor(
 			RobotConfig::Digital::COMPRESSOR_PRESSURE_SENSOR_PIN,
@@ -49,6 +53,15 @@ void Pneumatics::setClimberArm(bool on, bool force)
 	if (on != m_climber.state || force)
 	{
 		m_climber.state = on;
+		m_climber.counter = m_pulse_length;
+	}
+}
+
+void Pneumatics::setShooterAngler(bool on, bool force)
+{
+	if(on != m_shooterAngler.state || force)
+	{
+		m_shooterAngler.state = on;
 		m_climber.counter = m_pulse_length;
 	}
 }
@@ -132,6 +145,7 @@ Pneumatics::~Pneumatics()
 	DELETE(m_collector.solenoid);
 	DELETE(m_hook.solenoid);
 	DELETE(m_climber.solenoid);
+	DELETE(m_shooterAngler.solenoid);
 	m_compressor->Stop();
 	DELETE(m_compressor);
 }
@@ -142,6 +156,8 @@ INT32 Pneumatics::Tick()
 	pulse(&m_hook);
 	pulse(&m_climber);
 	pulse(&m_storageExit);
+	pulse(&m_shooterAngler);
+	
 	return 0;
 }
 

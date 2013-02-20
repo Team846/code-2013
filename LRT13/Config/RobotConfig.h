@@ -52,14 +52,16 @@ namespace Digital // Ports 1-14
 
 namespace Solenoid // Ports 1-8
 {
-	const uint32_t COLLECTOR_A = CHANGEME;
-	const uint32_t COLLECTOR_B = CHANGEME;
-	const uint32_t CLIMBER_A = CHANGEME;
-	const uint32_t CLIMBER_B = CHANGEME;
-	const uint32_t HOOKS_A  = CHANGEME;
-	const uint32_t HOOKS_B = CHANGEME;
-	const uint32_t STORAGE_EXIT_A = CHANGEME;
-	const uint32_t STORAGE_EXIT_B = CHANGEME;
+	const uint32_t COLLECTOR_A = 9;
+	const uint32_t COLLECTOR_B = 10;
+	const uint32_t CLIMBER_A = 1;
+	const uint32_t CLIMBER_B = 2;
+	const uint32_t HOOKS_A  = 3;
+	const uint32_t HOOKS_B = 4;
+	const uint32_t STORAGE_EXIT_A = 5;
+	const uint32_t STORAGE_EXIT_B = 6;
+	const uint32_t SHOOTER_ANGLER_A = 7;
+	const uint32_t SHOOTER_ANGLER_B = 8;
 }
 
 namespace Relay // Ports 1-8

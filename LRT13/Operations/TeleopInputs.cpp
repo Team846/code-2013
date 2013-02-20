@@ -33,7 +33,11 @@ TeleopInputs::TeleopInputs(char * taskName, INT32 priority) :
 
 TeleopInputs::~TeleopInputs()
 {
-
+	DELETE(m_driver_stick);
+	DELETE(m_operator_stick);
+	DELETE(m_driver_wheel);
+	
+	DELETE(m_autoActions);
 }
 
 INT32 TeleopInputs::Tick()
