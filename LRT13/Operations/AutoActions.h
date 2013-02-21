@@ -17,15 +17,19 @@ class AutoActions
 public:
 	enum actions
 	{
-		AUTO_AIM,
-		AUTO_CLIMB,
-		DISC_TRACK
+		AUTO_AIM_BACKBOARD,
+		AUTO_AIM_PYRAMID,
+		FEEDER_STATION_APPROACH,
+		NO_ADV_AUTOMATION
 	};
+	
 	AutoActions();
-	bool AutoAim();
-	bool AutoClimb();
-	bool DiscTrack();
+	
+	void AutoAimBackboard();
+	void AutoAimPyramid();
+	bool FeederStationTrack();
 	void Reset();
+	
 private:
 	ComponentData* m_componentData;
 	static actions m_currentAction;

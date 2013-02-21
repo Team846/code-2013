@@ -17,13 +17,13 @@ class ComponentData;
 class AutoActions;
 
 /*!
- * @brief Performs autonomous routine and contains autonomous functions
- * @author Raphael Chang, Tony Peng
+ * @brief Performs autonomous routine and contains autonomous functions. It has two parts, the tick function which is meant to run every cycle to operate semi-automated processes
+ * @author Raphael Chang, Tony Peng, Brian Axelrod
  */
-class AutonomousRoutines : public SynchronizedProcess
+class AutonomousRoutines 
 {
 public:
-	AutonomousRoutines(char * taskName, INT32 priority=Task::kDefaultPriority);
+	AutonomousRoutines();
 	~AutonomousRoutines();
 	
 	/*
@@ -32,40 +32,26 @@ public:
 	void Stop();
 	bool IsRunning();
 	
-	enum autonStage
+	enum routines
 	{
-		INIT = 1,
-		DRIVE_FORWARD = 2,
-		AUTO_AIM = 3,
-		SHOOT = 4,
-		COMPLETED = 5
+		STANDING_3FRISBEE = 1,
+		STANDING_2FRISBEE = 2,
+		MID_4FRISBEE = 3,
+		BACK_7FRISBEE = 4,
 	};
-protected:
-	INT32 Tick();
+	
+	void tick();
 private:
 	/*
 	 * @brief Runs autonomous routine
 	 */
 	void Autonomous();
 	
-	/*
-	 * @brief Creates a queue of actions to run based on selected routine
-	 */
-	void LoadQueue();
-	
-	IRobotAction* m_autonActions[1];
-	
-	int m_autonActionCount;
-
 	data::ComponentData* m_componentData;
-	autonStage m_currentStage;
-	queue<autonStage> m_routine;
 	
 	AutoActions* m_autoActions;
 	
 	bool m_isRunning;
-	
-	const static autonStage DRIVE_FORWARD_AND_SHOOT[5];
 };
 
 #endif

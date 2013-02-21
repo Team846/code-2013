@@ -13,10 +13,6 @@ AutonomousRoutines::AutonomousRoutines(char * taskName, INT32 priority) :
 	SynchronizedProcess(taskName, priority)
 {
 	m_componentData = ComponentData::GetInstance();
-	m_currentStage = INIT;
-	
-	m_autonActionCount = 1;
-	m_autonActions[0] = new PauseAction(100);
 	
 	m_autoActions = new AutoActions();
 	
@@ -30,16 +26,8 @@ AutonomousRoutines::~AutonomousRoutines()
 
 INT32 AutonomousRoutines::Tick()
 {
-//	for(int i = 0; i < m_autonActionCount; i++)
-//	{
-//		m_autonActions[i]->Run();
-//	}
-	// Use position control in autonomous mode
-	m_componentData->drivetrainData->setControlMode(FORWARD, POSITION_CONTROL);
-	m_componentData->drivetrainData->setControlMode(TURN, POSITION_CONTROL);
 	if (!m_isRunning) // Does not run again (even after routine is completed) until game state is changed and changed back (Stop() is called).
 	{
-		LoadQueue();
 		Autonomous(); // Operation does not complete until entire routine is completed or when Stop() is called.
 	}
 	// Tick() does not finish until entire routine is completed or Stop() is called.
