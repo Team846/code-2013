@@ -25,10 +25,12 @@ public:
 	
 	AutoActions();
 	
-	void AutoAimBackboard();
-	void AutoAimPyramid();
-	bool FeederStationTrack();
+	void EnableAutoAimBackboard();
+	void EnableAutoAimPyramid();
+	void EnableFeederStationTrack();
 	void Reset();
+	
+	actions GetCurrentAutonomousAction();
 	
 private:
 	ComponentData* m_componentData;

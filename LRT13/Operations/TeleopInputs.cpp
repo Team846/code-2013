@@ -93,7 +93,7 @@ void TeleopInputs::Update()
 
 	/************************Climber Functions************************/
 	if (m_driver_stick->IsButtonJustPressed(
-			DriverStationConfig::JoystickButtons::AUTO_CLIMB))
+			DriverStationConfig::JoystickButtons::AUTO_AIM_PYRAMID))
 	{
 		switch (m_componentData->climberData->getDesiredClimbingStep())
 		{
@@ -115,19 +115,19 @@ void TeleopInputs::Update()
 	/************************Automatic Functions************************/
 
 	if (m_driver_stick->IsButtonDown(
-			DriverStationConfig::JoystickButtons::AUTO_AIM))
+			DriverStationConfig::JoystickButtons::AUTO_AIM_BACKBOARD))
 	{
-		m_autoActions->AutoAim();
+		m_autoActions->EnableAutoAimBackboard();
 	}
 	else if (m_driver_stick->IsButtonDown(
-			DriverStationConfig::JoystickButtons::AUTO_CLIMB))
+			DriverStationConfig::JoystickButtons::AUTO_AIM_PYRAMID))
 	{
-		m_autoActions->AutoClimb();
+		m_autoActions->EnableAutoAimPyramid();
 	}
 	else if (m_driver_stick->IsButtonDown(
-			DriverStationConfig::JoystickButtons::DISC_TRACK))
+			DriverStationConfig::JoystickButtons::FEEDER_STATION_APPROACH))
 	{
-		m_autoActions->DiscTrack();
+		m_autoActions->EnableFeederStationTrack();
 	}
 
 	/************************Config************************/

@@ -39,7 +39,7 @@ void InputUnitTest::Run()
 			Pneumatics::Instance()->setClimberArm(false);
 		}
 		
-		if(m_stick->IsButtonDown(DriverStationConfig::JoystickButtons::AUTO_AIM))
+		if(m_stick->IsButtonDown(DriverStationConfig::JoystickButtons::AUTO_AIM_BACKBOARD))
 		{
 			printf("auto aim is down.\n");
 			Pneumatics::Instance()->setCollector(true);
@@ -49,7 +49,7 @@ void InputUnitTest::Run()
 			Pneumatics::Instance()->setCollector(false);
 		}
 
-		if(m_stick->IsButtonDown(DriverStationConfig::JoystickButtons::AUTO_CLIMB))
+		if(m_stick->IsButtonDown(DriverStationConfig::JoystickButtons::AUTO_AIM_PYRAMID))
 		{
 			printf("auto climb is down.\n");
 			Pneumatics::Instance()->setCompressor(true);
@@ -69,7 +69,7 @@ void InputUnitTest::Run()
 			Pneumatics::Instance()->setCompressor(false);
 		}
 		
-		if(m_stick->IsButtonDown(DriverStationConfig::JoystickButtons::DISC_TRACK))
+		if(m_stick->IsButtonDown(DriverStationConfig::JoystickButtons::FEEDER_STATION_APPROACH))
 		{
 			printf("disc track is down.\n");
 			Pneumatics::Instance()->setHookPosition(true);

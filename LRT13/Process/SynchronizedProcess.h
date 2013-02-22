@@ -7,7 +7,7 @@
 #include "AsyncProcess.h"
 
 /*!
- * @brief Base class for synchronized processes. Synchronized processes wait for a signal before running a tick.
+ * @brief Base class for synchronized processes. Synchronized processes wait for a signal before running a Tick.
  * @author Tony Peng, Raphael Chang
  */
 

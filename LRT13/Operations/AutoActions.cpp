@@ -10,17 +10,17 @@ AutoActions::AutoActions()
 	m_componentData = ComponentData::GetInstance();
 }
 
-void AutoActions::AutoAimBackboard()
+void AutoActions::EnableAutoAimBackboard()
 {
 	m_currentAction = AUTO_AIM_BACKBOARD;
 }
 
-void AutoActions::AutoAimPyramid()
+void AutoActions::EnableAutoAimPyramid()
 {
 	m_currentAction = AUTO_AIM_PYRAMID;
 }
 
-void AutoActions::FeederStationTrack()
+void AutoActions::EnableFeederStationTrack()
 {
 	m_currentAction = FEEDER_STATION_APPROACH;
 }
@@ -28,5 +28,10 @@ void AutoActions::FeederStationTrack()
 void AutoActions::Reset()
 {
 	m_counter = 0;
-	m_currentAction = IDLE;
+	m_currentAction = NO_ADV_AUTOMATION;
+}
+
+AutoActions::actions AutoActions::GetCurrentAutonomousAction()
+{
+	return m_currentAction;
 }

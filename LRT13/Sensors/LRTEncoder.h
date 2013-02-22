@@ -34,13 +34,13 @@ public:
 
 	/*!
 	 * @brief Gets the current count of the encoder
-	 * @return encoder tick count
+	 * @return encoder Tick count
 	 */
 	INT32 Get();
 
 	/*!
 	 * @brief Gets the current rate of the encoder
-	 * @return encoder tick rate
+	 * @return encoder Tick rate
 	 */
 	double GetRate();
 

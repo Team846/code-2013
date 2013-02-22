@@ -17,7 +17,7 @@ class ComponentData;
 class AutoActions;
 
 /*!
- * @brief Performs autonomous routine and contains autonomous functions. It has two parts, the tick function which is meant to run every cycle to operate semi-automated processes
+ * @brief Performs autonomous routine and contains autonomous functions. It has two parts, the Tick function which is meant to run every cycle to operate semi-automated processes
  * @author Raphael Chang, Tony Peng, Brian Axelrod
  */
 class AutonomousRoutines 
@@ -40,12 +40,22 @@ public:
 		BACK_7FRISBEE = 4,
 	};
 	
-	void tick();
+	void Tick(); //called every cycle to manage semi-autonomous functions
+	
 private:
 	/*
 	 * @brief Runs autonomous routine
 	 */
 	void Autonomous();
+	
+	void ServiceAutoAimBackBoard();
+	void ServiceAutoAimPyramid();
+	void ServiceFeederStationApproach();
+	
+	/********* One function per auto routine ************/
+	void FireFrisbees(int numFrisbeesToFire, double timeoutSeconds);
+	void FrontCenter4FrisbeeRoutine();
+	void RearCornerToMidline(int numFrisbeesToPickUp);
 	
 	data::ComponentData* m_componentData;
 	

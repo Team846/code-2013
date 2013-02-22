@@ -15,7 +15,7 @@ LRTRobot13::~LRTRobot13()
 	printf("LRTRobot13 Destructing\n");
 	
 	// Stop all tasks
-	m_auton->Abort();
+	m_auton->Stop();
 	m_teleop->Abort();
 	for (vector<AsyncCANJaguar*>::iterator it = AsyncCANJaguar::jaguar_vector.begin(); it < AsyncCANJaguar::jaguar_vector.end(); it++)
 	{
@@ -45,9 +45,8 @@ void LRTRobot13::RobotInit()
 	m_teleop = new TeleopInputs("TeleopInputs");
 	m_teleop->Start();
 	
-	AsyncPrinter::Println("Starting AutonomousRoutines Task");
-	m_auton = new AutonomousRoutines("AutonomousRoutines");
-	m_auton->Start();
+	AsyncPrinter::Println("initializing AutonomousRoutines");
+	m_auton = new AutonomousRoutines();
 	
 	AsyncPrinter::Println("Starting Jaguar Tasks");
 	for (vector<AsyncCANJaguar*>::iterator it = AsyncCANJaguar::jaguar_vector.begin(); it < AsyncCANJaguar::jaguar_vector.end(); it++)
@@ -97,7 +96,7 @@ void LRTRobot13::Run()
 		// Update appropriate operation controllers
 		if (RobotData::GetCurrentState() == RobotData::AUTONOMOUS)
 		{
-			m_auton->RunOneCycle(); // Called every loop, but Tick() is only called again when the entire autonomous routine is complete.
+			m_auton->Tick(); // Called every loop, but Tick() is only called again when the entire autonomous routine is complete.
 		}
 		else if (RobotData::GetCurrentState() == RobotData::TELEOP)
 		{
