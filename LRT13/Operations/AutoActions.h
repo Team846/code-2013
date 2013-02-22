@@ -23,6 +23,12 @@ public:
 		NO_ADV_AUTOMATION
 	};
 	
+	enum routines
+	{
+		FRONT,
+		BACK
+	};
+	
 	AutoActions();
 	
 	void EnableAutoAimBackboard();
@@ -32,10 +38,18 @@ public:
 	
 	actions GetCurrentAutonomousAction();
 	
+	void SetRoutine(routines routine);
+	routines GetRoutine();
+	
+	void setNumFrisbeesToPickUp(int numFrisbeesToPickUp);
+	int getNumFrisbeesToPickUp();
+	
 private:
 	ComponentData* m_componentData;
-	static actions m_currentAction;
-	static unsigned int m_counter;
+	routines m_currentAutoRoutine;
+	actions m_currentAction;
+	unsigned int m_counter;
+	int m_numFrisbeesToPickUp;
 };
 
 #endif

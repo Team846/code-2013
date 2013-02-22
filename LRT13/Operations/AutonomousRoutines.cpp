@@ -47,7 +47,13 @@ void AutonomousRoutines::Autonomous()
 
 void AutonomousRoutines::Stop()
 {
-	m_isRunning = false; // Allows routine to start again when Tick() is called (autonomous mode is re-entered).
+	m_isRunning = false; 
+}
+
+void AutonomousRoutines::Start()
+{
+	m_isRunning = true; 
+	//faire qqch d'autre dans l'avenir
 }
 
 bool AutonomousRoutines::IsRunning()

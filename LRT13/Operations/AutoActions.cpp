@@ -2,9 +2,6 @@
 #include "../ComponentData/ComponentData.h"
 #include "../Config/RobotConfig.h"
 
-unsigned int AutoActions::m_counter = 0;
-AutoActions::actions AutoActions::m_currentAction = NO_ADV_AUTOMATION;
-	
 AutoActions::AutoActions()
 {
 	m_componentData = ComponentData::GetInstance();
@@ -34,4 +31,24 @@ void AutoActions::Reset()
 AutoActions::actions AutoActions::GetCurrentAutonomousAction()
 {
 	return m_currentAction;
+}
+
+void AutoActions::SetRoutine(routines routine)
+{
+	m_currentAutoRoutine = routine;
+}
+
+AutoActions::routines AutoActions::GetRoutine()
+{
+	return m_currentAutoRoutine;
+}
+
+void AutoActions::setNumFrisbeesToPickUp(int numFrisbeesToPickUp)
+{
+	m_numFrisbeesToPickUp = numFrisbeesToPickUp;
+}
+
+int AutoActions::getNumFrisbeesToPickUp()
+{
+	return m_numFrisbeesToPickUp;
 }

@@ -129,6 +129,10 @@ void TeleopInputs::Update()
 	{
 		m_autoActions->EnableFeederStationTrack();
 	}
+	else
+	{
+		m_autoActions->Reset();
+	}
 
 	/************************Config************************/
 
