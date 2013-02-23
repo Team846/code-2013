@@ -1,5 +1,6 @@
 #include "AutonomousRoutines.h"
 #include "../ComponentData/ComponentData.h"
+#include "../ComponentData/ShooterData.h"
 #include "AutoActions.h"
 #include "../Config/DriverStationConfig.h"
 #include "../Utils/AsyncPrinter.h"
@@ -63,8 +64,9 @@ void AutonomousRoutines::ServiceFeederStationApproach()
 void AutonomousRoutines::FireAllFrisbees(double timeoutSeconds)
 {
 	UINT32 startTime = GetFPGATime();//Microseconds
-	while (m_isRunning && GetFPGATime() < startTime + timeoutSeconds * 1E6 && m_componentData)
+	while (m_isRunning && GetFPGATime() < startTime + timeoutSeconds * 1E6 && m_componentData->shooterData->GetNumFrisbeesInStorage() > 0)
 	{
+		//TODO fire!
 		AutonomousFreeCPUPause();
 	}
 }

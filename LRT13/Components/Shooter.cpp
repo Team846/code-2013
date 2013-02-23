@@ -90,7 +90,7 @@ void Shooter::enabledPeriodic()
 	//TODO: write piston code when pneumatics code is fixed
 	if (atSpeed[FRONT] && atSpeed[BACK])
 	{
-		if (m_componentData->shooterData->ShouldExtendLauncher()) // Don't shoot
+		if (m_componentData->shooterData->ShouldLauncherBeHigh()) // Don't shoot
 		{
 			m_pneumatics->setStorageExit(true);
 		}
@@ -107,9 +107,16 @@ void Shooter::enabledPeriodic()
 	m_PIDs[FRONT].setInput(m_speed[FRONT]);
 	m_PIDs[BACK].setInput(m_speed[BACK]);
 	
-	LimitCurrent(FRONT, m_jaguar_front);
-	LimitCurrent(BACK, m_jaguar_back);
+	double PIDOut[2];
+	PIDOut[FRONT] = m_PIDs[FRONT].update(1.0 / RobotConfig::LOOP_RATE);
+	PIDOut[BACK] = m_PIDs[BACK].update(1.0 / RobotConfig::LOOP_RATE);
 	
+	LimitCurrent(FRONT, &PIDOut[FRONT]);
+	LimitCurrent(BACK, &PIDOut[BACK]);
+
+	m_jaguar_back->SetDutyCycle(PIDOut[BACK]);
+	m_jaguar_front->SetDutyCycle(PIDOut[FRONT]);
+
 	SetDutyCycle(FRONT, m_jaguar_front);
 	SetDutyCycle(BACK, m_jaguar_back);
 	

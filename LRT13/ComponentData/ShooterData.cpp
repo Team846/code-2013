@@ -43,17 +43,17 @@ double ShooterData::GetAcceptableSpeedError(int roller)
 	return acceptableSpeedError[roller];
 }
 
-void ShooterData::ExtendLauncher()
+void ShooterData::SetLauncherAngleHigh()
 {
 	extendLauncher = true;
 }
 
-void ShooterData::RetractLauncher()
+void ShooterData::SetLauncherAngleLow()
 {
 	extendLauncher = false;
 }
 
-bool ShooterData::ShouldExtendLauncher()
+bool ShooterData::ShouldLauncherBeHigh()
 {
 	return extendLauncher;
 }

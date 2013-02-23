@@ -30,9 +30,12 @@ namespace data
 				void SetAcceptableSpeedError(double error, int roller);
 				double GetAcceptableSpeedError(int roller);
 				
-				void ExtendLauncher();
-				void RetractLauncher();
-				bool ShouldExtendLauncher();
+				void SetLauncherAngleHigh();
+				void SetLauncherAngleLow();
+				bool ShouldLauncherBeHigh();
+				
+				void ShootOnce();
+				void ShootContinuous();
 				
 				int GetNumFrisbeesInStorage();
 				void SetNumFrisbeesInStorage(int numFrisbees);
