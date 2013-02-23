@@ -15,6 +15,7 @@ namespace RobotConfig
 const uint32_t LOOP_RATE = 50; //hertz
 const std::string CONFIG_FILE_PATH = "/LRT13.conf";
 const uint32_t MAX_GAME_PIECES = 4;
+const double MAX_VOLTAGE = 13;
 
 namespace Drive
 {
@@ -87,10 +88,6 @@ namespace PWM
 	const uint32_t RIGHT_PTO_SERVO = 2;
 }
 
-namespace Shooter
-{
-	const double MAX_VOLTAGE = 13;
-}
 
 }
 

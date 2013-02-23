@@ -36,6 +36,8 @@ namespace data
 				
 				void ShootOnce();
 				void ShootContinuous();
+				bool ShouldBeShootingContinuous();
+				bool ShouldBeShootingOnce();
 				
 				int GetNumFrisbeesInStorage();
 				void SetNumFrisbeesInStorage(int numFrisbees);

@@ -8,6 +8,8 @@
 using namespace data;
 using namespace data::drivetrain;
 
+//unsigned int AutonomousRoutines::standardWaitTicks = ;
+
 AutonomousRoutines::AutonomousRoutines()
 {
 	m_componentData = ComponentData::GetInstance();
@@ -66,8 +68,19 @@ void AutonomousRoutines::FireAllFrisbees(double timeoutSeconds)
 	UINT32 startTime = GetFPGATime();//Microseconds
 	while (m_isRunning && GetFPGATime() < startTime + timeoutSeconds * 1E6 && m_componentData->shooterData->GetNumFrisbeesInStorage() > 0)
 	{
-		//TODO fire!
+		m_componentData->shooterData->ShootContinuous();
 		AutonomousFreeCPUPause();
+	}
+	
+	if (m_componentData->shooterData->GetNumFrisbeesInStorage() > 0 )
+		AsyncPrinter::Printf("Shooting timed out, we did not fire all the frisbees\n");
+}
+
+void AutonomousRoutines::SafeGrabSem(SEM_ID sem)
+{
+	while (m_isRunning && semTake(sem, GetStandardWaitTicks()))
+	{
+		//ne faire rien pendant que nous attendons 
 	}
 }
 
@@ -75,11 +88,11 @@ void AutonomousRoutines::FireAllFrisbees(double timeoutSeconds)
 void AutonomousRoutines::FrontCenter(int numFrisbeesToPickUp)
 {
 /*write worst case start and end time of the op here*/
-/*0-2*/	FireAllFrisbees(2.0);
+/*0-2*/	FireAllFrisbees(3.0);
 /*2-2*/ //start driving back a distance. Distance depends on # of frisbees
 /*2-2*/ //start deploying the collector
 /*2-8*/ //Wait until right # of frisbees picked up or  distance is traveleld
-/*8-10*/ FireAllFrisbees(2.0);
+/*8-10*/ FireAllFrisbees(3.0);
 /*10-10*/ //start driving back to pick up more frisbees if there is a need
 /*10-13*/ //Wait until right # of frisbees picked up or  distance is traveleld
 /*13-15*/ //Fire rest of frisbees
@@ -109,5 +122,5 @@ bool AutonomousRoutines::IsRunning()
 
 void AutonomousRoutines::AutonomousFreeCPUPause()
 {
-	taskDelay(sysClkRateGet()/200);//4x per cycle. We don't really do anything computationall intensive in these function
+	taskDelay(GetStandardWaitTicks());//4x per cycle. We don't really do anything computationall intensive in these function
 }

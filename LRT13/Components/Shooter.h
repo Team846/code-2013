@@ -35,49 +35,28 @@ public:
 	virtual void Configure();
 	virtual void Log();
 	
-	void CheckError(int roller);
-	void LimitCurrent(int roller);
-	double GetSpeed(Counter* y);
-	void SetSetpoint(int roller);
-	
-	/*!
-	 * @brief Returns the status of the current to the roller.  This can be used to determine if the roller has grabbed a frisbee.
-	 * 
-	 * @returns True, if the current is over the specified normal current.
-	 * @returns False, if the current is under or equal to the specified normal current.
-	 */
-	bool IsOverCurrent();
-	
 private:
+	
+	void ManageShooterWheel(int roller);
 	string m_configSection;
 
-	AsyncCANJaguar* m_jaguar[2];
-	Counter* m_enc_front;
-	Counter* m_enc_back;
+	AsyncCANJaguar* m_jaguars[2];
+	Counter* m_encs[2];
+
 	Pneumatics* m_pneumatics;
 	DigitalInput* m_proximity;
 	
 	PID m_PIDs[2];
 	
-	double m_dutyCycleFront;
-	double m_dutyCycleBack;
-	
-	int m_overCurrentCounter;
-	int m_underCurrentCounter;
-
 	int atSpeedCounter[2];
 	
-	double m_speed[2];
 	double m_max_speed[2];
 	
 	bool atSpeed[2]; 
-	bool frisbee_detected;
 	
-	int requiredCycles;
+	int requiredCyclesAtSpeed;
 	double acceptableSpeedError[2];
-	
-	double maxDeltaDutyCycle, max_output[2], m_duty_cycle_delta, system_voltage;
-	double PIDOut[2];
+	double m_maxNormalizedCurrent;
 };
 
 #endif

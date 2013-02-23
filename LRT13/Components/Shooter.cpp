@@ -39,7 +39,7 @@ Shooter::Shooter() :
 	m_overCurrentCounter = 0;
 	m_underCurrentCounter = 0;
 
-	requiredCycles = 0;
+	requiredCyclesAtSpeed = 0;
 	acceptableSpeedError[FRONT] = 0;
 	acceptableSpeedError[BACK] = 0;
 
@@ -69,18 +69,32 @@ void Shooter::onDisable()
 
 void Shooter::enabledPeriodic()
 {
-	SetSetpoint(FRONT);
-	SetSetpoint(BACK);
-
-	m_speed[FRONT] = GetSpeed(m_enc_front);
-	m_speed[BACK] = GetSpeed(m_enc_back);
+	ManageShooterWheel(FRONT);
+	ManageShooterWheel(BACK);
+	
+	frisbee_detected = m_proximity->Get() == 0;
+	if (m_componentData->shooterData->ShouldBeShootingContinuous())
+	{
+		static bool m_isExtended;
+		if (m_isExtended)
+		{
+			//if the speed of the first shooter wheel drops a ton. (Defined by a threshold read fromconfig)
+			//retract
+			m_isExtended = false;
+		}
+		else
+		{
+			if (frisbee_detected)
+			{
+				//extend
+				m_isExtended = true;
+			}
+		}
+	}
+	
 	//m_speed_back = Util::Clamp<double>(m_speed_back, 0, m_max_speed * 1.3);
 
-	frisbee_detected = m_proximity->Get() == 0;
 	// TODO: change shooter speed based on orientation
-
-	CheckError(FRONT);
-	CheckError(BACK);
 
 	//TODO: write autofire code
 	if (atSpeed[FRONT] && atSpeed[BACK])
@@ -100,10 +114,24 @@ void Shooter::enabledPeriodic()
 		}
 	}
 	
-	system_voltage = DriverStation::GetInstance()->GetBatteryVoltage();
-	LimitCurrent(FRONT);
-	LimitCurrent(BACK);
 	
+}
+
+void Shooter::ManageShooterWheel(int roller)
+{
+	double currSpeed = (double) (m_encs[roller]->GetStopped()) ? 0.0 : (60.0 / 2.0 / m_encs[roller]->GetPeriod());
+	m_PIDs[roller].setInput(currSpeed/m_max_speed[roller]);
+	m_PIDs[roller].setSetpoint(m_componentData->shooterData->GetDesiredSpeed(roller));
+	
+	double out = m_PIDs[roller].update(1.0 / RobotConfig::LOOP_RATE); //out is a normalized voltage
+	
+	double maxOut = currSpeed + m_maxNormalizedCurrent;
+	
+	//now lets limit the current
+	out = Util::Min<double>(out, maxOut);
+	out /= (DriverStation::GetInstance()->GetBatteryVoltage() / RobotConfig::MAX_VOLTAGE);
+	
+	m_jaguars[roller]->SetDutyCycle(out);
 }
 
 void Shooter::SetSetpoint(int roller)
@@ -133,7 +161,7 @@ void Shooter::Configure()
 	m_dutyCycleBack = c->Get<double> (m_configSection, "backSpeed", 0.3F);
 
 	//TODO: Change default values.
-	requiredCycles = c->Get<int> (m_configSection, "requiredCycles", 9);
+	requiredCyclesAtSpeed = c->Get<int> (m_configSection, "requiredCycles", 9);
 	acceptableSpeedError[FRONT] = c->Get<double> (m_configSection,
 			"front_acceptableSpeedError", 0);
 	acceptableSpeedError[BACK] = c->Get<double> (m_configSection,
@@ -165,7 +193,7 @@ void Shooter::CheckError(int roller)
 	else
 	{
 		atSpeedCounter[roller]++;
-		if (atSpeedCounter[roller] > requiredCycles)
+		if (atSpeedCounter[roller] > requiredCyclesAtSpeed)
 		{
 			atSpeed[roller] = true;
 		}

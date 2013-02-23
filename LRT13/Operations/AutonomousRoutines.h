@@ -48,10 +48,17 @@ private:
 	void RearCorner(int numFrisbeesToPickUp);
 	
 	void AutonomousFreeCPUPause();
+	void SafeGrabSem(SEM_ID sem);
 	
 	data::ComponentData* m_componentData;
 	
 	AutoActions* m_autoActions;
+	
+	static const unsigned int standardWaitTicks = 1000/200;//sysClkRateGet() = 1000
+	unsigned int GetStandardWaitTicks()
+	{
+		return standardWaitTicks;
+	}
 	
 	bool m_isRunning;
 };
