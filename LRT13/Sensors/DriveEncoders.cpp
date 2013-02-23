@@ -33,12 +33,15 @@ DriveEncoders::DriveEncoders() :
 	m_encoders[LEFT]->SetDistancePerPulse(1);
 	m_encoders[RIGHT]->SetDistancePerPulse(1);
 
-	//m_encoders[LEFT]->Start();
-	//m_encoders[RIGHT]->Start();
+	
 	printf("Construct Drive Encoders\n");
 
 	MAX_ENCODER_RATE = MAX_TURNING_RATE
 			= PULSES_PER_REVOLUTION = TICKS_PER_FULL_TURN = WHEEL_DIAMETER = 1;
+
+	Configure();
+	m_encoders[LEFT]->Start();
+	m_encoders[RIGHT]->Start();
 }
 
 DriveEncoders::~DriveEncoders()
@@ -61,9 +64,6 @@ void DriveEncoders::Configure()
 			"ticks_per_full_turn", 2288.3 * 180.0 / 165.0 * 2.0);
 	WHEEL_DIAMETER = m_config->Get<double> (m_configsection, "wheel_diameter",
 			6.0); // inches
-	
-	m_encoders[LEFT]->Start();
-	m_encoders[RIGHT]->Start();
 }
 
 void DriveEncoders::Log()

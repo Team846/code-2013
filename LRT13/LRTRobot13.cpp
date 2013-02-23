@@ -77,71 +77,54 @@ static int TimeoutCallback(...)
 	return 0;
 }
 
-void LRTRobot13::Run()
+void LRTRobot13::Tick()
 {	
-	double lastUpdate = 0.0;
+	printf("clkRate: %d\n", sysClkRateGet());
 	
-	int e = -1;
+	wdStart(_watchdog, sysClkRateGet() / RobotConfig::LOOP_RATE,
+			TimeoutCallback, 0);
 	
-	while(true)
+	// Update current game state
+	UpdateGameState();
+
+	// Update appropriate operation controllers
+	if (RobotData::GetCurrentState() == RobotData::AUTONOMOUS)
 	{
-		lastUpdate = Timer::GetFPGATimestamp();
-		
-		wdStart(_watchdog, sysClkRateGet() / RobotConfig::LOOP_RATE,
-				TimeoutCallback, 0);
-		
-		// Update current game state
-		UpdateGameState();
-
-		// Update appropriate operation controllers
-		if (RobotData::GetCurrentState() == RobotData::AUTONOMOUS)
-		{
-			m_auton->Tick(); // Called every loop, but Tick() is only called again when the entire autonomous routine is complete.
-		}
-		else if (RobotData::GetCurrentState() == RobotData::TELEOP)
-		{
-			if (m_auton->IsRunning())
-			{
-				m_auton->Stop();
-			}
-			m_teleop->RunOneCycle();
-		}
-		else // Disabled
-		{
-			m_teleop->RunOneCycle();
-			if (m_auton->IsRunning())
-			{
-				m_auton->Stop();
-			}
-		}
-		
-		// Update all components
-		m_componentManager->Update();
-		
-		// Update all jaguars
-		for (vector<AsyncCANJaguar*>::iterator it = AsyncCANJaguar::jaguar_vector.begin(); it < AsyncCANJaguar::jaguar_vector.end(); it++)
-		{
-			(*it)->RunOneCycle();
-		}
-		
-		// Update pneumatics
-		Pneumatics::Instance()->RunOneCycle();
-		
-		// Update LogManager
-		LogManager::Instance()->RunOneCycle();
-		
-		wdCancel(_watchdog);
-		
-		double now = Timer::GetFPGATimestamp();
-		double timeSpent = (now - lastUpdate) / 1000;
-		
-		double toSleep = (int)((1000.0 / RobotConfig::LOOP_RATE) - timeSpent) / 1000.0;
-
-//		if(e++ % (RobotConfig::LOOP_RATE) == 0)
-//			AsyncPrinter::Printf("Tick: %d\n", e);
-		
-		Wait(toSleep);
+		m_auton->Tick(); // Called every loop, but Tick() is only called again when the entire autonomous routine is complete.
 	}
+	else if (RobotData::GetCurrentState() == RobotData::TELEOP)
+	{
+		if (m_auton->IsRunning())
+		{
+			m_auton->Stop();
+		}
+		m_teleop->RunOneCycle();
+	}
+	else // Disabled
+	{
+		m_teleop->RunOneCycle();
+		if (m_auton->IsRunning())
+		{
+			m_auton->Stop();
+		}
+	}
+	
+	// Update all components
+	m_componentManager->Update();
+	
+	// Update all jaguars
+	for (vector<AsyncCANJaguar*>::iterator it = AsyncCANJaguar::jaguar_vector.begin(); it < AsyncCANJaguar::jaguar_vector.end(); it++)
+	{
+		(*it)->RunOneCycle();
+	}
+	
+	// Update pneumatics
+	Pneumatics::Instance()->RunOneCycle();
+	
+	// Update LogManager
+	LogManager::Instance()->RunOneCycle();
+	
+	wdCancel(_watchdog);
 }
 
 void LRTRobot13::UpdateGameState()

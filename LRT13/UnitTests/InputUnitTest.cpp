@@ -109,10 +109,10 @@ void InputUnitTest::Run()
 		float rawZAxis = m_stick->GetAxis(Joystick::kZAxis);
 		float rawYAxis = m_stick->GetAxis(Joystick::kYAxis);
 		float rawXAxis = m_wheel->GetAxis(Joystick::kXAxis);
-		
-		printf("Stick Raw Z Axis: %f. \n", rawZAxis);
-		printf("Stick Raw Y Axis: %f. \n", rawYAxis);
-		printf("Wheel Raw X Axis: %f. \n", rawXAxis);
+//		
+//		printf("Stick Raw Z Axis: %f. \n", rawZAxis);
+//		printf("Stick Raw Y Axis: %f. \n", rawYAxis);
+//		printf("Wheel Raw X Axis: %f. \n", rawXAxis);
 		
 		taskDelay(sysClkRateGet() / 4);
 	}

@@ -36,7 +36,7 @@ class LRTRobot13 : public LRTRobotBase
 		void CreateComponents();
 	
 		// Function to start execution; basically a main function
-		void Run();
+		void Tick();
 		
 	private:
 		void UpdateGameState();

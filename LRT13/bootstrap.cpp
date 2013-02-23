@@ -20,7 +20,8 @@
  */
 RobotBase* FRC_userClassFactory()
 {
-	return new InputUnitTest();
+	return new LRTRobot13();
+//	return new InputUnitTest();
 }
 
 extern "C"
