@@ -45,8 +45,6 @@ Shooter::Shooter() :
 
 	maxDeltaDutyCycle = .75;
 	m_duty_cycle_delta = .25;
-	max_voltage[FRONT] = 13;
-	max_voltage[BACK] = 13;
 	
 	Configure();
 
@@ -101,20 +99,10 @@ void Shooter::enabledPeriodic()
 			}
 		}
 	}
-	m_PIDs[FRONT].setInput(m_speed[FRONT]);
-	m_PIDs[BACK].setInput(m_speed[BACK]);
-
-	PIDOut[FRONT] = m_PIDs[FRONT].update(1.0 / RobotConfig::LOOP_RATE);
-	PIDOut[BACK] = m_PIDs[BACK].update(1.0 / RobotConfig::LOOP_RATE);
 	
+	system_voltage = DriverStation::GetInstance()->GetBatteryVoltage();
 	LimitCurrent(FRONT);
 	LimitCurrent(BACK);
-
-	m_jaguar[BACK]->SetDutyCycle(PIDOut[BACK]);
-	m_jaguar[FRONT]->SetDutyCycle(PIDOut[FRONT]);
-
-	SetDutyCycle(FRONT);
-	SetDutyCycle(BACK);
 	
 }
 
@@ -126,11 +114,6 @@ void Shooter::SetSetpoint(int roller)
 double Shooter::GetSpeed(Counter* y)
 {
 	return (double)(y->GetStopped()) ? 0.0 : (60.0 / 2.0 / y->GetPeriod());
-}
-
-void Shooter::SetDutyCycle(int roller)
-{
-	m_jaguar[roller]->SetDutyCycle(m_PIDs[roller].update(1.0 / RobotConfig::LOOP_RATE));
 }
 
 void Shooter::disabledPeriodic()
@@ -192,10 +175,17 @@ void Shooter::CheckError(int roller)
 
 void Shooter::LimitCurrent(int roller)
 {
-	system_voltage[roller] = DriverStation::GetInstance()->GetBatteryVoltage();
+	
+	m_PIDs[roller].setInput(m_speed[roller]);
+	
+	PIDOut[roller] = m_PIDs[roller].update(1.0 / RobotConfig::LOOP_RATE);
+	
 	double desiredDutyCycle = m_componentData->shooterData->GetDesiredSpeed((Roller)roller) / m_max_speed[roller];
-	double maxDutyCycle = (m_speed[roller] / m_max_speed[roller]* max_voltage[roller] 
-	    + maxDeltaDutyCycle * system_voltage[roller]) / system_voltage[roller];
+	double maxDutyCycle = (m_speed[roller] / m_max_speed[roller]* RobotConfig::Shooter::MAX_VOLTAGE 
+	    + maxDeltaDutyCycle * system_voltage) / system_voltage;
 	double appliedDutyCycle = min(desiredDutyCycle, maxDutyCycle);
-	m_jaguar[roller]->ConfigMaxOutputVoltage(appliedDutyCycle * max_voltage[roller]);
+	m_jaguar[roller]->ConfigMaxOutputVoltage(appliedDutyCycle * RobotConfig::Shooter::MAX_VOLTAGE);
+	
+	m_jaguar[roller]->SetDutyCycle(PIDOut[roller]);
+	
 }

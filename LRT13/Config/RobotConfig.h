@@ -87,6 +87,11 @@ namespace PWM
 	const uint32_t RIGHT_PTO_SERVO = 2;
 }
 
+namespace Shooter
+{
+	const double MAX_VOLTAGE = 13;
+}
+
 }
 
 #endif

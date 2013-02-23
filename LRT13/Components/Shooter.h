@@ -37,7 +37,6 @@ public:
 	
 	void CheckError(int roller);
 	void LimitCurrent(int roller);
-	void SetDutyCycle(int roller);
 	double GetSpeed(Counter* y);
 	void SetSetpoint(int roller);
 	
@@ -77,8 +76,8 @@ private:
 	int requiredCycles;
 	double acceptableSpeedError[2];
 	
-	double maxDeltaDutyCycle, max_output[2], m_duty_cycle_delta, system_voltage[2];
-	double max_voltage[2], PIDOut[2];
+	double maxDeltaDutyCycle, max_output[2], m_duty_cycle_delta, system_voltage;
+	double PIDOut[2];
 };
 
 #endif
