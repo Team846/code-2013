@@ -36,7 +36,10 @@ public:
 	virtual void Log();
 	
 	void CheckError(int roller);
-	void LimitCurrent(int roller);
+	void LimitCurrent(int roller, AsyncCANJaguar* z);
+	void SetDutyCycle(int roller, AsyncCANJaguar* a);
+	double GetSpeed(Counter* y);
+	void SetSetpoint(int roller);
 	
 	/*!
 	 * @brief Returns the status of the current to the roller.  This can be used to determine if the roller has grabbed a frisbee.
@@ -69,13 +72,13 @@ private:
 	double m_speed[2];
 	double m_max_speed[2];
 	
-	bool atSpeed[2];
+	bool atSpeed[2]; 
 	bool frisbee_detected;
 	
 	int requiredCycles;
 	double acceptableSpeedError[2];
 	
-	double maxDeltaDutyCycle, max_output[2], m_duty_cycle_delta, m_output[2];
+	double maxDeltaDutyCycle, max_output[2], m_duty_cycle_delta, max_voltage[2], system_voltage[2];
 	
 };
 
