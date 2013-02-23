@@ -23,10 +23,13 @@ namespace data
 				ShooterData();
 				void SetDesiredSpeed(double desiredSpeed, Roller roller);
 				double GetDesiredSpeed(Roller roller);
+				
 				void SetAtSpeed(bool value, Roller roller);
 				bool IsAtSpeed(Roller roller);
+				
 				void SetAcceptableSpeedError(double error, int roller);
 				double GetAcceptableSpeedError(int roller);
+				
 				void ExtendLauncher();
 				void RetractLauncher();
 				bool ShouldExtendLauncher();

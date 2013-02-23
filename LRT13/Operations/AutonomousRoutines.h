@@ -43,9 +43,9 @@ private:
 	void ServiceFeederStationApproach();
 	
 	/********* One function per auto routine ************/
-	void FireFrisbees(int numFrisbeesToFire, double timeoutSeconds);
-	void FrontCenter4FrisbeeRoutine();
-	void RearCornerToMidline(int numFrisbeesToPickUp);
+	void FireAllFrisbees(double timeoutSeconds);
+	void FrontCenter(int numFrisbeesToPickUp);
+	void RearCorner(int numFrisbeesToPickUp);
 	
 	data::ComponentData* m_componentData;
 	

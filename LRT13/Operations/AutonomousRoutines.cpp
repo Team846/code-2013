@@ -44,6 +44,46 @@ void AutonomousRoutines::Autonomous()
 {
 }
 
+void AutonomousRoutines::ServiceAutoAimBackBoard()
+{
+	//TODO writeme
+}
+
+void AutonomousRoutines::ServiceAutoAimPyramid()
+{
+	//TODO writeme
+}
+
+void AutonomousRoutines::ServiceFeederStationApproach()
+{
+	//TODO writeme
+}
+
+/********* One function per auto routine ************/
+void AutonomousRoutines::FireAllFrisbees(double timeoutSeconds)
+{
+	//TODO writeme
+}
+
+//This is a sample outline of a routine
+void AutonomousRoutines::FrontCenter(int numFrisbeesToPickUp)
+{
+/*write worst case start and end time of the op here*/
+/*0-2*/	FireAllFrisbees(2.0);
+/*2-2*/ //start driving back a distance. Distance depends on # of frisbees
+/*2-2*/ //start deploying the collector
+/*2-8*/ //Wait until right # of frisbees picked up or  distance is traveleld
+/*8-10*/ FireAllFrisbees(2.0);
+/*10-10*/ //start driving back to pick up more frisbees if there is a need
+/*10-13*/ //Wait until right # of frisbees picked up or  distance is traveleld
+/*13-15*/ //Fire rest of frisbees
+	//TODO edit me once we know more about the robot
+}
+
+void AutonomousRoutines::RearCorner(int numFrisbeesToPickUp)
+{
+	//TODO writeme
+}
 
 void AutonomousRoutines::Stop()
 {
