@@ -33,11 +33,19 @@ namespace data
 				void ExtendLauncher();
 				void RetractLauncher();
 				bool ShouldExtendLauncher();
+				
+				int GetNumFrisbeesInStorage();
+				void SetNumFrisbeesInStorage(int numFrisbees);
+				void IncrementFrisbeeCounter();
+				void DecrementFrisbeeCounter();
+				
 			private:
 				double acceptableSpeedError[2];
 				double speed[2];
 				bool atSpeed[2];
 				bool extendLauncher;
+				
+				int frisbeeCounter;
 		};
 	}
 	

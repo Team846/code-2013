@@ -10,6 +10,7 @@ ShooterData::ShooterData()
 	memset(atSpeed, false, sizeof(atSpeed));
 	memset(speed, 0, sizeof(speed));
 	
+	frisbeeCounter = 0;
 }
 
 void ShooterData::SetDesiredSpeed(double desiredSpeed, Roller roller)
@@ -55,4 +56,24 @@ void ShooterData::RetractLauncher()
 bool ShooterData::ShouldExtendLauncher()
 {
 	return extendLauncher;
+}
+
+int ShooterData::GetNumFrisbeesInStorage()
+{
+	return frisbeeCounter;
+}
+
+void ShooterData::SetNumFrisbeesInStorage(int numFrisbees)
+{
+	frisbeeCounter = numFrisbees;
+}
+
+void ShooterData::IncrementFrisbeeCounter()
+{
+	frisbeeCounter++;
+}
+
+void ShooterData::DecrementFrisbeeCounter()
+{
+	frisbeeCounter--;
 }

@@ -62,7 +62,11 @@ void AutonomousRoutines::ServiceFeederStationApproach()
 /********* One function per auto routine ************/
 void AutonomousRoutines::FireAllFrisbees(double timeoutSeconds)
 {
-	//TODO writeme
+	UINT32 startTime = GetFPGATime();//Microseconds
+	while (m_isRunning && GetFPGATime() < startTime + timeoutSeconds * 1E6 && m_componentData)
+	{
+		AutonomousFreeCPUPause();
+	}
 }
 
 //This is a sample outline of a routine
@@ -99,4 +103,9 @@ void AutonomousRoutines::Start()
 bool AutonomousRoutines::IsRunning()
 {
 	return m_isRunning;
+}
+
+void AutonomousRoutines::AutonomousFreeCPUPause()
+{
+	taskDelay(sysClkRateGet()/200);//4x per cycle. We don't really do anything computationall intensive in these function
 }

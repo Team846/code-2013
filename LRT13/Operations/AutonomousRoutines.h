@@ -47,6 +47,8 @@ private:
 	void FrontCenter(int numFrisbeesToPickUp);
 	void RearCorner(int numFrisbeesToPickUp);
 	
+	void AutonomousFreeCPUPause();
+	
 	data::ComponentData* m_componentData;
 	
 	AutoActions* m_autoActions;

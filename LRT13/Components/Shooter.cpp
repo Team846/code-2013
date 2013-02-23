@@ -99,6 +99,7 @@ void Shooter::enabledPeriodic()
 			m_pneumatics->setStorageExit(false);
 			if (frisbee_detected)
 			{
+				m_componentData->shooterData->DecrementFrisbeeCounter();
 				RobotData::DecrementFrisbeeCounter();
 			}
 		}

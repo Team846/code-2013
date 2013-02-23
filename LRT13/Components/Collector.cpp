@@ -3,6 +3,7 @@
 #include "../Config/ConfigManager.h"
 #include "../Config/RobotConfig.h"
 #include "../Config/DriverStationConfig.h"
+#include "../ComponentData/ShooterData.h"
 
 Collector::Collector()
 : Component("Collector", DriverStationConfig::DigitalIns::COLLECTOR, true),
@@ -63,6 +64,7 @@ void Collector::enabledPeriodic()
 	// Frisbees aren't flush against each other
 	if (m_count == m_samplesThreshold)
 	{
+		m_componentData->shooterData->IncrementFrisbeeCounter();
 		RobotData::IncrementFrisbeeCounter();
 	}
 }
