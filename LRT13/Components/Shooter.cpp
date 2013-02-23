@@ -12,9 +12,9 @@ Shooter::Shooter() :
 	Component("Shooter", DriverStationConfig::DigitalIns::SHOOTER, true),
 			m_configSection("Shooter")
 {
-	m_jaguar_front = new AsyncCANJaguar(RobotConfig::CAN::SHOOTER_A,
+	m_jaguar[FRONT] = new AsyncCANJaguar(RobotConfig::CAN::SHOOTER_A,
 			"ShooterFront");
-	m_jaguar_back = new AsyncCANJaguar(RobotConfig::CAN::SHOOTER_B,
+	m_jaguar[BACK] = new AsyncCANJaguar(RobotConfig::CAN::SHOOTER_B,
 			"ShooterBack");
 	m_enc_front = new Counter((UINT32) RobotConfig::Digital::HALL_EFFECT_A);
 	m_enc_front->Start();
@@ -45,11 +45,8 @@ Shooter::Shooter() :
 
 	maxDeltaDutyCycle = .75;
 	m_duty_cycle_delta = .25;
-	max_voltage[FRONT] = 0;
-	max_voltage[BACK] = 0;
-	
-	system_voltage[FRONT] = m_jaguar_front->GetOutputVoltage();
-	system_voltage[BACK] = m_jaguar_back->GetOutputVoltage();
+	max_voltage[FRONT] = 13;
+	max_voltage[BACK] = 13;
 	
 	Configure();
 
@@ -57,8 +54,8 @@ Shooter::Shooter() :
 
 Shooter::~Shooter()
 {
-	DELETE(m_jaguar_front);
-	DELETE(m_jaguar_back);
+	DELETE(m_jaguar[FRONT]);
+	DELETE(m_jaguar[BACK]);
 }
 
 void Shooter::onEnable()
@@ -68,8 +65,8 @@ void Shooter::onEnable()
 
 void Shooter::onDisable()
 {
-	m_jaguar_front->SetDutyCycle(0.0F);
-	m_jaguar_back->SetDutyCycle(0.0F);
+	m_jaguar[FRONT]->SetDutyCycle(0.0F);
+	m_jaguar[BACK]->SetDutyCycle(0.0F);
 }
 
 void Shooter::enabledPeriodic()
@@ -87,7 +84,7 @@ void Shooter::enabledPeriodic()
 	CheckError(FRONT);
 	CheckError(BACK);
 
-	//TODO: write piston code when pneumatics code is fixed
+	//TODO: write autofire code
 	if (atSpeed[FRONT] && atSpeed[BACK])
 	{
 		if (m_componentData->shooterData->ShouldLauncherBeHigh()) // Don't shoot
@@ -106,19 +103,18 @@ void Shooter::enabledPeriodic()
 	}
 	m_PIDs[FRONT].setInput(m_speed[FRONT]);
 	m_PIDs[BACK].setInput(m_speed[BACK]);
-	
-	double PIDOut[2];
+
 	PIDOut[FRONT] = m_PIDs[FRONT].update(1.0 / RobotConfig::LOOP_RATE);
 	PIDOut[BACK] = m_PIDs[BACK].update(1.0 / RobotConfig::LOOP_RATE);
 	
-	LimitCurrent(FRONT, &PIDOut[FRONT]);
-	LimitCurrent(BACK, &PIDOut[BACK]);
+	LimitCurrent(FRONT);
+	LimitCurrent(BACK);
 
-	m_jaguar_back->SetDutyCycle(PIDOut[BACK]);
-	m_jaguar_front->SetDutyCycle(PIDOut[FRONT]);
+	m_jaguar[BACK]->SetDutyCycle(PIDOut[BACK]);
+	m_jaguar[FRONT]->SetDutyCycle(PIDOut[FRONT]);
 
-	SetDutyCycle(FRONT, m_jaguar_front);
-	SetDutyCycle(BACK, m_jaguar_back);
+	SetDutyCycle(FRONT);
+	SetDutyCycle(BACK);
 	
 }
 
@@ -132,15 +128,15 @@ double Shooter::GetSpeed(Counter* y)
 	return (double)(y->GetStopped()) ? 0.0 : (60.0 / 2.0 / y->GetPeriod());
 }
 
-void Shooter::SetDutyCycle(int roller, AsyncCANJaguar* z)
+void Shooter::SetDutyCycle(int roller)
 {
-	z->SetDutyCycle(m_PIDs[roller].update(1.0 / RobotConfig::LOOP_RATE));
+	m_jaguar[roller]->SetDutyCycle(m_PIDs[roller].update(1.0 / RobotConfig::LOOP_RATE));
 }
 
 void Shooter::disabledPeriodic()
 {
-	m_jaguar_front->SetDutyCycle(0.0F);
-	m_jaguar_back->SetDutyCycle(0.0F);
+	m_jaguar[FRONT]->SetDutyCycle(0.0F);
+	m_jaguar[BACK]->SetDutyCycle(0.0F);
 }
 
 void Shooter::Configure()
@@ -164,9 +160,8 @@ void Shooter::Configure()
 			.75);
 	m_duty_cycle_delta = c->Get<double> (m_configSection, "m_duty_cycle_delta",
 			.25);
-	//TODO: Change max voltage default values
-	max_voltage[FRONT] = c->Get<double>(m_configSection, "max_voltage_front", 0);
-	max_voltage[BACK] = c->Get<double>(m_configSection, "max_voltage_back", 0);
+	//max_voltage[FRONT] = c->Get<double>(m_configSection, "max_voltage_front", 0);
+	//max_voltage[BACK] = c->Get<double>(m_configSection, "max_voltage_back", 0);
 	
 }
 
@@ -195,13 +190,12 @@ void Shooter::CheckError(int roller)
 
 }
 
-void Shooter::LimitCurrent(int roller, AsyncCANJaguar* z)
+void Shooter::LimitCurrent(int roller)
 {
-	
+	system_voltage[roller] = DriverStation::GetInstance()->GetBatteryVoltage();
 	double desiredDutyCycle = m_componentData->shooterData->GetDesiredSpeed((Roller)roller) / m_max_speed[roller];
-	double maxDutyCycle = (m_speed[roller] / m_max_speed[roller]* max_voltage[roller]
-	     + maxDeltaDutyCycle * system_voltage[roller]) / system_voltage[roller];
+	double maxDutyCycle = (m_speed[roller] / m_max_speed[roller]* max_voltage[roller] 
+	    + maxDeltaDutyCycle * system_voltage[roller]) / system_voltage[roller];
 	double appliedDutyCycle = min(desiredDutyCycle, maxDutyCycle);
-	z->ConfigMaxOutputVoltage(appliedDutyCycle * max_voltage[roller]);
-	
+	m_jaguar[roller]->ConfigMaxOutputVoltage(appliedDutyCycle * max_voltage[roller]);
 }

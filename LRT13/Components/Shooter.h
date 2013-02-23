@@ -36,8 +36,8 @@ public:
 	virtual void Log();
 	
 	void CheckError(int roller);
-	void LimitCurrent(int roller, AsyncCANJaguar* z);
-	void SetDutyCycle(int roller, AsyncCANJaguar* a);
+	void LimitCurrent(int roller);
+	void SetDutyCycle(int roller);
 	double GetSpeed(Counter* y);
 	void SetSetpoint(int roller);
 	
@@ -52,8 +52,7 @@ public:
 private:
 	string m_configSection;
 
-	AsyncCANJaguar* m_jaguar_front;
-	AsyncCANJaguar* m_jaguar_back;
+	AsyncCANJaguar* m_jaguar[2];
 	Counter* m_enc_front;
 	Counter* m_enc_back;
 	Pneumatics* m_pneumatics;
@@ -78,8 +77,8 @@ private:
 	int requiredCycles;
 	double acceptableSpeedError[2];
 	
-	double maxDeltaDutyCycle, max_output[2], m_duty_cycle_delta, max_voltage[2], system_voltage[2];
-	
+	double maxDeltaDutyCycle, max_output[2], m_duty_cycle_delta, system_voltage[2];
+	double max_voltage[2], PIDOut[2];
 };
 
 #endif
