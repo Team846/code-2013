@@ -64,6 +64,9 @@ public:
 	 * Logs value
 	 */
 	virtual void Log();
+	
+	//returns state
+	bool GetStorageExitState();
 
 protected:
 	INT32 Tick();

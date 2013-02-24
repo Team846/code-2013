@@ -11,7 +11,10 @@ ShooterData::ShooterData()
 	memset(speed, 0, sizeof(speed));
 	
 	frisbeeCounter = 0;
-}
+	
+	shooter_setting = OFF;
+	
+} 
 
 void ShooterData::SetDesiredSpeed(double desiredSpeed, Roller roller)
 {
@@ -76,4 +79,14 @@ void ShooterData::IncrementFrisbeeCounter()
 void ShooterData::DecrementFrisbeeCounter()
 {
 	frisbeeCounter--;
+}
+
+void ShooterData::SetShooterSetting(ShooterSetting s)
+{
+	shooter_setting = s;
+}
+
+int ShooterData::GetShooterSetting()
+{
+	return shooter_setting;
 }

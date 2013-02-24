@@ -176,3 +176,8 @@ void Pneumatics::Log()
 {
 	
 }
+
+bool Pneumatics::GetStorageExitState()
+{
+	return m_storageExit.state;
+}

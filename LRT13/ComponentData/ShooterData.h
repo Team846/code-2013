@@ -17,6 +17,19 @@ namespace data
 			BACK = 1
 		};
 		
+		enum ShooterSetting
+		{
+			OFF = 0,
+			ONCE = 1,
+			AUTO = 2
+		};
+		
+		enum PneumaticsState
+		{
+			EXTENDED = true,
+			RETRACTED = false
+		};
+		
 		class ShooterData
 		{
 			public:
@@ -34,10 +47,8 @@ namespace data
 				void SetLauncherAngleLow();
 				bool ShouldLauncherBeHigh();
 				
-				void ShootOnce();
-				void ShootContinuous();
-				bool ShouldBeShootingContinuous();
-				bool ShouldBeShootingOnce();
+				void SetShooterSetting(ShooterSetting s);
+				int GetShooterSetting();
 				
 				int GetNumFrisbeesInStorage();
 				void SetNumFrisbeesInStorage(int numFrisbees);
@@ -49,7 +60,7 @@ namespace data
 				double speed[2];
 				bool atSpeed[2];
 				bool extendLauncher;
-				
+				ShooterSetting shooter_setting;
 				int frisbeeCounter;
 		};
 	}

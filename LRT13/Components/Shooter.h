@@ -57,6 +57,7 @@ private:
 	int requiredCyclesAtSpeed;
 	double acceptableSpeedError[2];
 	double m_maxNormalizedCurrent;
+	double frisbeeDetectionThreshold;
 };
 
 #endif

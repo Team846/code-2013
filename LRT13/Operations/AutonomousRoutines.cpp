@@ -7,7 +7,7 @@
 
 using namespace data;
 using namespace data::drivetrain;
-
+using namespace data::shooter;
 //unsigned int AutonomousRoutines::standardWaitTicks = ;
 
 AutonomousRoutines::AutonomousRoutines()
@@ -68,7 +68,7 @@ void AutonomousRoutines::FireAllFrisbees(double timeoutSeconds)
 	UINT32 startTime = GetFPGATime();//Microseconds
 	while (m_isRunning && GetFPGATime() < startTime + timeoutSeconds * 1E6 && m_componentData->shooterData->GetNumFrisbeesInStorage() > 0)
 	{
-		m_componentData->shooterData->ShootContinuous();
+		m_componentData->shooterData->SetShooterSetting(AUTO);
 		AutonomousFreeCPUPause();
 	}
 	
