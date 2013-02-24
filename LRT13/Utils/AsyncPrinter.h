@@ -16,7 +16,6 @@ class AsyncPrinter : public AsyncProcess
 {
 public:
 	static AsyncPrinter* Instance();
-	static void Initialize();
 	static void Finalize();
 	
 	static int Printf(const char* msg, ...);

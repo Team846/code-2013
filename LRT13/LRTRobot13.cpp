@@ -37,8 +37,6 @@ LRTRobot13::~LRTRobot13()
 
 void LRTRobot13::RobotInit()
 {
-	AsyncPrinter::Initialize();
-	
 	CreateComponents();
 
 	AsyncPrinter::Println("Starting TeleopInputs Task");

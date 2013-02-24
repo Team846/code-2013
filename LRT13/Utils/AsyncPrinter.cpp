@@ -6,16 +6,11 @@ AsyncPrinter* AsyncPrinter::Instance()
 {
 	if(!_instance)
 	{
-		printf("Null pointer at AsyncPrinter::Instance() -- did you call Initialize()?\n");
+		_instance = new AsyncPrinter();
+		_instance->Start();
 	}
 	
 	return _instance;
-}
-
-void AsyncPrinter::Initialize()
-{
-	_instance = new AsyncPrinter();
-	_instance->Start();
 }
 
 void AsyncPrinter::Finalize()
