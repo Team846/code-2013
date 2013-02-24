@@ -173,15 +173,6 @@ void ConfigManager::ConfigureAll()
 
 void ConfigManager::LoadConfig(string path)
 {
-	ifstream fin(path.c_str());
-
-	if (!fin.is_open())
-	{
-		AsyncPrinter::Printf("ConfigManager could not open %s for reading\n",
-				path.c_str());
-		return;
-	}
-
 	// Clear previous data
 	if (fileData != NULL)
 	{
@@ -199,6 +190,15 @@ void ConfigManager::LoadConfig(string path)
 	}
 	sectionMap = new map<string, list<string>::iterator>();
 
+	ifstream fin(path.c_str());
+
+	if (!fin.is_open())
+	{
+		AsyncPrinter::Printf("ConfigManager could not open %s for reading\n",
+				path.c_str());
+		return;
+	}
+	
 	// Read lines into list
 	while (!fin.eof())
 	{
@@ -245,15 +245,16 @@ void ConfigManager::SaveConfig(string path)
 	{
 		AsyncPrinter::Printf("ConfigManager could not open %s for writing\n",
 				path.c_str());
-		return;
 	}
 
 	for (list<string>::iterator it = fileData->begin(); it != fileData->end(); it++)
 	{
 		fout << *it << '\n';
 	}
-
+	
 	fout.close();
+	
+	AsyncPrinter::Printf("Done saving %s\n", path.c_str());
 }
 
 string ConfigManager::Trim(string str)

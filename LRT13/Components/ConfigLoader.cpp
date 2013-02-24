@@ -22,25 +22,22 @@ void ConfigLoader::onDisable()
 
 void ConfigLoader::enabledPeriodic()
 {
-	if(RobotData::GetCurrentState() != RobotData::DISABLED)
+	if (m_componentData->configLoaderData->IsLoadRequested())
 	{
-		if (m_componentData->configLoaderData->IsLoadRequested())
-		{
-			m_config->Load();
-			m_componentData->configLoaderData->RemoveLoadRequest();
-		}
-		else if (m_componentData->configLoaderData->IsSaveRequested())
-		{
-			m_config->Save();
-			m_componentData->configLoaderData->RemoveSaveRequest();
-		}
-		else if (m_componentData->configLoaderData->IsApplyRequested())
-		{
-			m_config->ConfigureAll();
-			m_componentData->configLoaderData->RemoveApplyRequest();
-		}	
+		m_config->Load();
+		m_componentData->configLoaderData->RemoveLoadRequest();
 	}
-	else
+	else if (m_componentData->configLoaderData->IsSaveRequested())
+	{
+		m_config->Save();
+		m_componentData->configLoaderData->RemoveSaveRequest();
+	}
+	else if (m_componentData->configLoaderData->IsApplyRequested())
+	{
+		m_config->ConfigureAll();
+		m_componentData->configLoaderData->RemoveApplyRequest();
+	}
+	if(RobotData::GetCurrentState() == RobotData::DISABLED)
 	{
 		static int e = 0;
 		if (++e % 5 == 0)

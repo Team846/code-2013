@@ -46,7 +46,7 @@ namespace Digital // Ports 1-14
 	const uint32_t PROXIMITY_B = CHANGEME;
 	const uint32_t PTO_SWITCH_LEFT = 9;
 	const uint32_t PTO_SWITCH_RIGHT = 10;
-	const uint32_t WINCH_GEAR_TOOTH = 3;
+	const uint32_t WINCH_GEAR_TOOTH = 12;
 	const uint32_t COMPRESSOR_PRESSURE_SENSOR_PIN = 14;
 	const uint32_t TWOCAN_MOSFET = CHANGEME;
 }

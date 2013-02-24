@@ -37,7 +37,9 @@ LRTRobot13::~LRTRobot13()
 
 void LRTRobot13::RobotInit()
 {
-	CreateComponents();
+	AsyncPrinter::Println("Creating Components");
+	m_componentManager = new ComponentManager();
+	m_componentManager->CreateComponents();
 
 	AsyncPrinter::Println("Starting TeleopInputs Task");
 	m_teleop = new TeleopInputs("TeleopInputs");
@@ -59,14 +61,6 @@ void LRTRobot13::RobotInit()
 	LogManager::Instance()->Start();
 	
 	ConfigManager::Instance()->ConfigureAll();
-}
-
-void LRTRobot13::CreateComponents()
-{
-	AsyncPrinter::Println("Creating Components");
-	m_componentManager = new ComponentManager();
-	m_componentManager->AddComponent(new Drivetrain());
-	m_componentManager->AddComponent(new ConfigLoader());
 }
 
 static int TimeoutCallback(...)

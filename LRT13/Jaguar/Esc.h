@@ -61,6 +61,7 @@ private:
 	std::string namea, nameb;
 	//	CANJaguar *m_jag1, *m_jag2;
 
+	float m_delta_voltage_limit;
 	
 	string m_name;
 	int m_cycle_count;

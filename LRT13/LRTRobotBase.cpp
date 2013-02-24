@@ -32,7 +32,7 @@ void LRTRobotBase::Run()
 	while(true)
 	{
 		semTake(m_loopSynchSem, WAIT_FOREVER);
-//		Tick();
+		Tick();
 	}
 }
 

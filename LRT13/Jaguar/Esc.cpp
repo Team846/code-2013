@@ -2,6 +2,7 @@
 #define MAX(a,b) ((a)<(b)?(b):(a))
 
 #include "Esc.h"
+#include "../Config/RobotConfig.h"
 
 #warning Overloaded constructors should chain to one master constructor/function
 /************************** Esc Class ********************/
@@ -12,6 +13,7 @@ ESC::ESC(int channel, LRTEncoder *encoder, string name) :
 	m_jag1 = new AsyncCANJaguar(channel, name.c_str());
 	m_jag2 = NULL;
 	m_cycle_count = 0;
+	m_delta_voltage_limit = 13.0;
 }
 
 ESC::ESC(int channelA, int channelB, LRTEncoder* encoder, string name) :
@@ -28,6 +30,7 @@ ESC::ESC(int channelA, int channelB, LRTEncoder* encoder, string name) :
 	m_jag2->ConfigNeutralMode(AsyncCANJaguar::kNeutralMode_Coast);
 
 	m_cycle_count = 0;
+	m_delta_voltage_limit = 13.0;
 	printf("Constructed ESC: %s\n", name.c_str());
 }
 
@@ -148,13 +151,20 @@ void ESC::SetDutyCycle(float dutyCycle)
 	//	if ((e++)%21 == 0)
 	//		AsyncPrinter::Printf("In: %.3f out %.3f speed %.3f origspeed %.3f braking %.3f, %.3f max speed\n", origDutyCycle, command.dutyCycle, speed, (m_encoder->GetRate() / DriveEncoders::GetInstance().getMaxEncoderRate()) , command.braking, DriveEncoders::GetInstance().getMaxEncoderRate());
 
+#define CURRENT_LIMIT
+#ifdef CURRENT_LIMIT
+	// TODO: change delta voltage based on battery
+	float dutyCycleLimit = (m_encoder->GetRate() / DriveEncoders::GetInstance()->getMaxEncoderRate() + m_delta_voltage_limit) / (DriverStation::GetInstance()->GetBatteryVoltage() / RobotConfig::MAX_VOLTAGE);
+#endif
 #define LINEARIZE 1
 #if LINEARIZE
-	m_jag1->SetDutyCycle(command.dutyCycle);
-	m_jag2->SetDutyCycle(command.dutyCycle);
+#ifdef CURRENT_LIMIT
+	m_jag1->SetDutyCycle(min(command.dutyCycle, dutyCycleLimit));
+	m_jag2->SetDutyCycle(min(command.dutyCycle, dutyCycleLimit));
+#endif
 #else
-	m_jag1->SetDutyCycle(origDutyCycle);
-	m_jag2->SetDutyCycle(origDutyCycle);
+	m_jag1->SetDutyCycle(min(origDutyCycle, dutyCycleLimit));
+	m_jag2->SetDutyCycle(min(origDutyCycle, dutyCycleLimit));
 #endif
 }
 

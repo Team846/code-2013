@@ -46,6 +46,10 @@ private:
 	int m_samplesThreshold;
 	
 	float m_dutyCycle;
+	int m_overflowWait;
+	int m_overflowWaitThreshold;
+	bool m_reverse;
+	bool m_lastReverseState;
 	
 	string m_configSection;
 };

@@ -20,6 +20,12 @@ ComponentManager::~ComponentManager()
 	m_components.clear();
 }
 
+void ComponentManager::CreateComponents()
+{
+	AddComponent(new Drivetrain());
+	AddComponent(new ConfigLoader());
+}
+
 void ComponentManager::Update()
 {
 	for(map<string, Component*>::iterator it = m_components.begin(); it != m_components.end(); ++it)
@@ -76,7 +82,7 @@ void ComponentManager::Update()
 
 void ComponentManager::AddComponent(Component* comp)
 {
-	AsyncPrinter::DbgPrint("Adding component: %s\n", comp->GetName().c_str());
+	AsyncPrinter::Printf("Adding component: %s\n", comp->GetName().c_str());
 	AddComponent(comp->GetName(), comp);
 }
 
