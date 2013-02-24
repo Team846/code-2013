@@ -55,9 +55,9 @@ private:
 	bool atSpeed[2]; 
 	
 	int requiredCyclesAtSpeed;
-	double acceptableSpeedError[2];
+	double acceptableSpeedError[2], m_speeds[2];
 	double m_maxNormalizedCurrent;
-	double frisbeeDetectionThreshold;
+	double frisbeeDetectionThreshold, lastSpeed;
 };
 
 #endif
