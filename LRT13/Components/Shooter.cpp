@@ -12,30 +12,32 @@ Shooter::Shooter() :
 	Component("Shooter", DriverStationConfig::DigitalIns::SHOOTER, true),
 			m_configSection("Shooter")
 {
-	m_jaguars[FRONT] = new AsyncCANJaguar(RobotConfig::CAN::SHOOTER_A,
+	m_jaguars[OUTER] = new AsyncCANJaguar(RobotConfig::CAN::SHOOTER_A,
 			"ShooterFront");
-	m_jaguars[BACK] = new AsyncCANJaguar(RobotConfig::CAN::SHOOTER_B,
+	m_jaguars[INNER] = new AsyncCANJaguar(RobotConfig::CAN::SHOOTER_B,
 			"ShooterBack");
-	m_encs[FRONT] = new Counter((UINT32) RobotConfig::Digital::HALL_EFFECT_A);
-	m_encs[FRONT]->Start();
-	m_encs[BACK] = new Counter((UINT32) RobotConfig::Digital::HALL_EFFECT_B);
-	m_encs[BACK]->Start();
+	m_encs[OUTER] = new Counter((UINT32) RobotConfig::Digital::HALL_EFFECT_A);
+	m_encs[OUTER]->Start();
+	m_encs[INNER] = new Counter((UINT32) RobotConfig::Digital::HALL_EFFECT_B);
+	m_encs[INNER]->Start();
 	m_pneumatics = Pneumatics::Instance();
 
-	atSpeedCounter[FRONT] = 0;
-	atSpeedCounter[BACK] = 0;
+	atSpeedCounter[OUTER] = 0;
+	atSpeedCounter[INNER] = 0;
 
-	atSpeed[FRONT] = false;
-	atSpeed[BACK] = false;
-
-	m_proximity = new DigitalInput(RobotConfig::Digital::PROXIMITY_B);
+	atSpeed[OUTER] = false;
+	atSpeed[INNER] = false;
+ 
+	//m_proximity = new DigitalInput(RobotConfig::Digital::PROXIMITY_B);
 
 	requiredCyclesAtSpeed = 0;
-	acceptableSpeedError[FRONT] = 0;
-	acceptableSpeedError[BACK] = 0;
+	acceptableSpeedError[OUTER] = 0;
+	acceptableSpeedError[INNER] = 0;
 	lastSpeed = 0;
-	m_speeds[FRONT] = 0;
-	m_speeds[BACK] = 0;
+	m_speeds[OUTER] = 0;
+	m_speeds[INNER] = 0;
+	
+	m_maxNormalizedCurrent = 0.0;
 	
 	Configure();
 
@@ -43,8 +45,8 @@ Shooter::Shooter() :
 
 Shooter::~Shooter()
 {
-	DELETE(m_jaguars[FRONT]);
-	DELETE(m_jaguars[BACK]);
+	DELETE(m_jaguars[OUTER]);
+	DELETE(m_jaguars[INNER]);
 }
 
 void Shooter::onEnable()
@@ -54,17 +56,19 @@ void Shooter::onEnable()
 
 void Shooter::onDisable()
 {
-	m_jaguars[FRONT]->SetDutyCycle(0.0F);
-	m_jaguars[BACK]->SetDutyCycle(0.0F);
+	m_jaguars[OUTER]->SetDutyCycle(0.0F);
+	m_jaguars[INNER]->SetDutyCycle(0.0F);
 }
 
 void Shooter::enabledPeriodic()
 {	
-	ManageShooterWheel(FRONT);
-	ManageShooterWheel(BACK);
+	ManageShooterWheel(OUTER);
+	ManageShooterWheel(INNER);
 	
-	double frisbee_detected = m_proximity->Get() == 0;
-	if(atSpeed[FRONT] && atSpeed[BACK])
+//	AsyncPrinter::Printf("outer %.2f, inner %.2f\n", m_PIDs[OUTER].getInput(), m_PIDs[INNER].getInput());
+	
+	double frisbee_detected = 1;//m_proximity->Get() == 0;
+	if(atSpeed[OUTER] && atSpeed[INNER])
 	{
 		if (m_componentData->shooterData->GetShooterSetting() == AUTO)
 		{
@@ -74,7 +78,7 @@ void Shooter::enabledPeriodic()
 				if (m_isExtended)
 				{
 					//if the speed of the first shooter wheel drops a ton. (Defined by a threshold read fromconfig)
-					if(m_speeds[FRONT] < (lastSpeed - frisbeeDetectionThreshold))
+					if(m_speeds[OUTER] < (lastSpeed - frisbeeDetectionThreshold))
 					{	
 						m_pneumatics->setStorageExit(RETRACTED);
 
@@ -119,7 +123,7 @@ void Shooter::enabledPeriodic()
 			m_pneumatics->setStorageExit(RETRACTED);
 		}
 	}
-	lastSpeed = m_speeds[FRONT];
+	lastSpeed = m_speeds[OUTER];
 	
 	//m_speed_back = Util::Clamp<double>(m_speed_back, 0, m_max_speed * 1.3);
 
@@ -128,20 +132,33 @@ void Shooter::enabledPeriodic()
 
 void Shooter::ManageShooterWheel(int roller)
 {
-	m_speeds[roller] = (double) (m_encs[roller]->GetStopped()) ? 0.0 : (60.0 / 2.0 / m_encs[roller]->GetPeriod());
+	m_speeds[roller] = (double) (m_encs[roller]->GetStopped()) ? 0.0 : (60.0 / m_encs[roller]->GetPeriod());
+	static int last = m_encs[roller]->Get();
+//	if (m_encs[roller]->Get() == last)
+//		AsyncPrinter::Printf("Old Shooter wheel data D:\n");
 	
-	m_PIDs[roller].setInput(m_speeds[roller]/m_max_speed[roller]);
-	m_PIDs[roller].setSetpoint(m_componentData->shooterData->GetDesiredSpeed((Roller)roller));
+	m_PIDs[roller].setInput(m_speeds[roller]);
+	//TODO fixme
+	//	m_PIDs[roller].setSetpoint(m_componentData->shooterData->GetDesiredSpeed((Roller)roller));
+//	m_PIDs[roller].setSetpoint(100000);
 	
-	double out = m_PIDs[roller].update(1.0 / RobotConfig::LOOP_RATE); //out is a normalized voltage
+	m_PIDs[roller].setSetpoint(m_target_speed[roller]);
+	
+	double out = m_PIDs[roller].update(1.0 / RobotConfig::LOOP_RATE) / m_max_speed[roller] ; //out is a normalized voltage
 	
 	double maxOut = m_speeds[roller] + m_maxNormalizedCurrent;
 	
 	//now lets limit the current
 	out = Util::Min<double>(out, maxOut);
+	
+	if (out < 0.0)
+		out = 0.0;// Don't do reverse power
+	
+//	AsyncPrinter::Printf("%d: %.2f\n", out);
 	out /= (DriverStation::GetInstance()->GetBatteryVoltage() / RobotConfig::MAX_VOLTAGE);
 	
 	m_jaguars[roller]->SetDutyCycle(out);
+	m_jaguars[roller]->SetVoltageRampRate(0.0);
 	
 	if(m_PIDs[roller].getError() < acceptableSpeedError[roller])
 	{
@@ -158,29 +175,47 @@ void Shooter::ManageShooterWheel(int roller)
 
 void Shooter::disabledPeriodic()
 {
-	m_jaguars[FRONT]->SetDutyCycle(0.0F);
-	m_jaguars[BACK]->SetDutyCycle(0.0F);
+	m_jaguars[OUTER]->SetDutyCycle(0.0F);
+	m_jaguars[INNER]->SetDutyCycle(0.0F);
 }
 
 void Shooter::Configure()
 {
 	ConfigManager * c = ConfigManager::Instance();
-	m_max_speed[FRONT] = c->Get<double> (m_configSection, "front_maxSpeed",
-			5180);
-	m_max_speed[BACK] = c->Get<double> (m_configSection, "back_maxSpeed", 5180);
+	m_max_speed[OUTER] = c->Get<double> (m_configSection, "outer_maxSpeed",
+			7400);
+	m_max_speed[INNER] = c->Get<double> (m_configSection, "inner_maxSpeed", 6000);
+
+	
+	m_target_speed[OUTER] = c->Get<double> (m_configSection, "outer_speedSetpoint",
+			6040);
+	m_target_speed[INNER] = c->Get<double> (m_configSection, "inner_speedSetpoint", 4400);
 
 	//TODO: Change default values.
 	requiredCyclesAtSpeed = c->Get<int> (m_configSection, "requiredCycles", 9);
-	acceptableSpeedError[FRONT] = c->Get<double> (m_configSection,
+	acceptableSpeedError[OUTER] = c->Get<double> (m_configSection,
 			"front_acceptableSpeedError", 0);
-	acceptableSpeedError[BACK] = c->Get<double> (m_configSection,
+	acceptableSpeedError[INNER] = c->Get<double> (m_configSection,
 			"back_acceptableSpeedError", 0);
 	
 	frisbeeDetectionThreshold = c->Get<double> (m_configSection, "shooterSpeedDrop", 0);
 	
+	m_maxNormalizedCurrent = c->Get<double>(m_configSection, "normalizedCurrentThreshold", 1.0);
+	
+	ConfigurePIDObject(&m_PIDs[INNER], "InnerWheelPID", 1.0);
+	ConfigurePIDObject(&m_PIDs[OUTER], "OuterWheelPID", 1.0);
 }
 
 void Shooter::Log()
 {
 
+}
+
+void Shooter::ConfigurePIDObject(PID *pid, std::string objName, bool feedForward)
+{
+	double p = m_config->Get<double>(Component::GetName(), objName + "_P", 1.0);
+	double i = m_config->Get<double>(Component::GetName(), objName + "_I", 0.0);
+	double d = m_config->Get<double>(Component::GetName(), objName + "_D", 0.0);
+	
+	pid->setParameters(p, i, d, 1.0, 0.87, feedForward);//super high decay, this makes it just like a filter. If you want it to act more like an integral you reduce the decay. This must be tuned. 
 }

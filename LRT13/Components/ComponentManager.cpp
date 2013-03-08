@@ -2,8 +2,10 @@
 #include "ConfigLoader.h"
 #include "Drivetrain.h"
 #include "Collector.h"
+#include "Shooter.h"
 #include "../ComponentData/RobotData.h"
 #include "../Utils/AsyncPrinter.h"
+#include "../Pneumatics/Pneumatics.h"
 
 ComponentManager::ComponentManager()
 {
@@ -23,6 +25,7 @@ ComponentManager::~ComponentManager()
 void ComponentManager::CreateComponents()
 {
 	AddComponent(new Drivetrain());
+	AddComponent(new Shooter());
 	AddComponent(new ConfigLoader());
 }
 

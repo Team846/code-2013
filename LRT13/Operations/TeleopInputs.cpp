@@ -54,11 +54,13 @@ void TeleopInputs::Update()
 {
 	RobotData::RobotState current_state = RobotData::GetCurrentState();
 
+	
 	/************************Drivetrain************************/
 
-	//#define USEOPENLOOP
+	#define USEOPENLOOP
 	// Use velocity control in teleoperated mode
 #ifdef USEOPENLOOP
+	
 	m_componentData->drivetrainData->setControlMode(FORWARD, OPEN_LOOP);
 	m_componentData->drivetrainData->setControlMode(TURN, OPEN_LOOP);
 #else

@@ -38,6 +38,7 @@ public:
 private:
 	
 	void ManageShooterWheel(int roller);
+	void ConfigurePIDObject(PID *pid, std::string objName, bool feedForward); //TODO make this a util
 	string m_configSection;
 
 	AsyncCANJaguar* m_jaguars[2];
@@ -51,6 +52,7 @@ private:
 	int atSpeedCounter[2];
 	
 	double m_max_speed[2];
+	double m_target_speed[2];
 	
 	bool atSpeed[2]; 
 	

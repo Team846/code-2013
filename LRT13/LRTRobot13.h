@@ -9,6 +9,7 @@
 #include "LRTRobotBase.h"
 #include "Config/ConfigManager.h"
 #include "Config/RobotConfig.h"
+#include "Config/DriverStationConfig.h"
 
 #include "ComponentData/RobotData.h"
 

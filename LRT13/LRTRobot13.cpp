@@ -70,9 +70,7 @@ static int TimeoutCallback(...)
 }
 
 void LRTRobot13::Tick()
-{	
-	printf("clkRate: %d\n", sysClkRateGet());
-	
+{
 	wdStart(_watchdog, sysClkRateGet() / RobotConfig::LOOP_RATE,
 			TimeoutCallback, 0);
 	
@@ -109,8 +107,16 @@ void LRTRobot13::Tick()
 	{
 		(*it)->RunOneCycle();
 	}
-	
+
 	// Update pneumatics
+	if (DriverStation::GetInstance()->GetDigitalIn(DriverStationConfig::DigitalIns::PNEUMATICS))
+	{
+		Pneumatics::Instance()->setCompressor(true);
+	}
+	else
+	{
+		Pneumatics::Instance()->setCompressor(false);
+	}
 	Pneumatics::Instance()->RunOneCycle();
 	
 	// Update LogManager

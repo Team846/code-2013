@@ -13,8 +13,8 @@ namespace data
 	{
 		enum Roller
 		{
-			FRONT = 0,
-			BACK = 1
+			OUTER = 0,
+			INNER = 1
 		};
 		
 		enum ShooterSetting
