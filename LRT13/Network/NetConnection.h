@@ -40,6 +40,9 @@ namespace Network
 {
 	class NetBuffer;
 
+	/*!
+	 * @brief Describes a message header used by the internal library.
+	 */
 	enum InternalMessageType
 	{
 		LIBRARY_DATA = 0x00,

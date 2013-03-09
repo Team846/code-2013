@@ -137,6 +137,7 @@ void NetConnection::Update()
 			// 2, 3, 4, 5 (4 bytes) form the packet id
 			int id = buff->ReadInt32();
 			
+			// we only need to ACK back reliable packets
 			switch(chann)
 			{
 			case NetChannel::NET_RELIABLE_SEQUENCED:
@@ -150,7 +151,8 @@ void NetConnection::Update()
 				ack.Write((char)channel);
 				ack.Write(id);
 				
-				int iResult = sendto(m_socket, ack.GetBuffer(), ack.GetBytePos(), 0, (struct sockaddr*) &m_remote_spec, sizeof(m_remote_spec));
+				// TODO error handling in the future
+				sendto(m_socket, ack.GetBuffer(), ack.GetBytePos(), 0, (struct sockaddr*) &m_remote_spec, sizeof(m_remote_spec));
 
 				break;
 			}
@@ -432,13 +434,12 @@ int NetConnection::Send(NetBuffer buff, NetChannel::Enum method, int channel)
 	{
 		return SEND_FAILED_BUFFER_INVALID;
 	}
-	
-	int netchannel = method + channel;
-	
+
 	MessageAwaitingACK maack;
 	
 	maack.buff = &buff;
 	maack.sentTime = Timer::GetFPGATimestamp();
+	maack.acknowledged = false;
 	
 	NetBuffer* localBuff = new NetBuffer();
 	localBuff->Write((char)USER_DATA);
