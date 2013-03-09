@@ -24,6 +24,8 @@
 #include "NetConnectionType.h"
 #include "NetChannel.h"
 
+#include "LibraryMessageType.h"
+
 #define SEND_FAILED_BUFFER_ALREADY_SENT -1000000000
 #define SEND_FAILED_BUFFER_INVALID -1000000001
 #define SEND_FAILED_UNKNOWN_ERROR -10000000002
@@ -38,7 +40,7 @@ namespace Network
 {
 	class NetBuffer;
 
-	enum LibraryMessageType
+	enum InternalMessageType
 	{
 		LIBRARY_DATA = 0x00,
 		USER_DATA = 0x01,
@@ -48,6 +50,8 @@ namespace Network
 	{
 		NetBuffer* buff;
 		double sentTime;
+		
+		bool acknowledged;
 	};
 	
 	/*!
@@ -87,18 +91,37 @@ namespace Network
 	protected:
 		INT32 Tick();
 	private:
+		static const double kResendPacketTime; // TO-DO: make me configurable
+		
 #ifdef __VXWORKS__
 		static INT32 InternalPlatformUpdateTaskWrapper(UINT32 instance);
+		static INT32 InternalPlatformMessageVerificationTaskWrapper(UINT32 instance);
 #endif
 		
 		void InternalPlatformQueueSynchronizationCreate();
 		void InternalPlatformQueueSynchronizationEnter();
 		void Update();
+		void CheckMessages();
 		void InternalPlatformQueueSynchronizationLeave();
 		
-		void InternalPlatformCreateUpdateTask();
-		void InternalPlatformRunUpdateTask();
-		void InternalPlatformDestroyUpdateTask();
+		// reliable
+		void InternalPlatformReliableUnorderedQueueSynchronizationCreate();
+		void InternalPlatformReliableUnorderedQueueSynchronizationEnter();
+		void InternalPlatformReliableUnorderedQueueSynchronizationLeave();
+		
+		// reliable sequenced
+		void InternalPlatformReliableSequencedQueueSynchronizationCreate();
+		void InternalPlatformReliableSequencedQueueSynchronizationEnter();
+		void InternalPlatformReliableSequencedQueueSynchronizationLeave();
+				
+		// reliable in order
+		void InternalPlatformReliableInOrderQueueSynchronizationCreate();
+		void InternalPlatformReliableInOrderQueueSynchronizationEnter();
+		void InternalPlatformReliableInOrderQueueSynchronizationLeave();
+		
+		void InternalPlatformCreateUpdateTasks();
+		void InternalPlatformRunUpdateTasks();
+		void InternalPlatformDestroyUpdateTasks();
 		
 		char* m_ip;
 		int m_port;
@@ -106,7 +129,10 @@ namespace Network
 #ifdef __VXWORKS__
 		SEM_ID m_msgQueueMutex;
 		
+		SEM_ID m_reliableUnorderedQueueMutex, m_reliableSequencedQueueMutex, m_reliableInOrderQueueMutex;
+		
 		Task* m_internalUpdateTask;
+		Task* m_internalMessageVerificationTask;
 #endif
 		queue<NetBuffer*> m_receivedMessages;
 		

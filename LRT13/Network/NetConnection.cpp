@@ -1,6 +1,8 @@
 #include "NetBuffer.h"
 #include "NetConnection.h"
 
+const double NetConnection::kResendPacketTime = 1.0; // resend if 100 ms passes with no ACK; max of 500ms roundtrip time
+
 NetConnection::NetConnection(char * ip, int port, NetConnectionType connType)
 {
 	this->m_ip = ip;
@@ -23,6 +25,10 @@ NetConnection::NetConnection(char * ip, int port, NetConnectionType connType)
 	this->m_currentUnreliableSequencedCounter = 0;
 	
 	InternalPlatformQueueSynchronizationCreate();
+	
+	InternalPlatformReliableUnorderedQueueSynchronizationCreate();
+	InternalPlatformReliableSequencedQueueSynchronizationCreate();
+	InternalPlatformReliableInOrderQueueSynchronizationCreate();
 }
 
 NetConnection::~NetConnection()
@@ -41,6 +47,22 @@ INT32 NetConnection:: InternalPlatformUpdateTaskWrapper(UINT32 instance)
 	{
 		conn->Update();
 	}
+	
+	return 0;
+}
+
+INT32 NetConnection::InternalPlatformMessageVerificationTaskWrapper(UINT32 instance)
+{
+	// vxworks specific code
+	
+	NetConnection* conn = (NetConnection*)instance;
+	
+	while(conn->m_isRunning)
+	{
+		conn->CheckMessages();
+	}
+	
+	return 0;
 }
 #endif
 
@@ -70,10 +92,142 @@ void NetConnection::Update()
 	{
 		NetBuffer* buff = new NetBuffer(rcv_buffer, received);
 		
-		// synchronize on the semaphore so that we make sure we're safely accessing the internal message queue
-		InternalPlatformQueueSynchronizationEnter();
-		m_receivedMessages.push(buff);
-		InternalPlatformQueueSynchronizationLeave(); // release the lock on the queue
+		InternalMessageType c = (InternalMessageType)buff->ReadChar();
+		
+		switch(c)
+		{
+		case LIBRARY_DATA:
+			// what message?
+			LibraryMessageType::Enum msgType = (LibraryMessageType::Enum)buff->ReadChar();
+			
+			switch(msgType)
+			{
+			case LibraryMessageType::MESSAGE_ACK:
+				// first byte is the send type
+				NetChannel::Enum chann = (NetChannel::Enum)buff->ReadChar();
+				
+				// second byte is the channel
+				int channel = buff->ReadChar();
+				
+				// 2, 3, 4, 5 (4 bytes) form the packet id
+				int id = buff->ReadInt32();
+				
+				switch(chann)
+				{
+				case NetChannel::NET_RELIABLE:
+					m_reliableUnordered[channel][id].acknowledged = true;
+					break;
+				case NetChannel::NET_RELIABLE_IN_ORDER:
+					m_reliableOrdered[channel][id].acknowledged = true;
+					break;
+				case NetChannel::NET_RELIABLE_SEQUENCED:
+					m_reliableSequenced[channel][id].acknowledged = true;
+					break;
+				}
+				break;
+			}
+			break;
+		case USER_DATA:
+			// read in the library header data first
+			
+			// first byte is the send type
+			NetChannel::Enum chann = (NetChannel::Enum)buff->ReadChar();
+			// second byte is the channel
+			int channel = buff->ReadChar();
+			// 2, 3, 4, 5 (4 bytes) form the packet id
+			int id = buff->ReadInt32();
+			
+			switch(chann)
+			{
+			case NetChannel::NET_RELIABLE_SEQUENCED:
+			case NetChannel::NET_RELIABLE_IN_ORDER:
+			case NetChannel::NET_RELIABLE:
+				// reliable needs an ACK
+				NetBuffer ack;
+				
+				ack.Write((char)LIBRARY_DATA);
+				ack.Write((char)chann);
+				ack.Write((char)channel);
+				ack.Write(id);
+				
+				int iResult = sendto(m_socket, ack.GetBuffer(), ack.GetBytePos(), 0, (struct sockaddr*) &m_remote_spec, sizeof(m_remote_spec));
+
+				break;
+			}
+				
+			// synchronize on the semaphore so that we make sure we're safely accessing the internal message queue
+			InternalPlatformQueueSynchronizationEnter();
+			m_receivedMessages.push(buff);
+			InternalPlatformQueueSynchronizationLeave(); // release the lock on the queue
+			break;
+		default:
+			// wtf?
+			break;
+		}
+	}
+}
+
+void NetConnection::CheckMessages()
+{
+	for(int channel = 0; channel < 16; channel++)
+	{
+		for(int i = 0; i < MAX_MESSAGE_TRACK; i++)
+		{
+			// reliable
+			InternalPlatformReliableUnorderedQueueSynchronizationEnter();
+			MessageAwaitingACK maack = m_reliableUnordered[channel][i];
+			
+			double now = Timer::GetFPGATimestamp();
+			
+			if(!maack.acknowledged && now - maack.sentTime > kResendPacketTime)
+			{
+				// mark this one as received so we don't send duplicates
+				m_reliableUnordered[channel][i].acknowledged = true;
+				
+				// resend
+				Send(*maack.buff, NetChannel::NET_RELIABLE, channel);
+			}
+			
+			InternalPlatformReliableUnorderedQueueSynchronizationLeave();
+			
+			// update timestamp
+			now = Timer::GetFPGATimestamp();
+			
+			InternalPlatformReliableSequencedQueueSynchronizationEnter();
+			
+			// check reliable sequenced
+			maack = m_reliableSequenced[channel][i];
+			
+			if(!maack.acknowledged && now - maack.sentTime > kResendPacketTime)
+			{
+				// mark this one as received so we don't send duplicates
+				m_reliableSequenced[channel][i].acknowledged = true;
+				
+				// resend
+				Send(*maack.buff, NetChannel::NET_RELIABLE_SEQUENCED, channel);
+			}
+			
+			InternalPlatformReliableSequencedQueueSynchronizationLeave();
+			
+			// update timestamp
+			now = Timer::GetFPGATimestamp();
+			
+			InternalPlatformReliableInOrderQueueSynchronizationEnter();
+			
+			// check reliable in order
+			maack = m_reliableSequenced[channel][i];
+						
+			if(!maack.acknowledged && now - maack.sentTime > kResendPacketTime)
+			{
+				// mark this one as received so we don't send duplicates
+				m_reliableUnordered[channel][i].acknowledged = true;
+				
+				// resend
+				Send(*maack.buff, NetChannel::NET_RELIABLE_IN_ORDER, channel);
+			}
+			
+			InternalPlatformReliableInOrderQueueSynchronizationLeave();
+		}
 	}
 }
 
@@ -85,7 +239,79 @@ void NetConnection::InternalPlatformQueueSynchronizationLeave()
 #endif
 }
 
-void NetConnection::InternalPlatformCreateUpdateTask()
+void NetConnection::InternalPlatformReliableUnorderedQueueSynchronizationCreate()
+{
+#ifdef __VXWORKS__
+	// vxworks specific code
+	m_reliableUnorderedQueueMutex = semBCreate(SEM_Q_PRIORITY, SEM_FULL);
+#endif
+}
+
+void NetConnection::InternalPlatformReliableUnorderedQueueSynchronizationEnter()
+{
+#ifdef __VXWORKS__
+	// vxworks specific code
+	semTake(m_reliableUnorderedQueueMutex, WAIT_FOREVER);
+#endif
+}
+
+void NetConnection::InternalPlatformReliableUnorderedQueueSynchronizationLeave()
+{
+#ifdef __VXWORKS__
+	// vxworks specific code
+	semGive(m_reliableUnorderedQueueMutex);
+#endif
+}
+
+void NetConnection::InternalPlatformReliableSequencedQueueSynchronizationCreate()
+{
+#ifdef __VXWORKS__
+	// vxworks specific code
+	m_reliableSequencedQueueMutex = semBCreate(SEM_Q_PRIORITY, SEM_FULL);
+#endif
+}
+
+void NetConnection::InternalPlatformReliableSequencedQueueSynchronizationEnter()
+{
+#ifdef __VXWORKS__
+	// vxworks specific code
+	semTake(m_reliableSequencedQueueMutex, WAIT_FOREVER);
+#endif
+}
+
+void NetConnection::InternalPlatformReliableSequencedQueueSynchronizationLeave()
+{
+#ifdef __VXWORKS__
+	// vxworks specific code
+	semGive(m_reliableSequencedQueueMutex);
+#endif
+}
+
+void NetConnection::InternalPlatformReliableInOrderQueueSynchronizationCreate()
+{
+#ifdef __VXWORKS__
+	// vxworks specific code
+	m_reliableInOrderQueueMutex = semBCreate(SEM_Q_PRIORITY, SEM_FULL);
+#endif
+}
+
+void NetConnection::InternalPlatformReliableInOrderQueueSynchronizationEnter()
+{
+#ifdef __VXWORKS__
+	// vxworks specific code
+	semTake(m_reliableInOrderQueueMutex, WAIT_FOREVER);
+#endif
+}
+
+void NetConnection::InternalPlatformReliableInOrderQueueSynchronizationLeave()
+{
+#ifdef __VXWORKS__
+	// vxworks specific code
+	semGive(m_reliableInOrderQueueMutex);
+#endif
+}
+
+void NetConnection::InternalPlatformCreateUpdateTasks()
 {
 	static int counter = 0;
 	
@@ -97,23 +323,33 @@ void NetConnection::InternalPlatformCreateUpdateTask()
 	// vxworks specific code
 	m_internalUpdateTask = new Task(s.str().c_str(), (FUNCPTR)InternalPlatformUpdateTaskWrapper);
 #endif
+	
+	s << "_MessageCheck";
+	
+#ifdef __VXWORKS__
+	// vxworks specific code
+	m_internalUpdateTask = new Task(s.str().c_str(), (FUNCPTR)InternalPlatformMessageVerificationTaskWrapper);
+#endif
 }
 
-void NetConnection::InternalPlatformRunUpdateTask()
+void NetConnection::InternalPlatformRunUpdateTasks()
 {
 #ifdef __VXWORKS__
 	// vxworks specific code
 	m_internalUpdateTask->Start((UINT32)this);
+	m_internalMessageVerificationTask->Start((UINT32)this);
 #endif
 }
 
-void NetConnection::InternalPlatformDestroyUpdateTask()
+void NetConnection::InternalPlatformDestroyUpdateTasks()
 {
 #ifdef __VXWORKS__
 	// vxworks specific code
 	m_internalUpdateTask->Stop();
+	m_internalMessageVerificationTask->Stop();
 	
 	DELETE(m_internalUpdateTask);
+	DELETE(m_internalMessageVerificationTask);
 #endif
 }
 
@@ -169,8 +405,8 @@ int NetConnection::Open(int options, ...)
 	
 	m_isRunning = true;
 	
-	InternalPlatformCreateUpdateTask();
-	InternalPlatformRunUpdateTask();
+	InternalPlatformCreateUpdateTasks();
+	InternalPlatformRunUpdateTasks();
 	
 	return 0;
 }
@@ -180,7 +416,7 @@ int NetConnection::Close()
 	m_isRunning = false;
 	
 #warning this function is potentially bad because we might be killing the thread while it's waiting for a message. -tp
-	InternalPlatformDestroyUpdateTask();
+	InternalPlatformDestroyUpdateTasks();
 	
 	return close(m_socket);
 }
@@ -207,23 +443,31 @@ int NetConnection::Send(NetBuffer buff, NetChannel::Enum method, int channel)
 	NetBuffer* localBuff = new NetBuffer();
 	localBuff->Write((char)USER_DATA);
 	localBuff->Write((char)method);
+	localBuff->Write((char)channel);
 	
 	switch(method)
 	{
 		// TODO: specific handlers for different methods
 	case NetChannel::NET_RELIABLE:
 		localBuff->Write(m_currentReliableUnorderedCounter);
+		InternalPlatformReliableUnorderedQueueSynchronizationEnter();
 		m_reliableUnordered[channel][m_currentReliableUnorderedCounter++] = maack;
+		InternalPlatformReliableUnorderedQueueSynchronizationLeave();
 		break;
 	case NetChannel::NET_RELIABLE_IN_ORDER:
 		localBuff->Write(m_currentReliableOrderedCounter);
+		InternalPlatformReliableInOrderQueueSynchronizationEnter();
 		m_reliableOrdered[channel][m_currentReliableOrderedCounter++] = maack;
+		InternalPlatformReliableInOrderQueueSynchronizationLeave();
 		break;
 	case NetChannel::NET_RELIABLE_SEQUENCED:
 		localBuff->Write(m_currentReliableSequencedCounter);
+		InternalPlatformReliableSequencedQueueSynchronizationEnter();
 		m_reliableSequenced[channel][m_currentReliableSequencedCounter++] = maack;
+		InternalPlatformReliableSequencedQueueSynchronizationLeave();
 		break;
 	case NetChannel::NET_UNRELIABLE:
+		localBuff->Write(0);
 		 break;
 	case NetChannel::NET_UNRELIABLE_SEQUENCED:
 		localBuff->Write(m_currentUnreliableSequencedCounter++);
@@ -232,11 +476,7 @@ int NetConnection::Send(NetBuffer buff, NetChannel::Enum method, int channel)
 
 		break;
 	}
-	
-	//TODO: implement reliable UDP
-	//NetBuffer* localBuff = new NetBuffer();
 
-	//localBuff->Write(buff.m_internalBuffer);
 	localBuff->Write(buff.m_internalBuffer);
 	
 	buff.m_sent = true;

@@ -76,15 +76,20 @@ namespace Network
 		void WritePadBits();
 		
 		/*!
+		 * @brief Reads a one byte value from the buffer at the current position. Does not advance the internal pointer.
+		 */
+		char PeekChar();
+		
+		/*!
 		 * @brief Reads a one-byte value from the buffer and advances the internal pointer by 8 bits.
 		 */
 		char ReadChar();
 		/*!
-		 * @brief Reads a length-prefixed byte array from the buffer.
+		 * @brief Reads a length-prefixed byte array from the buffer and advances the internal pointer.
 		 */
 		char* ReadBytes();
 		/*!
-		 * @brief Reads a length-prefixed STL string from the buffer.
+		 * @brief Reads a length-prefixed STL string from the buffer and advances the internal pointer.
 		 */
 		string ReadStdString();
 		/*!
@@ -108,9 +113,24 @@ namespace Network
 		 */
 		bool ReadBool();
 		/*!
-		 * @brief Skips over the remaining values in the current byte to improve CPU read time.
+		 * @brief Advances the internal pointer to skip over the remaining values in the current byte to improve CPU read time.
 		 */
 		void SkipPadBits();
+		
+		/*!
+		 * @brief Gets the position of the internal pointer in bytes.
+		 */
+		int GetBytePos();
+		
+		/*!
+		 * @brief Gets the position of the internal pointer in bits.
+		 */
+		int GetBitIndexInCurrentByte();
+		
+		/*!
+		 * @brief Gets the internal buffer.
+		 */
+		char* GetBuffer();
 		
 		friend int NetConnection::Send(NetBuffer buff, NetChannel::Enum method, int channel);
 	private:
@@ -127,8 +147,6 @@ namespace Network
 		char* InternalReadBytes(int length);
 		UINT64 InternalReadInteger(int bits);
 		
-		int GetBytePos();
-		int GetBitIndexInCurrentByte();
 		void FitBufferToSize(UINT32 bits);
 		
 		static const int kBufferResizeOverAllocateBytes; // TO-DO: make me configurable

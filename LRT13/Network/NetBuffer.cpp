@@ -90,6 +90,36 @@ void NetBuffer::WritePadBits()
 	WriteCurrentByteToBuffer();
 }
 
+// TODO create an InternalReadByte overload that does not advance the pointer.
+char NetBuffer::PeekChar()
+{
+	int bit_length = 8;
+	
+	if(!AssertBufferHasSpace(m_internalBitPos + 1 + bit_length))
+	{
+		AsyncPrinter::Println("[NetBuffer] Can't read past the buffer!");
+		return 0;
+	}
+	
+	int bit_pos = GetBitIndexInCurrentByte();
+	
+	int remainingBits = 8 - bit_pos;
+	int overflow = bit_length - remainingBits;
+	
+	char retrieved = (m_internalBuffer[GetBytePos()] & ((char)(~(0)) >> overflow)) << overflow;
+	
+	if(overflow <= 0)
+	{
+		// we're done.
+	}
+	else if(overflow > 0)
+	{
+		retrieved &= m_internalBuffer[GetBytePos() + 1] & ((char)(~(0)) << (8 - overflow)); 
+	}
+	
+	return retrieved;
+}
+
 char NetBuffer::ReadChar()
 {
 	return InternalReadByte(8);
@@ -343,4 +373,9 @@ void NetBuffer::FitBufferToSize(UINT32 bits)
 		
 		m_internalBuffer = newBuff;
 	}
+}
+
+char* NetBuffer::GetBuffer()
+{
+	return m_internalBuffer;
 }
