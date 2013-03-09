@@ -22,6 +22,8 @@ void NetServerUnitTest::Run()
 		
 		b.Write(s.str());
 		
+		m_conn->Send(b, NetChannel::NET_UNRELIABLE_SEQUENCED, 0);
+		
 		taskDelay(sysClkRateGet() / 4);
 	}
 }

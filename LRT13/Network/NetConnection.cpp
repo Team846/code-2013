@@ -128,6 +128,7 @@ void NetConnection::Update()
 			}
 			break;
 		case USER_DATA:
+		{
 			// read in the library header data first
 			
 			// first byte is the send type
@@ -158,12 +159,13 @@ void NetConnection::Update()
 			}
 			
 			bool receive = true;
+			int lastPacket;
 			
 			// handle sequencing
 			switch(chann)
 			{
 			case NetChannel::NET_UNRELIABLE_SEQUENCED:
-				int lastPacket = m_lastUnreliableSequenced[channel];
+				lastPacket = m_lastUnreliableSequenced[channel];
 				
 				if(id < lastPacket) // TODO: rollover will break this
 					receive = false;
@@ -171,7 +173,7 @@ void NetConnection::Update()
 					m_lastUnreliableSequenced[channel] = id;
 				break;
 			case NetChannel::NET_RELIABLE_SEQUENCED:
-				int lastPacket = m_lastReliableSequenced[channel];
+				lastPacket = m_lastReliableSequenced[channel];
 								
 				if(id < lastPacket) // TODO: rollover will break this
 					receive = false;
@@ -191,6 +193,7 @@ void NetConnection::Update()
 				InternalPlatformQueueSynchronizationLeave(); // release the lock on the queue
 			}
 			break;
+		}
 		default:
 			// wtf?
 			break;
