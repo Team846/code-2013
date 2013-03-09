@@ -156,11 +156,40 @@ void NetConnection::Update()
 
 				break;
 			}
+			
+			bool receive = true;
+			
+			// handle sequencing
+			switch(chann)
+			{
+			case NetChannel::NET_UNRELIABLE_SEQUENCED:
+				int lastPacket = m_lastUnreliableSequenced[channel];
 				
-			// synchronize on the semaphore so that we make sure we're safely accessing the internal message queue
-			InternalPlatformQueueSynchronizationEnter();
-			m_receivedMessages.push(buff);
-			InternalPlatformQueueSynchronizationLeave(); // release the lock on the queue
+				if(id < lastPacket) // TODO: rollover will break this
+					receive = false;
+				else
+					m_lastUnreliableSequenced[channel] = id;
+				break;
+			case NetChannel::NET_RELIABLE_SEQUENCED:
+				int lastPacket = m_lastReliableSequenced[channel];
+								
+				if(id < lastPacket) // TODO: rollover will break this
+					receive = false;
+				else
+					m_lastReliableSequenced[channel] = id;
+				break;
+			case NetChannel::NET_RELIABLE_IN_ORDER:
+				receive = false; // will do this later
+				break;
+			}
+			
+			if(receive)
+			{
+				// synchronize on the semaphore so that we make sure we're safely accessing the internal message queue
+				InternalPlatformQueueSynchronizationEnter();
+				m_receivedMessages.push(buff);
+				InternalPlatformQueueSynchronizationLeave(); // release the lock on the queue
+			}
 			break;
 		default:
 			// wtf?
