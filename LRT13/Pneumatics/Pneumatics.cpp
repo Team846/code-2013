@@ -157,6 +157,8 @@ INT32 Pneumatics::Tick()
 	pulse(&m_climber);
 	pulse(&m_storageExit);
 	pulse(&m_shooterAngler);
+//	AsyncPrinter::Printf("Compressor: %s\n", (m_compressor->Enabled() ? "on" : "off"));
+//	AsyncPrinter::Printf("Pressure switch: %d\n", m_compressor->GetPressureSwitchValue());
 	
 	return 0;
 }

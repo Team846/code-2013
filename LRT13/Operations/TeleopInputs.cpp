@@ -53,7 +53,6 @@ INT32 TeleopInputs::Tick()
 void TeleopInputs::Update()
 {
 	RobotData::RobotState current_state = RobotData::GetCurrentState();
-
 	
 	/************************Drivetrain************************/
 
@@ -84,20 +83,20 @@ void TeleopInputs::Update()
 					RobotConfig::Drive::THROTTLE_EXPONENT);
 			
 			//blending routine
-//			double absForward = fabs(forward); //to ensure correct arc when switching direction
-//
-//			double blend = pow((1 - absForward),
-//					RobotConfig::Drive::BLEND_EXPONENT); //always between 0 and 1, raised to an exponent to adjust transition between in place and arc.
-//
-//			const double turnInPlace = turn; //normal turn
-//			const double constRadiusTurn = turn * absForward; //arc turn
-//
-//			double turnComposite = turnInPlace * (blend) + turnConstantRadius
-//					* (1 - blend); //blended function
+			double absForward = fabs(forward); //to ensure correct arc when switching direction
+
+			double blend = pow((1 - absForward),
+					RobotConfig::Drive::BLEND_EXPONENT); //always between 0 and 1, raised to an exponent to adjust transition between in place and arc.
+
+			const double turnInPlace = turn; //normal turn
+			const double constRadiusTurn = turn * absForward; //arc turn
+
+			double turnComposite = turnInPlace * (blend) + constRadiusTurn
+					* (1 - blend); //blended function
 			
 #ifdef USEOPENLOOP
 			m_componentData->drivetrainData->setOpenLoopOutput(FORWARD, forward);
-			m_componentData->drivetrainData->setOpenLoopOutput(TURN, turn);
+			m_componentData->drivetrainData->setOpenLoopOutput(TURN, turnComposite);
 #else
 			m_componentData->drivetrainData->setVelocitySetpoint(FORWARD,
 					forward);

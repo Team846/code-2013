@@ -70,7 +70,9 @@ void Drivetrain::enabledPeriodic()
 	double fwdOutput = ComputeOutput(data::drivetrain::FORWARD); //positive means forward
 	double turnOutput = ComputeOutput(data::drivetrain::TURN);   //positive means turning counter-clockwise. Matches the way driveencoders work.
 	
-	AsyncPrinter::Printf("fwd: %.2f, turn %.2f\n", fwdOutput, turnOutput);
+	static int e = 0;
+	if(++e % 2 == 0)
+		AsyncPrinter::Printf("fwd: %.2f, turn %.2f, fwd %.2f, turn %.2f\n", fwdOutput, turnOutput, m_driveEncoders->getNormalizedForwardSpeed(), m_driveEncoders->getNormalizedTurningSpeed());
 	
 	double leftOutput = fwdOutput - turnOutput;
 	double rightOutput = fwdOutput + turnOutput;

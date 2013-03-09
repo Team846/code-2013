@@ -19,9 +19,9 @@ const double MAX_VOLTAGE = 13;
 
 namespace Drive
 {
-	const uint32_t THROTTLE_COEFFICIENT = CHANGEME; // TODO: anurag, change this
+	const uint32_t THROTTLE_COEFFICIENT = 1; // TODO: anurag, change this
 	const uint32_t THROTTLE_EXPONENT = 1; // TODO: anurag, change this
-	const uint32_t BLEND_COEFFICIENT = CHANGEME; // TODO: anurag, change this
+	const uint32_t BLEND_COEFFICIENT = 1; // TODO: anurag, change this
 	const uint32_t BLEND_EXPONENT = 3; // TODO: anurag, change this
 }
 

@@ -99,7 +99,7 @@ double DriveEncoders::getNormalizedTurningSpeed()
 
 double DriveEncoders::getRobotDist()
 {
-	return (getWheelDist(LEFT) + getWheelDist(RIGHT)) / 2;
+	return (getWheelDist(LEFT) + getWheelDist(RIGHT)) / 2.0;
 }
 
 int DriveEncoders::getTurnTicks()

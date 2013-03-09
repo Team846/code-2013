@@ -94,6 +94,7 @@ void ESC::SetDutyCycle(float dutyCycle)
 {
 	double speed = m_encoder->GetRate()
 			/ DriveEncoders::GetInstance()->getMaxEncoderRate();
+	
 
 	speed = Util::Clamp<double>(speed, -1, 1);
 	
@@ -161,11 +162,14 @@ void ESC::SetDutyCycle(float dutyCycle)
 #ifdef CURRENT_LIMIT
 	m_jag1->SetDutyCycle(min(command.dutyCycle, dutyCycleLimit));
 	m_jag2->SetDutyCycle(min(command.dutyCycle, dutyCycleLimit));
-#endif
 #else
-	m_jag1->SetDutyCycle(min(origDutyCycle, dutyCycleLimit));
-	m_jag2->SetDutyCycle(min(origDutyCycle, dutyCycleLimit));
+	m_jag1->SetDutyCycle(command.dutyCycle);
+	m_jag2->SetDutyCycle(command.dutyCycle);
 #endif
+#endif
+	static int e = 0;
+	if(++e % 8 == 0)
+		AsyncPrinter::Printf("Speed %.2f out: %.2f, braking %.2f\n", speed, command.dutyCycle, command.braking);
 }
 
 void ESC::Disable()
