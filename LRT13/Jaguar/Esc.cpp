@@ -152,7 +152,7 @@ void ESC::SetDutyCycle(float dutyCycle)
 	//	if ((e++)%21 == 0)
 	//		AsyncPrinter::Printf("In: %.3f out %.3f speed %.3f origspeed %.3f braking %.3f, %.3f max speed\n", origDutyCycle, command.dutyCycle, speed, (m_encoder->GetRate() / DriveEncoders::GetInstance().getMaxEncoderRate()) , command.braking, DriveEncoders::GetInstance().getMaxEncoderRate());
 
-#define CURRENT_LIMIT
+//#define CURRENT_LIMIT
 #ifdef CURRENT_LIMIT
 	// TODO: change delta voltage based on battery
 	float dutyCycleLimit = (m_encoder->GetRate() / DriveEncoders::GetInstance()->getMaxEncoderRate() + m_delta_voltage_limit) / (DriverStation::GetInstance()->GetBatteryVoltage() / RobotConfig::MAX_VOLTAGE);
@@ -167,9 +167,9 @@ void ESC::SetDutyCycle(float dutyCycle)
 	m_jag2->SetDutyCycle(command.dutyCycle);
 #endif
 #endif
-	static int e = 0;
-	if(++e % 8 == 0)
-		AsyncPrinter::Printf("Speed %.2f out: %.2f, braking %.2f\n", speed, command.dutyCycle, command.braking);
+//	static int e = 0;
+//	if(++e % 8 == 0)
+//		AsyncPrinter::Printf("Speed %.2f out: %.2f, braking %.2f\n", speed, command.dutyCycle, command.braking);
 }
 
 void ESC::Disable()

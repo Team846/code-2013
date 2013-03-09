@@ -22,7 +22,7 @@ void LEDUnitTest::Run()
 //		taskDelay(sysClkRateGet() / 100);
 //		m_led->Set(0);
 //		taskDelay(sysClkRateGet() / 100);
-		printf("While loop rate: %.15lf\n", newTime - currentTime);
+//		printf("While loop rate: %.15f\n", newTime - currentTime);//This line kills the robot. Be careful with you matching of types of printf args
 		currentTime = GetTime();
 		newTime = GetTime();
 //		taskDelay(sysClkRateGet());

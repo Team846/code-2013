@@ -56,7 +56,7 @@ void TeleopInputs::Update()
 	
 	/************************Drivetrain************************/
 
-	#define USEOPENLOOP
+//	#define USEOPENLOOP
 	// Use velocity control in teleoperated mode
 #ifdef USEOPENLOOP
 	
@@ -100,7 +100,7 @@ void TeleopInputs::Update()
 #else
 			m_componentData->drivetrainData->setVelocitySetpoint(FORWARD,
 					forward);
-			m_componentData->drivetrainData->setVelocitySetpoint(TURN, turn);
+			m_componentData->drivetrainData->setVelocitySetpoint(TURN, turnComposite);
 #endif
 		}
 	}

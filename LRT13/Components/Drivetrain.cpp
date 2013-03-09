@@ -70,9 +70,9 @@ void Drivetrain::enabledPeriodic()
 	double fwdOutput = ComputeOutput(data::drivetrain::FORWARD); //positive means forward
 	double turnOutput = ComputeOutput(data::drivetrain::TURN);   //positive means turning counter-clockwise. Matches the way driveencoders work.
 	
-	static int e = 0;
-	if(++e % 2 == 0)
-		AsyncPrinter::Printf("fwd: %.2f, turn %.2f, fwd %.2f, turn %.2f\n", fwdOutput, turnOutput, m_driveEncoders->getNormalizedForwardSpeed(), m_driveEncoders->getNormalizedTurningSpeed());
+//	static int e = 0;
+//	if(++e % 2 == 0)
+//		AsyncPrinter::Printf("fwd: %.2f, turn %.2f, fwd %.2f, turn %.2f\n", fwdOutput, turnOutput, m_driveEncoders->getNormalizedForwardSpeed(), m_driveEncoders->getNormalizedTurningSpeed());
 	
 	double leftOutput = fwdOutput - turnOutput;
 	double rightOutput = fwdOutput + turnOutput;
@@ -85,6 +85,8 @@ void Drivetrain::enabledPeriodic()
 //	{
 //		AsyncPrinter::Printf("fwdin: %.4f fwdRead:%.4f turnRead:%.4f\n",fwdOutput , m_driveEncoders->getNormalizedForwardSpeed(), m_driveEncoders->getNormalizedTurningSpeed());
 //	}
+//	AsyncPrinter::Printf("Encoders left: %.3f, %.2f\n", m_driveEncoders->getNormalizedSpeed(drivetrain::LEFT), DriverStation::GetInstance()->GetBatteryVoltage());
+//	AsyncPrinter::Printf("Encoders right: %.3f\n", m_driveEncoders->getNormalizedSpeed(drivetrain::RIGHT));
 	m_escs[LEFT]->SetDutyCycle(leftOutput);
 	m_escs[RIGHT]->SetDutyCycle(rightOutput);
 	
@@ -125,7 +127,7 @@ void Drivetrain::Log()
 
 void Drivetrain::ConfigurePIDObject(PID *pid, std::string objName, bool feedForward)
 {
-	double p = m_config->Get<double>(Component::GetName(), objName + "_P", 1.0);
+	double p = m_config->Get<double>(Component::GetName(), objName + "_P", 4.0);
 	double i = m_config->Get<double>(Component::GetName(), objName + "_I", 0.0);
 	double d = m_config->Get<double>(Component::GetName(), objName + "_D", 0.0);
 	

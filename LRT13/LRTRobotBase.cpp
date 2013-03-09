@@ -1,4 +1,5 @@
 #include "LRTRobotBase.h"
+#include <sysLib.h>
 
 LRTRobotBase::LRTRobotBase()
 : m_loopSynchronizer((TimerEventHandler) LRTRobotBase::ReleaseLoop, this)
@@ -15,7 +16,8 @@ LRTRobotBase::~LRTRobotBase()
 void LRTRobotBase::StartCompetition()
 {
 	//Diagnostic: Print the task name.
-	printf("vxWorks task: %s\n", m_task->GetName());
+	taskDelay(sysClkRateGet());//wait 1 sec, see if this fixes the issue
+	printf("vxWorks task: %s\n", m_task->GetName()); //Maybe this line was crashing it...
 
 	GetWatchdog().SetEnabled(false);
 	m_loopSynchronizer.StartPeriodic(1.0/50.0);
