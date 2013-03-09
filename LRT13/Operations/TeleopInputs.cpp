@@ -76,8 +76,8 @@ void TeleopInputs::Update()
 		else
 		{
 			double turn = 0.0;
-			//			turn = -m_driver_wheel->GetAxis(Joystick::kXAxis);
-			turn = -m_driver_stick->GetAxis(Joystick::kZAxis);
+						turn = -m_driver_wheel->GetAxis(Joystick::kXAxis);
+			//turn = -m_driver_stick->GetAxis(Joystick::kZAxis);
 
 			double forward = pow(-m_driver_stick->GetAxis(Joystick::kYAxis),
 					RobotConfig::Drive::THROTTLE_EXPONENT);
@@ -100,8 +100,8 @@ void TeleopInputs::Update()
 #else
 			m_componentData->drivetrainData->setVelocitySetpoint(FORWARD,
 					forward);
-//			m_componentData->drivetrainData->setVelocitySetpoint(TURN, turnComposite);
-			m_componentData->drivetrainData->setVelocitySetpoint(TURN, turn);
+		m_componentData->drivetrainData->setVelocitySetpoint(TURN, turnComposite);
+			//m_componentData->drivetrainData->setVelocitySetpoint(TURN, turn);
 #endif
 		}
 	}

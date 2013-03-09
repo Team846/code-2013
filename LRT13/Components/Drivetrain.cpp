@@ -127,7 +127,7 @@ void Drivetrain::Log()
 
 void Drivetrain::ConfigurePIDObject(PID *pid, std::string objName, bool feedForward)
 {
-	double p = m_config->Get<double>(Component::GetName(), objName + "_P", 4.0);
+	double p = m_config->Get<double>(Component::GetName(), objName + "_P", 2.0);
 	double i = m_config->Get<double>(Component::GetName(), objName + "_I", 0.0);
 	double d = m_config->Get<double>(Component::GetName(), objName + "_D", 0.0);
 	
