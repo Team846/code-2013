@@ -70,34 +70,19 @@ void Shooter::enabledPeriodic()
 	double frisbee_detected = 1;//m_proximity->Get() == 0;
 	if(atSpeed[OUTER] && atSpeed[INNER])
 	{
-		if (m_componentData->shooterData->GetShooterSetting() == AUTO)
+		if (m_componentData->shooterData->GetShooterSetting() == CONTINOUS)
 		{
-			if(m_componentData->shooterData->GetNumFrisbeesInStorage() > 0)
+			bool isExtended = m_pneumatics->GetStorageExitState();
+			if (isExtended)
 			{
-				bool m_isExtended = m_pneumatics->GetStorageExitState();
-				if (m_isExtended)
-				{
-					//if the speed of the first shooter wheel drops a ton. (Defined by a threshold read fromconfig)
-					if(m_speeds[OUTER] < (lastSpeed - frisbeeDetectionThreshold))
-					{	
-						m_pneumatics->setStorageExit(RETRACTED);
-
-					}
-					m_isExtended = false;
-				}
-				else
-				{
-					if (frisbee_detected)
-					{
-						//extend
-						m_pneumatics->setStorageExit(EXTENDED);
-						m_isExtended = true;
-					}
-				}
+				//if the speed of the first shooter wheel drops a ton. (Defined by a threshold read fromconfig)
+				if(m_speeds[INNER] < (lastSpeed - frisbeeDetectionThreshold))
+					m_pneumatics->setStorageExit(RETRACTED);
 			}
 			else
 			{
-				m_componentData->shooterData->SetShooterSetting(OFF);
+				if (frisbee_detected)
+					m_pneumatics->setStorageExit(EXTENDED); //extend
 			}
 		} else if(m_componentData->shooterData->GetShooterSetting() == ONCE)
 		{
@@ -123,7 +108,7 @@ void Shooter::enabledPeriodic()
 			m_pneumatics->setStorageExit(RETRACTED);
 		}
 	}
-	lastSpeed = m_speeds[OUTER];
+	lastSpeed = m_speeds[INNER];
 	
 	//m_speed_back = Util::Clamp<double>(m_speed_back, 0, m_max_speed * 1.3);
 
@@ -133,12 +118,12 @@ void Shooter::enabledPeriodic()
 void Shooter::ManageShooterWheel(int roller)
 {
 	m_speeds[roller] = (double) (m_encs[roller]->GetStopped()) ? 0.0 : (60.0 / m_encs[roller]->GetPeriod());
-	static int last = m_encs[roller]->Get();
+//	static int last = m_encs[roller]->Get();
 //	if (m_encs[roller]->Get() == last)
 //		AsyncPrinter::Printf("Old Shooter wheel data D:\n");
 	
 	m_PIDs[roller].setInput(m_speeds[roller]);
-	//TODO fixme
+	//TODO fixme, add a switch
 	//	m_PIDs[roller].setSetpoint(m_componentData->shooterData->GetDesiredSpeed((Roller)roller));
 //	m_PIDs[roller].setSetpoint(100000);
 	
@@ -160,7 +145,7 @@ void Shooter::ManageShooterWheel(int roller)
 	m_jaguars[roller]->SetDutyCycle(out);
 	m_jaguars[roller]->SetVoltageRampRate(0.0);
 	
-	if(m_PIDs[roller].getError() < acceptableSpeedError[roller])
+	if(fabs(m_PIDs[roller].getError()) < acceptableSpeedError[roller])
 	{
 		atSpeedCounter[roller]++;
 		atSpeed[roller] = atSpeedCounter[roller] > requiredCyclesAtSpeed;
@@ -192,11 +177,11 @@ void Shooter::Configure()
 	m_target_speed[INNER] = c->Get<double> (m_configSection, "inner_speedSetpoint", 4400);
 
 	//TODO: Change default values.
-	requiredCyclesAtSpeed = c->Get<int> (m_configSection, "requiredCycles", 9);
+	requiredCyclesAtSpeed = c->Get<int> (m_configSection, "requiredCycles", 2);
 	acceptableSpeedError[OUTER] = c->Get<double> (m_configSection,
-			"front_acceptableSpeedError", 0);
+			"front_acceptableSpeedError", 100);
 	acceptableSpeedError[INNER] = c->Get<double> (m_configSection,
-			"back_acceptableSpeedError", 0);
+			"back_acceptableSpeedError", 100);
 	
 	frisbeeDetectionThreshold = c->Get<double> (m_configSection, "shooterSpeedDrop", 0);
 	
@@ -213,7 +198,7 @@ void Shooter::Log()
 
 void Shooter::ConfigurePIDObject(PID *pid, std::string objName, bool feedForward)
 {
-	double p = m_config->Get<double>(Component::GetName(), objName + "_P", 1.0);
+	double p = m_config->Get<double>(Component::GetName(), objName + "_P", 0.002);
 	double i = m_config->Get<double>(Component::GetName(), objName + "_I", 0.0);
 	double d = m_config->Get<double>(Component::GetName(), objName + "_D", 0.0);
 	
