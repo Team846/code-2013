@@ -24,12 +24,13 @@ Pneumatics::Pneumatics() :
 					RobotConfig::Solenoid::HOOKS_B));
 
 	INIT_PULSED_SOLENOID(m_storageExit, new DoubleSolenoid(
+					2,
 					RobotConfig::Solenoid::STORAGE_EXIT_A,
 					RobotConfig::Solenoid::STORAGE_EXIT_B));
 	
 	INIT_PULSED_SOLENOID(m_shooterAngler, new DoubleSolenoid(
-					RobotConfig::Solenoid::STORAGE_EXIT_A,
-					RobotConfig::Solenoid::STORAGE_EXIT_B));
+					RobotConfig::Solenoid::SHOOTER_ANGLER_A,
+					RobotConfig::Solenoid::SHOOTER_ANGLER_B));
 
 	m_compressor = new Compressor(
 			RobotConfig::Digital::COMPRESSOR_PRESSURE_SENSOR_PIN,

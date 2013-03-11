@@ -42,7 +42,7 @@ double Drivetrain::ComputeOutput(data::drivetrain::ForwardOrTurn axis)
 	case data::drivetrain::VELOCITY_CONTROL:
 		static int e = 0; 
 		if (++e % 100 == 0)
-			AsyncPrinter::Printf("p: %.2f\n", m_PIDs[VELOCITY][FORWARD].getProportionalGain());
+//			AsyncPrinter::Printf("p: %.2f\n", m_PIDs[VELOCITY][FORWARD].getProportionalGain());
 		//1.0e-2
 		if (fabs(velocitySetpoint) < 1.0E-2)
 			m_PIDs[VELOCITY][axis].setIIREnabled(true);

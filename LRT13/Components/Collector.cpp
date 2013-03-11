@@ -115,7 +115,7 @@ void Collector::disabledPeriodic()
 
 void Collector::Configure()
 {
-	m_dutyCycle = ConfigManager::Instance()->Get<float> (m_configSection, "speed", 0.5F);
+	m_dutyCycle = ConfigManager::Instance()->Get<float> (m_configSection, "speed", 1.0F);
 	m_samplesThreshold = ConfigManager::Instance()->Get<int> (m_configSection, "samplesThreshold", 4);
 	m_overflowWaitThreshold = ConfigManager::Instance()->Get<int> (m_configSection, "overflowWaitCycles", 50);
 }

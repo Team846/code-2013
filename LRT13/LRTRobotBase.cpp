@@ -16,7 +16,6 @@ LRTRobotBase::~LRTRobotBase()
 void LRTRobotBase::StartCompetition()
 {
 	//Diagnostic: Print the task name.
-	taskDelay(sysClkRateGet());//wait 1 sec, see if this fixes the issue
 	printf("vxWorks task: %s\n", m_task->GetName()); //Maybe this line was crashing it...
 
 	GetWatchdog().SetEnabled(false);
