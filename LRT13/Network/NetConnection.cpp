@@ -249,12 +249,12 @@ void NetConnection::CheckMessages()
 			InternalPlatformReliableInOrderQueueSynchronizationEnter();
 			
 			// check reliable in order
-			maack = m_reliableSequenced[channel][i];
+			maack = m_reliableOrdered[channel][i];
 						
 			if(!maack.acknowledged && now - maack.sentTime > kResendPacketTime)
 			{
 				// mark this one as received so we don't send duplicates
-				m_reliableUnordered[channel][i].acknowledged = true;
+				m_reliableOrdered[channel][i].acknowledged = true;
 				
 				// resend
 				Send(*maack.buff, NetChannel::NET_RELIABLE_IN_ORDER, channel);
