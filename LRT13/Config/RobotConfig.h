@@ -82,7 +82,7 @@ namespace CAN // Ports 1-16 (2CAN limitation)
 	const uint32_t WINCH_WORM = CHANGEME;
 }
 
-namespace PWM
+namespace Servo
 {
 	const uint32_t LEFT_PTO_SERVO = 1;
 	const uint32_t RIGHT_PTO_SERVO = 2;

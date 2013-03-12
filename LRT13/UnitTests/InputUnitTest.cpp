@@ -31,7 +31,7 @@ void InputUnitTest::Run()
 		{
 			m_stick->Update();
 
-			Pneumatics::Instance()->setCompressor(false);
+			Pneumatics::Instance()->setCompressor(true);
 			if(m_stick->IsButtonDown(DriverStationConfig::JoystickButtons::APPLY_CONFIG))
 			{
 				printf("apply config is down.\n");
@@ -50,16 +50,6 @@ void InputUnitTest::Run()
 			else
 			{
 				Pneumatics::Instance()->setCollector(false);
-			}
-			
-			if(m_stick->IsButtonDown(DriverStationConfig::JoystickButtons::CONTINUE_CLIMB))
-			{
-				printf("continue climb is down.\n");
-				Pneumatics::Instance()->setHookPosition(true);
-			}
-			else
-			{
-				Pneumatics::Instance()->setCompressor(false);
 			}
 			
 			if(m_stick->IsButtonDown(DriverStationConfig::JoystickButtons::FEEDER_STATION_APPROACH))
@@ -111,6 +101,6 @@ void InputUnitTest::Run()
 		{
 			Pneumatics::Instance()->setCompressor(false);
 		}
-		taskDelay(sysClkRateGet() / 4);
+		taskDelay(sysClkRateGet() / 10);
 	}
 }

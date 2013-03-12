@@ -4,6 +4,7 @@
 #include "UnitTests/EncodersUnitTest.h"
 #include "UnitTests/GearToothTest.h"
 #include "UnitTests/InputUnitTest.h"
+#include "UnitTests/ServoTest.h"
 #include "UnitTests/NetUnitTest.h"
 #include "UnitTests/NetServerUnitTest.h"
 
@@ -22,7 +23,7 @@
  */
 RobotBase* FRC_userClassFactory()
 {
-//	return new NetServerUnitTest();
+//	return new InputUnitTest();
 	return new LRTRobot13();
 }
 

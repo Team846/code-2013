@@ -7,6 +7,7 @@
 #include "AutoActions.h"
 #include "../ComponentData/ClimberData.h"
 #include "../ComponentData/ShooterData.h"
+#include "../ComponentData/CollectorData.h"
 #include <cmath>
 
 using namespace data;
@@ -162,7 +163,21 @@ void TeleopInputs::Update()
 	{
 		m_autoActions->Reset();
 	}
-
+	
+	/************************Collector************************/
+	if (m_driver_stick->IsButtonJustPressed(
+				DriverStationConfig::JoystickButtons::COLLECTOR_SLIDE))
+	{
+		if(m_componentData->collectorData->IsDown())
+		{
+			m_componentData->collectorData->SlideUp();
+		}
+		else if(m_componentData->collectorData->IsUp())
+		{
+			m_componentData->collectorData->SlideDown();
+		}
+	}
+		
 	/************************Config************************/
 
 	if (m_driver_stick->IsButtonJustPressed(

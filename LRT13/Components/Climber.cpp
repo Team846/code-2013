@@ -9,12 +9,12 @@ using namespace data;
 using namespace drivetrain;
 
 Climber::Climber() :
-	Component("Climber", DriverStationConfig::DigitalIns::CLIMBER, true), m_configSection("climber"),
+	Component("Climber", DriverStationConfig::DigitalIns::CLIMBER, true), m_configSection("Climber"),
 			m_winch_worm(RobotConfig::CAN::WINCH_WORM, "WinchWorm"),
 			m_digital_input_left(RobotConfig::Digital::PTO_SWITCH_LEFT),
 			m_digital_input_right(RobotConfig::Digital::PTO_SWITCH_RIGHT),
-			m_servo_left(RobotConfig::PWM::LEFT_PTO_SERVO, "leftServo"),
-			m_servo_right(RobotConfig::PWM::RIGHT_PTO_SERVO, "rightServo"),
+			m_servo_left(RobotConfig::Servo::LEFT_PTO_SERVO, "leftServo"),
+			m_servo_right(RobotConfig::Servo::RIGHT_PTO_SERVO, "rightServo"),
 			m_winch_gear_tooth((UINT32) RobotConfig::Digital::WINCH_GEAR_TOOTH)
 {
 	m_pneumatics = Pneumatics::Instance();
@@ -38,6 +38,10 @@ void Climber::onEnable()
 
 void Climber::onDisable()
 {
+	m_servo_left.SetEnabled(true);
+	m_servo_right.SetEnabled(true);
+	m_servo_left.SetMicroseconds(m_servo_left_disengaged_position);
+	m_servo_right.SetMicroseconds(m_servo_right_disengaged_position);
 }
 
 void Climber::enabledPeriodic()

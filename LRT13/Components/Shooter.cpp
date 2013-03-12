@@ -73,6 +73,7 @@ void Shooter::enabledPeriodic()
 	ManageShooterWheel(INNER);
 	
 	static int e = 0;
+	e++;
 //	AsyncPrinter::Printf("%d: inner Speed %.2f, inner error %.2f, inner out %.2f\n", ++e, m_PIDs[INNER].getInput(), m_PIDs[INNER].getError(), m_PIDs[INNER].getOutput()/ m_max_speed[INNER] );
 //	AsyncPrinter::Printf("%d: inner Speed %.2f, inner error %.2f, inner out %.2f\n", ++e, m_PIDs[OUTER].getInput(), m_PIDs[OUTER].getError(), m_PIDs[OUTER].getOutput()/ m_max_speed[OUTER] );
 	
@@ -88,7 +89,10 @@ void Shooter::enabledPeriodic()
 					m_fireState = RETRACT_LOADER;
 					m_cyclesToContinueRetracting = requiredCyclesDown ;
 					m_pneumatics->setStorageExit(RETRACTED);
+					startShotTime = e;
 				}
+				else if (e % 20 == 0)
+					AsyncPrinter::Printf("Not at speed %.0f, %.0f\n", m_speedsRPM[INNER], m_speedsRPM[OUTER]);
 				break;
 			case RETRACT_LOADER:
 				if (m_cyclesToContinueRetracting > 0)
@@ -106,10 +110,11 @@ void Shooter::enabledPeriodic()
 					m_pneumatics->setStorageExit(EXTENDED);
 					if (m_PIDs[INNER].getError() > frisbeeDetectionThreshold)
 					{
-						AsyncPrinter::Printf("Fired with newSpeed = %.0f, lastSpeed = %.0f\n", m_speedsRPM[INNER], lastSpeed);
+						AsyncPrinter::Printf("Fired with newSpeed = %.0f, lastSpeed = %.0f taking %d cycles\n", m_speedsRPM[INNER], lastSpeed, e - startShotTime);
 						m_fireState = RETRACT_LOADER;
 						m_cyclesToContinueRetracting = requiredCyclesDown ;
 						m_pneumatics->setStorageExit(RETRACTED);
+						startShotTime = e;
 					}
 //					else
 //						AsyncPrinter::Printf("Speed drop %.3f\n", lastSpeed - m_speeds[INNER]);

@@ -69,6 +69,7 @@ private:
 	double acceptableSpeedError[2], m_speedsRPM[2];
 	double m_maxNormalizedCurrent;
 	double frisbeeDetectionThreshold, lastSpeed;
+	int startShotTime;
 	
 	int m_cyclesToContinueRetracting;
 };
