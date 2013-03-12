@@ -124,6 +124,8 @@ void NetConnection::Update()
 					m_reliableSequenced[channel][id].acknowledged = true;
 					break;
 				}
+				
+				printf("Received message ack on channel %d with send method %d.\n", channel, chann);
 				break;
 			}
 			break;
@@ -362,7 +364,7 @@ void NetConnection::InternalPlatformCreateUpdateTasks()
 	
 #ifdef __VXWORKS__
 	// vxworks specific code
-	m_internalUpdateTask = new Task(s.str().c_str(), (FUNCPTR)InternalPlatformMessageVerificationTaskWrapper);
+	m_internalMessageVerificationTask = new Task(s.str().c_str(), (FUNCPTR)InternalPlatformMessageVerificationTaskWrapper);
 #endif
 }
 
@@ -441,7 +443,7 @@ int NetConnection::Open(int options, ...)
 	
 	InternalPlatformCreateUpdateTasks();
 	InternalPlatformRunUpdateTasks();
-	
+
 	return 0;
 }
 

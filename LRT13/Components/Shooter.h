@@ -35,6 +35,13 @@ public:
 	virtual void Configure();
 	virtual void Log();
 	
+	enum continuousFireState
+	{
+		FIRING_OFF = 0,
+		RETRACT_LOADER = 1,
+		EXTEND_LOADER = 2
+	};
+	
 private:
 	
 	void ManageShooterWheel(int roller);
@@ -46,6 +53,7 @@ private:
 
 	Pneumatics* m_pneumatics;
 	DigitalInput* m_proximity;
+	continuousFireState m_fireState;
 	
 	PID m_PIDs[2];
 	
@@ -57,9 +65,12 @@ private:
 	bool atSpeed[2]; 
 	
 	int requiredCyclesAtSpeed;
-	double acceptableSpeedError[2], m_speeds[2];
+	int requiredCyclesDown;
+	double acceptableSpeedError[2], m_speedsRPM[2];
 	double m_maxNormalizedCurrent;
 	double frisbeeDetectionThreshold, lastSpeed;
+	
+	int m_cyclesToContinueRetracting;
 };
 
 #endif

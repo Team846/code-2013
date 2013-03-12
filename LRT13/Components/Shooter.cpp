@@ -34,10 +34,13 @@ Shooter::Shooter() :
 	acceptableSpeedError[OUTER] = 0;
 	acceptableSpeedError[INNER] = 0;
 	lastSpeed = 0;
-	m_speeds[OUTER] = 0;
-	m_speeds[INNER] = 0;
+	m_speedsRPM[OUTER] = 0;
+	m_speedsRPM[INNER] = 0;
 	
 	m_maxNormalizedCurrent = 0.0;
+	
+	m_fireState = FIRING_OFF;
+	m_cyclesToContinueRetracting = 0;
 	
 	Configure();
 
@@ -60,69 +63,140 @@ void Shooter::onDisable()
 	m_jaguars[INNER]->SetDutyCycle(0.0F);
 }
 
+//inner_speedSetpoint=4400
+//outer_speedSetpoint=6040
+
 void Shooter::enabledPeriodic()
 {	
+//	AsyncPrinter::Printf("Period %.5f\n", m_encs[INNER]->GetPeriod());
 	ManageShooterWheel(OUTER);
 	ManageShooterWheel(INNER);
 	
-//	AsyncPrinter::Printf("outer %.2f, inner %.2f\n", m_PIDs[OUTER].getInput(), m_PIDs[INNER].getInput());
+	static int e = 0;
+//	AsyncPrinter::Printf("%d: inner Speed %.2f, inner error %.2f, inner out %.2f\n", ++e, m_PIDs[INNER].getInput(), m_PIDs[INNER].getError(), m_PIDs[INNER].getOutput()/ m_max_speed[INNER] );
+//	AsyncPrinter::Printf("%d: inner Speed %.2f, inner error %.2f, inner out %.2f\n", ++e, m_PIDs[OUTER].getInput(), m_PIDs[OUTER].getError(), m_PIDs[OUTER].getOutput()/ m_max_speed[OUTER] );
 	
-	double frisbee_detected = 1;//m_proximity->Get() == 0;
-	if(atSpeed[OUTER] && atSpeed[INNER])
+	switch (m_componentData->shooterData->GetShooterSetting())
 	{
-		if (m_componentData->shooterData->GetShooterSetting() == CONTINOUS)
-		{
-			bool isExtended = m_pneumatics->GetStorageExitState();
-			if (isExtended)
+	case CONTINOUS:
+			m_pneumatics->setStorageExit(EXTENDED);
+			switch(m_fireState)
 			{
-				//if the speed of the first shooter wheel drops a ton. (Defined by a threshold read fromconfig)
-				if(m_speeds[INNER] < (lastSpeed - frisbeeDetectionThreshold))
+			case FIRING_OFF:
+				if (atSpeed[OUTER] && atSpeed[INNER])
+				{
+					m_fireState = RETRACT_LOADER;
+					m_cyclesToContinueRetracting = requiredCyclesDown ;
 					m_pneumatics->setStorageExit(RETRACTED);
-			}
-			else
-			{
-				if (frisbee_detected)
-					m_pneumatics->setStorageExit(EXTENDED); //extend
-			}
-		} else if(m_componentData->shooterData->GetShooterSetting() == ONCE)
-		{
-			m_pneumatics->setStorageExit(RETRACTED);
-			bool m_isExtended = false;
-
-			if(!m_isExtended)
-			{
-				if(frisbee_detected)
+				}
+				break;
+			case RETRACT_LOADER:
+				if (m_cyclesToContinueRetracting > 0)
+				{
+					m_pneumatics->setStorageExit(RETRACTED);
+					m_cyclesToContinueRetracting--;
+				}
+				else
 				{
 					m_pneumatics->setStorageExit(EXTENDED);
-					m_isExtended = true;
+					m_fireState = EXTEND_LOADER;
 				}
-			} 
-			else
-			{
-				m_pneumatics->setStorageExit(RETRACTED);
-				m_componentData->shooterData->SetShooterSetting(OFF);
+				break;
+			case EXTEND_LOADER:
+					m_pneumatics->setStorageExit(EXTENDED);
+					if (m_PIDs[INNER].getError() > frisbeeDetectionThreshold)
+					{
+						AsyncPrinter::Printf("Fired with newSpeed = %.0f, lastSpeed = %.0f\n", m_speedsRPM[INNER], lastSpeed);
+						m_fireState = RETRACT_LOADER;
+						m_cyclesToContinueRetracting = requiredCyclesDown ;
+						m_pneumatics->setStorageExit(RETRACTED);
+					}
+//					else
+//						AsyncPrinter::Printf("Speed drop %.3f\n", lastSpeed - m_speeds[INNER]);
+				break;
 			}
-		} 
-		else
-		{
-			m_pneumatics->setStorageExit(RETRACTED);
-		}
+//			AsyncPrinter::Printf("Out\n");
+		break;
+	case ONCE:
+		break;
+	case OFF:
+//			AsyncPrinter::Printf("IN\n");
+			m_pneumatics->setStorageExit(EXTENDED);
+			m_fireState = FIRING_OFF;
+		break;
 	}
-	lastSpeed = m_speeds[INNER];
+	lastSpeed = m_speedsRPM[INNER];
+//	AsyncPrinter::Printf("Speed %.3f\n", m_speeds[INNER]);
+	
+//	double frisbee_detected = 1;//m_proximity->Get() == 0;
+//	if(atSpeed[OUTER] && atSpeed[INNER])
+//	{
+//		if (m_componentData->shooterData->GetShooterSetting() == CONTINOUS)
+//		{
+//			bool isExtended = m_pneumatics->GetStorageExitState();
+//			if (isExtended)
+//			{
+//				//if the speed of the first shooter wheel drops a ton. (Defined by a threshold read fromconfig)
+//				if(m_speeds[INNER] < (lastSpeed - frisbeeDetectionThreshold))
+//					m_pneumatics->setStorageExit(RETRACTED);
+//			}
+//			else
+//			{
+//				if (frisbee_detected)
+//					m_pneumatics->setStorageExit(EXTENDED); //extend
+//			}
+//		} else if(m_componentData->shooterData->GetShooterSetting() == ONCE)
+//		{
+//			m_pneumatics->setStorageExit(RETRACTED);
+//			bool m_isExtended = false;
+//
+//			if(!m_isExtended)
+//			{
+//				if(frisbee_detected)
+//				{
+//					m_pneumatics->setStorageExit(EXTENDED);
+//					m_isExtended = true;
+//				}
+//			} 
+//			else
+//			{
+//				m_pneumatics->setStorageExit(RETRACTED);
+//				m_componentData->shooterData->SetShooterSetting(OFF);
+//			}
+//		} 
+//		else
+//		{
+//			m_pneumatics->setStorageExit(RETRACTED);
+//		}
+//	}
+//	else
+//	{
+//		AsyncPrinter::Printf("Not at speed\n");
+//		m_pneumatics->setStorageExit(RETRACTED);
+//	}
 	
 	//m_speed_back = Util::Clamp<double>(m_speed_back, 0, m_max_speed * 1.3);
 
 	// TODO: change shooter speed based on orientation
 }
+#define PATCH_BAD_SPEED_DATA
 
 void Shooter::ManageShooterWheel(int roller)
 {
-	m_speeds[roller] = (double) (m_encs[roller]->GetStopped()) ? 0.0 : (60.0 / m_encs[roller]->GetPeriod());
+	//TODO assert to avoid out of bounds 
+	double tempSpeedRPM = (double) (m_encs[roller]->GetStopped()) ? 0.0 : (60.0 / m_encs[roller]->GetPeriod());
+
+#ifdef PATCH_BAD_SPEED_DATA
+	if (tempSpeedRPM > m_max_speed[roller])
+		tempSpeedRPM = m_speedsRPM[roller];
+#endif
+	
+	m_speedsRPM[roller] = tempSpeedRPM;
 //	static int last = m_encs[roller]->Get();
 //	if (m_encs[roller]->Get() == last)
 //		AsyncPrinter::Printf("Old Shooter wheel data D:\n");
 	
-	m_PIDs[roller].setInput(m_speeds[roller]);
+	m_PIDs[roller].setInput(m_speedsRPM[roller]);
 	//TODO fixme, add a switch
 	//	m_PIDs[roller].setSetpoint(m_componentData->shooterData->GetDesiredSpeed((Roller)roller));
 //	m_PIDs[roller].setSetpoint(100000);
@@ -131,7 +205,7 @@ void Shooter::ManageShooterWheel(int roller)
 	
 	double out = m_PIDs[roller].update(1.0 / RobotConfig::LOOP_RATE) / m_max_speed[roller] ; //out is a normalized voltage
 	
-	double maxOut = m_speeds[roller] + m_maxNormalizedCurrent;
+	double maxOut = m_speedsRPM[roller] + m_maxNormalizedCurrent;
 	
 	//now lets limit the current
 	out = Util::Min<double>(out, maxOut);
@@ -183,9 +257,12 @@ void Shooter::Configure()
 	acceptableSpeedError[INNER] = c->Get<double> (m_configSection,
 			"back_acceptableSpeedError", 100);
 	
-	frisbeeDetectionThreshold = c->Get<double> (m_configSection, "shooterSpeedDrop", 0);
+	frisbeeDetectionThreshold = c->Get<double> (m_configSection, "shooterSpeedDrop", 100);
 	
 	m_maxNormalizedCurrent = c->Get<double>(m_configSection, "normalizedCurrentThreshold", 1.0);
+	
+	
+	requiredCyclesDown = c->Get<double>(m_configSection, "cyclesToRetractLoader", 50);
 	
 	ConfigurePIDObject(&m_PIDs[INNER], "InnerWheelPID", 1.0);
 	ConfigurePIDObject(&m_PIDs[OUTER], "OuterWheelPID", 1.0);

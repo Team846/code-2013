@@ -6,9 +6,11 @@
 #include "../Utils/AsyncPrinter.h"
 #include "AutoActions.h"
 #include "../ComponentData/ClimberData.h"
+#include "../ComponentData/ShooterData.h"
 #include <cmath>
 
 using namespace data;
+using namespace shooter;
 using namespace climber;
 
 TeleopInputs::TeleopInputs(char * taskName, INT32 priority) :
@@ -126,6 +128,18 @@ void TeleopInputs::Update()
 	}
 	m_componentData->climberData->setShouldContinueClimbing(
 			m_driver_stick->IsButtonJustPressed(DriverStationConfig::JoystickButtons::CONTINUE_CLIMB));
+
+	/************************Shooter Functions************************/
+	if (m_driver_stick->IsButtonDown(DriverStationConfig::JoystickButtons::FIRE))
+	{
+//		AsyncPrinter::Printf("firing\n");
+		m_componentData->shooterData->SetShooterSetting(CONTINOUS);
+	}
+	else
+	{
+//		AsyncPrinter::Printf("Not firing\n");
+		m_componentData->shooterData->SetShooterSetting(OFF);
+	}
 
 	/************************Automatic Functions************************/
 

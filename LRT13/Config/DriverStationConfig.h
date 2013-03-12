@@ -23,8 +23,9 @@ const uint32_t DRIVER_WHEEL_PORT = 3;
 }
 namespace JoystickButtons
 {
-const uint32_t AUTO_AIM_BACKBOARD = 1;
-const uint32_t AUTO_AIM_PYRAMID = 2;
+const uint32_t FIRE = 1;
+const uint32_t AUTO_AIM_BACKBOARD = 9;
+const uint32_t AUTO_AIM_PYRAMID = 8;
 const uint32_t FEEDER_STATION_APPROACH = 3;
 const uint32_t CONTINUE_CLIMB = 4;
 const uint32_t APPLY_CONFIG = 5;
