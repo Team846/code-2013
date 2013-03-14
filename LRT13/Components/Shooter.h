@@ -38,8 +38,9 @@ public:
 	enum continuousFireState
 	{
 		FIRING_OFF = 0,
-		RETRACT_LOADER = 1,
-		EXTEND_LOADER = 2
+		RETRACT_LOADER_WAIT_FOR_LIFT = 1,
+		RETRACT_LOADER_WAIT_FOR_FALL = 2,
+		EXTEND_LOADER = 3
 	};
 	
 private:

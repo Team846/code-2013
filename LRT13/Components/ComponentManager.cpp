@@ -26,6 +26,7 @@ void ComponentManager::CreateComponents()
 {
 	AddComponent(new Drivetrain());
 	AddComponent(new Shooter());
+	AddComponent(new Collector());
 	AddComponent(new ConfigLoader());
 }
 

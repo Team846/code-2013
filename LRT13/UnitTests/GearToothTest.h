@@ -2,7 +2,7 @@
 #define GEAR_TOOTH_TEST_H_
 
 #include "../UnitTests/UnitTest.h"
-#include "Counter.h"
+#include "GearTooth.h"
 #include "../Config/RobotConfig.h"
 
 class GearToothTest : public UnitTest
@@ -11,7 +11,7 @@ public:
 	GearToothTest();
 	void Run();
 private:
-	Counter* gearTooth;
+	GearTooth* gearTooth;
 };
 
 #endif

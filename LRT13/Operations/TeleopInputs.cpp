@@ -97,6 +97,8 @@ void TeleopInputs::Update()
 			double turnComposite = turnInPlace * (blend) + constRadiusTurn
 					* (1 - blend); //blended function
 			
+//			AsyncPrinter::Printf("turnComposite: %lf forward: %lf\n", turnComposite, forward);
+			
 #ifdef USEOPENLOOP
 			m_componentData->drivetrainData->setOpenLoopOutput(FORWARD, forward);
 			m_componentData->drivetrainData->setOpenLoopOutput(TURN, turnComposite);
@@ -141,6 +143,14 @@ void TeleopInputs::Update()
 //		AsyncPrinter::Printf("Not firing\n");
 		m_componentData->shooterData->SetShooterSetting(OFF);
 	}
+	
+	if (m_driver_stick->IsButtonJustPressed(DriverStationConfig::JoystickButtons::CHANGE_ANGLE))
+	{
+		if (m_componentData->shooterData->ShouldLauncherBeHigh())
+			m_componentData->shooterData->SetLauncherAngleLow();
+		else
+			m_componentData->shooterData->SetLauncherAngleHigh();
+	}
 
 	/************************Automatic Functions************************/
 
@@ -165,17 +175,16 @@ void TeleopInputs::Update()
 	}
 	
 	/************************Collector************************/
-	if (m_driver_stick->IsButtonJustPressed(
+	if (m_driver_stick->IsButtonDown(
 				DriverStationConfig::JoystickButtons::COLLECTOR_SLIDE))
 	{
-		if(m_componentData->collectorData->IsDown())
-		{
-			m_componentData->collectorData->SlideUp();
-		}
-		else if(m_componentData->collectorData->IsUp())
-		{
-			m_componentData->collectorData->SlideDown();
-		}
+		m_componentData->collectorData->SlideDown();
+		m_componentData->collectorData->RunRollers();
+	}
+	else
+	{
+		m_componentData->collectorData->SlideUp();
+		m_componentData->collectorData->StopRollers();
 	}
 		
 	/************************Config************************/

@@ -8,6 +8,8 @@
 using namespace data;
 using namespace data::shooter;
 
+//Front of the pyramid is 3400, 4040
+
 Shooter::Shooter() :
 	Component("Shooter", DriverStationConfig::DigitalIns::SHOOTER, true),
 			m_configSection("Shooter")
@@ -28,7 +30,7 @@ Shooter::Shooter() :
 	atSpeed[OUTER] = false;
 	atSpeed[INNER] = false;
  
-	//m_proximity = new DigitalInput(RobotConfig::Digital::PROXIMITY_B);
+	m_proximity = new DigitalInput(RobotConfig::Digital::PROXIMITY_SHOOTER );
 
 	requiredCyclesAtSpeed = 0;
 	acceptableSpeedError[OUTER] = 0;
@@ -68,6 +70,12 @@ void Shooter::onDisable()
 
 void Shooter::enabledPeriodic()
 {	
+	if (m_componentData->shooterData->ShouldLauncherBeHigh())
+		m_pneumatics->setShooterAngler(EXTENDED);
+	else
+		m_pneumatics->setShooterAngler(RETRACTED);
+		
+	
 //	AsyncPrinter::Printf("Period %.5f\n", m_encs[INNER]->GetPeriod());
 	ManageShooterWheel(OUTER);
 	ManageShooterWheel(INNER);
@@ -86,7 +94,7 @@ void Shooter::enabledPeriodic()
 			case FIRING_OFF:
 				if (atSpeed[OUTER] && atSpeed[INNER])
 				{
-					m_fireState = RETRACT_LOADER;
+					m_fireState = RETRACT_LOADER_WAIT_FOR_LIFT;
 					m_cyclesToContinueRetracting = requiredCyclesDown ;
 					m_pneumatics->setStorageExit(RETRACTED);
 					startShotTime = e;
@@ -94,8 +102,22 @@ void Shooter::enabledPeriodic()
 				else if (e % 20 == 0)
 					AsyncPrinter::Printf("Not at speed %.0f, %.0f\n", m_speedsRPM[INNER], m_speedsRPM[OUTER]);
 				break;
-			case RETRACT_LOADER:
-				if (m_cyclesToContinueRetracting > 0)
+			case RETRACT_LOADER_WAIT_FOR_LIFT:
+//				if (m_cyclesToContinueRetracting > 0)
+				if (!m_proximity->Get())//keep waiting
+				{
+					m_pneumatics->setStorageExit(RETRACTED);
+					m_cyclesToContinueRetracting--;
+				}
+				else
+				{
+					m_pneumatics->setStorageExit(RETRACTED);
+//					m_pneumatics->setStorageExit(EXTENDED);
+					m_fireState = RETRACT_LOADER_WAIT_FOR_FALL;
+				}
+				break;
+			case RETRACT_LOADER_WAIT_FOR_FALL:
+				if (m_proximity->Get())//keep waiting
 				{
 					m_pneumatics->setStorageExit(RETRACTED);
 					m_cyclesToContinueRetracting--;
@@ -111,7 +133,7 @@ void Shooter::enabledPeriodic()
 					if (m_PIDs[INNER].getError() > frisbeeDetectionThreshold)
 					{
 						AsyncPrinter::Printf("Fired with newSpeed = %.0f, lastSpeed = %.0f taking %d cycles\n", m_speedsRPM[INNER], lastSpeed, e - startShotTime);
-						m_fireState = RETRACT_LOADER;
+						m_fireState = RETRACT_LOADER_WAIT_FOR_LIFT;
 						m_cyclesToContinueRetracting = requiredCyclesDown ;
 						m_pneumatics->setStorageExit(RETRACTED);
 						startShotTime = e;

@@ -33,7 +33,6 @@ Climber::~Climber()
 
 void Climber::onEnable()
 {
-
 }
 
 void Climber::onDisable()
@@ -204,6 +203,10 @@ void Climber::enabledPeriodic()
 
 void Climber::disabledPeriodic()
 {
+	m_servo_left.SetEnabled(true);
+	m_servo_right.SetEnabled(true);
+	m_servo_left.SetMicroseconds(m_servo_left_disengaged_position);
+	m_servo_right.SetMicroseconds(m_servo_right_disengaged_position);
 }
 
 void Climber::Configure()

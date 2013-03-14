@@ -13,6 +13,7 @@ ShooterData::ShooterData()
 	frisbeeCounter = 0;
 	
 	shooter_setting = OFF;
+	extendLauncher = true;
 	
 } 
 

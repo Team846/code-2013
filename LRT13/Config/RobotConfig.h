@@ -8,7 +8,7 @@
 
 #warning Update robot config
 
-#define CHANGEME 0
+#define CHANGEME 99
 
 namespace RobotConfig
 {
@@ -43,8 +43,8 @@ namespace Digital // Ports 1-14
 	const uint32_t WINCH_GEAR_TOOTH = 3;
 	const uint32_t HALL_EFFECT_A = 6;
 	const uint32_t HALL_EFFECT_B = 7;
-	const uint32_t PROXIMITY_A = CHANGEME;
-	const uint32_t PROXIMITY_B = CHANGEME;
+	const uint32_t PROXIMITY_SHOOTER = 4;
+	const uint32_t PROXIMITY_COLLECTOR = 5;
 	const uint32_t PTO_SWITCH_LEFT = 9;
 	const uint32_t PTO_SWITCH_RIGHT = 10;
 	const uint32_t COMPRESSOR_PRESSURE_SENSOR_PIN = 14;
@@ -76,7 +76,7 @@ namespace CAN // Ports 1-16 (2CAN limitation)
 	const uint32_t LEFT_DRIVE_B = 4;
 	const uint32_t RIGHT_DRIVE_A = 2;
 	const uint32_t RIGHT_DRIVE_B = 3;
-	const uint32_t COLLECTOR = CHANGEME;
+	const uint32_t COLLECTOR = 13;
 	const uint32_t SHOOTER_A = 7;
 	const uint32_t SHOOTER_B = 5;
 	const uint32_t WINCH_WORM = CHANGEME;

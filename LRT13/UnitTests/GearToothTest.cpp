@@ -5,7 +5,7 @@
 GearToothTest::GearToothTest() :
 	UnitTest()
 {
-	gearTooth = new Counter((UINT32)RobotConfig::Digital::WINCH_GEAR_TOOTH);
+	gearTooth = new GearTooth((UINT32)RobotConfig::Digital::WINCH_GEAR_TOOTH);
 	gearTooth->Start();
 }
 
