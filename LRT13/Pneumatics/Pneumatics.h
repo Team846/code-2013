@@ -67,6 +67,9 @@ public:
 	
 	//returns state
 	bool GetStorageExitState();
+	bool GetClimberState();
+	bool GetHookState();
+	bool GetShooterAngleState();
 
 protected:
 	INT32 Tick();

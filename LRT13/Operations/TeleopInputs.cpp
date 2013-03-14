@@ -112,25 +112,29 @@ void TeleopInputs::Update()
 	}
 
 	/************************Climber Functions************************/
-	if (m_driver_stick->IsButtonJustPressed(
-			DriverStationConfig::JoystickButtons::AUTO_AIM_PYRAMID))
-	{
-		switch (m_componentData->climberData->getDesiredClimbingStep())
-		{
-		case INTENDED_IDLE:
-			m_componentData->climberData->setDesiredClimbingStep(
-					INTENDED_ARM_UP);
-			break;
-		case INTENDED_ARM_UP:
-			m_componentData->climberData->setDesiredClimbingStep(
-					INTENDED_CLIMBING);
-			break;
-		case INTENDED_CLIMBING:
-			break;
-		}
-	}
+//	if (m_driver_stick->IsButtonJustPressed(
+//			DriverStationConfig::JoystickButtons::AUTO_AIM_PYRAMID))
+//	{
+//		switch (m_componentData->climberData->getDesiredClimbingStep())
+//		{
+//		case INTENDED_IDLE:
+//			m_componentData->climberData->setDesiredClimbingStep(
+//					INTENDED_ARM_UP);
+//			break;
+//		case INTENDED_ARM_UP:
+//			m_componentData->climberData->setDesiredClimbingStep(
+//					INTENDED_CLIMBING);
+//			break;
+//		case INTENDED_CLIMBING:
+//			break;
+//		}
+//	}
 	m_componentData->climberData->setShouldContinueClimbing(
 			m_driver_stick->IsButtonJustPressed(DriverStationConfig::JoystickButtons::CONTINUE_CLIMB));
+	
+	m_componentData->climberData->setShouldContinueClimbing(
+			m_driver_stick->IsButtonJustPressed(DriverStationConfig::JoystickButtons::FORCE_CLIMB_ADVANCE));
+	
 
 	/************************Shooter Functions************************/
 	if (m_driver_stick->IsButtonDown(DriverStationConfig::JoystickButtons::FIRE))

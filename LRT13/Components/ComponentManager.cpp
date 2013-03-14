@@ -1,5 +1,6 @@
 #include "ComponentManager.h"
 #include "ConfigLoader.h"
+#include "Climber.h"
 #include "Drivetrain.h"
 #include "Collector.h"
 #include "Shooter.h"
@@ -24,6 +25,7 @@ ComponentManager::~ComponentManager()
 
 void ComponentManager::CreateComponents()
 {
+	AddComponent(new Climber());
 	AddComponent(new Drivetrain());
 	AddComponent(new Shooter());
 	AddComponent(new Collector());

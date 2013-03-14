@@ -197,6 +197,43 @@ void Climber::enabledPeriodic()
 	{
 		m_paused = true; //we pause
 	}
+	
+	if (m_componentData->climberData->shouldForceContinueClimbing())
+	{
+		switch(m_state)
+		{
+		case IDLE:
+			m_state = ARM_UP_INITIAL;
+			break;
+		case ARM_UP_INITIAL:
+			m_state = WAIT;
+			break;
+		case WAIT:
+			m_state = ARM_DOWN;
+			break;
+		case ARM_DOWN:
+			m_state = DUMB_ENGAGE_PTO ;//TODO notice this, change to real engage PTO
+			break;
+		case DUMB_ENGAGE_PTO:
+			m_state = WINCH_UP;
+			break;
+		case ENGAGE_PTO:
+			m_state = WINCH_UP;
+			break;
+		case WINCH_UP:
+			m_state = ENGAGE_HOOKS;
+			break;
+		case ENGAGE_HOOKS:
+			m_state = DISENGAGE_PTO;
+			break;
+		case DISENGAGE_PTO:
+			m_state = ARM_UP_FINAL;
+			break;
+		case ARM_UP_FINAL:
+			m_state = WAIT;
+			break;
+		}
+	}
 
 	m_previous_state = m_state;
 }

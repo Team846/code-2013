@@ -21,7 +21,8 @@ typedef enum state
 		WINCH_UP = 6,
 		ENGAGE_HOOKS = 7,
 		DISENGAGE_PTO = 8,
-		ARM_UP_FINAL = 9
+		ARM_UP_FINAL = 9,
+		DUMB_ENGAGE_PTO = 10
 	};
 
 typedef enum humanState
@@ -39,10 +40,12 @@ typedef enum humanState
 		humanState getDesiredClimbingStep();
 		void setDesiredClimbingStep(humanState newState);
 		bool shouldContinueClimbing();
+		bool shouldForceContinueClimbing();
 		void setShouldContinueClimbing(bool shouldContinue);
+		void setShouldForceContinueClimbing(bool shouldContinue);
 	private:
 		humanState m_desiredClimbingStep;
-		bool m_shouldContinueClimbing;
+		bool m_shouldContinueClimbing, m_shouldForceContinueClimbing;
 	};
 }
 }

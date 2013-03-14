@@ -52,24 +52,16 @@ void InputUnitTest::Run()
 				Pneumatics::Instance()->setCollector(false);
 			}
 			
-			if(m_stick->IsButtonDown(DriverStationConfig::JoystickButtons::FEEDER_STATION_APPROACH))
+			if(m_stick->IsButtonJustPressed(DriverStationConfig::JoystickButtons::FEEDER_STATION_APPROACH))
 			{
 				printf("disc track is down.\n");
-				Pneumatics::Instance()->setHookPosition(true);
-			}
-			else
-			{
-				Pneumatics::Instance()->setHookPosition(false);
+				Pneumatics::Instance()->setHookPosition(!Pneumatics::Instance()->GetHookState());
 			}
 			
-			if(m_stick->IsButtonDown(DriverStationConfig::JoystickButtons::LOAD_CONFIG))
+			if(m_stick->IsButtonJustPressed(DriverStationConfig::JoystickButtons::LOAD_CONFIG))
 			{
 				printf("load config is down.\n");
-				Pneumatics::Instance()->setShooterAngler(true);
-			}
-			else
-			{
-				Pneumatics::Instance()->setShooterAngler(false);
+				Pneumatics::Instance()->setShooterAngler(!Pneumatics::Instance()->GetShooterAngleState());
 			}
 			
 			Pneumatics::Instance()->RunOneCycle();
@@ -84,9 +76,9 @@ void InputUnitTest::Run()
 				Pneumatics::Instance()->setStorageExit(false);
 			}
 			
-			if(m_stick->IsButtonDown(DriverStationConfig::JoystickButtons::SAVE_CONFIG))
+			if(m_stick->IsButtonJustPressed(DriverStationConfig::JoystickButtons::SAVE_CONFIG))
 			{
-				printf("save config is down.\n");
+				Pneumatics::Instance()->setClimberArm(!Pneumatics::Instance()->GetClimberState());
 			}
 			
 			float rawZAxis = m_stick->GetAxis(Joystick::kZAxis);

@@ -6,6 +6,7 @@ ClimberData::ClimberData()
 {
 	m_desiredClimbingStep = INTENDED_IDLE;
 	m_shouldContinueClimbing = false;
+	m_shouldForceContinueClimbing = false;
 }
 
 humanState ClimberData::getDesiredClimbingStep()
@@ -20,7 +21,18 @@ bool ClimberData::shouldContinueClimbing()
 {
 	return m_shouldContinueClimbing;
 }
+
+bool ClimberData::shouldForceContinueClimbing()
+{
+	return m_shouldForceContinueClimbing;
+}
+
 void ClimberData::setShouldContinueClimbing(bool shouldContinue)
+{
+	m_shouldContinueClimbing = shouldContinue;
+}
+
+void ClimberData::setShouldForceContinueClimbing(bool shouldContinue)
 {
 	m_shouldContinueClimbing = shouldContinue;
 }

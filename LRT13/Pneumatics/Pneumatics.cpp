@@ -184,3 +184,18 @@ bool Pneumatics::GetStorageExitState()
 {
 	return m_storageExit.state;
 }
+
+bool Pneumatics::GetClimberState()
+{
+	return m_climber.state;
+}
+
+bool Pneumatics::GetShooterAngleState()
+{
+	return m_shooterAngler.state;
+}
+
+bool Pneumatics::GetHookState()
+{
+	return m_hook.state;
+}
