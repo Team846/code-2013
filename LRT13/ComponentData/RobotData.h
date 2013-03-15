@@ -43,14 +43,20 @@ namespace data
 		static int AllocateKey(string className);
 		static void AddValue(int key, string type, string serialized);
 		
-		static string Serialize();
+		static void Serialize();
+		
+		static void NewFrame();
+		static void EnqueueBuffer(NetBuffer buff, NetConnection netConn, NetChannel::Enum channelType, int channel);
+		
 		
 	private:
+		
 		static int m_missedPacketsInLifetime;
 
 		static RobotState m_state;
 		static int _id;
 		static int m_frisbees;
+		
 		
 #warning rename/refactor me
 		struct Data
@@ -60,7 +66,19 @@ namespace data
 			vector<string> indexToValueMap;
 		};
 		
+		struct DataPacket
+		{
+			DataPacket();
+			NetBuffer netBuff;
+			NetConnection netConn;
+			int channel;
+			NetChannel::Enum channelType;
+		};
+		
 		static vector<Data> m_loggedClasses;
+		
+		static vector<DataPacket> m_frameList;
+		static vector<vector<DataPacket> > m_lifetimeList;
 	};
 };
 

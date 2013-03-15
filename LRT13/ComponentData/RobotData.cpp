@@ -63,38 +63,13 @@ void RobotData::AddValue(int key, string type, string serialized)
 	m_loggedClasses[key].indexToValueMap.push_back(serialized);
 }
 
-#warning Check me
-string RobotData::Serialize()
+
+void RobotData::Serialize()
 {
-	/*
-	CompleteMessage cm;
-	
-	for(vector<Data>::iterator it = m_loggedClasses.begin(); it != m_loggedClasses.end(); ++it)
+	for(vector<DataPacket>::iterator it = m_frameList.begin(); it != m_frameList.end(); it++)
 	{
-		Data d = *it;
-		
-		// assert that the two maps are synchronized
-		if(d.indexToTypeMap.size() != d.indexToValueMap.size())
-		{
-			// raise error
-			
-			return "-1";
-		}
-		
-		DataMessage* dMsg = cm.add_data();
-		
-		dMsg->set_classname(d.className);
-		
-		for(int i = 0; i < d.indexToTypeMap.size(); i++)
-		{
-			dMsg->mutable_indextotypemap()->add_type(d.indexToTypeMap[i]);
-			dMsg->mutable_indextovaluemap()->add_value(d.indexToValueMap[i]);
-		}
+		(*it).netConn.Send((*it).netBuff,(*it).channelType,(*it).channel );
 	}
-	
-	return cm.SerializeAsString();*/
-	
-	return "";
 }
 
 void RobotData::IncrementFrisbeeCounter()
@@ -111,3 +86,21 @@ int RobotData::GetFrisbeeCounter()
 {
 	return m_frisbees;
 }
+
+void RobotData::NewFrame()
+{
+	m_lifetimeList.push_back(m_frameList);
+	m_frameList.clear();
+}
+
+void RobotData::EnqueueBuffer(NetBuffer buff, NetConnection netConn, NetChannel::Enum channelType, int channel )
+{
+	DataPacket packet;
+	packet.netBuff = buff;
+	packet.netConn = netConn;
+	packet.channel = channel;
+	packet.channelType = channelType;
+	
+	m_frameList.push_back(packet);
+}
+
