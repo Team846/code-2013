@@ -79,7 +79,7 @@ namespace CAN // Ports 1-16 (2CAN limitation)
 	const uint32_t COLLECTOR = 13;
 	const uint32_t SHOOTER_A = 7;
 	const uint32_t SHOOTER_B = 5;
-	const uint32_t WINCH_WORM = CHANGEME;
+	const uint32_t WINCH_WORM = 6;
 }
 
 namespace Servo

@@ -6,7 +6,11 @@ int RobotData::_id = -1;
 int RobotData::m_frisbees = 0;
 
 RobotData::RobotState RobotData::m_state = RobotData::DISABLED;
+RobotData::RobotState RobotData::m_laststate = RobotData::DISABLED;
 vector<RobotData::Data> RobotData::m_loggedClasses;
+
+vector<RobotData::DataPacket> RobotData::m_frameList;
+vector<vector<RobotData::DataPacket> > RobotData::m_lifetimeList;
 
 int RobotData::GetMissedPacketsInLifetime() { return 0; }
 void RobotData::IncrementMissedPacketsInLifetime() { return; }
@@ -19,8 +23,14 @@ RobotData::RobotState RobotData::GetCurrentState()
 	return m_state;
 }
 
+RobotData::RobotState RobotData::GetLastState()
+{
+	return m_laststate;
+}
+
 void RobotData::SetRobotState(RobotData::RobotState state)
 {
+	m_laststate = m_state;
 	m_state = state;
 }
 

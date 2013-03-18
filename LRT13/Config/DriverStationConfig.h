@@ -26,17 +26,31 @@ namespace JoystickButtons
 const uint32_t FIRE = 1;
 const uint32_t COLLECTOR_SLIDE = 2;
 const uint32_t CHANGE_ANGLE = 3;
+const uint32_t CONTINUE_CLIMB = 4;
 
-const uint32_t FORCE_CLIMB_ADVANCE= 4;
+//const uint32_t FORCE_CLIMB_ADVANCE= 4;
 
 const uint32_t AUTO_AIM_BACKBOARD = 9;
-const uint32_t AUTO_AIM_PYRAMID = 8;
-const uint32_t FEEDER_STATION_APPROACH = 3;
-const uint32_t CONTINUE_CLIMB = 4;
+const uint32_t START_CLIMB = 8;
+//const uint32_t FEEDER_STATION_APPROACH = 3;
 const uint32_t APPLY_CONFIG = 5;
 const uint32_t LOAD_CONFIG = 6;
 const uint32_t SAVE_CONFIG = 7;
 const uint32_t RESET_ZERO = 10;
+
+
+
+const uint32_t DEBUG_CLIMBER = 1;
+const uint32_t TOGGLE_SHOOTER = 2;
+const uint32_t CLIMBER_ARM = 3;
+const uint32_t ARM_ANGLE = 4;
+const uint32_t COLLECTOR_DOWN_NO_MOTOR = 5;
+const uint32_t ENGAGE_PTO = 6;
+const uint32_t DISENGAGE_PTO = 7;
+const uint32_t PAWL_DOWN = 8;
+const uint32_t PAWL_UP = 9;
+
+const uint32_t STOP_ROBOT = 5;
 }
 namespace DigitalIns
 {

@@ -54,6 +54,8 @@ namespace data
 				void SetNumFrisbeesInStorage(int numFrisbees);
 				void IncrementFrisbeeCounter();
 				void DecrementFrisbeeCounter();
+				void SetEnabled(bool enabled);
+				bool IsEnabled();
 				
 			private:
 				double acceptableSpeedError[2];
@@ -62,6 +64,7 @@ namespace data
 				bool extendLauncher;
 				ShooterSetting shooter_setting;
 				int frisbeeCounter;
+				bool m_enabled;
 		};
 	}
 	

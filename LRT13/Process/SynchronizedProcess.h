@@ -21,7 +21,7 @@ public:
 	 * @brief Gives a semaphore which allows Tick() to be called
 	 */
 	void RunOneCycle();
-protected:
+//protected:
 	/*!
 	 * @brief Takes a semaphore which blocks Tick() until RunOneCycle() is called
 	 */

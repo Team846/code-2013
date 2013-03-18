@@ -18,7 +18,8 @@ Collector::Collector()
 	m_overflowWait = 0;
 	m_reverse = false;
 	m_lastReverseState = false;
-	
+	m_timer = 0;
+	m_lastStateWasUp = true;
 	Configure();
 }
 
@@ -66,15 +67,48 @@ void Collector::enabledPeriodic()
 		m_jaguar->SetDutyCycle(0.0);
 	}
 	
-	if (m_componentData->collectorData->IsDown())
+	if (m_lastStateWasUp != m_componentData->collectorData->IsUp())//change of state
 	{
+		if (m_componentData->collectorData->IsDown())
+		{
+			//going down is easy for now
+			m_pneumatics->setCollector(true);
+			m_componentData->shooterData->SetLauncherAngleLow();
+			m_timer = m_time_before_extend;
+		}
+		else
+		{
+			AsyncPrinter::Printf("Started going up\n");
+			m_componentData->shooterData->SetLauncherAngleLow();
+			m_timer = m_time_before_retract;
+//			m_pneumatics->setCollector(false);
+		}
+		
+	}
+	else if (m_componentData->collectorData->IsDown())
+	{
+		if (m_timer > 0)
+		{
+			m_timer--;
+		}
+		else
+		{
+			m_componentData->shooterData->SetLauncherAngleHigh();
+		}
 		m_pneumatics->setCollector(true);
 	}
 	else
 	{
-		m_pneumatics->setCollector(false);
+		if (m_timer > 0)
+		{
+			m_timer--;
+		}
+		else
+		{
+			m_pneumatics->setCollector(false);
+		}
 	}
-	
+	m_lastStateWasUp = m_componentData->collectorData->IsUp();
 //	if (m_proximity->Get() == 0)
 //	{
 //		m_count++;
@@ -123,6 +157,8 @@ void Collector::Configure()
 	m_dutyCycle = ConfigManager::Instance()->Get<float> (m_configSection, "speed", 1.0F);
 	m_samplesThreshold = ConfigManager::Instance()->Get<int> (m_configSection, "samplesThreshold", 4);
 	m_overflowWaitThreshold = ConfigManager::Instance()->Get<int> (m_configSection, "overflowWaitCycles", 50);
+	m_time_before_retract = ConfigManager::Instance()->Get<int>(m_configSection, "cyclesBeforeRetract", 15);
+	m_time_before_extend = ConfigManager::Instance()->Get<int>(m_configSection, "cyclesBeforeExtend", 15);
 }
 
 void Collector::Log()

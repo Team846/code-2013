@@ -63,7 +63,7 @@ void Pneumatics::setShooterAngler(bool on, bool force)
 	if(on != m_shooterAngler.state || force)
 	{
 		m_shooterAngler.state = on;
-		m_climber.counter = m_pulse_length;
+		m_shooterAngler.counter = m_pulse_length;
 	}
 }
 
@@ -147,17 +147,19 @@ Pneumatics::~Pneumatics()
 	DELETE(m_hook.solenoid);
 	DELETE(m_climber.solenoid);
 	DELETE(m_shooterAngler.solenoid);
-	m_compressor->Stop();
 	DELETE(m_compressor);
+	m_compressor->Stop();
 }
 
 INT32 Pneumatics::Tick()
 {
 	pulse(&m_collector);
 	pulse(&m_hook);
-	pulse(&m_climber);
+	//
 	pulse(&m_storageExit);
 	pulse(&m_shooterAngler);
+	pulse(&m_climber);
+//	AsyncPrinter::Printf("Arm %d, %d\n", m_climber.state, m_climber.counter);
 //	AsyncPrinter::Printf("Compressor: %s\n", (m_compressor->Enabled() ? "on" : "off"));
 //	AsyncPrinter::Printf("Pressure switch: %d\n", m_compressor->GetPressureSwitchValue());
 	

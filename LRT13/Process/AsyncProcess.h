@@ -24,11 +24,11 @@ public:
 protected:
 	virtual void preTick();
 	virtual INT32 Tick();
+	bool m_isRunning;
 private:
 	static void _TASK_ENTRY(void* asyncProcessInstance);
 
 	Task* m_task;
-	bool m_isRunning;
 	
 	SEM_ID m_quittingSem;
 };

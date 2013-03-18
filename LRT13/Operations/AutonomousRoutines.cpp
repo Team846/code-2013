@@ -11,6 +11,7 @@ using namespace data::shooter;
 //unsigned int AutonomousRoutines::standardWaitTicks = ;
 
 AutonomousRoutines::AutonomousRoutines()
+:  AsyncProcess("AutonTask")
 {
 	m_componentData = ComponentData::GetInstance();
 	
@@ -24,7 +25,7 @@ AutonomousRoutines::~AutonomousRoutines()
 
 }
 
-void AutonomousRoutines::Tick()
+void AutonomousRoutines::TeleopTick()
 {
 	switch (m_autoActions->GetCurrentAutonomousAction())
 	{
@@ -45,6 +46,46 @@ void AutonomousRoutines::Tick()
 
 void AutonomousRoutines::Autonomous()
 {
+	double delay = DriverStation::GetInstance()->GetAnalogIn(DriverStationConfig::AnalogIns::AUTONOMOUS_DELAY);
+	delay *= 3;//factor so that we can wait the whole auton
+	//waiting the delay
+	AsyncPrinter::Printf("STarting auton\n");
+	SafeWait(delay, 10);
+
+	printf("Wait is done\n");
+	
+	int routine = (int) (DriverStation::GetInstance()->GetAnalogIn(DriverStationConfig::AnalogIns::AUTONOMOUS_SELECT) + 0.5);
+	AsyncPrinter::Printf("STarting routine number %d\n", routine);
+	
+	switch (routine)
+	{
+	//simple shoot 2 routine
+	case 0:
+		m_componentData->shooterData->SetNumFrisbeesInStorage(2);
+		FireAllFrisbees(15.0);
+		break;
+	//simple shoot 3 routine
+	case 1:
+		m_componentData->shooterData->SetNumFrisbeesInStorage(3);
+		FireAllFrisbees(15.0);
+		break;
+		
+	//simple shoot 10 routine to make sure we unload all of our frisbees
+	case 2:
+		m_componentData->shooterData->SetNumFrisbeesInStorage(10);
+		FireAllFrisbees(15.0);
+		break;
+		
+	case 3://start in back and do the fancy driving back routine
+		break;
+		
+	case 4://test routine
+		break;
+		
+	}
+	//initial wait
+	AsyncPrinter::Printf("Auton done\n");
+	m_isRunning = false;
 }
 
 void AutonomousRoutines::ServiceAutoAimBackBoard()
@@ -65,9 +106,15 @@ void AutonomousRoutines::ServiceFeederStationApproach()
 /********* One function per auto routine ************/
 void AutonomousRoutines::FireAllFrisbees(double timeoutSeconds)
 {
+	m_isRunning = true;
 	UINT32 startTime = GetFPGATime();//Microseconds
+	AsyncPrinter::Printf("is running %d\n", m_isRunning);
+	AsyncPrinter::Printf("time: %d, endtime %d\n", GetFPGATime(), startTime + timeoutSeconds);
+	
+	AsyncPrinter::Printf("numFrisees %d\n", m_componentData->shooterData->GetNumFrisbeesInStorage() );
 	while (m_isRunning && GetFPGATime() < startTime + timeoutSeconds * 1E6 && m_componentData->shooterData->GetNumFrisbeesInStorage() > 0)
 	{
+		AsyncPrinter::Printf("Firing frisbees\n");
 		m_componentData->shooterData->SetShooterSetting(CONTINOUS);
 		AutonomousFreeCPUPause();
 	}
@@ -81,6 +128,46 @@ void AutonomousRoutines::SafeGrabSem(SEM_ID sem)
 	while (m_isRunning && semTake(sem, GetStandardWaitTicks()))
 	{
 		//ne faire rien pendant que nous attendons 
+	}
+}
+
+void AutonomousRoutines::SafeWait(double seconds, int safeCheckFrequency)
+{
+	taskDelay((UINT32) (sysClkRateGet() * seconds));
+	return;
+	AsyncPrinter::Printf("Waiting for %.2f td\n", seconds);
+//	Wait(seconds);
+	AsyncPrinter::Printf("Just Waited for %.2f w/ taskdelay\n", seconds);
+	taskDelay((UINT32) (sysClkRateGet()));
+	AsyncPrinter::Printf("Just Waited for another second w/ taskdelay\n");
+	return;
+	
+	if (sysClkRateGet()  != 1000)
+	{
+		AsyncPrinter::Printf("One of the auton wait assuptions does not hold ture and thus might not work\n");
+	}
+	UINT32 microsecondsToWait = (UINT32) (seconds * 1E6);
+	UINT32 currTime = GetFPGATime();
+	if (microsecondsToWait + currTime < currTime)//we have an overflow
+	{
+		AsyncPrinter::Printf("Auton delay causes an overflow! D:\n We thought this would never happen so we didn't write code to handle it. It should never happen.");
+	}
+	
+	UINT32 endTime = currTime + microsecondsToWait;
+	int unitWaitTicks = sysClkRateGet() / safeCheckFrequency;
+	int unitWaitMicroseconds = 1000 * unitWaitTicks;
+	
+	UINT32 timeRemaining; 
+	while (m_isRunning && endTime - GetFPGATime() > 0)
+	{
+		timeRemaining = endTime - GetFPGATime();
+		if (timeRemaining > unitWaitMicroseconds)
+			taskDelay(unitWaitTicks);
+		else
+		{
+			taskDelay(timeRemaining / 1E3 );// /1E6 and then * sysClkRateGet =1e3
+			break;
+		}
 	}
 }
 
@@ -104,23 +191,13 @@ void AutonomousRoutines::RearCorner(int numFrisbeesToPickUp)
 	//TODO writeme
 }
 
-void AutonomousRoutines::Stop()
-{
-	m_isRunning = false; 
-}
-
-void AutonomousRoutines::Start()
-{
-	m_isRunning = true; 
-	//faire qqch d'autre dans l'avenir
-}
-
-bool AutonomousRoutines::IsRunning()
-{
-	return m_isRunning;
-}
 
 void AutonomousRoutines::AutonomousFreeCPUPause()
 {
 	taskDelay(GetStandardWaitTicks());//4x per cycle. We don't really do anything computationall intensive in these function
+}
+
+INT32 AutonomousRoutines::Tick()
+{
+	Autonomous();
 }

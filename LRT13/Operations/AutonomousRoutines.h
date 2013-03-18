@@ -20,18 +20,16 @@ class AutoActions;
  * @brief Performs autonomous routine and contains autonomous functions. It has two parts, the Tick function which is meant to run every cycle to operate semi-automated processes
  * @author Raphael Chang, Tony Peng, Brian Axelrod
  */
-class AutonomousRoutines 
+class AutonomousRoutines : public AsyncProcess
 {
 public:
 	AutonomousRoutines();
 	~AutonomousRoutines();
 	
-	void Start();
-	void Stop();
-	bool IsRunning();
 	
-	void Tick(); //called every cycle to manage semi-autonomous functions
-	
+	void TeleopTick(); //called every cycle to manage semi-autonomous functions
+protected:
+	virtual INT32 Tick();
 private:
 	/*
 	 * @brief Runs autonomous routine
@@ -49,6 +47,7 @@ private:
 	
 	void AutonomousFreeCPUPause();
 	void SafeGrabSem(SEM_ID sem);
+	void SafeWait(double seconds, int safeCheckFrequency);
 	
 	data::ComponentData* m_componentData;
 	
@@ -59,8 +58,6 @@ private:
 	{
 		return standardWaitTicks;
 	}
-	
-	bool m_isRunning;
 };
 
 #endif

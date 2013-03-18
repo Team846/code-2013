@@ -32,15 +32,15 @@ void InputUnitTest::Run()
 			m_stick->Update();
 
 			Pneumatics::Instance()->setCompressor(true);
-			if(m_stick->IsButtonDown(DriverStationConfig::JoystickButtons::APPLY_CONFIG))
-			{
-				printf("apply config is down.\n");
-				Pneumatics::Instance()->setClimberArm(true);
-			}
-			else
-			{
-				Pneumatics::Instance()->setClimberArm(false);
-			}
+//			if(m_stick->IsButtonJustPressed(DriverStationConfig::JoystickButtons::APPLY_CONFIG))
+//			{
+//				printf("apply config is down.\n");
+//				Pneumatics::Instance()->setClimberArm(P);
+//			}
+//			else
+//			{
+//				Pneumatics::Instance()->setClimberArm(false);
+//			}
 			
 			if(m_stick->IsButtonDown(DriverStationConfig::JoystickButtons::AUTO_AIM_BACKBOARD))
 			{
@@ -52,11 +52,13 @@ void InputUnitTest::Run()
 				Pneumatics::Instance()->setCollector(false);
 			}
 			
-			if(m_stick->IsButtonJustPressed(DriverStationConfig::JoystickButtons::FEEDER_STATION_APPROACH))
-			{
-				printf("disc track is down.\n");
-				Pneumatics::Instance()->setHookPosition(!Pneumatics::Instance()->GetHookState());
-			}
+//			if(m_stick->IsButtonJustPressed(DriverStationConfig::JoystickButtons::FEEDER_STATION_APPROACH))
+//			{
+//				printf("disc track is down.\n");
+//				Pneumatics::Instance()->setHookPosition(!Pneumatics::Instance()->GetHookState());
+//			}
+			
+			
 			
 			if(m_stick->IsButtonJustPressed(DriverStationConfig::JoystickButtons::LOAD_CONFIG))
 			{

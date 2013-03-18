@@ -1,4 +1,5 @@
 #include "ShooterData.h"
+#include "../Utils/AsyncPrinter.h"
 #include "ComponentData.h"
 
 using namespace data;
@@ -84,10 +85,25 @@ void ShooterData::DecrementFrisbeeCounter()
 
 void ShooterData::SetShooterSetting(ShooterSetting s)
 {
+//	if (s == OFF)
+//		AsyncPrinter::Printf("WHY IS THIS THING OFF\n");
+//	
+//	if(s == CONTINOUS)
+//		AsyncPrinter::Printf("Setting to continuous\n");
 	shooter_setting = s;
 }
 
 int ShooterData::GetShooterSetting()
 {
 	return shooter_setting;
+}
+
+void ShooterData::SetEnabled(bool enabled)
+{
+	m_enabled = enabled;
+}
+
+bool ShooterData::IsEnabled()
+{
+	return m_enabled;
 }

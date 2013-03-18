@@ -22,7 +22,9 @@ typedef enum state
 		ENGAGE_HOOKS = 7,
 		DISENGAGE_PTO = 8,
 		ARM_UP_FINAL = 9,
-		DUMB_ENGAGE_PTO = 10
+		DUMB_ENGAGE_PTO = 10,
+		UNLOCK_PAWL = 11,
+		PREPARE_CLIMBING_POSITION = 12
 	};
 
 typedef enum humanState
@@ -43,9 +45,42 @@ typedef enum humanState
 		bool shouldForceContinueClimbing();
 		void setShouldContinueClimbing(bool shouldContinue);
 		void setShouldForceContinueClimbing(bool shouldContinue);
+
+		//Debug functions
+		bool shouldDebug();
+		void enableDebug();
+		void disableDebug();
+		
+		bool shouldChangeArmState();
+		bool changeArmState();
+		
+		bool shouldChangeAngleState();
+		void changeAngleState();
+		
+		bool shouldWinchPawlGoDown();
+		bool shouldWinchPawlGoUp();
+		void winchPawlDown();
+		void winchPawlUp();
+		
+		bool shouldPTOChangeDisengage();
+		bool shouldPTOChangeEngage();
+		bool EngagePTO();
+		bool DisengagePTO();
+		
 	private:
 		humanState m_desiredClimbingStep;
 		bool m_shouldContinueClimbing, m_shouldForceContinueClimbing;
+		
+		bool m_shouldChangeArmState;
+		bool m_shouldChangeAngleState;
+		
+		bool m_shouldWinchPawlGoDown;
+		bool m_shouldWinchPawlGoUp;
+		
+		bool m_shouldPTOEngage;
+		bool m_shouldPTODisEngage;
+		
+		bool m_shoulddebug;
 	};
 }
 }

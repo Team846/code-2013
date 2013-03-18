@@ -45,6 +45,9 @@ private:
 	int m_count;
 	int m_samplesThreshold;
 	
+	int m_timer;
+	int m_time_before_retract;
+	int m_time_before_extend;
 	float m_dutyCycle;
 	int m_overflowWait;
 	int m_overflowWaitThreshold;
@@ -52,6 +55,8 @@ private:
 	bool m_lastReverseState;
 	
 	string m_configSection;
+	
+	bool m_lastStateWasUp;
 };
 
 #endif

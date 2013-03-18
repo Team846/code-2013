@@ -25,10 +25,10 @@ ComponentManager::~ComponentManager()
 
 void ComponentManager::CreateComponents()
 {
-	AddComponent(new Climber());
+	AddComponent(new Collector());//must be before the shooter
+	AddComponent(new Climber()); //climber must be before drivetrain
+	AddComponent(new Shooter()); //must be after climber
 	AddComponent(new Drivetrain());
-	AddComponent(new Shooter());
-	AddComponent(new Collector());
 	AddComponent(new ConfigLoader());
 }
 
@@ -75,14 +75,14 @@ void ComponentManager::Update()
 			}
 		}
 		
-		if(comp->IsEnabled())
-		{
-			comp->enabledPeriodic();
-		}
-		else
-		{
-			comp->disabledPeriodic();
-		}
+//		if(comp->IsEnabled())
+//		{
+//			comp->enabledPeriodic();
+//		}
+//		else
+//		{
+//			comp->disabledPeriodic();
+//		}
 	}
 }
 

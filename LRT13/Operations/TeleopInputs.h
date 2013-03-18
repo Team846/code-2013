@@ -24,12 +24,12 @@ class AutoActions;
  * @brief Processes driver station inputs in teleoperated mode
  * @author Raphael Chang
  */
-class TeleopInputs : public SynchronizedProcess
+class TeleopInputs// : public SynchronizedProcess
 {
 public:
 	TeleopInputs(char * taskName, INT32 priority=Task::kDefaultPriority);
 	~TeleopInputs();
-protected:
+//protected:
 	/*
 	 * @brief Processes joystick inputs and sets component data
 	 */

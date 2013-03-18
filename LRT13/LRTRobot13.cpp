@@ -15,8 +15,8 @@ LRTRobot13::~LRTRobot13()
 	printf("LRTRobot13 Destructing\n");
 	
 	// Stop all tasks
-	m_auton->Stop();
-	m_teleop->Abort();
+	m_auton->Abort(0, 1.0);
+//	m_teleop->Abort();
 	for (vector<AsyncCANJaguar*>::iterator it = AsyncCANJaguar::jaguar_vector.begin(); it < AsyncCANJaguar::jaguar_vector.end(); it++)
 	{
 		(*it)->Abort();
@@ -43,7 +43,7 @@ void LRTRobot13::RobotInit()
 
 	AsyncPrinter::Println("Starting TeleopInputs Task");
 	m_teleop = new TeleopInputs("TeleopInputs");
-	m_teleop->Start();
+//	m_teleop->Start();
 	
 	AsyncPrinter::Println("initializing AutonomousRoutines");
 	m_auton = new AutonomousRoutines();
@@ -78,24 +78,31 @@ void LRTRobot13::Tick()
 	UpdateGameState();
 
 	// Update appropriate operation controllers
-	if (RobotData::GetCurrentState() == RobotData::AUTONOMOUS)
+	if (RobotData::GetCurrentState() == RobotData::AUTONOMOUS )
 	{
-		m_auton->Tick(); // Called every loop, but Tick() is only called again when the entire autonomous routine is complete.
+		if (RobotData::GetLastState() != RobotData::GetCurrentState())
+			m_auton->Start();
 	}
 	else if (RobotData::GetCurrentState() == RobotData::TELEOP)
 	{
+		m_auton->TeleopTick(); // Handles the automation involving vision
 		if (m_auton->IsRunning())
 		{
-			m_auton->Stop();
+			m_auton->Abort(0, 1.0);
+			AsyncPrinter::Printf("Killing auton\n");
 		}
-		m_teleop->RunOneCycle();
+//		m_teleop->RunOneCycle();
+//		AsyncPrinter::Printf("TELEOP!\n");
+		m_teleop->Tick();
 	}
 	else // Disabled
 	{
-		m_teleop->RunOneCycle();
+//		AsyncPrinter::Printf("Disabled!\n");
+		m_teleop->Tick();
+//		m_teleop->RunOneCycle();
 		if (m_auton->IsRunning())
 		{
-			m_auton->Stop();
+			m_auton->Abort(1.0, 1.0);
 		}
 	}
 	

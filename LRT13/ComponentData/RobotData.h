@@ -5,6 +5,7 @@
 #include <vector>
 
 #include "../Network/NetConnection.h"
+#include "../Network/NetConnectionType.h"
 #include "../Network/NetBuffer.h"
 
 //#include "robotdata.pb.h"
@@ -38,6 +39,7 @@ namespace data
 		static void IncrementCycleCount();
 		
 		static RobotState GetCurrentState();
+		static RobotState GetLastState();
 		static void SetRobotState(RobotState state);
 		
 		static int AllocateKey(string className);
@@ -54,6 +56,7 @@ namespace data
 		static int m_missedPacketsInLifetime;
 
 		static RobotState m_state;
+		static RobotState m_laststate;
 		static int _id;
 		static int m_frisbees;
 		
@@ -68,7 +71,7 @@ namespace data
 		
 		struct DataPacket
 		{
-			DataPacket();
+			DataPacket() : netConn("10.8.46.5", 80, Network::SERVER){};//Finish writing your code before you commit it, seriously, don't give me stuff with linker errors. I changed this to make it compile. FIx it so it actually works. 
 			NetBuffer netBuff;
 			NetConnection netConn;
 			int channel;
