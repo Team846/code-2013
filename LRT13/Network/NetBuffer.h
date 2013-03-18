@@ -4,7 +4,6 @@
 #include <WPILib.h>
 #include <string.h>
 
-#include "NetConnection.h"
 #include "../Utils/AsyncPrinter.h"
 
 using namespace std;
@@ -47,6 +46,10 @@ namespace Network
 		 */
 		void Write(char* c, UINT16 len);
 		/*!
+		 * @brief Writes a byte array to the buffer.
+		 */
+		void WriteRaw(char* c, UINT16 len);
+		/*!
 		 * @brief Wriets a length-prefixed string to the buffer.
 		 */
 		void Write(string str);
@@ -74,11 +77,6 @@ namespace Network
 		 * @brief Finishes the current byte to improve CPU read/write time.
 		 */
 		void WritePadBits();
-		
-		/*!
-		 * @brief Reads a one byte value from the buffer at the current position. Does not advance the internal pointer.
-		 */
-		char PeekChar();
 		
 		/*!
 		 * @brief Reads a one-byte value from the buffer and advances the internal pointer by 8 bits.
@@ -132,11 +130,12 @@ namespace Network
 		 */
 		char* GetBuffer();
 		
-		friend int NetConnection::Send(NetBuffer buff, NetChannel::Enum method, int channel);
+		//friend int NetPeer::Send(NetBuffer buff, NetChannel::Enum method, int channel);
+		
+		bool m_sent;
 	private:
 		void construct(char* buff, int size);
-		
-		void WriteCurrentByteToBuffer();
+
 		bool AssertBufferHasSpace(UINT32 bits);
 		
 		void InternalWriteByte(const char data, int bit_length);
@@ -156,7 +155,6 @@ namespace Network
 		int m_internalBitPos;
 		
 		bool m_isReadOnly;
-		bool m_sent;
 	};
 };
 

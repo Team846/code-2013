@@ -45,8 +45,14 @@ void NetBuffer::Write(char* c, UINT16 len)
 	InternalWriteBytes(c, len);
 }
 
+void NetBuffer::WriteRaw(char* c, UINT16 len)
+{
+	InternalWriteBytes(c, len);
+}
+
 void NetBuffer::Write(string str)
 {
+	InternalWriteInteger((ULONG)str.length(), sizeof(UINT16) * 8);
 	InternalWriteBytes(str.c_str(), str.length());
 }
 
@@ -87,37 +93,7 @@ void NetBuffer::WritePadBits()
 		return;
 	}
 	
-	WriteCurrentByteToBuffer();
-}
-
-// TODO create an InternalReadByte overload that does not advance the pointer.
-char NetBuffer::PeekChar()
-{
-	int bit_length = 8;
-	
-	if(!AssertBufferHasSpace(m_internalBitPos + 1 + bit_length))
-	{
-		AsyncPrinter::Println("[NetBuffer] Can't read past the buffer!");
-		return 0;
-	}
-	
-	int bit_pos = GetBitIndexInCurrentByte();
-	
-	int remainingBits = 8 - bit_pos;
-	int overflow = bit_length - remainingBits;
-	
-	char retrieved = (m_internalBuffer[GetBytePos()] & ((char)(~(0)) >> overflow)) << overflow;
-	
-	if(overflow <= 0)
-	{
-		// we're done.
-	}
-	else if(overflow > 0)
-	{
-		retrieved &= m_internalBuffer[GetBytePos() + 1] & ((char)(~(0)) << (8 - overflow)); 
-	}
-	
-	return retrieved;
+	m_internalBitPos += 8 - m_internalBitPos % 8;
 }
 
 char NetBuffer::ReadChar()
@@ -127,14 +103,14 @@ char NetBuffer::ReadChar()
 
 char* NetBuffer::ReadBytes()
 {
-	UINT16 len = InternalReadInteger(sizeof(UINT16));
+	UINT16 len = InternalReadInteger(sizeof(UINT16) * 8);
 	
 	return InternalReadBytes(len);
 }
 
 string NetBuffer::ReadStdString()
 {
-	UINT16 len = InternalReadInteger(sizeof(UINT16));
+	UINT16 len = InternalReadInteger(sizeof(UINT16) * 8);
 	
 	return InternalReadBytes(len);
 }
@@ -174,17 +150,12 @@ bool NetBuffer::ReadBool()
 
 void NetBuffer::SkipPadBits()
 {
-	m_internalBitPos = (GetBytePos() + 1) * 8;
+	m_internalBitPos += 8 - m_internalBitPos % 8;
 }
 
 bool NetBuffer::AssertBufferHasSpace(UINT32 bits)
 {
 	return ((bits + 7) >> 3) < m_internalBufferSize;
-}
-
-void NetBuffer::WriteCurrentByteToBuffer()
-{
-	m_internalBitPos = (GetBytePos() + 1) * 8;
 }
 
 void NetBuffer::InternalWriteByte(const char data, int bit_length)
@@ -208,27 +179,24 @@ void NetBuffer::InternalWriteByte(const char data, int bit_length)
 	// this operation performs a logical AND on the given data and the bit_length
 	// in order to get rid of the unnecessary bits.
 	// The data is AND'ed with 0xFF (1111 1111) shifted to the right by 8 - bit_length, creating the masker.
-	char data_masked = (data & ((char)(~(0)) >> (8 - bit_length)));
+	char data_masked = (char)(((UINT32)data & ((UINT32)(~(UINT32)(0)) >> (8 - bit_length))));
 	
 	int remainingBits = 8 - bit_pos;
 	int overflow = bit_length - remainingBits;
 	
-	m_internalBuffer[GetBytePos()] &= (data_masked >> (overflow));
+	m_internalBuffer[GetBytePos()] |= (data_masked >> (overflow));
 	
 	// this byte is finished
 	if(overflow <= 0)
 	{
-		WriteCurrentByteToBuffer();
 	}
 	// write into the next byte
 	else if(overflow > 0)
 	{
-		WriteCurrentByteToBuffer();
-		
 		remainingBits = overflow;
 		
 		// mask off written bits
-		data_masked &= ((char)(~(0)) >> (8 - remainingBits));
+		data_masked &= ((char)((UINT32)(~(UINT32)(0)) >> (8 - remainingBits)));
 		
 		m_internalBuffer[GetBytePos()] &= (data_masked << (8 - remainingBits));
 	}
@@ -292,7 +260,9 @@ char NetBuffer::InternalReadByte(int bit_length)
 	int remainingBits = 8 - bit_pos;
 	int overflow = bit_length - remainingBits;
 	
-	char retrieved = (m_internalBuffer[GetBytePos()] & ((char)(~(0)) >> overflow)) << overflow;
+	int pos = GetBytePos();
+	
+	char retrieved = (char)((UINT32)m_internalBuffer[pos] & (~(UINT32)(0) >> (overflow)));
 	
 	if(overflow <= 0)
 	{
@@ -300,11 +270,11 @@ char NetBuffer::InternalReadByte(int bit_length)
 	}
 	else if(overflow > 0)
 	{
-		retrieved &= m_internalBuffer[GetBytePos() + 1] & ((char)(~(0)) << (8 - overflow)); 
+		retrieved = (char)((UINT32)(retrieved) & m_internalBuffer[GetBytePos() + 1] & (~(UINT32)(0) << (8 - overflow))); 
 	}
 	
 	m_internalBitPos += bit_length;
-	return retrieved;
+	return (char)retrieved;
 }
 
 char* NetBuffer::InternalReadBytes(int bytes)
@@ -330,11 +300,11 @@ UINT64 NetBuffer::InternalReadInteger(int bits)
 		{
 			// this is the last bitset
 			int rem_bits = bits - i;
-			retrieved &= (UINT64)InternalReadByte(rem_bits) << i;
+			retrieved |= (UINT64)InternalReadByte(rem_bits) << i;
 		}
 		else
 		{
-			retrieved &= (UINT64)InternalReadByte(8) << i;
+			retrieved |= (UINT64)InternalReadByte(8) << i;
 		}
 	}
 	

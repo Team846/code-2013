@@ -4,7 +4,7 @@
 #include <string>
 #include <vector>
 
-#include "../Network/NetConnection.h"
+#include "../Network/NetPeer.h"
 #include "../Network/NetConnectionType.h"
 #include "../Network/NetBuffer.h"
 
@@ -48,7 +48,7 @@ namespace data
 		static void Serialize();
 		
 		static void NewFrame();
-		static void EnqueueBuffer(NetBuffer buff, NetConnection netConn, NetChannel::Enum channelType, int channel);
+		static void EnqueueBuffer(NetBuffer buff, NetPeer netConn, NetChannel::Enum channelType, int channel);
 		
 		
 	private:
@@ -73,7 +73,7 @@ namespace data
 		{
 			DataPacket() : netConn("10.8.46.5", 80, Network::SERVER){};//Finish writing your code before you commit it, seriously, don't give me stuff with linker errors. I changed this to make it compile. FIx it so it actually works. 
 			NetBuffer netBuff;
-			NetConnection netConn;
+			NetPeer netConn;
 			int channel;
 			NetChannel::Enum channelType;
 		};

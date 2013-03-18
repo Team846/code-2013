@@ -12,7 +12,9 @@ namespace Network
 	{
 		enum Enum
 		{
-			MESSAGE_ACK = 0x00
+			MESSAGE_ACK = 0x00,
+			CONNECTION_REQUEST = 0x10,
+			CONNECTION_CONFIRM = 0x11,
 		};
 	};
 };

@@ -78,7 +78,7 @@ void RobotData::Serialize()
 {
 	for(vector<DataPacket>::iterator it = m_frameList.begin(); it != m_frameList.end(); it++)
 	{
-		(*it).netConn.Send((*it).netBuff,(*it).channelType,(*it).channel );
+		//(*it).netConn.Send((*it).netBuff,(*it).channelType,(*it).channel );
 	}
 }
 
@@ -103,7 +103,7 @@ void RobotData::NewFrame()
 	m_frameList.clear();
 }
 
-void RobotData::EnqueueBuffer(NetBuffer buff, NetConnection netConn, NetChannel::Enum channelType, int channel )
+void RobotData::EnqueueBuffer(NetBuffer buff, NetPeer netConn, NetChannel::Enum channelType, int channel )
 {
 	DataPacket packet;
 	packet.netBuff = buff;

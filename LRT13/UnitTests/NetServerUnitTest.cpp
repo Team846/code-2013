@@ -4,7 +4,7 @@ NetServerUnitTest::NetServerUnitTest()
 	: UnitTest()
 {
 	printf("Creating NetConnection\n");
-	m_conn = new NetConnection(INADDR_ANY, 2568, SERVER);
+	m_conn = new NetPeer(INADDR_ANY, 2568, SERVER);
 }
 
 void NetServerUnitTest::Run()
@@ -27,7 +27,7 @@ void NetServerUnitTest::Run()
 
 		b.Write(s.str());
 		
-		m_conn->Send(b, NetChannel::NET_UNRELIABLE_SEQUENCED, 0);
+		//m_conn->Send(b, NetChannel::NET_UNRELIABLE_SEQUENCED, 0);
 		
 		printf("Sending packet...%d\n", counter);
 		

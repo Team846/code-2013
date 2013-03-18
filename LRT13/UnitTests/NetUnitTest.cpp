@@ -3,7 +3,7 @@
 NetUnitTest::NetUnitTest()
 	: UnitTest()
 {
-	m_conn = new NetConnection("10.8.46.x", 2568, CLIENT);
+	m_conn = new NetPeer("10.8.46.x", 2568, CLIENT);
 }
 
 void NetUnitTest::Run()
@@ -22,7 +22,7 @@ void NetUnitTest::Run()
 		
 		b.Write(s.str());
 		
-		m_conn->Send(b, NetChannel::NET_UNRELIABLE_SEQUENCED, 0);
+		//m_conn->Send(b, NetChannel::NET_UNRELIABLE_SEQUENCED, 0);
 		
 		taskDelay(sysClkRateGet() / 4);
 	}

@@ -6,7 +6,7 @@
 
 #include "UnitTest.h"
 
-#include "../Network/NetConnection.h"
+#include "../Network/NetPeer.h"
 #include "../Network/NetBuffer.h"
 
 using namespace Network;
@@ -17,7 +17,7 @@ public:
 	NetUnitTest();
 	void Run();
 private:
-	NetConnection* m_conn;
+	NetPeer* m_conn;
 };
 
 #endif

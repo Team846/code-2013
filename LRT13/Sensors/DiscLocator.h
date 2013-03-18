@@ -2,7 +2,7 @@
 #define DISCLOCATOR_H_
 
 #include "../Network/NetBuffer.h"
-#include "../Network/NetConnection.h"
+#include "../Network/NetPeer.h"
 #include "../Utils/Util.h"
 
 /*!
@@ -19,7 +19,7 @@ public:
 	void Update();
 	
 private:
-	NetConnection* m_conn;
+	NetPeer* m_conn;
 };
 
 #endif

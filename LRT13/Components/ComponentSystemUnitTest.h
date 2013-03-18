@@ -3,7 +3,7 @@
 #include "../Config/RobotConfig.h"
 #include "../Utils/AsyncPrinter.h"
 
-#include "../Network/NetConnection.h"
+#include "../Network/NetPeer.h"
 #include "../Network/NetBuffer.h"
 
 using namespace Network;
@@ -47,5 +47,5 @@ public:
 	
 private:
 	NetBuffer* m_netBuffer;
-	NetConnection* m_netConnection;
+	NetPeer* m_netConnection;
 };

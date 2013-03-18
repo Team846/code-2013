@@ -2,7 +2,7 @@
 
 DiscLocator::DiscLocator()
 {
-	m_conn = new NetConnection(INADDR_ANY, 8000, Network::SERVER);
+	m_conn = new NetPeer(INADDR_ANY, 8000, Network::SERVER);
 }
 
 DiscLocator::~DiscLocator()
@@ -14,7 +14,7 @@ void DiscLocator::Update()
 {
 	NetBuffer* msg;
 	
-	while((msg = m_conn->GetMessage()) != NULL)
+	while((msg = m_conn->ReadMessage()) != NULL)
 	{
 		// process packets
 		

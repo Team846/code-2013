@@ -1,20 +1,20 @@
-#include "NetBuffer.h"
+#include "NetPeer.h"
 #include "NetConnection.h"
 
-const double NetConnection::kResendPacketTime = 1.0; // resend if 100 ms passes with no ACK; max of 500ms roundtrip time
+const double NetPeer::kResendPacketTime = 1.0; // resend if 100 ms passes with no ACK; max of 500ms roundtrip time
 
-NetConnection::NetConnection(char * ip, int port, NetConnectionType connType)
+NetPeer::NetPeer(char * ip, int port, NetConnectionType connType)
 {
 	this->m_ip = ip;
 	this->m_port = port;
 	this->m_connType = connType;
 	
-	for(int i = 0; i < 16; i++)
-	{
-		m_reliableOrdered[i] = new MessageAwaitingACK[MAX_MESSAGE_TRACK];
-		m_reliableSequenced[i] = new MessageAwaitingACK[MAX_MESSAGE_TRACK];
-		m_reliableOrdered[i] = new MessageAwaitingACK[MAX_MESSAGE_TRACK];
-	}
+//	for(int i = 0; i < 16; i++)
+//	{
+//		m_reliableOrdered[i] = new MessageAwaitingACK[MAX_MESSAGE_TRACK];
+//		m_reliableSequenced[i] = new MessageAwaitingACK[MAX_MESSAGE_TRACK];
+//		m_reliableOrdered[i] = new MessageAwaitingACK[MAX_MESSAGE_TRACK];
+//	}
 	
 	this->m_lastUnreliableSequenced = new int[MAX_MESSAGE_TRACK];
 	this->m_lastReliableSequenced 	= new int[MAX_MESSAGE_TRACK];
@@ -26,22 +26,24 @@ NetConnection::NetConnection(char * ip, int port, NetConnectionType connType)
 	
 	InternalPlatformQueueSynchronizationCreate();
 	
+	InternalPlatformConnectionListSynchronizationCreate();
+	
 	InternalPlatformReliableUnorderedQueueSynchronizationCreate();
 	InternalPlatformReliableSequencedQueueSynchronizationCreate();
 	InternalPlatformReliableInOrderQueueSynchronizationCreate();
 }
 
-NetConnection::~NetConnection()
+NetPeer::~NetPeer()
 {
 	Close();
 }
 
 #ifdef __VXWORKS__
-INT32 NetConnection:: InternalPlatformUpdateTaskWrapper(UINT32 instance)
+INT32 NetPeer:: InternalPlatformUpdateTaskWrapper(UINT32 instance)
 {
 	// vxworks specific code
 	
-	NetConnection* conn = (NetConnection*)instance;
+	NetPeer* conn = (NetPeer*)instance;
 	
 	while(conn->m_isRunning)
 	{
@@ -51,11 +53,11 @@ INT32 NetConnection:: InternalPlatformUpdateTaskWrapper(UINT32 instance)
 	return 0;
 }
 
-INT32 NetConnection::InternalPlatformMessageVerificationTaskWrapper(UINT32 instance)
+INT32 NetPeer::InternalPlatformMessageVerificationTaskWrapper(UINT32 instance)
 {
 	// vxworks specific code
 	
-	NetConnection* conn = (NetConnection*)instance;
+	NetPeer* conn = (NetPeer*)instance;
 	
 	while(conn->m_isRunning)
 	{
@@ -66,7 +68,7 @@ INT32 NetConnection::InternalPlatformMessageVerificationTaskWrapper(UINT32 insta
 }
 #endif
 
-void NetConnection::InternalPlatformQueueSynchronizationCreate()
+void NetPeer::InternalPlatformQueueSynchronizationCreate()
 {
 #ifdef __VXWORKS__
 	// vxworks specific code
@@ -74,7 +76,7 @@ void NetConnection::InternalPlatformQueueSynchronizationCreate()
 #endif
 }
 
-void NetConnection::InternalPlatformQueueSynchronizationEnter()
+void NetPeer::InternalPlatformQueueSynchronizationEnter()
 {
 #ifdef __VXWORKS__
 	// vxworks specific code
@@ -82,13 +84,16 @@ void NetConnection::InternalPlatformQueueSynchronizationEnter()
 #endif
 }
 
-void NetConnection::Update()
+void NetPeer::Update()
 {
 	int received;
 	char rcv_buffer[MAX_RECEIVE_BUFFER_SIZE];
 	int addr_size = sizeof(m_remote_spec);
 	
-	while((received = recvfrom(m_socket, rcv_buffer, MAX_RECEIVE_BUFFER_SIZE, 0, (struct sockaddr*)&m_remote_spec, &addr_size)) > 0)
+	struct sockaddr from;
+	int size;
+	
+	while((received = recvfrom(m_socket, rcv_buffer, MAX_RECEIVE_BUFFER_SIZE, 0, &from, &size)) > 0)
 	{
 		NetBuffer* buff = new NetBuffer(rcv_buffer, received);
 		
@@ -97,6 +102,7 @@ void NetConnection::Update()
 		switch(c)
 		{
 		case LIBRARY_DATA:
+		{
 			// what message?
 			LibraryMessageType::Enum msgType = (LibraryMessageType::Enum)buff->ReadChar();
 			
@@ -115,19 +121,50 @@ void NetConnection::Update()
 				switch(chann)
 				{
 				case NetChannel::NET_RELIABLE:
-					m_reliableUnordered[channel][id].acknowledged = true;
+					InternalPlatformReliableUnorderedQueueSynchronizationEnter();
+					m_reliableUnordered[channel].erase(id);
+					InternalPlatformReliableUnorderedQueueSynchronizationLeave();
 					break;
 				case NetChannel::NET_RELIABLE_IN_ORDER:
-					m_reliableOrdered[channel][id].acknowledged = true;
+					InternalPlatformReliableInOrderQueueSynchronizationEnter();
+					m_reliableOrdered[channel].erase(id);
+					InternalPlatformReliableInOrderQueueSynchronizationLeave();
 					break;
 				case NetChannel::NET_RELIABLE_SEQUENCED:
-					m_reliableSequenced[channel][id].acknowledged = true;
+					InternalPlatformReliableSequencedQueueSynchronizationEnter();
+					m_reliableSequenced[channel].erase(id);
+					InternalPlatformReliableSequencedQueueSynchronizationLeave();
 					break;
 				}
-				
-				printf("Received message ack on channel %d with send method %d.\n", channel, chann);
 				break;
+				case LibraryMessageType::CONNECTION_REQUEST:
+				{
+					if(m_connType == CLIENT)
+					{
+						AsyncPrinter::Printf("Somebody tried to connect to us..\n");
+						break;
+					}
+					
+					NetConnection* nc = new NetConnection(from, this);
+					
+					InternalPlatformConnectionListSynchronizationEnter();
+					if(std::find(m_netConnections.begin(), m_netConnections.end(), nc) == m_netConnections.end())
+						m_netConnections.push_back(nc);
+					InternalPlatformConnectionListSynchronizationLeave();
+					
+					NetBuffer confirm;
+					
+					confirm.Write((char)LIBRARY_DATA);
+					confirm.Write((char)LibraryMessageType::CONNECTION_CONFIRM);
+					
+					SendRaw(confirm, *nc);
+				}
+					break;
+				case LibraryMessageType::CONNECTION_CONFIRM:
+					_connected = true;
+					break;
 			}
+		}
 			break;
 		case USER_DATA:
 		{
@@ -150,12 +187,13 @@ void NetConnection::Update()
 				NetBuffer ack;
 				
 				ack.Write((char)LIBRARY_DATA);
+				ack.Write((char)LibraryMessageType::MESSAGE_ACK);
 				ack.Write((char)chann);
 				ack.Write((char)channel);
 				ack.Write(id);
 				
 				// TODO error handling in the future
-				sendto(m_socket, ack.GetBuffer(), ack.GetBytePos(), 0, (struct sockaddr*) &m_remote_spec, sizeof(m_remote_spec));
+				sendto(m_socket, ack.GetBuffer(), ack.GetBytePos(), 0, &from, sizeof(from));
 
 				break;
 			}
@@ -169,7 +207,7 @@ void NetConnection::Update()
 			case NetChannel::NET_UNRELIABLE_SEQUENCED:
 				lastPacket = m_lastUnreliableSequenced[channel];
 				
-				if(id < lastPacket) // TODO: rollover will break this
+				if(id <= lastPacket) // TODO: rollover will break this
 					receive = false;
 				else
 					m_lastUnreliableSequenced[channel] = id;
@@ -177,7 +215,7 @@ void NetConnection::Update()
 			case NetChannel::NET_RELIABLE_SEQUENCED:
 				lastPacket = m_lastReliableSequenced[channel];
 								
-				if(id < lastPacket) // TODO: rollover will break this
+				if(id <= lastPacket) // TODO: rollover will break this
 					receive = false;
 				else
 					m_lastReliableSequenced[channel] = id;
@@ -203,71 +241,99 @@ void NetConnection::Update()
 	}
 }
 
-void NetConnection::CheckMessages()
+void NetPeer::CheckMessages()
 {
-	for(int channel = 0; channel < 16; channel++)
+	while(true)
 	{
-		for(int i = 0; i < MAX_MESSAGE_TRACK; i++)
+		for(int channel = 0; channel < 16; channel++)
 		{
 			// reliable
+			double now;
+			MessageAwaitingACK maack;
+			
 			InternalPlatformReliableUnorderedQueueSynchronizationEnter();
-			MessageAwaitingACK maack = m_reliableUnordered[channel][i];
-			
-			double now = Timer::GetFPGATimestamp();
-			
-			if(!maack.acknowledged && now - maack.sentTime > kResendPacketTime)
+			for(map<int, MessageAwaitingACK>::iterator it = m_reliableUnordered[channel].begin(); it != m_reliableUnordered[channel].end(); it++)
 			{
-				// mark this one as received so we don't send duplicates
-				m_reliableUnordered[channel][i].acknowledged = true;
+				maack = it->second;
 				
-				// resend
-				Send(*maack.buff, NetChannel::NET_RELIABLE, channel);
+				now = Timer::GetFPGATimestamp();
+				
+				if(maack.initialized && !maack.acknowledged && (now - maack.sentTime) > kResendPacketTime)
+				{
+					it->second.acknowledged = true;
+					
+					Send(*maack.buff, *maack.recipient, NetChannel::NET_RELIABLE, channel, it->first);
+				}
 			}
-			
 			InternalPlatformReliableUnorderedQueueSynchronizationLeave();
 			
-			// update timestamp
-			now = Timer::GetFPGATimestamp();
-			
 			InternalPlatformReliableSequencedQueueSynchronizationEnter();
-			
-			// check reliable sequenced
-			maack = m_reliableSequenced[channel][i];
-			
-			if(!maack.acknowledged && now - maack.sentTime > kResendPacketTime)
+			for(map<int, MessageAwaitingACK>::iterator it = m_reliableSequenced[channel].begin(); it != m_reliableSequenced[channel].end(); it++)
 			{
-				// mark this one as received so we don't send duplicates
-				m_reliableSequenced[channel][i].acknowledged = true;
+				maack = it->second;
+								
+				now = Timer::GetFPGATimestamp();
 				
-				// resend
-				Send(*maack.buff, NetChannel::NET_RELIABLE_SEQUENCED, channel);
+				if(maack.initialized && !maack.acknowledged && (now - maack.sentTime) > kResendPacketTime)
+				{
+					it->second.acknowledged = true;
+					
+					Send(*maack.buff, *maack.recipient, NetChannel::NET_RELIABLE_SEQUENCED, channel, it->first);
+				}
 			}
-			
 			InternalPlatformReliableSequencedQueueSynchronizationLeave();
 			
-			// update timestamp
-			now = Timer::GetFPGATimestamp();
-			
 			InternalPlatformReliableInOrderQueueSynchronizationEnter();
-			
-			// check reliable in order
-			maack = m_reliableOrdered[channel][i];
-						
-			if(!maack.acknowledged && now - maack.sentTime > kResendPacketTime)
+			for(map<int, MessageAwaitingACK>::iterator it = m_reliableOrdered[channel].begin(); it != m_reliableOrdered[channel].end(); it++)
 			{
-				// mark this one as received so we don't send duplicates
-				m_reliableOrdered[channel][i].acknowledged = true;
+				maack = it->second;
+								
+				now = Timer::GetFPGATimestamp();
 				
-				// resend
-				Send(*maack.buff, NetChannel::NET_RELIABLE_IN_ORDER, channel);
+				if(maack.initialized && !maack.acknowledged && (now - maack.sentTime) > kResendPacketTime)
+				{
+					it->second.acknowledged = true;
+					
+					Send(*maack.buff, *maack.recipient, NetChannel::NET_RELIABLE_IN_ORDER, channel, it->first);
+				}
 			}
-			
 			InternalPlatformReliableInOrderQueueSynchronizationLeave();
+		}
+	}
+	
+	if(_connectionRequested && !_connected)
+	{
+		if((Timer::GetFPGATimestamp() - _connectionRequestTime) > 1.00)
+		{
+			// TODO retry connect
+			
+			_connectionRequestTime = Timer::GetFPGATimestamp();
 		}
 	}
 }
 
-void NetConnection::InternalPlatformQueueSynchronizationLeave()
+void NetPeer::InternalPlatformConnectionListSynchronizationCreate()
+{
+#ifdef __VXWORKS__
+	m_connectionListMutex = semBCreate(SEM_Q_PRIORITY, SEM_FULL);
+#endif
+}
+
+void NetPeer::InternalPlatformConnectionListSynchronizationEnter()
+{
+#ifdef __VXWORKS__
+	semTake(m_connectionListMutex, WAIT_FOREVER);
+#endif
+}
+
+void NetPeer::InternalPlatformConnectionListSynchronizationLeave()
+{
+#ifdef __VXWORKS__
+	semGive(m_connectionListMutex);
+#endif
+}
+
+void NetPeer::InternalPlatformQueueSynchronizationLeave()
 {
 #ifdef __VXWORKS__
 	// vxworks specific code
@@ -275,7 +341,7 @@ void NetConnection::InternalPlatformQueueSynchronizationLeave()
 #endif
 }
 
-void NetConnection::InternalPlatformReliableUnorderedQueueSynchronizationCreate()
+void NetPeer::InternalPlatformReliableUnorderedQueueSynchronizationCreate()
 {
 #ifdef __VXWORKS__
 	// vxworks specific code
@@ -283,7 +349,7 @@ void NetConnection::InternalPlatformReliableUnorderedQueueSynchronizationCreate(
 #endif
 }
 
-void NetConnection::InternalPlatformReliableUnorderedQueueSynchronizationEnter()
+void NetPeer::InternalPlatformReliableUnorderedQueueSynchronizationEnter()
 {
 #ifdef __VXWORKS__
 	// vxworks specific code
@@ -291,7 +357,7 @@ void NetConnection::InternalPlatformReliableUnorderedQueueSynchronizationEnter()
 #endif
 }
 
-void NetConnection::InternalPlatformReliableUnorderedQueueSynchronizationLeave()
+void NetPeer::InternalPlatformReliableUnorderedQueueSynchronizationLeave()
 {
 #ifdef __VXWORKS__
 	// vxworks specific code
@@ -299,7 +365,7 @@ void NetConnection::InternalPlatformReliableUnorderedQueueSynchronizationLeave()
 #endif
 }
 
-void NetConnection::InternalPlatformReliableSequencedQueueSynchronizationCreate()
+void NetPeer::InternalPlatformReliableSequencedQueueSynchronizationCreate()
 {
 #ifdef __VXWORKS__
 	// vxworks specific code
@@ -307,7 +373,7 @@ void NetConnection::InternalPlatformReliableSequencedQueueSynchronizationCreate(
 #endif
 }
 
-void NetConnection::InternalPlatformReliableSequencedQueueSynchronizationEnter()
+void NetPeer::InternalPlatformReliableSequencedQueueSynchronizationEnter()
 {
 #ifdef __VXWORKS__
 	// vxworks specific code
@@ -315,7 +381,7 @@ void NetConnection::InternalPlatformReliableSequencedQueueSynchronizationEnter()
 #endif
 }
 
-void NetConnection::InternalPlatformReliableSequencedQueueSynchronizationLeave()
+void NetPeer::InternalPlatformReliableSequencedQueueSynchronizationLeave()
 {
 #ifdef __VXWORKS__
 	// vxworks specific code
@@ -323,7 +389,7 @@ void NetConnection::InternalPlatformReliableSequencedQueueSynchronizationLeave()
 #endif
 }
 
-void NetConnection::InternalPlatformReliableInOrderQueueSynchronizationCreate()
+void NetPeer::InternalPlatformReliableInOrderQueueSynchronizationCreate()
 {
 #ifdef __VXWORKS__
 	// vxworks specific code
@@ -331,7 +397,7 @@ void NetConnection::InternalPlatformReliableInOrderQueueSynchronizationCreate()
 #endif
 }
 
-void NetConnection::InternalPlatformReliableInOrderQueueSynchronizationEnter()
+void NetPeer::InternalPlatformReliableInOrderQueueSynchronizationEnter()
 {
 #ifdef __VXWORKS__
 	// vxworks specific code
@@ -339,7 +405,7 @@ void NetConnection::InternalPlatformReliableInOrderQueueSynchronizationEnter()
 #endif
 }
 
-void NetConnection::InternalPlatformReliableInOrderQueueSynchronizationLeave()
+void NetPeer::InternalPlatformReliableInOrderQueueSynchronizationLeave()
 {
 #ifdef __VXWORKS__
 	// vxworks specific code
@@ -347,7 +413,7 @@ void NetConnection::InternalPlatformReliableInOrderQueueSynchronizationLeave()
 #endif
 }
 
-void NetConnection::InternalPlatformCreateUpdateTasks()
+void NetPeer::InternalPlatformCreateUpdateTasks()
 {
 	static int counter = 0;
 	
@@ -368,7 +434,7 @@ void NetConnection::InternalPlatformCreateUpdateTasks()
 #endif
 }
 
-void NetConnection::InternalPlatformRunUpdateTasks()
+void NetPeer::InternalPlatformRunUpdateTasks()
 {
 #ifdef __VXWORKS__
 	// vxworks specific code
@@ -377,7 +443,7 @@ void NetConnection::InternalPlatformRunUpdateTasks()
 #endif
 }
 
-void NetConnection::InternalPlatformDestroyUpdateTasks()
+void NetPeer::InternalPlatformDestroyUpdateTasks()
 {
 #ifdef __VXWORKS__
 	// vxworks specific code
@@ -389,7 +455,7 @@ void NetConnection::InternalPlatformDestroyUpdateTasks()
 #endif
 }
 
-int NetConnection::Open(int options, ...)
+int NetPeer::Open(int options, ...)
 {
 	m_socket = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
 	
@@ -417,26 +483,27 @@ int NetConnection::Open(int options, ...)
 	
 	va_end(vl);
 	
+	m_remote_spec.sin_family = AF_INET;
+	
 	switch(this->m_connType)
 	{
 		case Network::CLIENT:
 			m_remote_spec.sin_addr.s_addr = inet_addr(this->m_ip);
-			m_remote_spec.sin_family = AF_INET;
 			m_remote_spec.sin_port = htons(this->m_port);
+			
 			break;
 		case Network::SERVER:
-			m_remote_spec.sin_addr.s_addr = htonl(atoi(this->m_ip));
-			m_remote_spec.sin_family = AF_INET;
+			m_remote_spec.sin_addr.s_addr = INADDR_ANY;
 			m_remote_spec.sin_port = htons(this->m_port);
-			
-			int retcode = bind(m_socket, (struct sockaddr*) &m_remote_spec, sizeof(m_remote_spec));
-			
-			if(retcode < 0)
-			{
-				Close();
-				return retcode;
-			}
 			break;
+	}
+	
+	int retcode = bind(m_socket, (struct sockaddr*) &m_remote_spec, sizeof(m_remote_spec));
+	
+	if(retcode < 0)
+	{
+		Close();
+		return retcode;
 	}
 	
 	m_isRunning = true;
@@ -447,7 +514,7 @@ int NetConnection::Open(int options, ...)
 	return 0;
 }
 
-int NetConnection::Close()
+int NetPeer::Close()
 {
 	m_isRunning = false;
 	
@@ -457,23 +524,27 @@ int NetConnection::Close()
 	return close(m_socket);
 }
 
-int NetConnection::Send(NetBuffer buff, NetChannel::Enum method, int channel)
+int NetPeer::Send(NetBuffer buff, NetConnection to, NetChannel::Enum method, int channel, int id)
 {
 	if(buff.m_sent)
 	{
 		return SEND_FAILED_BUFFER_ALREADY_SENT;
 	}
 
-	if(buff.m_internalBuffer == NULL)
+	if(buff.GetBuffer() == NULL)
 	{
 		return SEND_FAILED_BUFFER_INVALID;
 	}
 
+	bool addToInternalQueue = id == -1;
+	
 	MessageAwaitingACK maack;
 	
+	maack.initialized = true;
 	maack.buff = &buff;
 	maack.sentTime = Timer::GetFPGATimestamp();
 	maack.acknowledged = false;
+	maack.recipient = &to;
 	
 	NetBuffer* localBuff = new NetBuffer();
 	localBuff->Write((char)USER_DATA);
@@ -484,22 +555,40 @@ int NetConnection::Send(NetBuffer buff, NetChannel::Enum method, int channel)
 	{
 		// TODO: specific handlers for different methods
 	case NetChannel::NET_RELIABLE:
-		localBuff->Write(m_currentReliableUnorderedCounter);
-		InternalPlatformReliableUnorderedQueueSynchronizationEnter();
-		m_reliableUnordered[channel][m_currentReliableUnorderedCounter++] = maack;
-		InternalPlatformReliableUnorderedQueueSynchronizationLeave();
+		id = id == -1 ? ++m_currentReliableUnorderedCounter : id;
+		
+		localBuff->Write(id);
+		
+		if(addToInternalQueue)
+		{
+			InternalPlatformReliableUnorderedQueueSynchronizationEnter();
+			m_reliableUnordered[channel][id] = maack;
+			InternalPlatformReliableUnorderedQueueSynchronizationLeave();
+		}
 		break;
 	case NetChannel::NET_RELIABLE_IN_ORDER:
-		localBuff->Write(m_currentReliableOrderedCounter);
-		InternalPlatformReliableInOrderQueueSynchronizationEnter();
-		m_reliableOrdered[channel][m_currentReliableOrderedCounter++] = maack;
-		InternalPlatformReliableInOrderQueueSynchronizationLeave();
+		id = id == -1 ? ++m_currentReliableOrderedCounter : id;
+		
+		localBuff->Write(id);
+		
+		if(addToInternalQueue)
+		{
+			InternalPlatformReliableInOrderQueueSynchronizationEnter();
+			m_reliableOrdered[channel][id] = maack;
+			InternalPlatformReliableInOrderQueueSynchronizationLeave();
+		}
 		break;
 	case NetChannel::NET_RELIABLE_SEQUENCED:
-		localBuff->Write(m_currentReliableSequencedCounter);
-		InternalPlatformReliableSequencedQueueSynchronizationEnter();
-		m_reliableSequenced[channel][m_currentReliableSequencedCounter++] = maack;
-		InternalPlatformReliableSequencedQueueSynchronizationLeave();
+		id = id == -1 ? ++m_currentReliableSequencedCounter : id;
+		
+		localBuff->Write(id);
+		
+		if(addToInternalQueue)
+		{
+			InternalPlatformReliableSequencedQueueSynchronizationEnter();
+			m_reliableSequenced[channel][id] = maack;
+			InternalPlatformReliableSequencedQueueSynchronizationLeave();
+		}
 		break;
 	case NetChannel::NET_UNRELIABLE:
 		localBuff->Write(0);
@@ -512,16 +601,23 @@ int NetConnection::Send(NetBuffer buff, NetChannel::Enum method, int channel)
 		break;
 	}
 
-	localBuff->Write(buff.m_internalBuffer);
+	localBuff->WriteRaw(buff.GetBuffer(), buff.GetBytePos());
 	
 	buff.m_sent = true;
 	
-	int iResult = sendto(m_socket, buff.m_internalBuffer, buff.GetBytePos(), 0, (struct sockaddr*) &m_remote_spec, sizeof(m_remote_spec));
+	int iResult = sendto(m_socket, localBuff->GetBuffer(), localBuff->GetBytePos(), 0, to.RemoteEndpoint(), sizeof(*(to.RemoteEndpoint())));
 	
 	return iResult;
 }
 
-NetBuffer* NetConnection::GetMessage()
+void NetPeer::SendRaw(NetBuffer nb, NetConnection nc)
+{
+	nb.m_sent = true;
+	
+	sendto(m_socket, nb.GetBuffer(), nb.GetBytePos(), 0, nc.RemoteEndpoint(), sizeof(*nc.RemoteEndpoint()));
+}
+
+NetBuffer* NetPeer::ReadMessage()
 {
 	NetBuffer* buff;
 	
