@@ -126,21 +126,34 @@ void TeleopInputs::Update()
 	
 //	AsyncPrinter::Printf("Inputs\n");
 
-	/************************Climber Functions************************/
+	if (m_operator_stick->IsButtonJustPressed(DriverStationConfig::JoystickButtons::CLIMBER_ARM))
+	{
+		m_componentData->climberData->changeArmState();
+		AsyncPrinter::Printf("Arm\n");
+		//change arm position
+	}
+	/************************Climber Functions************************/\
+	if (m_operator_stick->IsButtonDown(DriverStationConfig::JoystickButtons::CONDITIONAL_ABORT))
+	{
+		m_componentData->climberData->setShouldPotentiallyAbort(true);
+	}
+	else
+	{
+		m_componentData->climberData->setShouldPotentiallyAbort(false);
+	}
+	
+	if (m_operator_stick->IsButtonJustPressed(DriverStationConfig::JoystickButtons::ARM_ANGLE))
+	{
+//		m_componentData->climberData->changeAngleState();
+		//change angle
+		if (m_componentData->shooterData->ShouldLauncherBeHigh())
+					m_componentData->shooterData->SetLauncherAngleLow();
+				else
+					m_componentData->shooterData->SetLauncherAngleHigh();
+	}
 	if (m_operator_stick->IsButtonDown(DriverStationConfig::JoystickButtons::DEBUG_CLIMBER))
 	{
 		m_componentData->climberData->enableDebug();
-		if (m_operator_stick->IsButtonJustPressed(DriverStationConfig::JoystickButtons::CLIMBER_ARM))
-		{
-			m_componentData->climberData->changeArmState();
-			AsyncPrinter::Printf("Arm\n");
-			//change arm position
-		}
-		if (m_operator_stick->IsButtonJustPressed(DriverStationConfig::JoystickButtons::ARM_ANGLE))
-		{
-			m_componentData->climberData->changeAngleState();
-			//change angle
-		}
 
 		
 		if (m_operator_stick->IsButtonJustPressed(DriverStationConfig::JoystickButtons::ENGAGE_PTO))
@@ -199,6 +212,10 @@ void TeleopInputs::Update()
 //		AsyncPrinter::Printf("firing\n");
 		m_componentData->shooterData->SetShooterSetting(CONTINOUS);
 	}
+	else if (m_driver_stick->IsButtonDown(DriverStationConfig::JoystickButtons::FIRE_SINGLE))
+	{
+		m_componentData->shooterData->SetShooterSetting(ONCE);
+	}
 	else
 	{
 //		AsyncPrinter::Printf("Not firing\n");
@@ -214,7 +231,7 @@ void TeleopInputs::Update()
 			m_componentData->shooterData->SetLauncherAngleHigh();
 	}
 	
-	if (m_operator_stick->IsButtonJustPressed(DriverStationConfig::JoystickButtons::TOGGLE_SHOOTER))
+	if (m_operator_stick->IsButtonJustPressed(DriverStationConfig::JoystickButtons::SHOOTER_ON))
 	{
 		m_componentData->shooterData->SetEnabled(true);
 	}
@@ -247,7 +264,10 @@ void TeleopInputs::Update()
 	
 	/************************Collector************************/
 	if (m_driver_stick->IsButtonDown(
-				DriverStationConfig::JoystickButtons::COLLECTOR_SLIDE))
+				DriverStationConfig::JoystickButtons::COLLECTOR_SLIDE) || 
+		m_operator_stick->IsButtonDown(
+						DriverStationConfig::JoystickButtons::COLLECTOR_DOWN_OPERATOR) 
+				)
 	{
 		m_componentData->collectorData->SlideDown();
 		m_componentData->collectorData->RunRollers();
@@ -260,6 +280,12 @@ void TeleopInputs::Update()
 	{
 		m_componentData->collectorData->SlideUp();
 		m_componentData->collectorData->StopRollers();
+	}
+	
+	if (m_operator_stick->IsButtonDown(DriverStationConfig::JoystickButtons::RUN_BACKWORDS) &&
+			!m_operator_stick->IsButtonDown(DriverStationConfig::JoystickButtons::DEBUG_CLIMBER))
+	{
+		m_componentData->collectorData->RunRollersBackwords();
 	}
 	
 		

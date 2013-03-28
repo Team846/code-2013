@@ -1,5 +1,6 @@
 #include "AutonomousRoutines.h"
 #include "../ComponentData/ComponentData.h"
+#include "../ComponentData/CollectorData.h"
 #include "../ComponentData/ShooterData.h"
 #include "AutoActions.h"
 #include "../Config/DriverStationConfig.h"
@@ -46,16 +47,20 @@ void AutonomousRoutines::TeleopTick()
 
 void AutonomousRoutines::Autonomous()
 {
+	m_componentData->shooterData->SetLauncherAngleLow();
+	m_componentData->shooterData->SetEnabled(true);
+	m_componentData->drivetrainData->setVelocitySetpoint(FORWARD, 0.0);
+	m_componentData->drivetrainData->setVelocitySetpoint(TURN, 0.0);
 	double delay = DriverStation::GetInstance()->GetAnalogIn(DriverStationConfig::AnalogIns::AUTONOMOUS_DELAY);
 	delay *= 3;//factor so that we can wait the whole auton
 	//waiting the delay
-	AsyncPrinter::Printf("STarting auton\n");
+	AsyncPrinter::Printf("Starting auton.\n");
 	SafeWait(delay, 10);
 
 	printf("Wait is done\n");
 	
 	int routine = (int) (DriverStation::GetInstance()->GetAnalogIn(DriverStationConfig::AnalogIns::AUTONOMOUS_SELECT) + 0.5);
-	AsyncPrinter::Printf("STarting routine number %d\n", routine);
+	AsyncPrinter::Printf("Starting routine number %d.\n", routine);
 	
 	switch (routine)
 	{
@@ -72,11 +77,113 @@ void AutonomousRoutines::Autonomous()
 		
 	//simple shoot 10 routine to make sure we unload all of our frisbees
 	case 2:
+		AsyncPrinter::Printf("Crazy\n");
 		m_componentData->shooterData->SetNumFrisbeesInStorage(10);
 		FireAllFrisbees(15.0);
 		break;
 		
 	case 3://start in back and do the fancy driving back routine
+//		m_componentData->shooterData->SetNumFrisbeesInStorage(6);
+//		FireAllFrisbees(5.0);
+		m_componentData->drivetrainData->setControlMode(FORWARD, POSITION_CONTROL);
+		m_componentData->drivetrainData->setRelativePositionSetpoint(FORWARD, 12 * 3.5, 0.4);
+		m_componentData->drivetrainData->setVelocitySetpoint(TURN, 0.0);
+		m_componentData->drivetrainData->cleanWaitForSem(m_componentData->drivetrainData->createPositionOperationSemaphore(FORWARD, 0.1));
+		StopDrive();
+		
+		m_componentData->drivetrainData->setControlMode(TURN, POSITION_CONTROL);
+		m_componentData->drivetrainData->setRelativePositionSetpoint(TURN, -55, 0.4);
+		m_componentData->drivetrainData->setVelocitySetpoint(FORWARD, 0.0);
+		m_componentData->drivetrainData->cleanWaitForSem(m_componentData->drivetrainData->createPositionOperationSemaphore(TURN, 5));
+		StopDrive();
+		
+		m_componentData->collectorData->SlideDown();
+		m_componentData->collectorData->RunRollers();
+		
+		m_componentData->drivetrainData->setControlMode(FORWARD, POSITION_CONTROL);
+		m_componentData->drivetrainData->setRelativePositionSetpoint(FORWARD, 12.0 * 8, 0.4);
+		m_componentData->drivetrainData->setVelocitySetpoint(TURN, 0.0);
+		m_componentData->drivetrainData->cleanWaitForSem(m_componentData->drivetrainData->createPositionOperationSemaphore(FORWARD, 0.1));
+		StopDrive();
+
+		m_componentData->drivetrainData->setControlMode(TURN, POSITION_CONTROL);
+		m_componentData->drivetrainData->setRelativePositionSetpoint(TURN, 146.5, 0.4);
+		m_componentData->drivetrainData->setVelocitySetpoint(FORWARD, 0.0);
+		m_componentData->drivetrainData->cleanWaitForSem(m_componentData->drivetrainData->createPositionOperationSemaphore(TURN, 5));
+		StopDrive();
+		
+		m_componentData->drivetrainData->setControlMode(FORWARD, POSITION_CONTROL);
+		m_componentData->drivetrainData->setRelativePositionSetpoint(FORWARD, 12.0 * 5, 0.20);
+		m_componentData->drivetrainData->setVelocitySetpoint(TURN, 0.0);
+		m_componentData->drivetrainData->cleanWaitForSem(m_componentData->drivetrainData->createPositionOperationSemaphore(FORWARD, 0.15));
+		StopDrive();
+		
+		m_componentData->drivetrainData->setControlMode(TURN, POSITION_CONTROL);
+		m_componentData->drivetrainData->setRelativePositionSetpoint(TURN, -45, 0.4);
+		m_componentData->drivetrainData->setVelocitySetpoint(FORWARD, 0.0);
+		m_componentData->drivetrainData->cleanWaitForSem(m_componentData->drivetrainData->createPositionOperationSemaphore(TURN, 5));
+		StopDrive();
+
+		m_componentData->drivetrainData->setControlMode(FORWARD, POSITION_CONTROL);
+		m_componentData->drivetrainData->setRelativePositionSetpoint(FORWARD, -12.0 * 6, 0.2);
+		m_componentData->drivetrainData->setVelocitySetpoint(TURN, 0.0);
+		m_componentData->drivetrainData->cleanWaitForSem(m_componentData->drivetrainData->createPositionOperationSemaphore(FORWARD, 0.1));
+		StopDrive();
+
+		AsyncPrinter::Printf("About to move the rollers up.\n");
+		
+		
+		m_componentData->collectorData->SlideUp();
+		m_componentData->collectorData->StopRollers();
+				
+		AsyncPrinter::Printf("Just moved the rollers up.\n");
+
+		m_componentData->drivetrainData->setControlMode(TURN, POSITION_CONTROL);
+		m_componentData->drivetrainData->setRelativePositionSetpoint(TURN, -45, 0.2);
+		m_componentData->drivetrainData->setVelocitySetpoint(FORWARD, 0.0);
+		m_componentData->drivetrainData->cleanWaitForSem(m_componentData->drivetrainData->createPositionOperationSemaphore(TURN, 5));
+		StopDrive();
+//		
+//		m_componentData->drivetrainData->setControlMode(FORWARD, POSITION_CONTROL);
+//		m_componentData->drivetrainData->setRelativePositionSetpoint(FORWARD, -12 * 4, 0.2);
+//		m_componentData->drivetrainData->setVelocitySetpoint(TURN, 0.0);
+//		m_componentData->drivetrainData->cleanWaitForSem(m_componentData->drivetrainData->createPositionOperationSemaphore(FORWARD, 0.1));
+//		StopDrive();
+//		m_componentData->drivetrainData->setControlMode(FORWARD, VELOCITY_CONTROL);
+//		m_componentData->drivetrainData->setVelocitySetpoint(FORWARD, 0.0);
+//		m_componentData->drivetrainData->setVelocitySetpoint(TURN, 0.0);
+		
+		//-108.5
+		//-2405.8166
+		
+		//2297.3
+		//229.73 per rev
+		
+		//New code
+		//Positive = clockwise
+			
+//		m_componentData->drivetrainData->setControlMode(FORWARD, POSITION_CONTROL);
+//		m_componentData->drivetrainData->setRelativePositionSetpoint(FORWARD, 12.0 * 4.0, 0.2);
+//		m_componentData->drivetrainData->setVelocitySetpoint(TURN, 0.0);
+//		m_componentData->drivetrainData->cleanWaitForSem(m_componentData->drivetrainData->createPositionOperationSemaphore(TURN, 5));
+//		StopDrive();
+//		
+//		m_componentData->drivetrainData->setControlMode(TURN, POSITION_CONTROL);
+//		m_componentData->drivetrainData->setRelativePositionSetpoint(TURN, -135, 0.2);
+//		m_componentData->drivetrainData->setVelocitySetpoint(FORWARD, 0.0);
+//		m_componentData->drivetrainData->cleanWaitForSem(m_componentData->drivetrainData->createPositionOperationSemaphore(TURN, 5));
+//		StopDrive();
+//		
+//		m_componentData->drivetrainData->setControlMode(FORWARD, POSITION_CONTROL);
+//		m_componentData->drivetrainData->setRelativePositionSetpoint(FORWARD, 12.0 * 6.0, 0.2);
+//		m_componentData->drivetrainData->setVelocitySetpoint(TURN, 0.0);
+//		m_componentData->drivetrainData->cleanWaitForSem(m_componentData->drivetrainData->createPositionOperationSemaphore(TURN, 5));
+//		StopDrive();
+//		
+		
+		
+		
+		
 		break;
 		
 	case 4://test routine
@@ -84,8 +191,16 @@ void AutonomousRoutines::Autonomous()
 		
 	}
 	//initial wait
-	AsyncPrinter::Printf("Auton done\n");
+	AsyncPrinter::Printf("Auton done.\n");
 	m_isRunning = false;
+}
+
+void AutonomousRoutines::StopDrive()
+{
+	m_componentData->drivetrainData->setControlMode(TURN, VELOCITY_CONTROL);
+	m_componentData->drivetrainData->setControlMode(FORWARD, VELOCITY_CONTROL);
+	m_componentData->drivetrainData->setVelocitySetpoint(FORWARD, 0.0);
+	m_componentData->drivetrainData->setVelocitySetpoint(TURN, 0.0);
 }
 
 void AutonomousRoutines::ServiceAutoAimBackBoard()
@@ -111,11 +226,38 @@ void AutonomousRoutines::FireAllFrisbees(double timeoutSeconds)
 	AsyncPrinter::Printf("is running %d\n", m_isRunning);
 	AsyncPrinter::Printf("time: %d, endtime %d\n", GetFPGATime(), startTime + timeoutSeconds);
 	
+	static int e = 0;
+	static int lastNum = m_componentData->shooterData->GetNumFrisbeesInStorage();
+	static int releaseCount = 0;
+	
 	AsyncPrinter::Printf("numFrisees %d\n", m_componentData->shooterData->GetNumFrisbeesInStorage() );
 	while (m_isRunning && GetFPGATime() < startTime + timeoutSeconds * 1E6 && m_componentData->shooterData->GetNumFrisbeesInStorage() > 0)
 	{
-		AsyncPrinter::Printf("Firing frisbees\n");
-		m_componentData->shooterData->SetShooterSetting(CONTINOUS);
+		if (lastNum != m_componentData->shooterData->GetNumFrisbeesInStorage())
+			e = 0;
+		else 
+			e++;
+		lastNum = m_componentData->shooterData->GetNumFrisbeesInStorage();
+		
+		if (e > 200 * 2)
+		{
+			AsyncPrinter::Printf("Timing out");
+			releaseCount = 25 * 2;
+			e = 0;
+		}
+		
+		if (releaseCount > 0)
+		{
+			AsyncPrinter::Printf("releasing\n");
+			releaseCount--;
+			m_componentData->shooterData->SetShooterSetting(OFF);
+		}
+		else
+		{
+//			AsyncPrinter::Printf("Firing frisbees\n");
+			m_componentData->shooterData->SetShooterSetting(CONTINOUS);
+			
+		}
 		AutonomousFreeCPUPause();
 	}
 	

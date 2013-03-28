@@ -31,6 +31,7 @@ public:
 protected:
 	virtual INT32 Tick();
 private:
+	void StopDrive();
 	/*
 	 * @brief Runs autonomous routine
 	 */

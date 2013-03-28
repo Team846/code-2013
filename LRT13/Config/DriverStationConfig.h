@@ -11,6 +11,7 @@ namespace DriverStationConfig
 {
 namespace JoystickConfig
 {
+
 const uint32_t NUM_JOYSTICK_BUTTONS = 12;// Max supported by the driver station software. 
 										// Having more than 12 can cause a crash in very particular scenarios involving broken USB hubs. 
 const uint32_t NUM_JOYSTICK_AXES = 6;
@@ -23,10 +24,12 @@ const uint32_t DRIVER_WHEEL_PORT = 3;
 }
 namespace JoystickButtons
 {
-const uint32_t FIRE = 1;
-const uint32_t COLLECTOR_SLIDE = 2;
+//Driver stick
+const uint32_t COLLECTOR_SLIDE = 1;
+const uint32_t FIRE = 2;
 const uint32_t CHANGE_ANGLE = 3;
-const uint32_t CONTINUE_CLIMB = 4;
+const uint32_t FIRE_SINGLE = 4;
+const uint32_t CONTINUE_CLIMB = 11;
 
 //const uint32_t FORCE_CLIMB_ADVANCE= 4;
 
@@ -39,16 +42,21 @@ const uint32_t SAVE_CONFIG = 7;
 const uint32_t RESET_ZERO = 10;
 
 
-
+//Operator stick 
 const uint32_t DEBUG_CLIMBER = 1;
-const uint32_t TOGGLE_SHOOTER = 2;
+const uint32_t SHOOTER_ON = 2;
+const uint32_t CONDITIONAL_ABORT = 2;
 const uint32_t CLIMBER_ARM = 3;
 const uint32_t ARM_ANGLE = 4;
 const uint32_t COLLECTOR_DOWN_NO_MOTOR = 5;
-const uint32_t ENGAGE_PTO = 6;
-const uint32_t DISENGAGE_PTO = 7;
+const uint32_t ENGAGE_PTO = 6;//debug
+const uint32_t SHOOTER_SLOWER = 6;
+const uint32_t DISENGAGE_PTO = 7;//debug
+const uint32_t SHOOTER_FASTER = 7;
 const uint32_t PAWL_DOWN = 8;
+const uint32_t RUN_BACKWORDS = 8;
 const uint32_t PAWL_UP = 9;
+const uint32_t COLLECTOR_DOWN_OPERATOR = 10;
 
 const uint32_t STOP_ROBOT = 5;
 }

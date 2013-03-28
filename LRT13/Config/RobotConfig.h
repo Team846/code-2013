@@ -76,7 +76,7 @@ namespace CAN // Ports 1-16 (2CAN limitation)
 	const uint32_t LEFT_DRIVE_B = 4;
 	const uint32_t RIGHT_DRIVE_A = 2;
 	const uint32_t RIGHT_DRIVE_B = 3;
-	const uint32_t COLLECTOR = 13;
+	const uint32_t COLLECTOR = 8;
 	const uint32_t SHOOTER_A = 7;
 	const uint32_t SHOOTER_B = 5;
 	const uint32_t WINCH_WORM = 6;
