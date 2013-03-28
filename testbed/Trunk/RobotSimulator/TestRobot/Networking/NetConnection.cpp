@@ -2,19 +2,19 @@
 
 using namespace Network;
 
-sockaddr* NetConnection::RemoteEndpoint()
+sockaddr_in* NetConnection::RemoteEndpoint()
 {
 	return &m_remoteEndpoint;
 }
 
-NetConnection::NetConnection(sockaddr iep, NetPeer* peer)
+NetConnection::NetConnection(sockaddr_in iep, NetPeer* peer)
 {
 	m_remoteEndpoint = iep;
 	
 	m_netPeer = peer;
 }
 		
-void NetConnection::Send(NetBuffer buff, NetChannel::Enum method, int channel)
+void NetConnection::Send(NetBuffer* buff, NetChannel::Enum method, int channel)
 {
-	m_netPeer->Send(buff, *this, method, channel);
+	m_netPeer->Send(buff, this, method, channel);
 }

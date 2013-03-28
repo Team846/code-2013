@@ -21,7 +21,7 @@ namespace Network
 	public:
 		NetServer(int port);
 		
-		void SendToAll(NetBuffer buff, NetChannel::Enum method, int channel);
+		void SendToAll(NetBuffer* buff, NetChannel::Enum method, int channel);
 		
 		vector<NetConnection*> Connections(); 
 	};

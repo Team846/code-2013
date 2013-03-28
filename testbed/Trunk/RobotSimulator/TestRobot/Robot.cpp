@@ -62,7 +62,7 @@ void Robot::StartCompetition()
 		buff.Write((float)totalTime);
 		buff.Write(1.0f);
 
-		server->SendToAll(buff, NetChannel::NET_UNRELIABLE_SEQUENCED, 1);
+		server->SendToAll(&buff, NetChannel::NET_UNRELIABLE_SEQUENCED, 1);
 
 		printf("Sending value of 1.0"); 
 
@@ -92,4 +92,29 @@ __declspec(dllexport) INT32 FRC_UserProgram_StartupLibraryInit()
 extern "C" __declspec(dllexport) void InteropTest()
 {
 	printf("From unmanaged DLL!\n");
+}
+
+int main()
+{
+	printf("RobotSimulator 1.0\n");
+	printf("\n");
+
+	//RBase *robot = new Rbt();
+
+	//RobotBase* robot = new Robot();
+
+	//printf("!");
+
+	//FRC_userClassFactory();
+
+	RobotBase::startRobotTask((FUNCPTR)FRC_userClassFactory);
+	/*
+	Task *t = new Task("test task", (FUNCPTR)ThreadEntry, 101, 20000);
+	t->Start('a');
+
+	Task *t2 = new Task("test task 2", (FUNCPTR)ThreadEntry, 101, 20000);
+	t->Start('b');*/
+
+	while(true) ;
+	//system("PAUSE");
 }

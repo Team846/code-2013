@@ -8,14 +8,16 @@ NetServer::NetServer(int port)
 	
 }
 
-void NetServer::SendToAll(NetBuffer buff, NetChannel::Enum method, int channel)
+void NetServer::SendToAll(NetBuffer* buff, NetChannel::Enum method, int channel)
 {
 	vector<NetConnection*> netConnections = Connections();
 	
 	for(vector<NetConnection*>::iterator it = netConnections.begin(); it != netConnections.end(); it++)
 	{
-		Send(buff, **it, method, channel); // the exotic double dereference
+		Send(buff, *it, method, channel);
 	}
+
+	printf("done sending\n");
 }
 
 vector<NetConnection*> NetServer::Connections()

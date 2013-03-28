@@ -42,6 +42,8 @@ NetPeer::~NetPeer()
 INT32 NetPeer:: InternalPlatformUpdateTaskWrapper(UINT32 instance)
 {
 	// vxworks specific code
+
+	printf("Update task started. \n");
 	
 	NetPeer* conn = (NetPeer*)instance;
 	
@@ -57,6 +59,8 @@ INT32 NetPeer::InternalPlatformMessageVerificationTaskWrapper(UINT32 instance)
 {
 	// vxworks specific code
 	
+	printf("Message check task started. \n");
+
 	NetPeer* conn = (NetPeer*)instance;
 	
 	while(conn->m_isRunning)
@@ -86,14 +90,16 @@ void NetPeer::InternalPlatformQueueSynchronizationEnter()
 
 void NetPeer::Update()
 {
-	int received;
+	int received = 0;
 	char rcv_buffer[MAX_RECEIVE_BUFFER_SIZE];
 	int addr_size = sizeof(m_remote_spec);
 	
-	struct sockaddr from;
+	sockaddr_in from;
+	int fromSize = sizeof(from);
+
 	int size;
 	
-	while((received = recvfrom(m_socket, rcv_buffer, MAX_RECEIVE_BUFFER_SIZE, 0, &from, &size)) > 0)
+	while((received = recvfrom(m_socket, rcv_buffer, MAX_RECEIVE_BUFFER_SIZE, 0, (sockaddr*)&from, &fromSize)) > 0)
 	{
 		NetBuffer* buff = new NetBuffer(rcv_buffer, received);
 		
@@ -159,7 +165,7 @@ void NetPeer::Update()
 					confirm.Write((char)LIBRARY_DATA);
 					confirm.Write((char)LibraryMessageType::CONNECTION_CONFIRM);
 					
-					SendRaw(confirm, *nc);
+					SendRaw(&confirm, nc);
 				}
 					break;
 				case LibraryMessageType::CONNECTION_CONFIRM:
@@ -195,7 +201,7 @@ void NetPeer::Update()
 				ack.Write(id);
 				
 				// TODO error handling in the future
-				sendto(m_socket, ack.GetBuffer(), ack.GetBytePos(), 0, &from, sizeof(from));
+				sendto(m_socket, ack.GetBuffer(), ack.GetBytePos(), 0, (sockaddr*)&from, sizeof(from));
 
 				break;
 			}
@@ -264,7 +270,7 @@ void NetPeer::CheckMessages()
 				{
 					it->second.acknowledged = true;
 					
-					Send(*maack.buff, *maack.recipient, NetChannel::NET_RELIABLE, channel, it->first);
+					Send(maack.buff, maack.recipient, NetChannel::NET_RELIABLE, channel, it->first);
 				}
 			}
 			InternalPlatformReliableUnorderedQueueSynchronizationLeave();
@@ -280,7 +286,7 @@ void NetPeer::CheckMessages()
 				{
 					it->second.acknowledged = true;
 					
-					Send(*maack.buff, *maack.recipient, NetChannel::NET_RELIABLE_SEQUENCED, channel, it->first);
+					Send(maack.buff, maack.recipient, NetChannel::NET_RELIABLE_SEQUENCED, channel, it->first);
 				}
 			}
 			InternalPlatformReliableSequencedQueueSynchronizationLeave();
@@ -296,7 +302,7 @@ void NetPeer::CheckMessages()
 				{
 					it->second.acknowledged = true;
 					
-					Send(*maack.buff, *maack.recipient, NetChannel::NET_RELIABLE_IN_ORDER, channel, it->first);
+					Send(maack.buff, maack.recipient, NetChannel::NET_RELIABLE_IN_ORDER, channel, it->first);
 				}
 			}
 			InternalPlatformReliableInOrderQueueSynchronizationLeave();
@@ -526,14 +532,14 @@ int NetPeer::Close()
 	return close(m_socket);
 }
 
-int NetPeer::Send(NetBuffer buff, NetConnection to, NetChannel::Enum method, int channel, int id)
+int NetPeer::Send(NetBuffer* buff, NetConnection* to, NetChannel::Enum method, int channel, int id)
 {
-	if(buff.m_sent)
+	if(buff->m_sent)
 	{
 		return SEND_FAILED_BUFFER_ALREADY_SENT;
 	}
 
-	if(buff.GetBuffer() == NULL)
+	if(buff->GetBuffer() == NULL)
 	{
 		return SEND_FAILED_BUFFER_INVALID;
 	}
@@ -543,10 +549,10 @@ int NetPeer::Send(NetBuffer buff, NetConnection to, NetChannel::Enum method, int
 	MessageAwaitingACK maack;
 	
 	maack.initialized = true;
-	maack.buff = &buff;
+	maack.buff = buff;
 	maack.sentTime = Timer::GetFPGATimestamp();
 	maack.acknowledged = false;
-	maack.recipient = &to;
+	maack.recipient = to;
 	
 	NetBuffer* localBuff = new NetBuffer();
 	localBuff->Write((char)USER_DATA);
@@ -603,20 +609,20 @@ int NetPeer::Send(NetBuffer buff, NetConnection to, NetChannel::Enum method, int
 		break;
 	}
 
-	localBuff->WriteRaw(buff.GetBuffer(), buff.GetBytePos());
+	localBuff->WriteRaw(buff->GetBuffer(), buff->GetBytePos());
 	
-	buff.m_sent = true;
+	buff->m_sent = true;
 	
-	int iResult = sendto(m_socket, localBuff->GetBuffer(), localBuff->GetBytePos(), 0, to.RemoteEndpoint(), sizeof(*(to.RemoteEndpoint())));
+	int iResult = sendto(m_socket, localBuff->GetBuffer(), localBuff->GetBytePos(), 0, (sockaddr*)to->RemoteEndpoint(), sizeof(*(to->RemoteEndpoint())));
 	
 	return iResult;
 }
 
-void NetPeer::SendRaw(NetBuffer nb, NetConnection nc)
+void NetPeer::SendRaw(NetBuffer* nb, NetConnection* nc)
 {
-	nb.m_sent = true;
+	nb->m_sent = true;
 	
-	sendto(m_socket, nb.GetBuffer(), nb.GetBytePos(), 0, nc.RemoteEndpoint(), sizeof(*nc.RemoteEndpoint()));
+	sendto(m_socket, nb->GetBuffer(), nb->GetBytePos(), 0, (sockaddr*)nc->RemoteEndpoint(), sizeof(*nc->RemoteEndpoint()));
 }
 
 NetBuffer* NetPeer::ReadMessage()

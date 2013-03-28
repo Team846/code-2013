@@ -13,6 +13,8 @@
 #include "Utility.h"
 #include "taskLib.h"
 
+#include "sys/socket.h"
+
 RobotBase* RobotBase::m_instance = NULL;
 
 void RobotBase::setInstance(RobotBase* robot)
@@ -152,6 +154,16 @@ void RobotBase::startRobotTask(FUNCPTR factory)
 	printf("WPILib was compiled without -D'SVN_REV=nnnn'\n");
 #endif
 
+	printf("Setting up WinSock2...\n");
+	// Initialize Winsock
+	WSAData wsaData;
+    int iResult = WSAStartup(MAKEWORD(2,2), &wsaData);
+    if (iResult != 0) {
+        printf("WSAStartup failed with error: %d\n", iResult);
+        return;
+    }
+
+	printf("Running robot code!\n");
 	// Start robot task
 	// This is done to ensure that the C++ robot task is spawned with the floating point
 	// context save parameter.

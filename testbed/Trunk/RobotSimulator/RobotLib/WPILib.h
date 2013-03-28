@@ -5,6 +5,8 @@
 #define WIN32_LEAN_AND_MEAN
 #endif
 
+#define __VXWORKS__
+
 #define OK (0)
 #define ERROR (-1)
 
