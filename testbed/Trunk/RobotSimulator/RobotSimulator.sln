@@ -7,9 +7,11 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Playground", "Playground\Pl
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FRCSimulator", "FRCSimulator\FRCSimulator\FRCSimulator.csproj", "{A05262A3-68AC-4C67-AED0-D8B51C19DAEE}"
 EndProject
-Project("{96E2B04D-8817-42C6-938A-82C39BA4D311}") = "FRCSimulatorContent", "FRCSimulator\FRCSimulatorContent\FRCSimulatorContent.contentproj", "{FFF1144C-7372-4CD8-A8AC-D5BEC73507F7}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FRCSimulatorContent", "FRCSimulator\FRCSimulatorContent\FRCSimulatorContent.contentproj", "{FFF1144C-7372-4CD8-A8AC-D5BEC73507F7}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TestRobot", "TestRobot\TestRobot.vcxproj", "{6A2ADF39-8AE2-4E55-BBAD-C6EBA2B5A090}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "LRT13", "LRT13\LRT13.vcxproj", "{DDA79DD0-DCA9-4C6C-9716-8846F18A2847}"
 EndProject
 Global
 	GlobalSection(SubversionScc) = preSolution
@@ -71,6 +73,16 @@ Global
 		{6A2ADF39-8AE2-4E55-BBAD-C6EBA2B5A090}.Release|Win32.ActiveCfg = Release|Win32
 		{6A2ADF39-8AE2-4E55-BBAD-C6EBA2B5A090}.Release|Win32.Build.0 = Release|Win32
 		{6A2ADF39-8AE2-4E55-BBAD-C6EBA2B5A090}.Release|x86.ActiveCfg = Release|Win32
+		{DDA79DD0-DCA9-4C6C-9716-8846F18A2847}.Debug|Mixed Platforms.ActiveCfg = Debug|Win32
+		{DDA79DD0-DCA9-4C6C-9716-8846F18A2847}.Debug|Mixed Platforms.Build.0 = Debug|Win32
+		{DDA79DD0-DCA9-4C6C-9716-8846F18A2847}.Debug|Win32.ActiveCfg = Debug|Win32
+		{DDA79DD0-DCA9-4C6C-9716-8846F18A2847}.Debug|Win32.Build.0 = Debug|Win32
+		{DDA79DD0-DCA9-4C6C-9716-8846F18A2847}.Debug|x86.ActiveCfg = Debug|Win32
+		{DDA79DD0-DCA9-4C6C-9716-8846F18A2847}.Release|Mixed Platforms.ActiveCfg = Release|Win32
+		{DDA79DD0-DCA9-4C6C-9716-8846F18A2847}.Release|Mixed Platforms.Build.0 = Release|Win32
+		{DDA79DD0-DCA9-4C6C-9716-8846F18A2847}.Release|Win32.ActiveCfg = Release|Win32
+		{DDA79DD0-DCA9-4C6C-9716-8846F18A2847}.Release|Win32.Build.0 = Release|Win32
+		{DDA79DD0-DCA9-4C6C-9716-8846F18A2847}.Release|x86.ActiveCfg = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

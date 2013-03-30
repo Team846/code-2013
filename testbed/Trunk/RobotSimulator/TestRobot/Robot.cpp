@@ -1,3 +1,5 @@
+#include <cmath>
+
 #include "Utils/AsyncPrinter.h"
 
 #include "Networking\NetServer.h"
@@ -58,17 +60,19 @@ void Robot::StartCompetition()
 
 		NetBuffer buff;
 
+		float value = fabs(sin((float)totalTime / 1000.0f));
+
 		buff.Write((char)MessageType::FRONT_SHOOTER_DATA);
-		buff.Write((float)totalTime);
-		buff.Write(1.0f);
+		buff.Write((float)totalTime / 1000.0f);
+		buff.Write(value);
 
 		server->SendToAll(&buff, NetChannel::NET_UNRELIABLE_SEQUENCED, 1);
 
-		printf("Sending value of 1.0"); 
+		printf("Sending value of %f at time %f", value, (float)totalTime / 1000.0f); 
 
-		Sleep(1000);
+		Sleep(10);
 
-		totalTime += 1000;
+		totalTime += 10;
 
 		printf("\n");
 	}

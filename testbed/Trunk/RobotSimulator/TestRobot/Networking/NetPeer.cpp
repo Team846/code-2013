@@ -534,10 +534,10 @@ int NetPeer::Close()
 
 int NetPeer::Send(NetBuffer* buff, NetConnection* to, NetChannel::Enum method, int channel, int id)
 {
-	if(buff->m_sent)
-	{
-		return SEND_FAILED_BUFFER_ALREADY_SENT;
-	}
+	//if(buff->m_sent)
+	//{
+	//	return SEND_FAILED_BUFFER_ALREADY_SENT;
+	//}
 
 	if(buff->GetBuffer() == NULL)
 	{
