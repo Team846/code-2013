@@ -155,7 +155,7 @@ void NetBuffer::SkipPadBits()
 
 bool NetBuffer::AssertBufferHasSpace(UINT32 bits)
 {
-	return ((bits + 7) >> 3) < m_internalBufferSize;
+	return ((bits + 7) >> 3) <= m_internalBufferSize;
 }
 
 void NetBuffer::InternalWriteByte(const char data, int bit_length)
@@ -249,7 +249,7 @@ char NetBuffer::InternalReadByte(int bit_length)
 		return 0;
 	}
 	
-	if(!AssertBufferHasSpace(m_internalBitPos + 1 + bit_length))
+	if(!AssertBufferHasSpace(m_internalBitPos + bit_length))
 	{
 		AsyncPrinter::Println("[NetBuffer] Can't read past the buffer!");
 		return 0;
@@ -330,12 +330,15 @@ void NetBuffer::FitBufferToSize(UINT32 bits)
 		int len = bytes + NetBuffer::kBufferResizeOverAllocateBytes;
 		m_internalBuffer = new char[len];
 		m_internalBufferSize = len;
+		memset(m_internalBuffer, 0, sizeof(char) * len);
 	}
 	else if(bytes > m_internalBufferSize)
 	{
 		int len = bytes + NetBuffer::kBufferResizeOverAllocateBytes;
 		char* newBuff = new char[len];
 		
+		memset(newBuff, 0, sizeof(char) * len);
+
 		memcpy(newBuff, m_internalBuffer, m_internalBufferSize);
 		m_internalBufferSize = len;
 		

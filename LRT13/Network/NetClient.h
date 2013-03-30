@@ -18,7 +18,7 @@ namespace Network
 	public:
 		NetClient();
 		
-		void Connect(struct sockaddr ep);
+		void Connect(sockaddr_in ep);
 	private:
 		NetConnection* _server;
 	};

@@ -90,14 +90,14 @@ namespace Network
 		/*!
 		 * @brief Sends the contents of the NetBuffer over the network connection.
 		 */
-		int Send(NetBuffer buff, NetConnection to, NetChannel::Enum method, int channel, int id=-1);
+		int Send(NetBuffer* buff, NetConnection* to, NetChannel::Enum method, int channel, int id=-1);
 		
 		/*!
 		 * @brief Returns the next message in the message queue.
 		 */
 		NetBuffer* ReadMessage();
 	protected:
-		void SendRaw(NetBuffer nb, NetConnection nc);
+		void SendRaw(NetBuffer* nb, NetConnection* nc);
 		
 		double _connectionRequestTime;
 		bool _connectionRequested;

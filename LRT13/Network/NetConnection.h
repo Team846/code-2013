@@ -16,15 +16,15 @@ namespace Network
 	private:
 		int m_socket;
 		
-		struct sockaddr m_remoteEndpoint;
+		sockaddr_in m_remoteEndpoint;
 		NetPeer* m_netPeer;
 		
 	public:
-		struct sockaddr* RemoteEndpoint();
+		sockaddr_in* RemoteEndpoint();
 		
-		NetConnection(struct sockaddr iep, NetPeer* peer);
+		NetConnection(sockaddr_in iep, NetPeer* peer);
 		
-		void Send(NetBuffer buff, NetChannel::Enum method, int channel);
+		void Send(NetBuffer* buff, NetChannel::Enum method, int channel);
 	};
 };
 

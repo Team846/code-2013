@@ -8,7 +8,7 @@ NetClient::NetClient()
 	
 }
 
-void NetClient::Connect(sockaddr ep)
+void NetClient::Connect(sockaddr_in ep)
 {
 	if(_connectionRequested)
 		return;
@@ -23,5 +23,5 @@ void NetClient::Connect(sockaddr ep)
 	netBuffer.Write((char)LIBRARY_DATA);
 	netBuffer.Write((char)LibraryMessageType::CONNECTION_REQUEST);
 	
-	SendRaw(netBuffer, *_server);
+	SendRaw(&netBuffer, _server);
 }
