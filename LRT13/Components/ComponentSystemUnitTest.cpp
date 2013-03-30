@@ -5,8 +5,8 @@ ComponentSystemUnitTest::ComponentSystemUnitTest()
 {
 	AsyncPrinter::Println("ComponentSystemUnitTest::ctor()");
 	
-	m_netConnection = new NetPeer(INADDR_ANY, 1337, Network::SERVER);
-	m_netBuffer = new NetBuffer();
+//	m_netConnection = new NetPeer(INADDR_ANY, 1337, Network::SERVER);
+//	m_netBuffer = new NetBuffer();
 }
 
 ComponentSystemUnitTest::~ComponentSystemUnitTest()

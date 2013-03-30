@@ -9,6 +9,9 @@
 using namespace data;
 using namespace data::shooter;
 
+#define RELIABLE_SHOOTING 0
+#define TWOSPEED 1
+
 //Front of the pyramid is 3400, 4040
 
 Shooter::Shooter() :
@@ -97,7 +100,6 @@ void Shooter::enabledPeriodic()
 		{
 		case CONTINOUS:
 				m_pneumatics->setStorageExit(EXTENDED);
-				AsyncPrinter::Printf("Proximity::Get(): %d\n", m_proximity->Get());
 				switch(m_fireState)
 				{
 				case FIRING_OFF:
@@ -107,13 +109,20 @@ void Shooter::enabledPeriodic()
 						m_cyclesToContinueRetracting = requiredCyclesDown ;
 						m_pneumatics->setStorageExit(RETRACTED);
 						startShotTime = e;
+						
+						m_timer = 50 * 1.3;
 					}
 					else if (e % 20 == 0)
 						AsyncPrinter::Printf("Not at speed %.0f, %.0f\n", m_speedsRPM[INNER], m_speedsRPM[OUTER]);
 					break;
 				case RETRACT_LOADER_WAIT_FOR_LIFT:
+					m_timer--;
 	//				if (m_cyclesToContinueRetracting > 0)
+#if RELIABLE_SHOOTING
+					if (!m_proximity->Get() && m_timer > 0)//keep waiting
+#else
 					if (!m_proximity->Get())//keep waiting
+#endif
 					{
 						m_pneumatics->setStorageExit(RETRACTED);
 						m_cyclesToContinueRetracting--;
@@ -126,7 +135,11 @@ void Shooter::enabledPeriodic()
 					}
 					break;
 				case RETRACT_LOADER_WAIT_FOR_FALL:
+#if RELIABLE_SHOOTING
+					if (m_proximity->Get() && m_timer > 0)//keep waiting
+#else
 					if (m_proximity->Get())//keep waiting
+#endif
 					{
 						m_pneumatics->setStorageExit(RETRACTED);
 						m_cyclesToContinueRetracting--;
@@ -135,16 +148,26 @@ void Shooter::enabledPeriodic()
 					{
 						m_pneumatics->setStorageExit(EXTENDED);
 						m_fireState = EXTEND_LOADER;
+						m_timer = 50;
 					}
 					break;
 				case EXTEND_LOADER:
 						m_pneumatics->setStorageExit(EXTENDED);
+						m_timer--;
+#if RELIABLE_SHOOTING
+						if (m_PIDs[INNER].getError() > frisbeeDetectionThreshold || m_timer < 0)
+#else
 						if (m_PIDs[INNER].getError() > frisbeeDetectionThreshold)
+#endif
 						{
 							AsyncPrinter::Printf("Fired with newSpeed = %.0f, lastSpeed = %.0f taking %d cycles\n", m_speedsRPM[INNER], lastSpeed, e - startShotTime);
 							m_fireState = RETRACT_LOADER_WAIT_FOR_LIFT;
 							m_cyclesToContinueRetracting = requiredCyclesDown ;
 							m_pneumatics->setStorageExit(RETRACTED);
+							
+							if (m_timer >= 0)
+								m_componentData->shooterData->DecrementFrisbeeCounter();
+							
 							startShotTime = e;
 						}
 	//					else
@@ -154,6 +177,7 @@ void Shooter::enabledPeriodic()
 	//			AsyncPrinter::Printf("Out\n");
 			break;
 		case ONCE:
+			m_pneumatics->setStorageExit(RETRACTED);
 			break;
 		case OFF:
 //				AsyncPrinter::Printf("off\n");
@@ -243,7 +267,33 @@ void Shooter::ManageShooterWheel(int roller)
 	//	m_PIDs[roller].setSetpoint(m_componentData->shooterData->GetDesiredSpeed((Roller)roller));
 //	m_PIDs[roller].setSetpoint(100000);
 	
-	m_PIDs[roller].setSetpoint(m_target_speed[roller]);
+#if TWOSPEED
+	if (m_componentData->shooterData->ShouldLauncherBeHigh()) //low speed. meantime
+	{
+		m_PIDs[roller].setSetpoint(m_speed_setpoints[roller][HIGH]);
+		AsyncPrinter::Printf("Setpoint: %.0f\n", m_PIDs[roller].getSetpoint());
+	}
+	else
+	{
+		m_PIDs[roller].setSetpoint(m_speed_setpoints[roller][LOW]);
+	}
+#else
+	if (!m_componentData->shooterData->ShouldLauncherBeHigh())
+	{
+		if (roller == OUTER)
+		{
+			m_PIDs[roller].setSetpoint(5300);
+		}
+		else
+		{
+			m_PIDs[roller].setSetpoint(4900);
+		}
+	}
+	else
+	{
+		m_PIDs[roller].setSetpoint(m_target_speed[roller]);
+	}
+#endif
 	
 	double out = m_PIDs[roller].update(1.0 / RobotConfig::LOOP_RATE) / m_max_speed[roller] ; //out is a normalized voltage
 	
@@ -258,6 +308,11 @@ void Shooter::ManageShooterWheel(int roller)
 //	AsyncPrinter::Printf("%d: %.2f\n", out);
 	out /= (DriverStation::GetInstance()->GetBatteryVoltage() / RobotConfig::MAX_VOLTAGE);
 	
+	if (m_PIDs[roller].getError() < -400)
+		m_jaguars[roller]->ConfigNeutralMode(CANJaguar::kNeutralMode_Brake);
+	else 
+		m_jaguars[roller]->ConfigNeutralMode(CANJaguar::kNeutralMode_Coast);
+		
 	m_jaguars[roller]->SetDutyCycle(out);
 	m_jaguars[roller]->SetVoltageRampRate(0.0);
 	
@@ -305,6 +360,13 @@ void Shooter::Configure()
 	m_target_speed[OUTER] = c->Get<double> (m_configSection, "outer_speedSetpoint",
 			6040);
 	m_target_speed[INNER] = c->Get<double> (m_configSection, "inner_speedSetpoint", 4400);
+	
+	
+	m_speed_setpoints[OUTER][LOW] = c->Get<double>(m_configSection, "outer_highSpeedSetpoint", 5300);
+	m_speed_setpoints[INNER][LOW] = c->Get<double>(m_configSection, "inner_highSpeedSetpoint", 4900);
+
+	m_speed_setpoints[OUTER][HIGH] = c->Get<double>(m_configSection, "outer_lowSpeedSetpoint", 3100);
+	m_speed_setpoints[INNER][HIGH] = c->Get<double>(m_configSection, "inner_lowSpeedSetpoint", 2800);
 
 	//TODO: Change default values.
 	requiredCyclesAtSpeed = c->Get<int> (m_configSection, "requiredCycles", 2);

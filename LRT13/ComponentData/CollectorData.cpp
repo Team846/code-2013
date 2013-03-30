@@ -11,6 +11,13 @@ CollectorData::CollectorData()
 void CollectorData::RunRollers()
 {
 	m_running = true;
+	dir = 1;
+}
+
+void CollectorData::RunRollersBackwords()
+{
+	m_running = true;
+	dir = -1;
 }
 
 void CollectorData::StopRollers()
@@ -21,6 +28,11 @@ void CollectorData::StopRollers()
 bool CollectorData::ShouldRunRollers()
 {
 	return m_running;
+}
+
+int CollectorData::RollerDirection()
+{
+	return dir;
 }
 
 void CollectorData::Slide(CollectorState::Enum position)

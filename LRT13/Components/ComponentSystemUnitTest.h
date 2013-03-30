@@ -6,7 +6,7 @@
 #include "../Network/NetPeer.h"
 #include "../Network/NetBuffer.h"
 
-using namespace Network;
+//using namespace Network;
 
 /*!
  * @brief Test component for the Component system
@@ -46,6 +46,6 @@ public:
 	virtual void disabledPeriodic();
 	
 private:
-	NetBuffer* m_netBuffer;
-	NetPeer* m_netConnection;
+//	NetBuffer* m_netBuffer;
+//	NetPeer* m_netConnection;
 };

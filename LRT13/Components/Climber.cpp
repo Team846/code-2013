@@ -52,6 +52,20 @@ void Climber::onDisable()
 
 void Climber::enabledPeriodic()
 {
+	if (m_state != IDLE && m_componentData->climberData->shouldPotentiallyAbort())
+	{
+		m_state = IDLE;
+		m_componentData->drivetrainData->setOpenLoopOutput(FORWARD, 0.0);
+		m_componentData->drivetrainData->setOpenLoopOutput(TURN, 0.0);
+		m_componentData->drivetrainData->setVelocitySetpoint(FORWARD, 0.0);
+		m_componentData->drivetrainData->setVelocitySetpoint(TURN, 0.0);
+		
+		m_servo_left.SetMicroseconds(m_servo_left_disengaged_position);
+		m_servo_right.SetMicroseconds(m_servo_right_disengaged_position);
+		
+		m_winch_worm.SetDutyCycle(0.0);
+		m_paused = false;
+	}
 	static bool wasDebugging = false;
 	if (m_componentData->climberData->shouldDebug())
 	{
@@ -150,6 +164,7 @@ void Climber::enabledPeriodic()
 			return;
 	}
 	
+	static bool engaged = false;
 	static double driveSpeed = 0.0;
 	double curr;
 	switch (m_state)
@@ -209,6 +224,11 @@ void Climber::enabledPeriodic()
 				m_state = ENGAGE_PTO;
 				m_hasStartedEngaging = false;
 				m_timer = 25;
+				
+//				m_timer = 5;//for unlocking the pawl
+//				m_state = WINCH_UP;
+//				driveSpeed = 0.0;
+//				m_drive_train_position = m_driving_encoders->getRobotDist(); //awk 
 			}
 		}
 		else
@@ -229,50 +249,54 @@ void Climber::enabledPeriodic()
 //		}
 		break;
 	case ENGAGE_PTO:
-//		m_pneumatics->setClimberArm(false);
-		m_componentData->drivetrainData->setControlMode(FORWARD, VELOCITY_CONTROL);
-		m_componentData->drivetrainData->setControlMode(TURN, VELOCITY_CONTROL);
-		if (m_climbing_level < 1)
-			m_winch_worm.SetDutyCycle(-m_winch_engage_duty_cycle);
-		else
-			m_winch_worm.SetDutyCycle(0.0);
-
-		if (m_digital_input_left.Get() ^ m_digital_input_right.Get()) // only one side engaged
-		{
-			if (m_digital_input_left.Get()) // left side engaged
-				m_side_engaged = 1;
-			else
-				// right side engaged
-				m_side_engaged = -1;
-
-			if (m_winch_worm.GetOutputCurrent() > m_winch_current_threshold)
-			{
-				m_hasStartedEngaging = true;
-			}
-			else if (m_hasStartedEngaging)
-			{
-				m_componentData->drivetrainData->setVelocitySetpoint(FORWARD, 0.0);
-				m_componentData->drivetrainData->setVelocitySetpoint(TURN, 0.03 * m_side_engaged);
-			}
-		}
-		else if (!m_digital_input_left.Get() && !m_digital_input_left.Get()) // both engaged
-		{
-			m_timer = 5;//for unlocking the pawl
-			m_state = WINCH_UP;
-			driveSpeed = 0.0;
-			m_drive_train_position = m_driving_encoders->getRobotDist(); //awk units (2/3 in)
-		}
-		else
-		{
-			m_hasStartedEngaging = false;
-			m_componentData->drivetrainData->setVelocitySetpoint(FORWARD, 0.0);
-			m_componentData->drivetrainData->setVelocitySetpoint(TURN, 0.0);
-		}
+		AsyncPrinter::Printf("Climb\n");
 		m_servo_left.SetEnabled(true);
 		m_servo_right.SetEnabled(true);
 		m_servo_left.SetMicroseconds(m_servo_left_engaged_position);
 		m_servo_right.SetMicroseconds(m_servo_right_engaged_position);
-		// TODO: disable servo afterwards
+		engaged = false;
+		m_state = WINCH_UP;
+		
+//		m_pneumatics->setClimberArm(false);
+//		m_componentData->drivetrainData->setControlMode(FORWARD, VELOCITY_CONTROL);
+//		m_componentData->drivetrainData->setControlMode(TURN, VELOCITY_CONTROL);
+//		if (m_climbing_level < 1)
+//			m_winch_worm.SetDutyCycle(-m_winch_engage_duty_cycle);
+//		else
+//			m_winch_worm.SetDutyCycle(0.0);
+//
+//		if (m_digital_input_left.Get() ^ m_digital_input_right.Get()) // only one side engaged
+//		{
+//			if (m_digital_input_left.Get()) // left side engaged
+//				m_side_engaged = 1;
+//			else
+//				// right side engaged
+//				m_side_engaged = -1;
+//
+//			if (m_winch_worm.GetOutputCurrent() > m_winch_current_threshold)
+//			{
+//				m_hasStartedEngaging = true;
+//			}
+//			else if (m_hasStartedEngaging)
+//			{
+//				m_componentData->drivetrainData->setVelocitySetpoint(FORWARD, 0.0);
+//				m_componentData->drivetrainData->setVelocitySetpoint(TURN, 0.09 * m_side_engaged);
+//			}
+//		}
+//		else if (!m_digital_input_left.Get() && !m_digital_input_left.Get()) // both engaged
+//		{
+//			m_timer = 5;//for unlocking the pawl
+//			m_state = WINCH_UP;
+//			driveSpeed = 0.0;
+//			m_drive_train_position = m_driving_encoders->getRobotDist(); //awk units (2/3 in)
+//		}
+//		else
+//		{
+//			m_hasStartedEngaging = false;
+//			m_componentData->drivetrainData->setVelocitySetpoint(FORWARD, 0.0);
+//			m_componentData->drivetrainData->setVelocitySetpoint(TURN, 0.0);
+//		}
+//		// TODO: disable servo afterwards
 		break;
 	case UNLOCK_PAWL:
 		m_timer--;
@@ -303,10 +327,16 @@ void Climber::enabledPeriodic()
 		m_componentData->drivetrainData->setOpenLoopOutput(FORWARD, driveSpeed);
 		m_componentData->drivetrainData->setOpenLoopOutput(TURN, 0.0);
 		
-		if (fabs(m_driving_encoders->getRobotDist() - m_drive_train_position) > m_drive_train_position_threshold)//SHould be about 42
+		if (!engaged && m_digital_input_left.Get() && m_digital_input_left.Get())
+		{
+			m_drive_train_position = m_driving_encoders->getRobotDist(); //awk units (2/3 in)
+			engaged = true;
+		}
+		else if (engaged && fabs(m_driving_encoders->getRobotDist() - m_drive_train_position) > m_drive_train_position_threshold)//SHould be about 42
 		{
 			m_winch_worm.SetDutyCycle(0.0);
-			m_state = ENGAGE_HOOKS;
+			m_state = IDLE;
+//			m_state = ENGAGE_HOOKS;
 			m_climbing_level++;
 			m_componentData->drivetrainData->setControlMode(FORWARD, OPEN_LOOP);
 			m_componentData->drivetrainData->setControlMode(TURN, OPEN_LOOP);
@@ -315,7 +345,8 @@ void Climber::enabledPeriodic()
 		}
 		else
 		{
-			AsyncPrinter::Printf("dist: %.2f\n", fabs(m_driving_encoders->getRobotDist() - m_drive_train_position) );
+			AsyncPrinter::Printf("encoder dist: %.2f \n", m_driving_encoders->getRobotDist());
+			AsyncPrinter::Printf("dist: %.2f, l: %d, r: %d\n", fabs(m_driving_encoders->getRobotDist() - m_drive_train_position) , m_digital_input_left.Get(), m_digital_input_right.Get());
 		}
 		break;
 	case ENGAGE_HOOKS:
@@ -371,9 +402,10 @@ void Climber::enabledPeriodic()
 		}
 		break;
 	}
+	m_paused = false; //we pause
 	if (m_previous_state != m_state)
 	{
-		m_paused = true; //we pause
+//		m_paused = true; //we pause
 	}
 	
 	if (m_componentData->climberData->shouldForceContinueClimbing())
@@ -428,6 +460,8 @@ void Climber::disabledPeriodic()
 	m_servo_right.SetEnabled(true);
 	m_servo_left.SetMicroseconds(m_servo_left_disengaged_position);
 	m_servo_right.SetMicroseconds(m_servo_right_disengaged_position);
+	
+	m_pneumatics->setHookPosition(false);
 }
 
 void Climber::Configure()

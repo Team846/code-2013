@@ -16,6 +16,12 @@ namespace data
 			OUTER = 0,
 			INNER = 1
 		};
+
+		enum Speed
+		{
+			HIGH = 0,
+			LOW = 1
+		};
 		
 		enum ShooterSetting
 		{
@@ -47,6 +53,12 @@ namespace data
 				void SetLauncherAngleLow();
 				bool ShouldLauncherBeHigh();
 				
+				void increaseSpeed();
+				void decreaseSpeed();
+				
+				bool shouldIncreaseSpeedOnce();
+				bool shouldDecreaseSpeedOnce();
+				
 				void SetShooterSetting(ShooterSetting s);
 				int GetShooterSetting();
 				
@@ -58,6 +70,7 @@ namespace data
 				bool IsEnabled();
 				
 			private:
+				bool m_shouldIncreaseSpeed, m_shouldDecreaseSpeed;
 				double acceptableSpeedError[2];
 				double speed[2];
 				bool atSpeed[2];

@@ -32,6 +32,9 @@ namespace collector
 		
 		void RunRollers();
 		void StopRollers();
+		void RunRollersBackwords();
+		
+		int RollerDirection();
 		
 		bool ShouldRunRollers();
 		
@@ -46,6 +49,7 @@ namespace collector
 		bool IsUp();
 	private:
 		bool m_running;
+		int dir;
 		CollectorState::Enum m_collectorState;
 	};
 }

@@ -107,3 +107,36 @@ bool ShooterData::IsEnabled()
 {
 	return m_enabled;
 }
+
+void ShooterData::increaseSpeed()
+{
+	m_shouldIncreaseSpeed = true;
+}
+
+void ShooterData::decreaseSpeed()
+{
+	m_shouldDecreaseSpeed = true;
+}
+
+bool ShooterData::shouldIncreaseSpeedOnce()
+{
+	if (m_shouldIncreaseSpeed)
+	{
+		m_shouldIncreaseSpeed = false;
+		return true;
+	}
+	else 
+		return false;
+}
+
+bool ShooterData::shouldDecreaseSpeedOnce()
+{
+	if (m_shouldDecreaseSpeed)
+	{
+		m_shouldDecreaseSpeed = false;
+		return true;
+	}
+	else 
+		return false;
+	
+}

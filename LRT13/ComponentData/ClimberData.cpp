@@ -17,6 +17,18 @@ ClimberData::ClimberData()
 	m_shouldPTOEngage = false;
 	m_shouldPTODisEngage = false;
 
+	m_shouldPotentiallyAbort = false;
+}
+
+
+bool ClimberData::shouldPotentiallyAbort()
+{
+	return m_shouldPotentiallyAbort;
+}
+
+bool ClimberData::setShouldPotentiallyAbort(bool shouldAbort)
+{
+	m_shouldPotentiallyAbort = shouldAbort;
 }
 
 humanState ClimberData::getDesiredClimbingStep()

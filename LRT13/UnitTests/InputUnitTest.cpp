@@ -23,6 +23,7 @@ InputUnitTest::~InputUnitTest()
 
 void InputUnitTest::Run()
 {
+	GetWatchdog().SetEnabled(false);
 	Pneumatics::Instance()->Start();
 	
 	while(true)
@@ -32,17 +33,13 @@ void InputUnitTest::Run()
 			m_stick->Update();
 
 			Pneumatics::Instance()->setCompressor(true);
-//			if(m_stick->IsButtonJustPressed(DriverStationConfig::JoystickButtons::APPLY_CONFIG))
-//			{
-//				printf("apply config is down.\n");
-//				Pneumatics::Instance()->setClimberArm(P);
-//			}
-//			else
-//			{
-//				Pneumatics::Instance()->setClimberArm(false);
-//			}
+
+			if(m_stick->IsButtonJustPressed(1))
+			{
+				Pneumatics::Instance()->setClimberArm(!Pneumatics::Instance()->GetClimberState());
+			}
 			
-			if(m_stick->IsButtonDown(DriverStationConfig::JoystickButtons::AUTO_AIM_BACKBOARD))
+			if(m_stick->IsButtonDown(2))
 			{
 				printf("auto aim is down.\n");
 				Pneumatics::Instance()->setCollector(true);
@@ -52,15 +49,15 @@ void InputUnitTest::Run()
 				Pneumatics::Instance()->setCollector(false);
 			}
 			
-//			if(m_stick->IsButtonJustPressed(DriverStationConfig::JoystickButtons::FEEDER_STATION_APPROACH))
-//			{
-//				printf("disc track is down.\n");
-//				Pneumatics::Instance()->setHookPosition(!Pneumatics::Instance()->GetHookState());
-//			}
+			if(m_stick->IsButtonJustPressed(3))
+			{
+				printf("disc track is down.\n");
+				Pneumatics::Instance()->setHookPosition(!Pneumatics::Instance()->GetHookState());
+			}
 			
 			
 			
-			if(m_stick->IsButtonJustPressed(DriverStationConfig::JoystickButtons::LOAD_CONFIG))
+			if(m_stick->IsButtonJustPressed(4))
 			{
 				printf("load config is down.\n");
 				Pneumatics::Instance()->setShooterAngler(!Pneumatics::Instance()->GetShooterAngleState());
@@ -68,7 +65,7 @@ void InputUnitTest::Run()
 			
 			Pneumatics::Instance()->RunOneCycle();
 			
-			if(m_stick->IsButtonDown(DriverStationConfig::JoystickButtons::RESET_ZERO))
+			if(m_stick->IsButtonDown(5))
 			{
 				printf("reset zero is down.\n");
 				Pneumatics::Instance()->setStorageExit(true);
@@ -78,7 +75,7 @@ void InputUnitTest::Run()
 				Pneumatics::Instance()->setStorageExit(false);
 			}
 			
-			if(m_stick->IsButtonJustPressed(DriverStationConfig::JoystickButtons::SAVE_CONFIG))
+			if(m_stick->IsButtonJustPressed(6))
 			{
 				Pneumatics::Instance()->setClimberArm(!Pneumatics::Instance()->GetClimberState());
 			}
@@ -87,9 +84,10 @@ void InputUnitTest::Run()
 			float rawYAxis = m_stick->GetAxis(Joystick::kYAxis);
 			float rawXAxis = m_wheel->GetAxis(Joystick::kXAxis);
 	//		
-	//		printf("Stick Raw Z Axis: %f. \n", rawZAxis);
-	//		printf("Stick Raw Y Axis: %f. \n", rawYAxis);
-	//		printf("Wheel Raw X Axis: %f. \n", rawXAxis);
+//			printf("Stick Raw Z Axis: %f. \n", rawZAxis);
+//			printf("Stick Raw Y Axis: %f. \n", rawYAxis);
+			
+//			printf("Wheel Raw X Axis: %f. \n", rawXAxis);
 		}
 		else
 		{

@@ -167,11 +167,9 @@ void ESC::SetDutyCycle(float dutyCycle)
 	m_jag2->SetDutyCycle(command.dutyCycle);
 #endif
 #endif
-//	static int e = 0;
-//	if(++e % 8 == 0)
-//		AsyncPrinter::Printf("Speed %.2f out: %.2f, braking %.2f\n", speed, command.dutyCycle, command.braking);
+//	AsyncPrinter::Printf("Speed %.2f out: %.2f, braking %.2f\n", speed, command.dutyCycle, command.braking);
 }
-
+	
 void ESC::Disable()
 {
 	m_jag1->SetDutyCycle(0.0);

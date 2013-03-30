@@ -41,7 +41,7 @@ double Drivetrain::ComputeOutput(data::drivetrain::ForwardOrTurn axis)
 		//fall through the switch
 	case data::drivetrain::VELOCITY_CONTROL:
 		//1.0e-2
-		if (fabs(velocitySetpoint) < 1.0E-2)
+		if (fabs(velocitySetpoint) < 2.0E-2)
 			m_PIDs[VELOCITY][axis].setIIREnabled(true);
 		else 
 			m_PIDs[VELOCITY][axis].setIIREnabled(false);
@@ -77,11 +77,11 @@ void Drivetrain::enabledPeriodic()
 	Util::Clamp<double>(leftOutput, -1.0, 1.0);
 	Util::Clamp<double>(rightOutput, -1.0, 1.0);
 	
-//	static int e = 0;
-//	if (++e % 15 == 0)
-//	{
-//		AsyncPrinter::Printf("fwdin: %.4f fwdRead:%.4f turnRead:%.4f\n",fwdOutput , m_driveEncoders->getNormalizedForwardSpeed(), m_driveEncoders->getNormalizedTurningSpeed());
-//	}
+	static int e = 0;
+	if (++e % 50 == 0)
+	{
+//		AsyncPrinter::Printf("turnPos:%.4f\n",m_driveEncoders->getTurnAngle());
+	}
 //	AsyncPrinter::Printf("Encoders left: %.3f, %.2f\n", m_driveEncoders->getNormalizedSpeed(drivetrain::LEFT), DriverStation::GetInstance()->GetBatteryVoltage());
 //	AsyncPrinter::Printf("Encoders right: %.3f\n", m_driveEncoders->getNormalizedSpeed(drivetrain::RIGHT));
 	m_escs[LEFT]->SetDutyCycle(leftOutput);

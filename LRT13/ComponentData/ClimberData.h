@@ -45,6 +45,9 @@ typedef enum humanState
 		bool shouldForceContinueClimbing();
 		void setShouldContinueClimbing(bool shouldContinue);
 		void setShouldForceContinueClimbing(bool shouldContinue);
+		
+		bool shouldPotentiallyAbort();
+		bool setShouldPotentiallyAbort(bool shouldAbort);
 
 		//Debug functions
 		bool shouldDebug();
@@ -71,6 +74,7 @@ typedef enum humanState
 		humanState m_desiredClimbingStep;
 		bool m_shouldContinueClimbing, m_shouldForceContinueClimbing;
 		
+		bool m_shouldPotentiallyAbort;
 		bool m_shouldChangeArmState;
 		bool m_shouldChangeAngleState;
 		

@@ -18,7 +18,7 @@ using namespace data;
 
 /*!
  * @brief Provides control over the shooter component.
- * @author Tony Peng, Varun Parthasarathy, Raphael Chang
+ * @author Tony Peng, Varun Parthasarathy, Raphael Chang, Brian
  */
 class Shooter : public Component, public Configurable, public Loggable
 {
@@ -62,6 +62,7 @@ private:
 	
 	double m_max_speed[2];
 	double m_target_speed[2];
+	double m_speed_setpoints[2][2];
 	
 	bool atSpeed[2]; 
 	
@@ -71,6 +72,8 @@ private:
 	double m_maxNormalizedCurrent;
 	double frisbeeDetectionThreshold, lastSpeed;
 	int startShotTime;
+	
+	int m_timer;
 	
 	int m_cyclesToContinueRetracting;
 };
