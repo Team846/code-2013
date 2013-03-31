@@ -12,6 +12,7 @@ using namespace data::shooter;
 //unsigned int AutonomousRoutines::standardWaitTicks = ;
 
 #define FULL_AUTON 0
+#define USE_COLLECTOR 0
 
 AutonomousRoutines::AutonomousRoutines()
 :  AsyncProcess("AutonTask")
@@ -97,7 +98,7 @@ void AutonomousRoutines::Autonomous()
 		AsyncPrinter::Printf("Starting driving back\n");
 		m_componentData->drivetrainData->setControlMode(FORWARD, POSITION_CONTROL);
 		m_componentData->drivetrainData->setControlMode(TURN, VELOCITY_CONTROL);
-		m_componentData->drivetrainData->setRelativePositionSetpoint(FORWARD, 12 * 2.6, 0.90);
+		m_componentData->drivetrainData->setRelativePositionSetpoint(FORWARD, 12 * 2.6 , 0.90);
 		m_componentData->drivetrainData->setVelocitySetpoint(TURN, 0.0);
 		m_componentData->drivetrainData->cleanWaitForSem(m_componentData->drivetrainData->createPositionOperationSemaphore(FORWARD, 0.5));
 //		StopDrive();
@@ -112,14 +113,17 @@ void AutonomousRoutines::Autonomous()
 		
 		
 		m_componentData->drivetrainData->setRelativePositionSetpoint(FORWARD, 92.0 + 12.0 + 7.0, 0.90);
+		m_componentData->drivetrainData->cleanWaitForSem(m_componentData->drivetrainData->createPositionOperationSemaphore(FORWARD, 45));
+		m_componentData->drivetrainData->setMaxPositionControlSpeed(FORWARD, 0.5);
 		m_componentData->drivetrainData->cleanWaitForSem(m_componentData->drivetrainData->createPositionOperationSemaphore(FORWARD, 0.5));
 
 		SafeWait(0.3, 10);
 		AsyncPrinter::Printf("Starting second turn\n");
+#if USE_COLLECTOR
 		m_componentData->collectorData->SlideDown();
 		m_componentData->collectorData->RunRollers();
-		
-		m_componentData->drivetrainData->setRelativePositionSetpoint(TURN, 35 + 90 + 8, 0.8);
+#endif
+		m_componentData->drivetrainData->setRelativePositionSetpoint(TURN, 35 + 90 + 8 - 3.0 + 1, 0.8);
 		m_componentData->drivetrainData->cleanWaitForSem(m_componentData->drivetrainData->createPositionOperationSemaphore(TURN, 6));
 		SafeWait(0.3, 10);
  
@@ -141,17 +145,28 @@ void AutonomousRoutines::Autonomous()
 		m_componentData->drivetrainData->cleanWaitForSem(m_componentData->drivetrainData->createPositionOperationSemaphore(FORWARD, 0.5));
 		//we want to slow down at driveBackDistance - numFrisbees * 11.0 - 20
 		AsyncPrinter::Printf("driving aligning again\n");
-		m_componentData->drivetrainData->setRelativePositionSetpoint(FORWARD, -driveBackDistance + 40 + 40.0, 0.9);
+		
+		m_componentData->drivetrainData->setRelativePositionSetpoint(FORWARD, -driveBackDistance + 40 + 40.0 + 34 - 15 + 1.0 - 6, 0.9);
+		m_componentData->drivetrainData->cleanWaitForSem(m_componentData->drivetrainData->createPositionOperationSemaphore(FORWARD, 45));
+		m_componentData->drivetrainData->setMaxPositionControlSpeed(FORWARD, 0.5);
 		m_componentData->drivetrainData->cleanWaitForSem(m_componentData->drivetrainData->createPositionOperationSemaphore(FORWARD, 0.5));
 		
 			
 		AsyncPrinter::Printf("turning\n");
 		
+#if USE_COLLECTOR
 		m_componentData->collectorData->SlideUp();
-			m_componentData->collectorData->StopRollers();
+		m_componentData->collectorData->StopRollers();
+#endif
 		
-		m_componentData->drivetrainData->setRelativePositionSetpoint(TURN, -90.0, 0.8);
-		AsyncPrinter::Printf("going back\n");
+		m_componentData->drivetrainData->setRelativePositionSetpoint(TURN, -91.5, 0.8);
+		m_componentData->drivetrainData->cleanWaitForSem(m_componentData->drivetrainData->createPositionOperationSemaphore(TURN, 5));
+		SafeWait(0.3, 10);
+		AsyncPrinter::Printf("going back to starting pos\n");
+		m_componentData->drivetrainData->setRelativePositionSetpoint(FORWARD, -5 * 12.0 - 54 + 11, 0.9);
+		m_componentData->drivetrainData->cleanWaitForSem(m_componentData->drivetrainData->createPositionOperationSemaphore(FORWARD, 50));
+		m_componentData->drivetrainData->setMaxPositionControlSpeed(FORWARD, 0.5);
+		m_componentData->drivetrainData->cleanWaitForSem(m_componentData->drivetrainData->createPositionOperationSemaphore(FORWARD, 0.5));
 		//so the distance to the center is 12.0 * 8.0 - 2.0 = 94, 77 to center
 //		m_componentData->drivetrainData->setRelativePositionSetpoint(FORWARD, 12.0 * 8.0 - 2.0, 0.90);
 //		m_componentData->drivetrainData->cleanWaitForSem(m_componentData->drivetrainData->createPositionOperationSemaphore(FORWARD, 0.5));
