@@ -54,6 +54,11 @@ void AutonomousRoutines::Autonomous()
 	m_componentData->drivetrainData->setVelocitySetpoint(FORWARD, 0.0);
 	m_componentData->drivetrainData->setVelocitySetpoint(TURN, 0.0);
 	double delay = DriverStation::GetInstance()->GetAnalogIn(DriverStationConfig::AnalogIns::AUTONOMOUS_DELAY);
+	
+			
+	double dNumFrisbees = DriverStation::GetInstance()->GetAnalogIn(DriverStationConfig::AnalogIns::NUM_FRISBEES) * 2;
+	int numFrisbees = (int) (dNumFrisbees + 0.5);
+	
 	delay *= 3;//factor so that we can wait the whole auton
 	//waiting the delay
 	AsyncPrinter::Printf("Starting auton.\n");
@@ -64,6 +69,7 @@ void AutonomousRoutines::Autonomous()
 	int routine = (int) (DriverStation::GetInstance()->GetAnalogIn(DriverStationConfig::AnalogIns::AUTONOMOUS_SELECT) + 0.5);
 	AsyncPrinter::Printf("Starting routine number %d.\n", routine);
 	
+	double driveBackDistance = 0;
 	switch (routine)
 	{
 	//simple shoot 2 routine
@@ -86,23 +92,71 @@ void AutonomousRoutines::Autonomous()
 		
 	case 3://start in back and do the fancy driving back routine
 		m_componentData->shooterData->SetNumFrisbeesInStorage(10);
-		FireAllFrisbees(6.0);
+//		FireAllFrisbees(6.0);
 		
+		AsyncPrinter::Printf("Starting driving back\n");
 		m_componentData->drivetrainData->setControlMode(FORWARD, POSITION_CONTROL);
 		m_componentData->drivetrainData->setControlMode(TURN, VELOCITY_CONTROL);
-		m_componentData->drivetrainData->setRelativePositionSetpoint(FORWARD, 12 * 4.6, 0.90);
+		m_componentData->drivetrainData->setRelativePositionSetpoint(FORWARD, 12 * 2.6, 0.90);
 		m_componentData->drivetrainData->setVelocitySetpoint(TURN, 0.0);
-		m_componentData->drivetrainData->cleanWaitForSem(m_componentData->drivetrainData->createPositionOperationSemaphore(FORWARD, 0.25));
+		m_componentData->drivetrainData->cleanWaitForSem(m_componentData->drivetrainData->createPositionOperationSemaphore(FORWARD, 0.5));
 //		StopDrive();
 		
-//		m_componentData->drivetrainData->setRelativePositionSetpoint(FORWARD, 0.0, 0.20);
-//		m_componentData->drivetrainData->setRelativePositionSetpoint(TURN, -55, 0.8);
-//		m_componentData->drivetrainData->cleanWaitForSem(m_componentData->driv  etrainData->createPositionOperationSemaphore(TURN, 8));
+		AsyncPrinter::Printf("Starting first turn\n");
+		m_componentData->drivetrainData->setControlMode(TURN, POSITION_CONTROL);
+		m_componentData->drivetrainData->setRelativePositionSetpoint(TURN, -35, 0.8);
+		m_componentData->drivetrainData->cleanWaitForSem(m_componentData->drivetrainData->createPositionOperationSemaphore(TURN, 8));
+
+		AsyncPrinter::Printf("Starting diagonal backing up\n");
 ////		StopDrive();
+		
+		
+		m_componentData->drivetrainData->setRelativePositionSetpoint(FORWARD, 92.0 + 12.0 + 7.0, 0.90);
+		m_componentData->drivetrainData->cleanWaitForSem(m_componentData->drivetrainData->createPositionOperationSemaphore(FORWARD, 0.5));
+
+		SafeWait(0.3, 10);
+		AsyncPrinter::Printf("Starting second turn\n");
+		m_componentData->collectorData->SlideDown();
+		m_componentData->collectorData->RunRollers();
+		
+		m_componentData->drivetrainData->setRelativePositionSetpoint(TURN, 35 + 90 + 8, 0.8);
+		m_componentData->drivetrainData->cleanWaitForSem(m_componentData->drivetrainData->createPositionOperationSemaphore(TURN, 6));
+		SafeWait(0.3, 10);
+ 
+		driveBackDistance = 94;
+		AsyncPrinter::Printf("Starting straight run\n");
+		if (numFrisbees % 2 == 1)//odd, wtf
+		{
+			driveBackDistance += 11.0/2;
+			driveBackDistance += 11.0 * (numFrisbees - 1) / 2.0;
+		}
+		else
+		{
+			driveBackDistance += 11.0 * (numFrisbees) / 2.0;
+		}
+		
+		m_componentData->drivetrainData->setRelativePositionSetpoint(FORWARD, driveBackDistance, 0.9);
+		m_componentData->drivetrainData->cleanWaitForSem(m_componentData->drivetrainData->createPositionOperationSemaphore(FORWARD, numFrisbees * 11.0 + 20));
+		m_componentData->drivetrainData->setMaxPositionControlSpeed(FORWARD, 0.125);
+		m_componentData->drivetrainData->cleanWaitForSem(m_componentData->drivetrainData->createPositionOperationSemaphore(FORWARD, 0.5));
+		//we want to slow down at driveBackDistance - numFrisbees * 11.0 - 20
+		AsyncPrinter::Printf("driving aligning again\n");
+		m_componentData->drivetrainData->setRelativePositionSetpoint(FORWARD, -driveBackDistance + 40 + 40.0, 0.9);
+		m_componentData->drivetrainData->cleanWaitForSem(m_componentData->drivetrainData->createPositionOperationSemaphore(FORWARD, 0.5));
+		
+			
+		AsyncPrinter::Printf("turning\n");
+		
+		m_componentData->collectorData->SlideUp();
+			m_componentData->collectorData->StopRollers();
+		
+		m_componentData->drivetrainData->setRelativePositionSetpoint(TURN, -90.0, 0.8);
+		AsyncPrinter::Printf("going back\n");
+		//so the distance to the center is 12.0 * 8.0 - 2.0 = 94, 77 to center
+//		m_componentData->drivetrainData->setRelativePositionSetpoint(FORWARD, 12.0 * 8.0 - 2.0, 0.90);
+//		m_componentData->drivetrainData->cleanWaitForSem(m_componentData->drivetrainData->createPositionOperationSemaphore(FORWARD, 0.5));
 //		
-//		m_componentData->collectorData->SlideDown();
-//		m_componentData->collectorData->RunRollers();
-//		
+		AsyncPrinter::Printf("done with\n");
 //		m_componentData->drivetrainData->setControlMode(FORWARD, POSITION_CONTROL);
 //		m_componentData->drivetrainData->setRelativePositionSetpoint(FORWARD, 12.0 * 8, 0.55);
 //		m_componentData->drivetrainData->setVelocitySetpoint(TURN, 0.0);

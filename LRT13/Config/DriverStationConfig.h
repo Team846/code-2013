@@ -74,6 +74,7 @@ namespace AnalogIns
 {
 const uint32_t AUTONOMOUS_DELAY = 1;
 const uint32_t AUTONOMOUS_SELECT = 2;
+const uint32_t NUM_FRISBEES = 3;
 }
 }
 
