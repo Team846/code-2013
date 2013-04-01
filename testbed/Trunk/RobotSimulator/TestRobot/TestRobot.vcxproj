@@ -68,6 +68,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Networking\NetConnection.cpp" />
+    <ClCompile Include="Networking\NetUtil.cpp" />
     <ClCompile Include="Process\AsyncProcess.cpp" />
     <ClCompile Include="Utils\AsyncPrinter.cpp" />
     <ClCompile Include="Networking\NetBuffer.cpp" />
@@ -77,6 +78,7 @@
     <ClCompile Include="Robot.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Networking\NetUtil.h" />
     <ClInclude Include="Process\AsyncProcess.h" />
     <ClInclude Include="Utils\AsyncPrinter.h" />
     <ClInclude Include="Networking\LibraryMessageType.h" />
