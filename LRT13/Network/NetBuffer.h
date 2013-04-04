@@ -6,6 +6,8 @@
 
 #include "../Utils/AsyncPrinter.h"
 
+#include "NetUtil.h"
+
 using namespace std;
 
 namespace Network
@@ -58,6 +60,10 @@ namespace Network
 		 */
 		void Write(INT32 i);
 		/*!
+		 * @brief Writes a four-byte unsigned value to the buffer.
+		 */
+		void Write(UINT32 i);
+		/*!
 		 * @brief Writes a two-byte value to the buffer.
 		 */
 		void Write(INT16 s);
@@ -94,6 +100,10 @@ namespace Network
 		 * @brief Reads a four-byte value from the buffer and advances the internal pointer by 32 bits.
 		 */
 		INT32 ReadInt32();
+		/*!
+		 * @brief Reads a four-byte unsigned value from the buffer and advances the internal pointer by 32 bits.
+		 */
+		UINT32 ReadUInt32();
 		/*!
 		 * @brief Reads a two-byte value from the buffer and advances the internal pointer by 16 bits.
 		 */
