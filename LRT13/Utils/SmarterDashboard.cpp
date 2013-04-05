@@ -36,8 +36,9 @@ SmarterDashboard::SmarterDashboard()
 {
 	m_queueSem = semBCreate(SEM_Q_PRIORITY, SEM_FULL);
 	
-	m_server = new NetServer(846);
+	m_server = new NetServer(1140);
 	m_server->Open();
+	AsyncPrinter::Println("The SmarterDashboard service is running on port 1140.");
 }
 
 SmarterDashboard::~SmarterDashboard()

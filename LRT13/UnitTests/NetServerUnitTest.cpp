@@ -24,9 +24,12 @@ void NetServerUnitTest::Run()
 
 		float value = (float)fabs(sin((float)totalTime / 1000.0f));
 		
-		b.Write((char)MessageType::FRONT_SHOOTER_DATA);
-		b.Write(1.0f);
-		b.Write(1.0f);
+		std::stringstream ss;
+		
+		ss << counter;
+		
+		b.Write((char)MessageType::ROBOT_TELEMETRY);
+		b.Write(ss.str());
 		
 		m_conn->SendToAll(&b, NetChannel::NET_UNRELIABLE_SEQUENCED, 1);
 		//m_conn->Send(b, NetChannel::NET_UNRELIABLE_SEQUENCED, 0);

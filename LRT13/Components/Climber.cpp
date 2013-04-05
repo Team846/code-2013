@@ -128,42 +128,61 @@ void Climber::enabledPeriodic()
 	//start at 24
 	//mid at 42, max at
 	if (e % 10 == 0)
+	{
+		string str = "no_state";
 	switch(m_state)
 	{
 	case IDLE:
 		AsyncPrinter::Printf("Idle\n");
+		str = "idle";
 		break;
 	case ARM_UP_INITIAL:
 		AsyncPrinter::Printf("Arm up\n");
+		str = "arm up";
 		break;
 	case WAIT:
 		AsyncPrinter::Printf("Wait\n");
+		str = "wait";
 		break;
 	case ARM_DOWN:
 		AsyncPrinter::Printf("Arm Down\n");
+		str = "arm down";
 		break;
 	case DUMB_ENGAGE_PTO:
 		AsyncPrinter::Printf("Dumb Engage PTO\n");
+		str = "dumb engage pto";
 		break;
 	case ENGAGE_PTO:
 		AsyncPrinter::Printf("Engage PTO\n");
 		AsyncPrinter::Printf("Left %d, rigt %d\n", m_digital_input_left.Get(), m_digital_input_right.Get());
+		str = "engage pto";
 		break;
 	case WINCH_UP:
 		AsyncPrinter::Printf("WINCH_UP\n");
+		str = "winch up";
 		break;
 	case ENGAGE_HOOKS:
 		AsyncPrinter::Printf("ENGAGE HOOKS\n");
+		str = "engage hooks";
 		break;
 	case DISENGAGE_PTO:
 		m_state = ARM_UP_FINAL;
+		str = "disengage pto";
 		break;
 	case ARM_UP_FINAL:
 		AsyncPrinter::Printf("ARM_UP_FINAl\n");
 		m_state = WAIT;
+		str = "arm up final";
 		break;
 	}
 	
+	NetBuffer buff;
+	
+	buff.Write((char)MessageType::ROBOT_TELEMETRY);
+	buff.Write(str);
+	
+	SmarterDashboard::Instance()->EnqueueMessage(&buff, NetChannel::NET_RELIABLE, 2);
+	}
 	
 	if (m_paused)
 	{

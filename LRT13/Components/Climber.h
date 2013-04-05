@@ -13,7 +13,9 @@
 #include "../ComponentData/ClimberData.h"
 #include "../Sensors/DriveEncoders.h"
 #include "../Servo/LRTServo.h"
-
+#include "../Utils/SmarterDashboard.h"
+#include "../Network/MessageType.h"
+#include "../Network/NetChannel.h"
 
 #include "Component.h"
 

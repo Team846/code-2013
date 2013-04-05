@@ -50,6 +50,7 @@ INT32 NetPeer:: InternalPlatformUpdateTaskWrapper(UINT32 instance)
 	while(conn->m_isRunning)
 	{
 		conn->Update();
+		Wait(0.01);
 	}
 	
 	return 0;
@@ -66,6 +67,7 @@ INT32 NetPeer::InternalPlatformMessageVerificationTaskWrapper(UINT32 instance)
 	while(conn->m_isRunning)
 	{
 		conn->CheckMessages();
+		Wait(0.01);
 	}
 	
 	return 0;
@@ -92,7 +94,7 @@ void NetPeer::Update()
 {
 	int received = 0;
 	char rcv_buffer[MAX_RECEIVE_BUFFER_SIZE];
-	int addr_size = sizeof(m_socketEndpoint);
+	int addr_size = sizeof(m_remote_spec);
 	
 	sockaddr_in from;
 	int fromSize = sizeof(from);
@@ -493,22 +495,22 @@ int NetPeer::Open(int options, ...)
 	
 	va_end(vl);
 	
-	m_socketEndpoint.sin_family = AF_INET;
+	m_remote_spec.sin_family = AF_INET;
 	
 	switch(this->m_connType)
 	{
 		case Network::CLIENT:
-			m_socketEndpoint.sin_addr.s_addr = inet_addr(this->m_ip);
-			m_socketEndpoint.sin_port = htons(this->m_port);
+			m_remote_spec.sin_addr.s_addr = inet_addr(this->m_ip);
+			m_remote_spec.sin_port = htons(this->m_port);
 			
 			break;
 		case Network::SERVER:
-			m_socketEndpoint.sin_addr.s_addr = INADDR_ANY;
-			m_socketEndpoint.sin_port = htons(this->m_port);
+			m_remote_spec.sin_addr.s_addr = INADDR_ANY;
+			m_remote_spec.sin_port = htons(this->m_port);
 			break;
 	}
 	
-	int retcode = bind(m_socket, (struct sockaddr*) &m_socketEndpoint, sizeof(m_socketEndpoint));
+	int retcode = bind(m_socket, (struct sockaddr*) &m_remote_spec, sizeof(m_remote_spec));
 	
 	if(retcode < 0)
 	{

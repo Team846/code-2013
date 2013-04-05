@@ -15,7 +15,7 @@
 #include <queue>
 #include <map>
 
-#include <WPILib.h>
+#include "Includes.h"
 
 #ifdef __VXWORKS__
 #include <Task.h>
@@ -163,7 +163,7 @@ namespace Network
 		bool m_isRunning;
 		
 		int m_socket;
-		struct sockaddr_in m_socketEndpoint;
+		struct sockaddr_in m_remote_spec;
 
 		map<int, MessageAwaitingACK> m_reliableUnordered[16];
 		map<int, MessageAwaitingACK> m_reliableSequenced[16];

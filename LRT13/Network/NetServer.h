@@ -7,8 +7,6 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 
-#include <semLib.h>
-
 #include "NetPeer.h"
 #include "NetChannel.h"
 
