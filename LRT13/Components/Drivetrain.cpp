@@ -27,6 +27,9 @@ Drivetrain::~Drivetrain()
 double Drivetrain::ComputeOutput(data::drivetrain::ForwardOrTurn axis)
 {
 	double positionSetpoint = m_componentData->drivetrainData->getRelativePositionSetpoint(axis); // this will tell you how much further to go. i.e. if you have to go 5 units further forward it will return 5
+	
+//	AsyncPrinter::Printf("relative position setpoin: %lf\n", positionSetpoint);
+	
 	double velocitySetpoint = m_componentData->drivetrainData->getVelocitySetpoint(axis);
 	double rawOutput 		= m_componentData->drivetrainData->getOpenLoopOutput(axis);
 	

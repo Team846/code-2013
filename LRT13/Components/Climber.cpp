@@ -51,7 +51,9 @@ void Climber::onDisable()
 }	
 
 void Climber::enabledPeriodic()
+
 {
+	m_paused = false; //we pause
 	if (m_state != IDLE && m_componentData->climberData->shouldPotentiallyAbort())
 	{
 		m_state = IDLE;
@@ -69,7 +71,7 @@ void Climber::enabledPeriodic()
 	static bool wasDebugging = false;
 	if (m_componentData->climberData->shouldDebug())
 	{
-//		AsyncPrinter::Printf("Debug\n");
+		AsyncPrinter::Printf("Debug\n");
 		if (m_componentData->climberData->shouldChangeAngleState())
 		{
 			if (m_componentData->shooterData->ShouldLauncherBeHigh())
@@ -85,9 +87,15 @@ void Climber::enabledPeriodic()
 		}
 		
 		if (m_componentData->climberData->shouldWinchPawlGoDown())
+		{
+			AsyncPrinter::Printf("geartooth %d\n", m_winch_gear_tooth.Get());
 			m_winch_worm.SetDutyCycle(0.4);
+		}
 		else if (m_componentData->climberData->shouldWinchPawlGoUp())
+		{
+			AsyncPrinter::Printf("geartooth %d\n", m_winch_gear_tooth.Get());
 			m_winch_worm.SetDutyCycle(-0.4);
+		}
 		else
 		{
 //			AsyncPrinter::Printf("You failed a tlife!\n");
@@ -113,6 +121,8 @@ void Climber::enabledPeriodic()
 	e++;
 	m_servo_left.SetEnabled(true);
 	m_servo_right.SetEnabled(true);
+	//start at 24
+	//mid at 42, max at
 	if (e % 10 == 0)
 	switch(m_state)
 	{
@@ -170,6 +180,8 @@ void Climber::enabledPeriodic()
 	switch (m_state)
 	{
 	case IDLE:
+		m_pneumatics->setHookPosition(false);
+		m_climbing_level  = 0;                       
 		m_pneumatics->setClimberArm(RETRACTED, true);
 		m_winch_worm.SetDutyCycle(0.0);
 		if (m_componentData->climberData->getDesiredClimbingStep() == INTENDED_ARM_UP)
@@ -208,6 +220,7 @@ void Climber::enabledPeriodic()
 		break;
 	case ARM_DOWN:
 #define DIRECTION 1
+		
 		m_pneumatics->setClimberArm(EXTENDED);
 		m_componentData->shooterData->SetLauncherAngleLow();
 		m_winch_worm.SetDutyCycle(-1.0 * DIRECTION);
@@ -256,7 +269,9 @@ void Climber::enabledPeriodic()
 		m_servo_right.SetMicroseconds(m_servo_right_engaged_position);
 		engaged = false;
 		m_state = WINCH_UP;
-		
+		m_drive_train_position = m_winch_gear_tooth.Get();
+		m_timer = 25;
+		driveSpeed = 0;
 //		m_pneumatics->setClimberArm(false);
 //		m_componentData->drivetrainData->setControlMode(FORWARD, VELOCITY_CONTROL);
 //		m_componentData->drivetrainData->setControlMode(TURN, VELOCITY_CONTROL);
@@ -311,28 +326,36 @@ void Climber::enabledPeriodic()
 		}
 		break;
 	case WINCH_UP:
-		m_timer = 0;
 //		m_pneumatics->setClimberArm(RETRACTED);
 //		m_componentData->shooterData->SetLauncherAngleLow();
 		m_winch_worm.SetDutyCycle(-1.0 * DIRECTION);
 		//30:1 on worm, 4:1, 19k rpm, 158.33333333333333333333333333333 max
 		//11:1, 14-54, 5400/ 42.428571428571428571428571428571  = 130
-		if (fabs(driveSpeed) < 0.99)
+		if (m_climbing_level < 1 && false)
 		{
-			driveSpeed += 0.02 * DIRECTION;
+			driveSpeed = DIRECTION;
 		}
-		m_componentData->drivetrainData->setControlMode(FORWARD, OPEN_LOOP);
-		m_componentData->drivetrainData->setControlMode(TURN, OPEN_LOOP);
-//		m_componentData->drivetrainData->setOpenLoopOutput(FORWARD, 1.0 * DIRECTION);
-		m_componentData->drivetrainData->setOpenLoopOutput(FORWARD, driveSpeed);
-		m_componentData->drivetrainData->setOpenLoopOutput(TURN, 0.0);
+		else if (fabs(driveSpeed) < 0.99)
+		{
+			driveSpeed += 0.05 * DIRECTION;
+		}
 		
-		if (!engaged && m_digital_input_left.Get() && m_digital_input_left.Get())
+//		m_timer--;
+//		if (m_timer < 0)
+		{
+			m_componentData->drivetrainData->setControlMode(FORWARD, OPEN_LOOP);
+			m_componentData->drivetrainData->setControlMode(TURN, OPEN_LOOP);
+			m_componentData->drivetrainData->setOpenLoopOutput(FORWARD, driveSpeed);
+			m_componentData->drivetrainData->setOpenLoopOutput(TURN, 0.0);
+		}
+		
+		if (false)//!engaged && m_digital_input_left.Get() && m_digital_input_left.Get())
+		
 		{
 			m_drive_train_position = m_driving_encoders->getRobotDist(); //awk units (2/3 in)
 			engaged = true;
 		}
-		else if (engaged && fabs(m_driving_encoders->getRobotDist() - m_drive_train_position) > m_drive_train_position_threshold)//SHould be about 42
+		else if (m_winch_gear_tooth.Get() - m_drive_train_position > 39)//SHould be about 42
 		{
 			m_winch_worm.SetDutyCycle(0.0);
 			m_state = IDLE;
@@ -345,24 +368,21 @@ void Climber::enabledPeriodic()
 		}
 		else
 		{
-			AsyncPrinter::Printf("encoder dist: %.2f \n", m_driving_encoders->getRobotDist());
-			AsyncPrinter::Printf("dist: %.2f, l: %d, r: %d\n", fabs(m_driving_encoders->getRobotDist() - m_drive_train_position) , m_digital_input_left.Get(), m_digital_input_right.Get());
+			AsyncPrinter::Printf("encoder dist: %.2f speed %.2f\n", m_winch_gear_tooth.Get() - m_drive_train_position, driveSpeed);
+//			AsyncPrinter::Printf("dist: %.2f, l: %d, r: %d\n", fabs(m_driving_encoders->getRobotDist() - m_drive_train_position) , m_digital_input_left.Get(), m_digital_input_right.Get());
 		}
 		break;
 	case ENGAGE_HOOKS:
-		m_pneumatics->setHookPosition(EXTENDED);
-//		m_componentData->drivetrainData->setControlMode(FORWARD, VELOCITY_CONTROL);
-//		m_componentData->drivetrainData->setControlMode(TURN, VELOCITY_CONTROL);
-//		m_componentData->drivetrainData->setControlMode(FORWARD, OPEN_LOOP);
-//		m_componentData->drivetrainData->setControlMode(TURN, OPEN_LOOP);
-//		m_componentData->drivetrainData->setVelocitySetpoint(FORWARD, 0.0);
-//		m_componentData->drivetrainData->setVelocitySetpoint(TURN, 0.0);
-//		return;
+		m_pneumatics->setHookPosition(true);
+
+		driveSpeed = 0;
 		if (++m_timer > m_timer_threshold)
 		{
 			if (m_climbing_level < 3)
 			{
-				m_state = DISENGAGE_PTO;
+//				m_state = DISENGAGE_PTO;
+				m_state = ARM_UP_FINAL;
+				m_gear_tooth_ticks_position = m_winch_gear_tooth.Get();
 				m_timer = 0;
 			}
 			else
@@ -394,17 +414,25 @@ void Climber::enabledPeriodic()
 		break;
 	case ARM_UP_FINAL:
 		m_pneumatics->setClimberArm(true);
-		m_winch_worm.SetDutyCycle(1.0);
-		if (m_winch_gear_tooth.Get() - m_gear_tooth_ticks_position > m_gear_tooth_threshold)
+		m_winch_worm.SetDutyCycle(1.0 * DIRECTION);
+		
+		m_componentData->drivetrainData->setControlMode(FORWARD, OPEN_LOOP);
+		m_componentData->drivetrainData->setControlMode(TURN, OPEN_LOOP);
+		m_componentData->drivetrainData->setOpenLoopOutput(FORWARD, -DIRECTION);
+		m_componentData->drivetrainData->setOpenLoopOutput(TURN, 0.0);
+		
+		
+		if (m_winch_gear_tooth.Get() - m_gear_tooth_ticks_position > 80)
 		{
 			m_winch_worm.SetDutyCycle(0.0);
-			m_state = ARM_DOWN;
+			m_state = WINCH_UP;
 		}
 		break;
 	}
 	m_paused = false; //we pause
 	if (m_previous_state != m_state)
 	{
+		//don't pause for now
 //		m_paused = true; //we pause
 	}
 	
@@ -450,6 +478,7 @@ void Climber::enabledPeriodic()
 
 void Climber::disabledPeriodic()
 {
+	
 	m_componentData->climberData->setDesiredClimbingStep(INTENDED_IDLE );
 	m_state = IDLE;//Restart the routine, makes debugging easier.
 	static int e = 0;
@@ -462,6 +491,11 @@ void Climber::disabledPeriodic()
 	m_servo_right.SetMicroseconds(m_servo_right_disengaged_position);
 	
 	m_pneumatics->setHookPosition(false);
+//	if (e % 50 == 0)
+//	{
+//		AsyncPrinter::Printf("Hook Change to %d\n", !m_pneumatics->GetHookState()	);
+//		m_pneumatics->setHookPosition(!m_pneumatics->GetHookState());
+//	}
 }
 
 void Climber::Configure()

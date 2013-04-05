@@ -5,6 +5,7 @@
 #include "ConfigLoaderData.h"
 #include "ShooterData.h"
 #include "CollectorData.h"
+#include "LEDIndicatorData.h"
 
 using namespace data;
 using namespace drivetrain;

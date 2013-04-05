@@ -24,7 +24,8 @@ typedef enum state
 		ARM_UP_FINAL = 9,
 		DUMB_ENGAGE_PTO = 10,
 		UNLOCK_PAWL = 11,
-		PREPARE_CLIMBING_POSITION = 12
+		PREPARE_CLIMBING_POSITION = 12,
+		DO_NOTHING= 13
 	};
 
 typedef enum humanState

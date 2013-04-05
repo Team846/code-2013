@@ -20,12 +20,12 @@ namespace data
 		public:
 			LEDIndicatorData();
 			
-			void setColorRGB(Indicator i, INT8 red, INT8 green, INT8 blue);
+			void setColorRGB(INT8 red, INT8 green, INT8 blue);
 			
-			int getColor(Indicator i);
-			int getColorR(Indicator i);
-			int getColorG(Indicator i);
-			int getColorB(Indicator i);
+			int getColor();
+			int getColorR();
+			int getColorG();
+			int getColorB();
 			
 		private:
 			UINT32 m_rgb;

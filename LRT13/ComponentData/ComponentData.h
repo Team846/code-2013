@@ -31,6 +31,11 @@ namespace data
 		class ClimberData;
 	}
 	
+	namespace indicators
+	{
+		class LEDIndicatorData;
+	}
+	
 	/*!
 	 * @brief Provides a central hub for data access.
 	 * @author Tony Peng, Brian Axelrod, Raphael Chang

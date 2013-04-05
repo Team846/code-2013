@@ -12,7 +12,7 @@ using namespace data::shooter;
 //unsigned int AutonomousRoutines::standardWaitTicks = ;
 
 #define FULL_AUTON 0
-#define USE_COLLECTOR 0
+#define USE_COLLECTOR 1
 
 AutonomousRoutines::AutonomousRoutines()
 :  AsyncProcess("AutonTask")
@@ -92,13 +92,15 @@ void AutonomousRoutines::Autonomous()
 		break;
 		
 	case 3://start in back and do the fancy driving back routine
-		m_componentData->shooterData->SetNumFrisbeesInStorage(10);
+		m_componentData->shooterData->SetNumFrisbeesInStorage(6);
+		FireAllFrisbees(7.0);
+		m_componentData->shooterData->SetShooterSetting(OFF);
 //		FireAllFrisbees(6.0);
 		
 		AsyncPrinter::Printf("Starting driving back\n");
 		m_componentData->drivetrainData->setControlMode(FORWARD, POSITION_CONTROL);
 		m_componentData->drivetrainData->setControlMode(TURN, VELOCITY_CONTROL);
-		m_componentData->drivetrainData->setRelativePositionSetpoint(FORWARD, 12 * 2.6 , 0.90);
+		m_componentData->drivetrainData->setRelativePositionSetpoint(FORWARD, 12 * 2.6 - 1.5 - 4 , 0.90);
 		m_componentData->drivetrainData->setVelocitySetpoint(TURN, 0.0);
 		m_componentData->drivetrainData->cleanWaitForSem(m_componentData->drivetrainData->createPositionOperationSemaphore(FORWARD, 0.5));
 //		StopDrive();
@@ -141,7 +143,7 @@ void AutonomousRoutines::Autonomous()
 		
 		m_componentData->drivetrainData->setRelativePositionSetpoint(FORWARD, driveBackDistance, 0.9);
 		m_componentData->drivetrainData->cleanWaitForSem(m_componentData->drivetrainData->createPositionOperationSemaphore(FORWARD, numFrisbees * 11.0 + 20));
-		m_componentData->drivetrainData->setMaxPositionControlSpeed(FORWARD, 0.125);
+		m_componentData->drivetrainData->setMaxPositionControlSpeed(FORWARD, 0.30);
 		m_componentData->drivetrainData->cleanWaitForSem(m_componentData->drivetrainData->createPositionOperationSemaphore(FORWARD, 0.5));
 		//we want to slow down at driveBackDistance - numFrisbees * 11.0 - 20
 		AsyncPrinter::Printf("driving aligning again\n");

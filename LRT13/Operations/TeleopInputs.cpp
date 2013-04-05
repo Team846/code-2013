@@ -112,6 +112,9 @@ void TeleopInputs::Update()
 			m_componentData->drivetrainData->setOpenLoopOutput(FORWARD, forward);
 			m_componentData->drivetrainData->setOpenLoopOutput(TURN, turnComposite);
 #else
+//			static int oops = 0;
+//			if (++oops % 5 == 0)
+//				AsyncPrinter::Printf("fwd: %.2f\n", forward);
 		m_componentData->drivetrainData->setOpenLoopOutput(FORWARD, forward);
 		m_componentData->drivetrainData->setOpenLoopOutput(TURN, turnComposite);
 		//for when the climber is being used

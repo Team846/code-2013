@@ -153,6 +153,8 @@ void NetPeer::Update()
 						break;
 					}
 					
+					AsyncPrinter::Printf("Connection request receieved.\n");
+					
 					NetConnection* nc = new NetConnection(from, this);
 					
 					InternalPlatformConnectionListSynchronizationEnter();
