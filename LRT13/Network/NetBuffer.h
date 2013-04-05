@@ -55,6 +55,8 @@ namespace Network
 		 * @brief Wriets a length-prefixed string to the buffer.
 		 */
 		void Write(string str);
+		void Write(INT64 l);
+		void Write(UINT64 l);
 		/*!
 		 * @brief Writes an four-byte value to the buffer. 
 		 */
@@ -96,6 +98,8 @@ namespace Network
 		 * @brief Reads a length-prefixed STL string from the buffer and advances the internal pointer.
 		 */
 		string ReadStdString();
+		INT64 ReadInt64();
+		UINT64 ReadUInt64();
 		/*!
 		 * @brief Reads a four-byte value from the buffer and advances the internal pointer by 32 bits.
 		 */

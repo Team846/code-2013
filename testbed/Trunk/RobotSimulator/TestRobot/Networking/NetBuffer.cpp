@@ -63,9 +63,9 @@ void NetBuffer::Write(bool b)
 
 void NetBuffer::Write(double d)
 {
-	char *byteArray = reinterpret_cast<char*>(&d);
-	
-	InternalWriteBytes(byteArray,sizeof(double));
+	UINT64 packed = NetUtil::PackDouble(d);
+
+	Write(packed);
 }
 
 void NetBuffer::Write(float f)
@@ -73,6 +73,16 @@ void NetBuffer::Write(float f)
 	UINT32 packed = NetUtil::PackFloat(f);
 
 	Write(packed);
+}
+
+void NetBuffer::Write(INT64 l)
+{
+	InternalWriteInteger((UINT64)l, sizeof(INT64) * 8);
+}
+
+void NetBuffer::Write(UINT64 l)
+{
+	InternalWriteInteger(l, sizeof(UINT64) * 8);
 }
 
 void NetBuffer::Write(INT32 i)
@@ -120,6 +130,16 @@ string NetBuffer::ReadStdString()
 	return InternalReadBytes(len);
 }
 
+INT64 NetBuffer::ReadInt64()
+{
+	return (INT64)InternalReadInteger(sizeof(INT64) * 8);
+}
+
+UINT64 NetBuffer::ReadUInt64()
+{
+	return InternalReadInteger(sizeof(UINT64) * 8);
+}
+
 INT32 NetBuffer::ReadInt32()
 {
 	return (INT32)InternalReadInteger(sizeof(INT32) * 8);
@@ -137,11 +157,9 @@ INT16 NetBuffer::ReadInt16()
 
 double NetBuffer::ReadDouble()
 {
-	char *byteArray = InternalReadBytes(sizeof(double));
-		
-	double d = *reinterpret_cast<double*>(byteArray);
-	
-	return d;
+	UINT64 packed = ReadUInt64();
+
+	return NetUtil::UnpackDouble(packed);
 }
 
 float NetBuffer::ReadFloat()

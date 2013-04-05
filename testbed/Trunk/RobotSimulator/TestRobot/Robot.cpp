@@ -38,7 +38,7 @@ Robot::~Robot()
 
 void Robot::StartCompetition()
 {
-	NetServer* server = new NetServer(846);
+	NetServer* server = new NetServer(8000);
 
 	server->Open();
 
@@ -61,16 +61,21 @@ void Robot::StartCompetition()
 		NetBuffer buff;
 
 		float value = fabs(sin((float)totalTime / 1000.0f));
+		value = -4.0f;
 
-		buff.Write((char)MessageType::FRONT_SHOOTER_DATA);
-		buff.Write((float)totalTime / 1000.0f);
-		buff.Write(value);
+		double valueD = 3.14159265;
+
+		//buff.Write((char)MessageType::FRONT_SHOOTER_DATA);
+		//buff.Write((float)totalTime / 1000.0f);
+		//buff.Write(value);
+
+		buff.Write(valueD);
 
 		server->SendToAll(&buff, NetChannel::NET_UNRELIABLE_SEQUENCED, 1);
 
-		printf("Sending value of %f at time %f", value, (float)totalTime / 1000.0f); 
+		printf("Sending value of %lf at time %f", valueD, (float)totalTime / 1000.0f); 
 
-		Sleep(10);
+		Sleep(100);
 
 		totalTime += 10;
 
