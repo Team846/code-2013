@@ -26,6 +26,8 @@ LRTRobot13::~LRTRobot13()
 	
 	DELETE(m_componentManager);
 	
+	SmarterDashboard::Close();
+	
 	// Finalize all singletons
 	ComponentData::Finalize();
 	AsyncPrinter::Finalize();
@@ -37,30 +39,36 @@ LRTRobot13::~LRTRobot13()
 
 void LRTRobot13::RobotInit()
 {
-	AsyncPrinter::Println("Creating Components");
+	AsyncPrinter::Println("Creating Components...");
 	m_componentManager = new ComponentManager();
 	m_componentManager->CreateComponents();
 
-	AsyncPrinter::Println("Starting TeleopInputs Task");
+	AsyncPrinter::Println("Starting TeleopInputs Task...");
 	m_teleop = new TeleopInputs("TeleopInputs");
 //	m_teleop->Start();
 	
-	AsyncPrinter::Println("initializing AutonomousRoutines");
+	AsyncPrinter::Println("initializing AutonomousRoutines...");
 	m_auton = new AutonomousRoutines();
 	
-	AsyncPrinter::Println("Starting Jaguar Tasks");
+	AsyncPrinter::Println("Starting Jaguar Tasks...");
 	for (vector<AsyncCANJaguar*>::iterator it = AsyncCANJaguar::jaguar_vector.begin(); it < AsyncCANJaguar::jaguar_vector.end(); it++)
 	{
 		(*it)->Start();
 	}
 	
-	AsyncPrinter::Println("Starting Pneumatics Task");
+	AsyncPrinter::Println("Starting Pneumatics Task...");
 	Pneumatics::Instance()->Start();
 	
-	AsyncPrinter::Println("Starting LogManager Task");
+	AsyncPrinter::Println("Starting LogManager Task...");
 	LogManager::Instance()->Start();
 	
+	AsyncPrinter::Println("Configuring...");
 	ConfigManager::Instance()->ConfigureAll();
+	
+	AsyncPrinter::Println("Starting SmarterDashboard service...");
+	SmarterDashboard::Start();
+	
+	AsyncPrinter::Println("Reticulating splines...");
 }
 
 static int TimeoutCallback(...)

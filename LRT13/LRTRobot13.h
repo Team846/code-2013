@@ -27,6 +27,8 @@
 
 #include "Sensors/DriveEncoders.h"
 
+#include "Utils/SmarterDashboard.h"
+
 class LRTRobot13 : public LRTRobotBase
 {
 	public:

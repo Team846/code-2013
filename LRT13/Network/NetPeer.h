@@ -163,7 +163,7 @@ namespace Network
 		bool m_isRunning;
 		
 		int m_socket;
-		struct sockaddr_in m_remote_spec;
+		struct sockaddr_in m_socketEndpoint;
 
 		map<int, MessageAwaitingACK> m_reliableUnordered[16];
 		map<int, MessageAwaitingACK> m_reliableSequenced[16];
