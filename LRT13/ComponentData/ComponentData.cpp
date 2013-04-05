@@ -12,6 +12,7 @@ using namespace shooter;
 using namespace collector;
 using namespace climber;
 using namespace configloader;
+using namespace indicators;
 
 ComponentData* ComponentData::m_instance = NULL;
 
@@ -33,7 +34,8 @@ ComponentData::ComponentData()
   shooterData(new ShooterData()),
   collectorData(new CollectorData()),
   climberData(new ClimberData()),
-  configLoaderData(new ConfigLoaderData())
+  configLoaderData(new ConfigLoaderData()),
+  ledIndicatorData(new LEDIndicatorData())
 {
 	
 }

@@ -53,7 +53,7 @@ void AutoAim::Update()
 			// we're to the left
 			ComponentData::GetInstance()->drivetrainData->setControlMode(TURN, POSITION_CONTROL);
 			ComponentData::GetInstance()->drivetrainData->setRelativePositionSetpoint(TURN, -5, 0.3);
-			ComponentData::GetInstance()->drivetrainData->cleanWaitForSem(m_componentData->drivetrainData->createPositionOperationSemaphore(TURN, 2));
+			ComponentData::GetInstance()->drivetrainData->cleanWaitForSem(ComponentData::GetInstance()->drivetrainData->createPositionOperationSemaphore(TURN, 2));
 			
 			NetBuffer buff;
 						
@@ -68,7 +68,7 @@ void AutoAim::Update()
 			// we're to the right
 			ComponentData::GetInstance()->drivetrainData->setControlMode(TURN, POSITION_CONTROL);
 			ComponentData::GetInstance()->drivetrainData->setRelativePositionSetpoint(TURN, 5, 0.3);
-			ComponentData::GetInstance()->drivetrainData->cleanWaitForSem(m_componentData->drivetrainData->createPositionOperationSemaphore(TURN, 2));
+			ComponentData::GetInstance()->drivetrainData->cleanWaitForSem(ComponentData::GetInstance()->drivetrainData->createPositionOperationSemaphore(TURN, 2));
 			
 			NetBuffer buff;
 						

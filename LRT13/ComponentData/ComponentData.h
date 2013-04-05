@@ -47,6 +47,7 @@ namespace data
 		collector::CollectorData* const collectorData;
 		climber::ClimberData* const climberData;
 		configloader::ConfigLoaderData* const configLoaderData;
+		indicators::LEDIndicatorData* const ledIndicatorData;
 	
 	protected:
 		ComponentData();
