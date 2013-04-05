@@ -12,7 +12,7 @@
 using namespace data;
 using namespace data::indicators;
 
-class LEDIndicators : AsyncProcess
+class LEDIndicators : public AsyncProcess
 {
 public:
 	LEDIndicators();

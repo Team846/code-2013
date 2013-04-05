@@ -1,5 +1,6 @@
 #include "Climber.h"
 #include "../ComponentData/ClimberData.h"
+#include "../ComponentData/LEDIndicatorData.h"
 #include "../Config/ConfigManager.h"
 #include "../Config/RobotConfig.h"
 #include "../ComponentData/ShooterData.h"
@@ -40,6 +41,7 @@ void Climber::onEnable()
 void Climber::onDisable()
 {
 	disabledPeriodic();
+	m_componentData->ledIndicatorData->setColorRGB(255,0,0);
 //	static int e = 0;
 //	e++;
 //		if (e % 10 == 0)
@@ -53,6 +55,8 @@ void Climber::onDisable()
 void Climber::enabledPeriodic()
 
 {
+	m_componentData->ledIndicatorData->setColorRGB(255,0,0);
+	
 	m_paused = false; //we pause
 	if (m_state != IDLE && m_componentData->climberData->shouldPotentiallyAbort())
 	{

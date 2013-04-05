@@ -29,6 +29,7 @@
 
 #include "Utils/SmarterDashboard.h"
 
+#include "Components/LEDIndicators.h"
 class LRTRobot13 : public LRTRobotBase
 {
 	public:
@@ -46,6 +47,8 @@ class LRTRobot13 : public LRTRobotBase
 		ComponentManager* m_componentManager;
 		TeleopInputs* m_teleop;
 		AutonomousRoutines* m_auton;
+		
+		LEDIndicators leds;
 		
 		WDOG_ID _watchdog;
 

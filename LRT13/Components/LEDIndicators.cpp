@@ -6,6 +6,7 @@ LEDIndicators::LEDIndicators() :
 	spi->SetMSBFirst();
 	spi->SetClockRate(2000000);
 	spi->Write(0);
+
 }
 
 LEDIndicators::~LEDIndicators() {
@@ -13,11 +14,13 @@ LEDIndicators::~LEDIndicators() {
 }
 
 INT32 LEDIndicators::Tick() {
+//	AsyncPrinter::Printf("Alive\n");
 	int r = ComponentData::GetInstance()->ledIndicatorData->getColorR();
 	int g = ComponentData::GetInstance()->ledIndicatorData->getColorG();
 	int b = ComponentData::GetInstance()->ledIndicatorData->getColorB();
 		
-	for(int i = 0; i < 16; i++){
+	for(int i = 0; i < 16; i++)
+	{
 		spi->Write(r);
 		spi->Write(g);
 		spi->Write(b);

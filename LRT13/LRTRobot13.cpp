@@ -66,7 +66,9 @@ void LRTRobot13::RobotInit()
 	ConfigManager::Instance()->ConfigureAll();
 	
 	AsyncPrinter::Println("Starting SmarterDashboard service...");
-	SmarterDashboard::Start();
+//	SmarterDashboard::Start();
+	
+	leds.Start();
 	
 	AsyncPrinter::Println("Reticulating splines...");
 }
