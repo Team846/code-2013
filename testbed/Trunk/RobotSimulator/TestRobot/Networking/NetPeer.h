@@ -15,7 +15,7 @@
 #include <queue>
 #include <map>
 
-#include <WPILib.h>
+#include "Includes.h"
 
 #ifdef __VXWORKS__
 #include <Task.h>

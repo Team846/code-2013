@@ -20,6 +20,7 @@ namespace Network
 			GENERAL_DATA = 0x40,
 			AUTO_AIM_DATA = 0x50,
 			DISC_LOCATOR_DATA = 0x60,
+			ROBOT_TELEMETRY = 0x70,
 
 			// out
 			DASHBOARD_DATA = 0x20,

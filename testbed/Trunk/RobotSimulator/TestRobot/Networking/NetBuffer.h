@@ -1,10 +1,12 @@
 #ifndef NET_BUFFER_H_
 #define NET_BUFFER_H_
 
-#include <WPILib.h>
+#include "Includes.h"
 #include <string.h>
 
+#ifdef __VXWORKS__
 #include "../Utils/AsyncPrinter.h"
+#endif
 
 #include "NetUtil.h"
 

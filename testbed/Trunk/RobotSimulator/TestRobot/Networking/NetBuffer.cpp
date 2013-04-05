@@ -104,7 +104,11 @@ void NetBuffer::WritePadBits()
 {	
 	if(m_isReadOnly)
 	{
-		AsyncPrinter::Println("[NetBuffer] Can't write to a read-only buffer!");
+		#ifdef __VXWORKS__
+AsyncPrinter::Println("[NetBuffer] Can't write to a read-only buffer!");
+#else
+printf("[NetBuffer] Can't write to a read-only buffer!\n");
+#endif
 		return;
 	}
 	
@@ -188,13 +192,21 @@ void NetBuffer::InternalWriteByte(const char data, int bit_length)
 {
 	if(m_isReadOnly)
 	{
-		AsyncPrinter::Println("[NetBuffer] Can't write to a read-only buffer!");
+		#ifdef __VXWORKS__
+AsyncPrinter::Println("[NetBuffer] Can't write to a read-only buffer!");
+#else
+printf("[NetBuffer] Can't write to a read-only buffer!\n");
+#endif
 		return;
 	}
 	
 	if(bit_length < 1 || bit_length > 8)
 	{
-		AsyncPrinter::Println("[NetBuffer] Can't write less than one bit or more than eight bits!");
+		#ifdef __VXWORKS__
+AsyncPrinter::Println("[NetBuffer] Can't write less than one bit or more than eight bits!");
+#else
+printf("[NetBuffer] Can't write less than one bit or more than eight bits!\n");
+#endif
 		return;
 	}
 	
@@ -234,7 +246,11 @@ void NetBuffer::InternalWriteBytes(const char data[], int bytes)
 {
 	if(m_isReadOnly)
 	{
-		AsyncPrinter::Println("[NetBuffer] Can't write to a read-only buffer!");
+		#ifdef __VXWORKS__
+AsyncPrinter::Println("[NetBuffer] Can't write to a read-only buffer!");
+#else
+printf("[NetBuffer] Can't write to a read-only buffer!\n");
+#endif
 		return;
 	}
 	
@@ -248,7 +264,11 @@ void NetBuffer::InternalWriteInteger(const UINT64 data, int bits)
 {	
 	if(m_isReadOnly)
 	{
-		AsyncPrinter::Println("[NetBuffer] Can't write to a read-only buffer!");
+		#ifdef __VXWORKS__
+AsyncPrinter::Println("[NetBuffer] Can't write to a read-only buffer!");
+#else
+printf("[NetBuffer] Can't write to a read-only buffer!\n");
+#endif
 		return;
 	}
 	
@@ -271,13 +291,21 @@ char NetBuffer::InternalReadByte(int bit_length)
 {
 	if(bit_length < 1 || bit_length > 8)
 	{
-		AsyncPrinter::Println("[NetBuffer] Can't read less than one bit or more than eight bits!");
+		#ifdef __VXWORKS__
+AsyncPrinter::Println("[NetBuffer] Can't read less than one bit or more than eight bits!");
+#else
+printf("[NetBuffer] Can't read less than one bit or more than eight bits!\n");
+#endif
 		return 0;
 	}
 	
 	if(!AssertBufferHasSpace(m_internalBitPos + bit_length))
 	{
-		AsyncPrinter::Println("[NetBuffer] Can't read past the buffer!");
+		#ifdef __VXWORKS__
+AsyncPrinter::Println("[NetBuffer] Can't read past the buffer!");
+#else
+printf("[NetBuffer] Can't read past the buffer!\n");
+#endif
 		return 0;
 	}
 	

@@ -1,7 +1,7 @@
 #ifndef NETUTIL_H_
 #define NETUTIL_H_
 
-#include <WPILib.h>
+#include "Includes.h"
 #include <cmath>
 
 namespace Network

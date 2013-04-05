@@ -38,7 +38,7 @@ Robot::~Robot()
 
 void Robot::StartCompetition()
 {
-	NetServer* server = new NetServer(8000);
+	NetServer* server = new NetServer(846);
 
 	server->Open();
 
@@ -69,7 +69,12 @@ void Robot::StartCompetition()
 		//buff.Write((float)totalTime / 1000.0f);
 		//buff.Write(value);
 
-		buff.Write(valueD);
+		std::stringstream ss;
+
+		ss << i++;
+
+		buff.Write((char)MessageType::ROBOT_TELEMETRY);
+		buff.Write(ss.str());
 
 		server->SendToAll(&buff, NetChannel::NET_UNRELIABLE_SEQUENCED, 1);
 

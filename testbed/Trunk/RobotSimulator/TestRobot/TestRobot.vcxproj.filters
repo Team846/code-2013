@@ -83,5 +83,11 @@
     <ClInclude Include="Networking\NetUtil.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Networking\Includes.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Networking\xplat_types.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
