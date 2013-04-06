@@ -32,6 +32,13 @@
 
 #include "LibraryMessageType.h"
 
+// sleep for X milliseconds
+#ifdef __VXWORKS__
+#define NET_SLEEP(x) Wait (x / 1000.0)
+#else
+#define NET_SLEEP(x) usleep(x * 1000.0);
+#endif
+
 #define SEND_FAILED_BUFFER_ALREADY_SENT -1000000000
 #define SEND_FAILED_BUFFER_INVALID -1000000001
 #define SEND_FAILED_UNKNOWN_ERROR -10000000002

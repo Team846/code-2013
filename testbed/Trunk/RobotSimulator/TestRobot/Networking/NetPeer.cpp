@@ -50,7 +50,7 @@ INT32 NetPeer:: InternalPlatformUpdateTaskWrapper(UINT32 instance)
 	while(conn->m_isRunning)
 	{
 		conn->Update();
-		Wait(0.01);
+		NET_SLEEP(10);
 	}
 	
 	return 0;
@@ -67,7 +67,7 @@ INT32 NetPeer::InternalPlatformMessageVerificationTaskWrapper(UINT32 instance)
 	while(conn->m_isRunning)
 	{
 		conn->CheckMessages();
-		Wait(0.01);
+		NET_SLEEP(10);
 	}
 	
 	return 0;
