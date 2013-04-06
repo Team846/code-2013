@@ -1,8 +1,6 @@
 #ifndef LED_INDICATOR_H_
 #define LED_INDICATOR_H_
 
-#include <WPILib.h>
-#include <SPI.h>
 #include <DigitalOutput.h>
 
 #include "../ComponentData/ComponentData.h"
@@ -21,9 +19,9 @@ public:
 	INT32 Tick();
 	
 private:
+	int numLEDs;
 	DigitalOutput m_clockOut;
 	DigitalOutput m_dataOut;
-	SPI* spi;
 };
 
 #endif
