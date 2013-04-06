@@ -76,6 +76,19 @@ private:
 	int m_timer;
 	
 	int m_cyclesToContinueRetracting;
+	
+	Notifier m_sensorProcessingNotifier;
+	
+	static void DeNoiseSensorEntry(void *param);
+	
+	void DeNoiseSensor();
+	
+	int m_sensorDeNoisingCycle;
+#define NUM_SENSOR_VALS 5
+	int m_sensorVals[NUM_SENSOR_VALS];//400/50/2 + 1
+	bool m_sensorWindow;
+	
+	bool m_isSensorTrue;
 };
 
 #endif

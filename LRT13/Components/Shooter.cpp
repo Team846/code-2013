@@ -10,13 +10,16 @@ using namespace data;
 using namespace data::shooter;
 
 #define RELIABLE_SHOOTING 0
+#define FILTERED_SENSOR 1
 #define TWOSPEED 1
 
 //Front of the pyramid is 3400, 4040
 
 Shooter::Shooter() :
 	Component("Shooter", DriverStationConfig::DigitalIns::SHOOTER, true),
-			m_configSection("Shooter")
+			m_configSection("Shooter"),
+			m_sensorProcessingNotifier((TimerEventHandler) Climber::DeNoiseSensorEntry, this)
+
 {
 	m_jaguars[OUTER] = new AsyncCANJaguar(RobotConfig::CAN::SHOOTER_A,
 			"ShooterFront");
@@ -47,8 +50,15 @@ Shooter::Shooter() :
 	
 	m_fireState = FIRING_OFF;
 	m_cyclesToContinueRetracting = 0;
+	m_sensorDeNoisingCycle = 0;
+	
+	m_isSensorTrue = false;
 	
 	Configure();
+	
+
+	
+	m_sensorProcessingNotifier.StartPeriodic(1.0 / SENSOR_DENOISE_RATE);
 } 
 
 Shooter::~Shooter()
@@ -120,8 +130,12 @@ void Shooter::enabledPeriodic()
 	//				if (m_cyclesToContinueRetracting > 0)
 #if RELIABLE_SHOOTING
 					if (!m_proximity->Get() && m_timer > 0)//keep waiting
-#else
+#else 
+	#if FILTERED_SENSOR
+					if (!m_isSensorTrue)//keep waiting
+	#else
 					if (!m_proximity->Get())//keep waiting
+	#endif
 #endif
 					{
 						m_pneumatics->setStorageExit(RETRACTED);
@@ -138,7 +152,11 @@ void Shooter::enabledPeriodic()
 #if RELIABLE_SHOOTING
 					if (m_proximity->Get() && m_timer > 0)//keep waiting
 #else
+	#if FILTERED_SENSOR
+					if (m_isSensorTrue)//keep waiting
+	#else
 					if (m_proximity->Get())//keep waiting
+	#endif
 #endif
 					{
 						m_pneumatics->setStorageExit(RETRACTED);
@@ -398,4 +416,41 @@ void Shooter::ConfigurePIDObject(PID *pid, std::string objName, bool feedForward
 	double d = m_config->Get<double>(Component::GetName(), objName + "_D", 0.0);
 	
 	pid->setParameters(p, i, d, 1.0, 0.87, feedForward);//super high decay, this makes it just like a filter. If you want it to act more like an integral you reduce the decay. This must be tuned. 
+}
+
+void Shooter::DeNoiseSensorEntry(void * param)
+{
+	Climber *climber = (Climber*) param;
+	climber->DeNoiseSensor();
+}
+
+void Shooter::DeNoiseSensor()
+{
+	m_sensorVals[m_sensorDeNoisingCycle] = m_proximity->Get();
+	int numTrue = 0, numFalse = 0;
+	
+	for (int i = 0; i < NUM_SENSOR_VALS; i++)
+	{
+		if (m_sensorVals[i])
+			numTrue++;
+		else
+			numFalse++;
+	}
+	
+	m_sensorDeNoisingCycle++;
+	if (m_sensorDeNoisingCycle >= NUM_SENSOR_VALS)
+	{
+		m_sensorDeNoisingCycle = 0;
+	}
+	
+	if (numTrue > numFalse)
+		m_isSensorTrue = true;
+	else
+		m_isSensorTrue = false;
+}
+
+
+void Shooter::Log()
+{
+
 }
