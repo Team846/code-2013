@@ -1,11 +1,12 @@
 #ifndef NET_PEER_H_
 #define NET_PEER_H_
-
+//sdfjkl
 #include <stdio.h>
 
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/socket.h>
+#include <algorithm>
 
 //#include <netinet/in.h> // <-- DO NOT USE
 //#include <arpa/inet.h> // <-- BLACK MAGIC
@@ -14,11 +15,15 @@
 #include <sstream>
 #include <queue>
 #include <map>
+#include <stdarg.h>
 
 #include "Includes.h"
 
 #ifdef __VXWORKS__
 #include <Task.h>
+#else #ifdef USE_BOOST
+#include <boost/thread.hpp>
+#include <boost/signals2/mutex.hpp>
 #endif
 
 #include "NetBuffer.h"
@@ -111,6 +116,10 @@ namespace Network
 #ifdef __VXWORKS__
 		static INT32 InternalPlatformUpdateTaskWrapper(UINT32 instance);
 		static INT32 InternalPlatformMessageVerificationTaskWrapper(UINT32 instance);
+
+#else #ifdef USE_BOOST
+		static INT32 InternalPlatformUpdateTaskWrapper(NetPeer* instance);
+		static INT32 InternalPlatformMessageVerificationTaskWrapper(NetPeer* instance);		
 #endif
 		
 		void InternalPlatformQueueSynchronizationCreate();
@@ -154,6 +163,14 @@ namespace Network
 		
 		Task* m_internalUpdateTask;
 		Task* m_internalMessageVerificationTask;
+		
+#else #ifdef USE_BOOST
+		boost::signals2::mutex* m_msgQueueMutex;
+		boost::signals2::mutex* m_connectionListMutex;
+		boost::signals2::mutex* m_reliableUnorderedQueueMutex, *m_reliableSequencedQueueMutex, *m_reliableInOrderQueueMutex;
+
+		boost::thread* m_internalUpdateTask;
+		boost::thread* m_internalMessageVerificationTask;
 #endif
 		
 		queue<NetBuffer*> m_receivedMessages;

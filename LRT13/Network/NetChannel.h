@@ -1,6 +1,6 @@
 #ifndef NET_CHANNEL_H_
 #define NET_CHANNEL_H_
-
+//stupid hack
 namespace Network
 {
 	// minor hack because pre-C++11 compilers move the enum values into the parent namespace.

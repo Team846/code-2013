@@ -1,6 +1,6 @@
 #ifndef LIBRARY_MESSAGETYPE_H_
 #define LIBRARY_MESSAGETYPE_H_
-
+//sdfjkl
 namespace Network
 {
 	// minor hack because pre-C++11 compilers move the enum values into the parent namespace.

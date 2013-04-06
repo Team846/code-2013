@@ -1,7 +1,7 @@
 #include "NetServer.h"
 
 #include "NetConnection.h"
-
+//sdfjkl
 NetServer::NetServer(int port)
 	: NetPeer("", port, SERVER)
 {

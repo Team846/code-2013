@@ -1,7 +1,7 @@
 #include "NetClient.h"
 #include "NetConnection.h"
 #include "NetBuffer.h"
-
+//sdf
 NetClient::NetClient()
 	: NetPeer("0.0.0.0", 0, CLIENT)
 {

@@ -1,5 +1,5 @@
 #include "NetBuffer.h"
-
+//stupid hack
 using namespace Network;
 
 const int NetBuffer::kBufferResizeOverAllocateBytes = 4;

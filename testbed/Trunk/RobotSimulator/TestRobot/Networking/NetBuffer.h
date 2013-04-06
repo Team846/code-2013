@@ -1,6 +1,6 @@
 #ifndef NET_BUFFER_H_
 #define NET_BUFFER_H_
-
+//stupid hack
 #include "Includes.h"
 #include <string.h>
 

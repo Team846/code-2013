@@ -1,5 +1,5 @@
 #include "NetConnection.h"
-
+//stpi
 using namespace Network;
 
 sockaddr_in* NetConnection::RemoteEndpoint()

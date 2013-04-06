@@ -1,6 +1,6 @@
 #include "NetPeer.h"
 #include "NetConnection.h"
-
+//sdfjkl
 const double NetPeer::kResendPacketTime = 1.0; // resend if 100 ms passes with no ACK; max of 500ms roundtrip time
 
 NetPeer::NetPeer(char * ip, int port, NetConnectionType connType)
@@ -79,6 +79,8 @@ void NetPeer::InternalPlatformQueueSynchronizationCreate()
 #ifdef __VXWORKS__
 	// vxworks specific code
 	m_msgQueueMutex = semBCreate(SEM_Q_PRIORITY, SEM_FULL);
+#else #ifdef USE_BOOST
+	m_msgQueueMutex = new boost::signals2::mutex();
 #endif
 }
 
@@ -87,6 +89,8 @@ void NetPeer::InternalPlatformQueueSynchronizationEnter()
 #ifdef __VXWORKS__
 	// vxworks specific code
 	semTake(m_msgQueueMutex, WAIT_FOREVER);
+#else #ifdef USE_BOOST
+	m_msgQueueMutex->lock();
 #endif
 }
 
@@ -255,71 +259,68 @@ void NetPeer::Update()
 
 void NetPeer::CheckMessages()
 {
-	while(true)
+	for(int channel = 0; channel < 16; channel++)
 	{
-		for(int channel = 0; channel < 16; channel++)
+		// reliable
+		double now;
+		MessageAwaitingACK maack;
+
+		InternalPlatformReliableUnorderedQueueSynchronizationEnter();
+		for(map<int, MessageAwaitingACK>::iterator it = m_reliableUnordered[channel].begin(); it != m_reliableUnordered[channel].end(); it++)
 		{
-			// reliable
-			double now;
-			MessageAwaitingACK maack;
+			maack = it->second;
+
+			now = clock() / (double)CLOCKS_PER_SEC;
 			
-			InternalPlatformReliableUnorderedQueueSynchronizationEnter();
-			for(map<int, MessageAwaitingACK>::iterator it = m_reliableUnordered[channel].begin(); it != m_reliableUnordered[channel].end(); it++)
+			if(maack.initialized && !maack.acknowledged && (now - maack.sentTime) > kResendPacketTime)
 			{
-				maack = it->second;
+				it->second.acknowledged = true;
 				
-				now = Timer::GetFPGATimestamp();
-				
-				if(maack.initialized && !maack.acknowledged && (now - maack.sentTime) > kResendPacketTime)
-				{
-					it->second.acknowledged = true;
-					
-					Send(maack.buff, maack.recipient, NetChannel::NET_RELIABLE, channel, it->first);
-				}
+				Send(maack.buff, maack.recipient, NetChannel::NET_RELIABLE, channel, it->first);
 			}
-			InternalPlatformReliableUnorderedQueueSynchronizationLeave();
-			
-			InternalPlatformReliableSequencedQueueSynchronizationEnter();
-			for(map<int, MessageAwaitingACK>::iterator it = m_reliableSequenced[channel].begin(); it != m_reliableSequenced[channel].end(); it++)
-			{
-				maack = it->second;
-								
-				now = Timer::GetFPGATimestamp();
-				
-				if(maack.initialized && !maack.acknowledged && (now - maack.sentTime) > kResendPacketTime)
-				{
-					it->second.acknowledged = true;
-					
-					Send(maack.buff, maack.recipient, NetChannel::NET_RELIABLE_SEQUENCED, channel, it->first);
-				}
-			}
-			InternalPlatformReliableSequencedQueueSynchronizationLeave();
-			
-			InternalPlatformReliableInOrderQueueSynchronizationEnter();
-			for(map<int, MessageAwaitingACK>::iterator it = m_reliableOrdered[channel].begin(); it != m_reliableOrdered[channel].end(); it++)
-			{
-				maack = it->second;
-								
-				now = Timer::GetFPGATimestamp();
-				
-				if(maack.initialized && !maack.acknowledged && (now - maack.sentTime) > kResendPacketTime)
-				{
-					it->second.acknowledged = true;
-					
-					Send(maack.buff, maack.recipient, NetChannel::NET_RELIABLE_IN_ORDER, channel, it->first);
-				}
-			}
-			InternalPlatformReliableInOrderQueueSynchronizationLeave();
 		}
+		InternalPlatformReliableUnorderedQueueSynchronizationLeave();
+
+		InternalPlatformReliableSequencedQueueSynchronizationEnter();
+		for(map<int, MessageAwaitingACK>::iterator it = m_reliableSequenced[channel].begin(); it != m_reliableSequenced[channel].end(); it++)
+		{
+			maack = it->second;
+
+			now = clock() / (double)CLOCKS_PER_SEC;
+
+			if(maack.initialized && !maack.acknowledged && (now - maack.sentTime) > kResendPacketTime)
+			{
+				it->second.acknowledged = true;
+				
+				Send(maack.buff, maack.recipient, NetChannel::NET_RELIABLE_SEQUENCED, channel, it->first);
+			}
+		}
+		InternalPlatformReliableSequencedQueueSynchronizationLeave();
+
+		InternalPlatformReliableInOrderQueueSynchronizationEnter();
+		for(map<int, MessageAwaitingACK>::iterator it = m_reliableOrdered[channel].begin(); it != m_reliableOrdered[channel].end(); it++)
+		{
+			maack = it->second;
+
+			now = clock() / (double)CLOCKS_PER_SEC;
+			
+			if(maack.initialized && !maack.acknowledged && (now - maack.sentTime) > kResendPacketTime)
+			{
+				it->second.acknowledged = true;
+				
+				Send(maack.buff, maack.recipient, NetChannel::NET_RELIABLE_IN_ORDER, channel, it->first);
+			}
+		}
+		InternalPlatformReliableInOrderQueueSynchronizationLeave();
 	}
-	
+
 	if(_connectionRequested && !_connected)
 	{
-		if((Timer::GetFPGATimestamp() - _connectionRequestTime) > 1.00)
+		if((clock() / (double)CLOCKS_PER_SEC - _connectionRequestTime) > 1.00)
 		{
 			// TODO retry connect
 			
-			_connectionRequestTime = Timer::GetFPGATimestamp();
+			_connectionRequestTime = clock() / (double)CLOCKS_PER_SEC;
 		}
 	}
 }
@@ -328,6 +329,8 @@ void NetPeer::InternalPlatformConnectionListSynchronizationCreate()
 {
 #ifdef __VXWORKS__
 	m_connectionListMutex = semBCreate(SEM_Q_PRIORITY, SEM_FULL);
+#else #ifdef USE_BOOST
+	m_connectionListMutex = new boost::signals2::mutex();
 #endif
 }
 
@@ -335,6 +338,8 @@ void NetPeer::InternalPlatformConnectionListSynchronizationEnter()
 {
 #ifdef __VXWORKS__
 	semTake(m_connectionListMutex, WAIT_FOREVER);
+#else #ifdef USE_BOOST
+	m_connectionListMutex->lock();
 #endif
 }
 
@@ -342,6 +347,8 @@ void NetPeer::InternalPlatformConnectionListSynchronizationLeave()
 {
 #ifdef __VXWORKS__
 	semGive(m_connectionListMutex);
+#else #ifdef USE_BOOST
+	m_connectionListMutex->unlock();
 #endif
 }
 
@@ -350,6 +357,8 @@ void NetPeer::InternalPlatformQueueSynchronizationLeave()
 #ifdef __VXWORKS__
 	// vxworks specific code
 	semGive(m_msgQueueMutex);
+#else #ifdef USE_BOOST
+	m_msgQueueMutex->unlock();
 #endif
 }
 
@@ -358,6 +367,8 @@ void NetPeer::InternalPlatformReliableUnorderedQueueSynchronizationCreate()
 #ifdef __VXWORKS__
 	// vxworks specific code
 	m_reliableUnorderedQueueMutex = semBCreate(SEM_Q_PRIORITY, SEM_FULL);
+#else #ifdef USE_BOOST
+	m_reliableUnorderedQueueMutex = new boost::signals2::mutex();
 #endif
 }
 
@@ -366,6 +377,8 @@ void NetPeer::InternalPlatformReliableUnorderedQueueSynchronizationEnter()
 #ifdef __VXWORKS__
 	// vxworks specific code
 	semTake(m_reliableUnorderedQueueMutex, WAIT_FOREVER);
+#else #ifdef USE_BOOST
+	m_reliableUnorderedQueueMutex->lock();
 #endif
 }
 
@@ -374,6 +387,8 @@ void NetPeer::InternalPlatformReliableUnorderedQueueSynchronizationLeave()
 #ifdef __VXWORKS__
 	// vxworks specific code
 	semGive(m_reliableUnorderedQueueMutex);
+#else #ifdef USE_BOOST
+	m_reliableUnorderedQueueMutex->unlock();
 #endif
 }
 
@@ -382,6 +397,8 @@ void NetPeer::InternalPlatformReliableSequencedQueueSynchronizationCreate()
 #ifdef __VXWORKS__
 	// vxworks specific code
 	m_reliableSequencedQueueMutex = semBCreate(SEM_Q_PRIORITY, SEM_FULL);
+#else #ifdef USE_BOOST
+	m_reliableSequencedQueueMutex = new boost::signals2::mutex();
 #endif
 }
 
@@ -390,6 +407,8 @@ void NetPeer::InternalPlatformReliableSequencedQueueSynchronizationEnter()
 #ifdef __VXWORKS__
 	// vxworks specific code
 	semTake(m_reliableSequencedQueueMutex, WAIT_FOREVER);
+#else #ifdef USE_BOOST
+	m_reliableSequencedQueueMutex->lock();
 #endif
 }
 
@@ -398,6 +417,8 @@ void NetPeer::InternalPlatformReliableSequencedQueueSynchronizationLeave()
 #ifdef __VXWORKS__
 	// vxworks specific code
 	semGive(m_reliableSequencedQueueMutex);
+#else #ifdef USE_BOOST
+	m_reliableSequencedQueueMutex->unlock();
 #endif
 }
 
@@ -406,6 +427,8 @@ void NetPeer::InternalPlatformReliableInOrderQueueSynchronizationCreate()
 #ifdef __VXWORKS__
 	// vxworks specific code
 	m_reliableInOrderQueueMutex = semBCreate(SEM_Q_PRIORITY, SEM_FULL);
+#else #ifdef USE_BOOST
+	m_reliableInOrderQueueMutex = new boost::signals2::mutex();
 #endif
 }
 
@@ -414,6 +437,8 @@ void NetPeer::InternalPlatformReliableInOrderQueueSynchronizationEnter()
 #ifdef __VXWORKS__
 	// vxworks specific code
 	semTake(m_reliableInOrderQueueMutex, WAIT_FOREVER);
+#else #ifdef USE_BOOST
+	m_reliableInOrderQueueMutex->lock();
 #endif
 }
 
@@ -422,9 +447,10 @@ void NetPeer::InternalPlatformReliableInOrderQueueSynchronizationLeave()
 #ifdef __VXWORKS__
 	// vxworks specific code
 	semGive(m_reliableInOrderQueueMutex);
+#else #ifdef USE_BOOST
+	m_reliableInOrderQueueMutex->unlock();
 #endif
 }
-
 void NetPeer::InternalPlatformCreateUpdateTasks()
 {
 	static int counter = 0;
@@ -452,6 +478,9 @@ void NetPeer::InternalPlatformRunUpdateTasks()
 	// vxworks specific code
 	m_internalUpdateTask->Start((UINT32)this);
 	m_internalMessageVerificationTask->Start((UINT32)this);
+#else #ifdef USE_BOOST
+	m_internalUpdateTask = new boost::thread(InternalPlatformUpdateTaskWrapper, this);
+	m_internalMessageVerificationTask = new boost::thread(InternalPlatformMessageVerificationTaskWrapper, this);
 #endif
 }
 
@@ -464,6 +493,14 @@ void NetPeer::InternalPlatformDestroyUpdateTasks()
 	
 	DELETE(m_internalUpdateTask);
 	DELETE(m_internalMessageVerificationTask);
+#else #ifdef USE_BOOST
+	m_internalUpdateTask->interrupt();
+	m_internalMessageVerificationTask->interrupt();
+
+	delete m_internalUpdateTask;
+	m_internalUpdateTask = NULL;
+	delete m_internalMessageVerificationTask;
+	m_internalMessageVerificationTask = NULL;
 #endif
 }
 
