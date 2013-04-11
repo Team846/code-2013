@@ -1,7 +1,7 @@
 #include "LEDIndicators.h"
 
 LEDIndicators::LEDIndicators() :
-	AsyncProcess("LED Indicators"), m_clockOut(8), m_dataOut(13), spi(new SPI(m_clockOut, m_dataOut))
+	AsyncProcess("LED Indicators"), m_clockOut(8), m_dataOut(13)
 {
 	numLEDs = 16;
 
@@ -39,19 +39,20 @@ INT32 LEDIndicators::Tick() {
 // Basic, push SPI data out
 void LEDIndicators::write8(uint8_t d) {
   for (uint8_t i=0; i<8; i++) {
-     if (d & _BV(7-i))
-       m_dataOut->Write(HIGH);
+     if (d & 1 << (7-i))
+       m_dataOut.Set(1);
      else
-       m_dataOut->Write(LOW);
-     m_clockOut->Write(HIGH);
-     m_clockOut->Write(LOW); 
+       m_dataOut.Set(0);
+     m_clockOut.Set(1);
+     m_clockOut.Set(0); 
   }
 }
 
 // Basic, push SPI data out
 void LEDIndicators::writezeros(uint16_t n) {
-  m_dataOut->Write(LOW);
+  m_dataOut.Set(0);
   for (uint16_t i=0; i<8*n; i++) {
-     m_clockOut->Write(HIGH);
-     m_clockOut->Write(LOW); 
+     m_clockOut.Set(1);
+     m_clockOut.Set(0); 
+  }
 }

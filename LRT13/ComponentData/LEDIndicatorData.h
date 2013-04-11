@@ -22,15 +22,14 @@ namespace data
 			
 			void setColorRGB(INT8 red, INT8 green, INT8 blue);
 			
-			int getColor();
-			int getColorR();
-			int getColorG();
-			int getColorB();
+			INT8 getColorR();
+			INT8 getColorG();
+			INT8 getColorB();
 			
 		private:
-			uint8_t r;
-			uint8_t g;
-			uint8_t b;
+			INT8 r;
+			INT8 g;
+			INT8 b;
 		};
 	};
 };

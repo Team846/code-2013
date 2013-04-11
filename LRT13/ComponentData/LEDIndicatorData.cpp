@@ -10,24 +10,24 @@ LEDIndicatorData::LEDIndicatorData()
 	b = 0;
 }
 
-void LEDIndicatorData::setColorRGB(uint8_t red, uint8_t green, uint8_t blue)
+void LEDIndicatorData::setColorRGB(INT8 red, INT8 green, INT8 blue)
 {
 	r = red;
 	g = green;
 	b = blue;
 }
 
-uint8_t LEDIndicatorData::getColorR()
+INT8 LEDIndicatorData::getColorR()
 {
 	return r;
 }
 
-uint8_t LEDIndicatorData::getColorG()
+INT8 LEDIndicatorData::getColorG()
 {
 	return g;
 }
 
-uint8_t LEDIndicatorData::getColorB()
+INT8 LEDIndicatorData::getColorB()
 {
 	return b;
 }

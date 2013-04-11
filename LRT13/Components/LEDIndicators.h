@@ -17,6 +17,8 @@ public:
 	~LEDIndicators();
 	
 	INT32 Tick();
+	void write8(uint8_t d);
+	void writezeros(uint16_t n);
 	
 private:
 	int numLEDs;
