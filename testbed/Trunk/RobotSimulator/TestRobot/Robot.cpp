@@ -73,8 +73,10 @@ void Robot::StartCompetition()
 
 		ss << i++;
 
-		buff.Write((char)MessageType::ROBOT_TELEMETRY);
-		buff.Write(ss.str());
+		buff.Write((char)MessageType::AUTO_AIM_DATA);
+		buff.Write(0);
+		buff.Write(0);
+		buff.Write(valueD);
 
 		server->SendToAll(&buff, NetChannel::NET_UNRELIABLE_SEQUENCED, 1);
 

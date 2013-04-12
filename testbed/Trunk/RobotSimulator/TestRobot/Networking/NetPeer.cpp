@@ -652,6 +652,13 @@ int NetPeer::Send(NetBuffer* buff, NetConnection* to, NetChannel::Enum method, i
 
 	localBuff->WriteRaw(buff->GetBuffer(), buff->GetBytePos());
 	
+	for(int i = 0; i < localBuff->GetBytePos(); i++)
+	{
+		printf("%u ", localBuff->GetBuffer()[i]);
+	}
+
+	printf("\n");
+
 	buff->m_sent = true;
 	
 	int iResult = sendto(m_socket, localBuff->GetBuffer(), localBuff->GetBytePos(), 0, (sockaddr*)to->RemoteEndpoint(), sizeof(*(to->RemoteEndpoint())));
