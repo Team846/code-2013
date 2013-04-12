@@ -10,15 +10,16 @@ using namespace data;
 using namespace data::shooter;
 
 #define RELIABLE_SHOOTING 0
-#define FILTERED_SENSOR 1
+#define FILTERED_SENSOR 0
 #define TWOSPEED 1
+#define SENSOR_DENOISE_RATE 400.0
 
 //Front of the pyramid is 3400, 4040
 
 Shooter::Shooter() :
 	Component("Shooter", DriverStationConfig::DigitalIns::SHOOTER, true),
 			m_configSection("Shooter"),
-			m_sensorProcessingNotifier((TimerEventHandler) Climber::DeNoiseSensorEntry, this)
+			m_sensorProcessingNotifier((TimerEventHandler) Shooter::DeNoiseSensorEntry, this)
 
 {
 	m_jaguars[OUTER] = new AsyncCANJaguar(RobotConfig::CAN::SHOOTER_A,
@@ -289,7 +290,7 @@ void Shooter::ManageShooterWheel(int roller)
 	if (m_componentData->shooterData->ShouldLauncherBeHigh()) //low speed. meantime
 	{
 		m_PIDs[roller].setSetpoint(m_speed_setpoints[roller][HIGH]);
-		AsyncPrinter::Printf("Setpoint: %.0f\n", m_PIDs[roller].getSetpoint());
+//		AsyncPrinter::Printf("Setpoint: %.0f\n", m_PIDs[roller].getSetpoint());
 	}
 	else
 	{
@@ -404,10 +405,6 @@ void Shooter::Configure()
 	ConfigurePIDObject(&m_PIDs[OUTER], "OuterWheelPID", 1.0);
 }
 
-void Shooter::Log()
-{
-
-}
 
 void Shooter::ConfigurePIDObject(PID *pid, std::string objName, bool feedForward)
 {
@@ -420,8 +417,8 @@ void Shooter::ConfigurePIDObject(PID *pid, std::string objName, bool feedForward
 
 void Shooter::DeNoiseSensorEntry(void * param)
 {
-	Climber *climber = (Climber*) param;
-	climber->DeNoiseSensor();
+	Shooter *shooter = (Shooter*) param;
+	shooter->DeNoiseSensor();
 }
 
 void Shooter::DeNoiseSensor()

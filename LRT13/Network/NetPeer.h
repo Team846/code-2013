@@ -113,6 +113,7 @@ namespace Network
 		
 		double _connectionRequestTime;
 		bool _connectionRequested;
+		NetConnection* _server;
 		
 		vector<NetConnection*> m_netConnections;
 		void InternalPlatformConnectionListSynchronizationEnter();

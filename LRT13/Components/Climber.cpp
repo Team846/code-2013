@@ -20,6 +20,7 @@ Climber::Climber() :
 			m_servo_right(RobotConfig::Servo::RIGHT_PTO_SERVO, "rightServo"),
 			m_winch_gear_tooth((UINT32) RobotConfig::Digital::WINCH_GEAR_TOOTH)
 {
+	m_climbing_level = 0;
 	m_pneumatics = Pneumatics::Instance();
 	m_state = IDLE;
 	m_driving_encoders = DriveEncoders::GetInstance();
@@ -382,6 +383,7 @@ void Climber::enabledPeriodic()
 		{
 			m_winch_worm.SetDutyCycle(0.0);
 			m_state = IDLE;
+			m_timer = 0;
 //			m_state = ENGAGE_HOOKS;
 			m_climbing_level++;
 			m_componentData->drivetrainData->setControlMode(FORWARD, OPEN_LOOP);
@@ -399,18 +401,19 @@ void Climber::enabledPeriodic()
 		m_pneumatics->setHookPosition(true);
 
 		driveSpeed = 0;
-		if (++m_timer > m_timer_threshold)
+		if (++m_timer > 25)
 		{
 			if (m_climbing_level < 3)
 			{
 //				m_state = DISENGAGE_PTO;
 				m_state = ARM_UP_FINAL;
+//				m_climbing_level++;
 				m_gear_tooth_ticks_position = m_winch_gear_tooth.Get();
-				m_timer = 0;
+//				m_	timer = 0;
 			}
 			else
 			{
-				m_state = IDLE;
+//				m_state = IDLE;
 			}
 
 			m_componentData->drivetrainData->setControlMode(FORWARD, OPEN_LOOP);
@@ -437,18 +440,22 @@ void Climber::enabledPeriodic()
 		break;
 	case ARM_UP_FINAL:
 		m_pneumatics->setClimberArm(true);
-		m_winch_worm.SetDutyCycle(1.0 * DIRECTION);
+		m_winch_worm.SetDutyCycle(-1.0 * DIRECTION);
 		
 		m_componentData->drivetrainData->setControlMode(FORWARD, OPEN_LOOP);
 		m_componentData->drivetrainData->setControlMode(TURN, OPEN_LOOP);
-		m_componentData->drivetrainData->setOpenLoopOutput(FORWARD, -DIRECTION);
+		m_componentData->drivetrainData->setOpenLoopOutput(FORWARD, DIRECTION);
 		m_componentData->drivetrainData->setOpenLoopOutput(TURN, 0.0);
 		
 		
 		if (m_winch_gear_tooth.Get() - m_gear_tooth_ticks_position > 80)
 		{
 			m_winch_worm.SetDutyCycle(0.0);
-			m_state = WINCH_UP;
+			m_componentData->drivetrainData->setControlMode(FORWARD, OPEN_LOOP);
+			m_componentData->drivetrainData->setControlMode(TURN, OPEN_LOOP);
+			m_componentData->drivetrainData->setOpenLoopOutput(FORWARD, 0.0);
+			m_componentData->drivetrainData->setOpenLoopOutput(TURN, 0.0);
+//			m_state = WINCH_UP;
 		}
 		break;
 	}

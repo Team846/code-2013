@@ -70,7 +70,7 @@ void LRTRobot13::RobotInit()
 	
 	leds.Start();
 	
-	AsyncPrinter::Println("Reticulating splines...");
+	AsyncPrinter::Println("Reticulating splines... %d", 2);
 }
 
 static int TimeoutCallback(...)
