@@ -316,7 +316,24 @@ void AutonomousRoutines::StopDrive()
 
 void AutonomousRoutines::ServiceAutoAimBackBoard()
 {
-	//TODO writeme
+	if(m_componentData->autoAimData->getDesiredX() - m_componentData->autoAimData->getCurrentX() < -m_componentData->autoAimData->getErrorThreshold())
+	{
+		// we're to the left
+		m_componentData->drivetrainData->setControlMode(TURN, VELOCITY_CONTROL);
+		m_componentData->drivetrainData->setVelocitySetpoint(TURN, m_componentData->autoAimData->getDesiredX() - m_componentData->autoAimData->getCurrentX());
+	}
+	else if(m_componentData->autoAimData->getDesiredX() - m_componentData->autoAimData->getCurrentX() > m_componentData->autoAimData->getErrorThreshold())
+	{
+		// we're to the right
+		m_componentData->drivetrainData->setControlMode(TURN, VELOCITY_CONTROL);
+		m_componentData->drivetrainData->setVelocitySetpoint(TURN, m_componentData->autoAimData->getDesiredX() - m_componentData->autoAimData->getCurrentX());
+	}
+	else
+	{
+		// we're lined up!
+		m_componentData->drivetrainData->setControlMode(TURN, VELOCITY_CONTROL);
+		m_componentData->drivetrainData->setVelocitySetpoint(TURN, 0);
+	}
 }
 
 void AutonomousRoutines::ServiceAutoAimPyramid()

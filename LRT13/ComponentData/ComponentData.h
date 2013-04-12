@@ -30,10 +30,13 @@ namespace data
 	{
 		class ClimberData;
 	}
-	
 	namespace indicators
 	{
 		class LEDIndicatorData;
+	}
+	namespace autoaim
+	{
+		class AutoAimData;
 	}
 	
 	/*!
@@ -53,6 +56,7 @@ namespace data
 		climber::ClimberData* const climberData;
 		configloader::ConfigLoaderData* const configLoaderData;
 		indicators::LEDIndicatorData* const ledIndicatorData;
+		autoaim::AutoAimData* const autoAimData;
 	
 	protected:
 		ComponentData();

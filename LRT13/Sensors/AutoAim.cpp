@@ -4,6 +4,7 @@ using namespace data;
 using namespace drivetrain;
 
 AutoAim::AutoAim()
+: AsyncProcess("AutoAim")
 {
 	m_client = new NetClient();
 	m_client->Open();
@@ -14,6 +15,8 @@ AutoAim::AutoAim()
 	endpoint.sin_port = htons(8000);
 	
 	m_client->Connect(endpoint);
+	
+	m_componentData = ComponentData::GetInstance();
 }
 
 AutoAim::~AutoAim()
@@ -23,10 +26,12 @@ AutoAim::~AutoAim()
 
 void AutoAim::Configure()
 {
-	m_maxError = m_config->Get<int>("autoaim", "max_error", 5);
+	m_maxError = m_config->Get<int>("autoaim", "max_error", 5); // Error each direction
+	m_desiredX = m_config->Get<int>("autoaim", "desired_x", 197);
+	m_desiredY = m_config->Get<int>("autoaim", "desired_y", 80);
 }
 
-void AutoAim::Update()
+INT32 AutoAim::Tick()
 {
 	NetBuffer* msg;
 	
@@ -48,48 +53,22 @@ void AutoAim::Update()
 		
 		double strength = msg->ReadDouble();
 		
-		if(desiredX - x < -m_maxError)
-		{
-			// we're to the left
-			ComponentData::GetInstance()->drivetrainData->setControlMode(TURN, POSITION_CONTROL);
-			ComponentData::GetInstance()->drivetrainData->setRelativePositionSetpoint(TURN, -5, 0.3);
-			ComponentData::GetInstance()->drivetrainData->cleanWaitForSem(ComponentData::GetInstance()->drivetrainData->createPositionOperationSemaphore(TURN, 2));
-			
-			NetBuffer buff;
-						
-			buff.Write((char)MessageType::AUTO_AIM_DATA);
-			buff.Write(strength);
-			buff.Write(false);
-			
-			SmarterDashboard::Instance()->EnqueueMessage(&buff, NetChannel::NET_UNRELIABLE_SEQUENCED, 2);
-		}
-		else if(desiredX - x > m_maxError)
-		{
-			// we're to the right
-			ComponentData::GetInstance()->drivetrainData->setControlMode(TURN, POSITION_CONTROL);
-			ComponentData::GetInstance()->drivetrainData->setRelativePositionSetpoint(TURN, 5, 0.3);
-			ComponentData::GetInstance()->drivetrainData->cleanWaitForSem(ComponentData::GetInstance()->drivetrainData->createPositionOperationSemaphore(TURN, 2));
-			
-			NetBuffer buff;
-						
-			buff.Write((char)MessageType::AUTO_AIM_DATA);
-			buff.Write(strength);
-			buff.Write(false);
-			
-			SmarterDashboard::Instance()->EnqueueMessage(&buff, NetChannel::NET_UNRELIABLE_SEQUENCED, 2);
-		}
-		else
-		{
-			// we're lined up!
-			NetBuffer buff;
-			
-			buff.Write((char)MessageType::AUTO_AIM_DATA);
-			buff.Write(strength);
-			buff.Write(true);
-			
-			SmarterDashboard::Instance()->EnqueueMessage(&buff, NetChannel::NET_UNRELIABLE_SEQUENCED, 2);
-		}
+		m_componentData->autoAimData->setCurrentX(x);
+		m_componentData->autoAimData->setCurrentY(y);
+		m_componentData->autoAimData->setDesiredX(desiredX);
+		m_componentData->autoAimData->setDesiredY(desiredY);
+		m_componentData->autoAimData->setStrength(strength);
 		
+		NetBuffer buff;
+					
+		buff.Write((char)MessageType::AUTO_AIM_DATA);
+		buff.Write(strength);
+		buff.Write(true);
+		
+		SmarterDashboard::Instance()->EnqueueMessage(&buff, NetChannel::NET_UNRELIABLE_SEQUENCED, 2);
+					
 		DELETE(msg);
 	}
+	
+	return 0;
 }

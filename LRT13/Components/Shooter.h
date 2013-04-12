@@ -48,7 +48,9 @@ private:
 	void ManageShooterWheel(int roller);
 	void ConfigurePIDObject(PID *pid, std::string objName, bool feedForward); //TODO make this a util
 	string m_configSection;
-
+	ofstream m_inner_file;
+	ofstream m_outer_file;
+	
 	AsyncCANJaguar* m_jaguars[2];
 	Counter* m_encs[2];
 
@@ -74,6 +76,7 @@ private:
 	int startShotTime;
 	
 	int m_timer;
+	int m_ticks;
 	
 	int m_cyclesToContinueRetracting;
 	

@@ -6,6 +6,7 @@
 #include "Actions/PauseAction.h"
 #include "../ComponentData/RobotData.h"
 #include "../ComponentData/DrivetrainData.h"
+#include "../ComponentData/AutoAimData.h"
 #include "../ComponentData/ConfigLoaderData.h"
 
 #include <queue>

@@ -7,7 +7,9 @@
 #include "../ComponentData/RobotData.h"
 #include "../ComponentData/DrivetrainData.h"
 #include "../ComponentData/ConfigLoaderData.h"
-
+#include "../ComponentData/LEDIndicatorData.h"
+#include "../ComponentData/AutoAimData.h"
+#include "../ComponentData/LEDIndicatorData.h"
 #include "../Config/ConfigManager.h"
 
 using namespace data;

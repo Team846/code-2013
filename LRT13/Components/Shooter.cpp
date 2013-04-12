@@ -4,7 +4,8 @@
 #include "../Config/RobotConfig.h"
 #include "../Config/DriverStationConfig.h"
 #include "../ComponentData/ShooterData.h"
-
+#include "../Components/Climber.h"
+#include "../Log/LogManager.h"
 
 using namespace data;
 using namespace data::shooter;
@@ -19,8 +20,9 @@ using namespace data::shooter;
 Shooter::Shooter() :
 	Component("Shooter", DriverStationConfig::DigitalIns::SHOOTER, true),
 			m_configSection("Shooter"),
+			m_inner_file("/ShooterInner.log"),
+			m_outer_file("/ShooterOuter.log"),
 			m_sensorProcessingNotifier((TimerEventHandler) Shooter::DeNoiseSensorEntry, this)
-
 {
 	m_jaguars[OUTER] = new AsyncCANJaguar(RobotConfig::CAN::SHOOTER_A,
 			"ShooterFront");
@@ -55,9 +57,9 @@ Shooter::Shooter() :
 	
 	m_isSensorTrue = false;
 	
-	Configure();
+	m_ticks = 0;
 	
-
+	Configure();
 	
 	m_sensorProcessingNotifier.StartPeriodic(1.0 / SENSOR_DENOISE_RATE);
 } 
@@ -70,11 +72,14 @@ Shooter::~Shooter()
 
 void Shooter::onEnable()
 {
-
+	m_outer_file.open("/ShooterOuter.log");
+	m_inner_file.open("/ShooterInner.log");
 }
 
 void Shooter::onDisable()
 {
+//	m_outer_file.close();
+//	m_inner_file.close();
 	m_jaguars[OUTER]->SetDutyCycle(0.0F);
 	m_jaguars[INNER]->SetDutyCycle(0.0F);
 }
@@ -206,7 +211,7 @@ void Shooter::enabledPeriodic()
 			break;
 		}
 		lastSpeed = m_speedsRPM[INNER];
-	//	AsyncPrinter::Printf("Speed %.3f\n", m_speeds[INNER]);
+		AsyncPrinter::Printf("Speed %.3f\n", m_speedsRPM[OUTER]);
 		
 	//	double frisbee_detected = 1;//m_proximity->Get() == 0;
 	//	if(atSpeed[OUTER] && atSpeed[INNER])
@@ -348,11 +353,16 @@ void Shooter::ManageShooterWheel(int roller)
 		atSpeedCounter[roller] = 0;
 		atSpeed[roller] = false;
 	}
+	m_ticks++;
+	m_outer_file << m_ticks << "," << m_speedsRPM[OUTER] << "," << m_jaguars[OUTER]->GetOutputCurrent() << "\n";
+	m_inner_file << m_ticks << "," << m_speedsRPM[INNER] << "," << m_jaguars[INNER]->GetOutputCurrent() << "\n";
 	
 }
 
 void Shooter::disabledPeriodic()
 {
+	m_outer_file.close();
+	m_inner_file.close();
 	if (m_componentData->shooterData->ShouldLauncherBeHigh())
 	{
 		m_pneumatics->setShooterAngler(EXTENDED);
@@ -405,7 +415,6 @@ void Shooter::Configure()
 	ConfigurePIDObject(&m_PIDs[OUTER], "OuterWheelPID", 1.0);
 }
 
-
 void Shooter::ConfigurePIDObject(PID *pid, std::string objName, bool feedForward)
 {
 	double p = m_config->Get<double>(Component::GetName(), objName + "_P", 0.002);
@@ -446,8 +455,6 @@ void Shooter::DeNoiseSensor()
 		m_isSensorTrue = false;
 }
 
-
 void Shooter::Log()
 {
-
 }

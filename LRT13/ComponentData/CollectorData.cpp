@@ -14,7 +14,7 @@ void CollectorData::RunRollers()
 	dir = 1;
 }
 
-void CollectorData::RunRollersBackwords()
+void CollectorData::RunRollersBackwards()
 {
 	m_running = true;
 	dir = -1;

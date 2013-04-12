@@ -6,6 +6,7 @@
 #include "ShooterData.h"
 #include "CollectorData.h"
 #include "LEDIndicatorData.h"
+#include "AutoAimData.h"
 
 using namespace data;
 using namespace drivetrain;
@@ -14,6 +15,7 @@ using namespace collector;
 using namespace climber;
 using namespace configloader;
 using namespace indicators;
+using namespace autoaim;
 
 ComponentData* ComponentData::m_instance = NULL;
 
@@ -36,7 +38,8 @@ ComponentData::ComponentData()
   collectorData(new CollectorData()),
   climberData(new ClimberData()),
   configLoaderData(new ConfigLoaderData()),
-  ledIndicatorData(new LEDIndicatorData())
+  ledIndicatorData(new LEDIndicatorData()),
+  autoAimData(new AutoAimData())
 {
 	
 }

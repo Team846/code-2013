@@ -115,182 +115,196 @@ void TeleopInputs::Update()
 //			static int oops = 0;
 //			if (++oops % 5 == 0)
 //				AsyncPrinter::Printf("fwd: %.2f\n", forward);
-		m_componentData->drivetrainData->setOpenLoopOutput(FORWARD, forward);
-		m_componentData->drivetrainData->setOpenLoopOutput(TURN, turnComposite);
-		//for when the climber is being used
-		
-		m_componentData->drivetrainData->setVelocitySetpoint(FORWARD,
-				forward);
-		m_componentData->drivetrainData->setVelocitySetpoint(TURN, turnComposite);
+			m_componentData->drivetrainData->setOpenLoopOutput(FORWARD, forward);
+			m_componentData->drivetrainData->setOpenLoopOutput(TURN, turnComposite);
+			//for when the climber is being used
+			
+			m_componentData->drivetrainData->setVelocitySetpoint(FORWARD,
+					forward);
+			m_componentData->drivetrainData->setVelocitySetpoint(TURN, turnComposite);
 			//m_componentData->drivetrainData->setVelocitySetpoint(TURN, turn);
 #endif
 		}
-	}
 	
-//	AsyncPrinter::Printf("Inputs\n");
-
-	if (m_operator_stick->IsButtonJustPressed(DriverStationConfig::JoystickButtons::CLIMBER_ARM))
-	{
-		m_componentData->climberData->changeArmState();
-		AsyncPrinter::Printf("Arm\n");
-		//change arm position
-	}
-	/************************Climber Functions************************/\
-	if (m_operator_stick->IsButtonDown(DriverStationConfig::JoystickButtons::CONDITIONAL_ABORT))
-	{
-		m_componentData->climberData->setShouldPotentiallyAbort(true);
-	}
-	else
-	{
-		m_componentData->climberData->setShouldPotentiallyAbort(false);
-	}
+	//	AsyncPrinter::Printf("Inputs\n");
 	
-	if (m_operator_stick->IsButtonJustPressed(DriverStationConfig::JoystickButtons::ARM_ANGLE))
-	{
-//		m_componentData->climberData->changeAngleState();
-		//change angle
-		if (m_componentData->shooterData->ShouldLauncherBeHigh())
-					m_componentData->shooterData->SetLauncherAngleLow();
-				else
-					m_componentData->shooterData->SetLauncherAngleHigh();
-	}
-	if (m_operator_stick->IsButtonDown(DriverStationConfig::JoystickButtons::DEBUG_CLIMBER))
-	{
-		m_componentData->climberData->enableDebug();
-
-		
-		if (m_operator_stick->IsButtonJustPressed(DriverStationConfig::JoystickButtons::ENGAGE_PTO))
+		if (m_operator_stick->IsButtonJustPressed(DriverStationConfig::JoystickButtons::CLIMBER_ARM))
 		{
-			m_componentData->climberData->EngagePTO();
-			//change PTO state
+			m_componentData->climberData->changeArmState();
+			AsyncPrinter::Printf("Arm\n");
+			//change arm position
 		}
-		else if (m_operator_stick->IsButtonJustPressed(DriverStationConfig::JoystickButtons::DISENGAGE_PTO))
+		/************************Climber Functions************************/\
+		if (m_operator_stick->IsButtonDown(DriverStationConfig::JoystickButtons::CONDITIONAL_ABORT))
 		{
-			m_componentData->climberData->DisengagePTO();
+			m_componentData->climberData->setShouldPotentiallyAbort(true);
 		}
-		
-		
-		
-		if (m_operator_stick->IsButtonDown(DriverStationConfig::JoystickButtons::PAWL_DOWN))
-		{
-			m_componentData->climberData->winchPawlDown();
-			
-		}
-		else if (m_operator_stick->IsButtonDown(DriverStationConfig::JoystickButtons::PAWL_UP))
-		{
-			m_componentData->climberData->winchPawlUp();
-			
-		}
-	}
-	else
-		m_componentData->climberData->disableDebug();
-	
-	if (m_driver_stick->IsButtonJustPressed(
-			DriverStationConfig::JoystickButtons::START_CLIMB))
-	{
-		switch (m_componentData->climberData->getDesiredClimbingStep())
-		{
-		case INTENDED_IDLE:
-			m_componentData->climberData->setDesiredClimbingStep(
-					INTENDED_ARM_UP);
-			break;
-		case INTENDED_ARM_UP:
-			m_componentData->climberData->setDesiredClimbingStep(
-					INTENDED_CLIMBING);
-			break;
-		case INTENDED_CLIMBING:
-			break;
-		}
-	}
-	m_componentData->climberData->setShouldContinueClimbing(
-			m_driver_stick->IsButtonJustPressed(DriverStationConfig::JoystickButtons::CONTINUE_CLIMB));
-	
-//	m_componentData->climberData->setShouldContinueClimbing(
-//			m_driver_stick->IsButtonJustPressed(DriverStationConfig::JoystickButtons::FORCE_CLIMB_ADVANCE));
-	
-
-	/************************Shooter Functions************************/
-	if (m_driver_stick->IsButtonDown(DriverStationConfig::JoystickButtons::FIRE))
-	{
-//		AsyncPrinter::Printf("firing\n");
-		m_componentData->shooterData->SetShooterSetting(CONTINOUS);
-	}
-	else if (m_driver_stick->IsButtonDown(DriverStationConfig::JoystickButtons::FIRE_SINGLE))
-	{
-		m_componentData->shooterData->SetShooterSetting(ONCE);
-	}
-	else
-	{
-//		AsyncPrinter::Printf("Not firing\n");
-//		AsyncPrinter::Printf("Seting shooter to off.\n");
-		m_componentData->shooterData->SetShooterSetting(OFF);
-	}
-	
-	if (m_driver_stick->IsButtonJustPressed(DriverStationConfig::JoystickButtons::CHANGE_ANGLE))
-	{
-		if (m_componentData->shooterData->ShouldLauncherBeHigh())
-			m_componentData->shooterData->SetLauncherAngleLow();
 		else
-			m_componentData->shooterData->SetLauncherAngleHigh();
-	}
+		{
+			m_componentData->climberData->setShouldPotentiallyAbort(false);
+		}
+		
+		if (m_operator_stick->IsButtonJustPressed(DriverStationConfig::JoystickButtons::ARM_ANGLE))
+		{
+	//		m_componentData->climberData->changeAngleState();
+			//change angle
+			if (m_componentData->shooterData->ShouldLauncherBeHigh())
+						m_componentData->shooterData->SetLauncherAngleLow();
+					else
+						m_componentData->shooterData->SetLauncherAngleHigh();
+		}
+		if (m_operator_stick->IsButtonDown(DriverStationConfig::JoystickButtons::DEBUG_CLIMBER))
+		{
+			m_componentData->climberData->enableDebug();
 	
-	if (m_operator_stick->IsButtonJustPressed(DriverStationConfig::JoystickButtons::SHOOTER_ON))
-	{
-		m_componentData->shooterData->SetEnabled(true);
-	}
-	else if (m_operator_stick->IsButtonJustPressed(DriverStationConfig::JoystickButtons::DEBUG_CLIMBER))
-	{
-		m_componentData->shooterData->SetEnabled(false);
-	}
-
-	/************************Automatic Functions************************/
-
-	if (m_driver_stick->IsButtonDown(
-			DriverStationConfig::JoystickButtons::AUTO_AIM_BACKBOARD))
-	{
-		m_autoActions->EnableAutoAimBackboard();
-	}
-	else if (m_driver_stick->IsButtonDown(
-			DriverStationConfig::JoystickButtons::START_CLIMB))
-	{
-		m_autoActions->EnableAutoAimPyramid();
-	}
-//	else if (m_driver_stick->IsButtonDown(
-//			DriverStationConfig::JoystickButtons::FEEDER_STATION_APPROACH))
-//	{
-//		m_autoActions->EnableFeederStationTrack();
-//	}
-	else
-	{
-		m_autoActions->Reset();
-	}
+			
+			if (m_operator_stick->IsButtonJustPressed(DriverStationConfig::JoystickButtons::ENGAGE_PTO))
+			{
+				m_componentData->climberData->EngagePTO();
+				//change PTO state
+			}
+			else if (m_operator_stick->IsButtonJustPressed(DriverStationConfig::JoystickButtons::DISENGAGE_PTO))
+			{
+				m_componentData->climberData->DisengagePTO();
+			}
+			
+			
+			
+			if (m_operator_stick->IsButtonDown(DriverStationConfig::JoystickButtons::PAWL_DOWN))
+			{
+				m_componentData->climberData->winchPawlDown();
+				
+			}
+			else if (m_operator_stick->IsButtonDown(DriverStationConfig::JoystickButtons::PAWL_UP))
+			{
+				m_componentData->climberData->winchPawlUp();
+				
+			}
+		}
+		else
+			m_componentData->climberData->disableDebug();
+		
+		if (m_driver_stick->IsButtonJustPressed(
+				DriverStationConfig::JoystickButtons::START_CLIMB))
+		{
+			switch (m_componentData->climberData->getDesiredClimbingStep())
+			{
+			case INTENDED_IDLE:
+				m_componentData->climberData->setDesiredClimbingStep(
+						INTENDED_ARM_UP);
+				break;
+			case INTENDED_ARM_UP:
+				m_componentData->climberData->setDesiredClimbingStep(
+						INTENDED_CLIMBING);
+				break;
+			case INTENDED_CLIMBING:
+				break;
+			}
+		}
+		m_componentData->climberData->setShouldContinueClimbing(
+				m_driver_stick->IsButtonJustPressed(DriverStationConfig::JoystickButtons::CONTINUE_CLIMB));
+		
+	//	m_componentData->climberData->setShouldContinueClimbing(
+	//			m_driver_stick->IsButtonJustPressed(DriverStationConfig::JoystickButtons::FORCE_CLIMB_ADVANCE));
+		
 	
-	/************************Collector************************/
-	if (m_driver_stick->IsButtonDown(
-				DriverStationConfig::JoystickButtons::COLLECTOR_SLIDE) || 
-		m_operator_stick->IsButtonDown(
-						DriverStationConfig::JoystickButtons::COLLECTOR_DOWN_OPERATOR) 
-				)
-	{
-		m_componentData->collectorData->SlideDown();
-		m_componentData->collectorData->RunRollers();
-	}
-	else if (m_operator_stick->IsButtonDown(DriverStationConfig::JoystickButtons::COLLECTOR_DOWN_NO_MOTOR))
-	{
-		m_componentData->collectorData->SlideDown();
-	}
-	else
-	{
-		m_componentData->collectorData->SlideUp();
-		m_componentData->collectorData->StopRollers();
-	}
+		/************************Shooter Functions************************/
+		if (m_driver_stick->IsButtonDown(DriverStationConfig::JoystickButtons::FIRE))
+		{
+	//		AsyncPrinter::Printf("firing\n");
+			m_componentData->shooterData->SetShooterSetting(CONTINOUS);
+		}
+		else if (m_driver_stick->IsButtonDown(DriverStationConfig::JoystickButtons::FIRE_SINGLE))
+		{
+			m_componentData->shooterData->SetShooterSetting(ONCE);
+		}
+		else
+		{
+	//		AsyncPrinter::Printf("Not firing\n");
+	//		AsyncPrinter::Printf("Seting shooter to off.\n");
+			m_componentData->shooterData->SetShooterSetting(OFF);
+		}
+		
+		if (m_driver_stick->IsButtonJustPressed(DriverStationConfig::JoystickButtons::CHANGE_ANGLE))
+		{
+			if (m_componentData->shooterData->ShouldLauncherBeHigh())
+				m_componentData->shooterData->SetLauncherAngleLow();
+			else
+				m_componentData->shooterData->SetLauncherAngleHigh();
+		}
+		
+		if (m_operator_stick->IsButtonJustPressed(DriverStationConfig::JoystickButtons::SHOOTER_ON))
+		{
+			m_componentData->shooterData->SetEnabled(true);
+		}
+		else if (m_operator_stick->IsButtonJustPressed(DriverStationConfig::JoystickButtons::DEBUG_CLIMBER))
+		{
+			m_componentData->shooterData->SetEnabled(false);
+		}
 	
-	if (m_operator_stick->IsButtonDown(DriverStationConfig::JoystickButtons::RUN_BACKWORDS) &&
-			!m_operator_stick->IsButtonDown(DriverStationConfig::JoystickButtons::DEBUG_CLIMBER))
-	{
-		m_componentData->collectorData->RunRollersBackwords();
-	}
+		/************************Automatic Functions************************/
 	
+		if(m_componentData->autoAimData->getDesiredX() - m_componentData->autoAimData->getCurrentX() < -m_componentData->autoAimData->getErrorThreshold())
+		{
+			// we're to the left
+			m_componentData->ledIndicatorData->setColorRGB(255, 0, 0);
+		}
+		else if(m_componentData->autoAimData->getDesiredX() - m_componentData->autoAimData->getCurrentX() > m_componentData->autoAimData->getErrorThreshold())
+		{
+			// we're to the right
+			m_componentData->ledIndicatorData->setColorRGB(0, 0, 255);
+		}
+		else
+		{
+			// we're lined up!
+			m_componentData->ledIndicatorData->setColorRGB(0, 255, 0);
+		}
+		if (m_driver_stick->IsButtonDown(
+				DriverStationConfig::JoystickButtons::AUTO_AIM_BACKBOARD))
+		{
+			m_autoActions->EnableAutoAimBackboard();
+		}
+		else if (m_driver_stick->IsButtonDown(
+				DriverStationConfig::JoystickButtons::START_CLIMB))
+		{
+			m_autoActions->EnableAutoAimPyramid();
+		}
+	//	else if (m_driver_stick->IsButtonDown(
+	//			DriverStationConfig::JoystickButtons::FEEDER_STATION_APPROACH))
+	//	{
+	//		m_autoActions->EnableFeederStationTrack();
+	//	}
+		else
+		{
+			m_autoActions->Reset();
+		}
+		
+		/************************Collector************************/
+		if (m_driver_stick->IsButtonDown(
+					DriverStationConfig::JoystickButtons::COLLECTOR_SLIDE) || 
+			m_operator_stick->IsButtonDown(
+							DriverStationConfig::JoystickButtons::COLLECTOR_DOWN_OPERATOR) 
+					)
+		{
+			m_componentData->collectorData->SlideDown();
+			m_componentData->collectorData->RunRollers();
+		}
+		else if (m_operator_stick->IsButtonDown(DriverStationConfig::JoystickButtons::COLLECTOR_DOWN_NO_MOTOR))
+		{
+			m_componentData->collectorData->SlideDown();
+		}
+		else
+		{
+			m_componentData->collectorData->SlideUp();
+			m_componentData->collectorData->StopRollers();
+		}
+		
+		if (m_operator_stick->IsButtonDown(DriverStationConfig::JoystickButtons::RUN_BACKWORDS) &&
+				!m_operator_stick->IsButtonDown(DriverStationConfig::JoystickButtons::DEBUG_CLIMBER))
+		{
+			m_componentData->collectorData->RunRollersBackwards();
+		}
+	}
 		
 	/************************Config************************/
 

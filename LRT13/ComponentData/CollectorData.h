@@ -32,7 +32,7 @@ namespace collector
 		
 		void RunRollers();
 		void StopRollers();
-		void RunRollersBackwords();
+		void RunRollersBackwards();
 		
 		int RollerDirection();
 		

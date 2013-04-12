@@ -1,5 +1,6 @@
 #ifndef LOGGABLE_H_
 #define LOGGABLE_H_
+#include <fstream>
 
 class LogManager;
 
