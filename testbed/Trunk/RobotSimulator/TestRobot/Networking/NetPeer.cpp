@@ -596,9 +596,9 @@ int NetPeer::Send(NetBuffer* buff, NetConnection* to, NetChannel::Enum method, i
 	maack.recipient = to;
 	
 	NetBuffer* localBuff = new NetBuffer();
-	localBuff->Write((char)USER_DATA);
-	localBuff->Write((char)method);
-	localBuff->Write((char)channel);
+	localBuff->Write((UINT8)USER_DATA);
+	localBuff->Write((UINT8)method);
+	localBuff->Write((UINT8)channel);
 	
 	switch(method)
 	{
