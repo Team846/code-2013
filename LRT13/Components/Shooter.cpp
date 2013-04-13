@@ -14,14 +14,15 @@ using namespace data::shooter;
 #define FILTERED_SENSOR 0
 #define TWOSPEED 1
 #define SENSOR_DENOISE_RATE 400.0
+//#define OPEN_LOOP
 
 //Front of the pyramid is 3400, 4040
 
 Shooter::Shooter() :
 	Component("Shooter", DriverStationConfig::DigitalIns::SHOOTER, true),
 			m_configSection("Shooter"),
-			m_inner_file("/ShooterInner.log"),
-			m_outer_file("/ShooterOuter.log"),
+			m_inner_file("/ShooterInner.csv"),
+			m_outer_file("/ShooterOuter.csv"),
 			m_sensorProcessingNotifier((TimerEventHandler) Shooter::DeNoiseSensorEntry, this)
 {
 	m_jaguars[OUTER] = new AsyncCANJaguar(RobotConfig::CAN::SHOOTER_A,
@@ -30,8 +31,10 @@ Shooter::Shooter() :
 			"ShooterBack");
 	m_encs[OUTER] = new Counter((UINT32) RobotConfig::Digital::HALL_EFFECT_A);
 	m_encs[OUTER]->Start();
+	m_encs[OUTER]->SetMaxPeriod(100 / 60.0); // Period of 100 RPM; minimum speed we can read -Raphael Chang 4/12/13
 	m_encs[INNER] = new Counter((UINT32) RobotConfig::Digital::HALL_EFFECT_B);
 	m_encs[INNER]->Start();
+	m_encs[INNER]->SetMaxPeriod(100 / 60.0); // Period of 100 RPM; minimum speed we can read -Raphael Chang 4/12/13
 	m_pneumatics = Pneumatics::Instance();
 
 	atSpeedCounter[OUTER] = 0;
@@ -48,6 +51,8 @@ Shooter::Shooter() :
 	lastSpeed = 0;
 	m_speedsRPM[OUTER] = 0;
 	m_speedsRPM[INNER] = 0;
+	m_periods[OUTER] = 0;
+	m_periods[INNER] = 0;
 	
 	m_maxNormalizedCurrent = 0.0;
 	
@@ -72,14 +77,18 @@ Shooter::~Shooter()
 
 void Shooter::onEnable()
 {
-	m_outer_file.open("/ShooterOuter.log");
-	m_inner_file.open("/ShooterInner.log");
+	if (!m_outer_file.is_open())
+		m_outer_file.open("/ShooterOuter.csv");
+	if (!m_inner_file.is_open())
+		m_inner_file.open("/ShooterInner.csv");
 }
 
 void Shooter::onDisable()
 {
-//	m_outer_file.close();
-//	m_inner_file.close();
+	if (m_outer_file.is_open())
+		m_outer_file.close();
+	if (m_inner_file.is_open())
+		m_inner_file.close();
 	m_jaguars[OUTER]->SetDutyCycle(0.0F);
 	m_jaguars[INNER]->SetDutyCycle(0.0F);
 }
@@ -263,6 +272,12 @@ void Shooter::enabledPeriodic()
 		//m_speed_back = Util::Clamp<double>(m_speed_back, 0, m_max_speed * 1.3);
 	
 		// TODO: change shooter speed based on orientation
+		AsyncPrinter::Printf("%d\n", m_inner_file.is_open());
+		m_ticks++;
+		m_outer_file << (double)(m_ticks / 50.0) << "," << m_speedsRPM[OUTER] << "," << m_periods[OUTER] << "\n";
+		m_inner_file << (double)(m_ticks / 50.0) << "," << m_speedsRPM[INNER] << "," << m_periods[INNER] << "\n";
+		m_outer_file.flush();
+		m_inner_file.flush();
 	}
 	else
 	{
@@ -274,14 +289,16 @@ void Shooter::enabledPeriodic()
 void Shooter::ManageShooterWheel(int roller)
 {
 	//TODO assert to avoid out of bounds 
-	double tempSpeedRPM = (double) (m_encs[roller]->GetStopped()) ? 0.0 : (60.0 / m_encs[roller]->GetPeriod());
+	double tempSpeedRPM = (double)(m_encs[roller]->GetStopped()) ? 0.0 : (60.0 / m_encs[roller]->GetPeriod());
 
+	
 #ifdef PATCH_BAD_SPEED_DATA
 	if (tempSpeedRPM > m_max_speed[roller])
 		tempSpeedRPM = m_speedsRPM[roller];
 #endif
 	
 	m_speedsRPM[roller] = tempSpeedRPM;
+	m_periods[roller] = (double) m_encs[roller]->GetPeriod();
 //	static int last = m_encs[roller]->Get();
 //	if (m_encs[roller]->Get() == last)
 //		AsyncPrinter::Printf("Old Shooter wheel data D:\n");
@@ -319,9 +336,10 @@ void Shooter::ManageShooterWheel(int roller)
 	}
 #endif
 	
-	double out = m_PIDs[roller].update(1.0 / RobotConfig::LOOP_RATE) / m_max_speed[roller] ; //out is a normalized voltage
+	double out = m_PIDs[roller].update( 1.0 / RobotConfig::LOOP_RATE);
+	out /= m_max_speed[roller] ; //out is a normalized voltage
 	
-	double maxOut = m_speedsRPM[roller] + m_maxNormalizedCurrent;
+	double maxOut = m_speedsRPM[roller] / m_max_speed[roller] + m_maxNormalizedCurrent;
 	
 	//now lets limit the current
 	out = Util::Min<double>(out, maxOut);
@@ -331,13 +349,26 @@ void Shooter::ManageShooterWheel(int roller)
 	
 //	AsyncPrinter::Printf("%d: %.2f\n", out);
 	out /= (DriverStation::GetInstance()->GetBatteryVoltage() / RobotConfig::MAX_VOLTAGE);
+	out = Util::Min<double>(out, 1.0);
 	
 	if (m_PIDs[roller].getError() < -400)
 		m_jaguars[roller]->ConfigNeutralMode(CANJaguar::kNeutralMode_Brake);
 	else 
 		m_jaguars[roller]->ConfigNeutralMode(CANJaguar::kNeutralMode_Coast);
 		
+#ifdef OPEN_LOOP
+	if (m_componentData->shooterData->ShouldLauncherBeHigh())
+	{
+		m_jaguars[roller]->SetDutyCycle(m_speed_setpoints[roller][HIGH] / m_max_speed[roller]);
+	}
+	else
+	{
+		m_jaguars[roller]->SetDutyCycle(m_speed_setpoints[roller][LOW] / m_max_speed[roller]);
+	}
+#else
+	m_outer_file << out << ",";
 	m_jaguars[roller]->SetDutyCycle(out);
+#endif
 	m_jaguars[roller]->SetVoltageRampRate(0.0);
 	
 	static int e = 0;
@@ -353,16 +384,11 @@ void Shooter::ManageShooterWheel(int roller)
 		atSpeedCounter[roller] = 0;
 		atSpeed[roller] = false;
 	}
-	m_ticks++;
-	m_outer_file << m_ticks << "," << m_speedsRPM[OUTER] << "," << m_jaguars[OUTER]->GetOutputCurrent() << "\n";
-	m_inner_file << m_ticks << "," << m_speedsRPM[INNER] << "," << m_jaguars[INNER]->GetOutputCurrent() << "\n";
 	
 }
 
 void Shooter::disabledPeriodic()
 {
-	m_outer_file.close();
-	m_inner_file.close();
 	if (m_componentData->shooterData->ShouldLauncherBeHigh())
 	{
 		m_pneumatics->setShooterAngler(EXTENDED);

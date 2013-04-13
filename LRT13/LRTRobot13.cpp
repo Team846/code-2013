@@ -66,7 +66,7 @@ void LRTRobot13::RobotInit()
 	ConfigManager::Instance()->ConfigureAll();
 	
 	AsyncPrinter::Println("Starting SmarterDashboard service...");
-//	SmarterDashboard::Start();
+	SmarterDashboard::Start();
 	
 	leds.Start();
 	
@@ -122,7 +122,8 @@ void LRTRobot13::Tick()
 	// Update all jaguars
 	for (vector<AsyncCANJaguar*>::iterator it = AsyncCANJaguar::jaguar_vector.begin(); it < AsyncCANJaguar::jaguar_vector.end(); it++)
 	{
-		(*it)->RunOneCycle();
+		if ((*it)->StatusOK())
+			(*it)->RunOneCycle();
 	}
 
 	// Update pneumatics

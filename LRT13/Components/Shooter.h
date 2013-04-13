@@ -70,7 +70,7 @@ private:
 	
 	int requiredCyclesAtSpeed;
 	int requiredCyclesDown;
-	double acceptableSpeedError[2], m_speedsRPM[2];
+	double acceptableSpeedError[2], m_speedsRPM[2], m_periods[2];
 	double m_maxNormalizedCurrent;
 	double frisbeeDetectionThreshold, lastSpeed;
 	int startShotTime;
