@@ -233,7 +233,7 @@ printf("[NetBuffer] Can't write less than one bit or more than eight bits!\n");
 	int remainingBits = 8 - bit_pos;
 	int overflow = bit_length - remainingBits;
 
-	m_internalBuffer[GetBytePos()] |= (data_masked >> ((8 - bit_length) + overflow));
+	m_internalBuffer[GetBytePos()] |= (UINT8)(data_masked >> ((8 - bit_length) + overflow));
 	
 	// this byte is finished
 	if(overflow <= 0)

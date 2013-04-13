@@ -209,7 +209,7 @@ void NetPeer::Update()
 				ack.Write(id);
 				
 				// TODO error handling in the future
-				sendto(m_socket, (char*)ack.GetBuffer(), ack.GetBytePos(), 0, (sockaddr*)&from, sizeof(from));
+				sendto(m_socket, (char*)ack.GetBuffer(), ack.GetBufferLength(), 0, (sockaddr*)&from, sizeof(from));
 
 				break;
 			}
@@ -650,9 +650,9 @@ int NetPeer::Send(NetBuffer* buff, NetConnection* to, NetChannel::Enum method, i
 		break;
 	}
 
-	localBuff->WriteRaw(buff->GetBuffer(), buff->GetBytePos());
+	localBuff->WriteRaw(buff->GetBuffer(), buff->GetBufferLength());
 	
-	for(int i = 0; i < localBuff->GetBytePos(); i++)
+	for(int i = 0; i < localBuff->GetBufferLength(); i++)
 	{
 		printf("%u ", localBuff->GetBuffer()[i]);
 	}
@@ -661,7 +661,7 @@ int NetPeer::Send(NetBuffer* buff, NetConnection* to, NetChannel::Enum method, i
 
 	buff->m_sent = true;
 	
-	int iResult = sendto(m_socket, (char*)localBuff->GetBuffer(), localBuff->GetBytePos(), 0, (sockaddr*)to->RemoteEndpoint(), sizeof(*(to->RemoteEndpoint())));
+	int iResult = sendto(m_socket, (char*)localBuff->GetBuffer(), localBuff->GetBufferLength(), 0, (sockaddr*)to->RemoteEndpoint(), sizeof(*(to->RemoteEndpoint())));
 	
 	return iResult;
 }
@@ -670,7 +670,7 @@ void NetPeer::SendRaw(NetBuffer* nb, NetConnection* nc)
 {
 	nb->m_sent = true;
 	
-	sendto(m_socket, (char*)nb->GetBuffer(), nb->GetBytePos(), 0, (sockaddr*)nc->RemoteEndpoint(), sizeof(*nc->RemoteEndpoint()));
+	sendto(m_socket, (char*)nb->GetBuffer(), nb->GetBufferLength(), 0, (sockaddr*)nc->RemoteEndpoint(), sizeof(*nc->RemoteEndpoint()));
 }
 
 NetBuffer* NetPeer::ReadMessage()
