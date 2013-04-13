@@ -107,7 +107,7 @@ void NetPeer::Update()
 	
 	while((received = recvfrom(m_socket, rcv_buffer, MAX_RECEIVE_BUFFER_SIZE, 0, (sockaddr*)&from, &fromSize)) > 0)
 	{
-		NetBuffer* buff = new NetBuffer(rcv_buffer, received);
+		NetBuffer* buff = new NetBuffer((UINT8*)rcv_buffer, received);
 		
 		InternalMessageType c = (InternalMessageType)buff->ReadChar();
 		
@@ -209,7 +209,7 @@ void NetPeer::Update()
 				ack.Write(id);
 				
 				// TODO error handling in the future
-				sendto(m_socket, ack.GetBuffer(), ack.GetBytePos(), 0, (sockaddr*)&from, sizeof(from));
+				sendto(m_socket, (char*)ack.GetBuffer(), ack.GetBytePos(), 0, (sockaddr*)&from, sizeof(from));
 
 				break;
 			}
@@ -661,7 +661,7 @@ int NetPeer::Send(NetBuffer* buff, NetConnection* to, NetChannel::Enum method, i
 
 	buff->m_sent = true;
 	
-	int iResult = sendto(m_socket, localBuff->GetBuffer(), localBuff->GetBytePos(), 0, (sockaddr*)to->RemoteEndpoint(), sizeof(*(to->RemoteEndpoint())));
+	int iResult = sendto(m_socket, (char*)localBuff->GetBuffer(), localBuff->GetBytePos(), 0, (sockaddr*)to->RemoteEndpoint(), sizeof(*(to->RemoteEndpoint())));
 	
 	return iResult;
 }
@@ -670,7 +670,7 @@ void NetPeer::SendRaw(NetBuffer* nb, NetConnection* nc)
 {
 	nb->m_sent = true;
 	
-	sendto(m_socket, nb->GetBuffer(), nb->GetBytePos(), 0, (sockaddr*)nc->RemoteEndpoint(), sizeof(*nc->RemoteEndpoint()));
+	sendto(m_socket, (char*)nb->GetBuffer(), nb->GetBytePos(), 0, (sockaddr*)nc->RemoteEndpoint(), sizeof(*nc->RemoteEndpoint()));
 }
 
 NetBuffer* NetPeer::ReadMessage()

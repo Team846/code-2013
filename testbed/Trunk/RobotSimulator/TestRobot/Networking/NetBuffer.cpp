@@ -11,10 +11,10 @@ NetBuffer::NetBuffer()
 
 NetBuffer::NetBuffer(int bufferDefaultSize)
 {
-	construct(new char[bufferDefaultSize], bufferDefaultSize);
+	construct(NULL, bufferDefaultSize);
 }
 
-NetBuffer::NetBuffer(char* buff, int len)
+NetBuffer::NetBuffer(UINT8* buff, int len)
 {
 	construct(buff, len);
 }
@@ -24,28 +24,39 @@ NetBuffer::~NetBuffer()
 	DELETE_ARR(m_internalBuffer);
 }
 
-void NetBuffer::construct(char* buff, int size)
+void NetBuffer::construct(UINT8* buff, int size)
 {
 	m_internalBitPos = 0;
-	m_internalBuffer = buff;
+	m_internalBuffer = NULL;
+
+	if(size > 0)
+	{
+		m_internalBuffer = new UINT8[size];
+
+		if(buff == NULL)
+			memset(m_internalBuffer, 0, size * sizeof(UINT8));
+		else
+			memcpy(m_internalBuffer, buff, size * sizeof(UINT8));
+	}
+
 	m_internalBufferSize = size;
 	
 	m_isReadOnly = buff != NULL;
 	m_sent = false;
 }
 
-void NetBuffer::Write(char c)
+void NetBuffer::Write(UINT8 c)
 {
-	InternalWriteByte(c, 8);
+	InternalWriteByte(c, sizeof(UINT8)*8);
 }
 
-void NetBuffer::Write(char* c, UINT16 len)
+void NetBuffer::Write(UINT8* c, UINT16 len)
 {
-	InternalWriteInteger(len, sizeof(UINT16));
+	InternalWriteInteger(len, sizeof(UINT16)*8);
 	InternalWriteBytes(c, len);
 }
 
-void NetBuffer::WriteRaw(char* c, UINT16 len)
+void NetBuffer::WriteRaw(UINT8* c, UINT16 len)
 {
 	InternalWriteBytes(c, len);
 }
@@ -53,7 +64,7 @@ void NetBuffer::WriteRaw(char* c, UINT16 len)
 void NetBuffer::Write(string str)
 {
 	InternalWriteInteger((ULONG)str.length(), sizeof(UINT16) * 8);
-	InternalWriteBytes(str.c_str(), str.length());
+	InternalWriteBytes((UINT8*)str.c_str(), str.length());
 }
 
 void NetBuffer::Write(bool b)
@@ -115,12 +126,12 @@ printf("[NetBuffer] Can't write to a read-only buffer!\n");
 	m_internalBitPos += 8 - m_internalBitPos % 8;
 }
 
-char NetBuffer::ReadChar()
+UINT8 NetBuffer::ReadChar()
 {
-	return InternalReadByte(8);
+	return InternalReadByte(sizeof(UINT8)*8);
 }
 
-char* NetBuffer::ReadBytes()
+UINT8* NetBuffer::ReadBytes()
 {
 	UINT16 len = InternalReadInteger(sizeof(UINT16) * 8);
 	
@@ -131,7 +142,7 @@ string NetBuffer::ReadStdString()
 {
 	UINT16 len = InternalReadInteger(sizeof(UINT16) * 8);
 	
-	return InternalReadBytes(len);
+	return (char*)InternalReadBytes(len);
 }
 
 INT64 NetBuffer::ReadInt64()
@@ -188,7 +199,7 @@ bool NetBuffer::AssertBufferHasSpace(UINT32 bits)
 	return ((bits + 7) >> 3) <= m_internalBufferSize;
 }
 
-void NetBuffer::InternalWriteByte(const char data, int bit_length)
+void NetBuffer::InternalWriteByte(const UINT8 data, int bit_length)
 {
 	if(m_isReadOnly)
 	{
@@ -217,12 +228,14 @@ printf("[NetBuffer] Can't write less than one bit or more than eight bits!\n");
 	// this operation performs a logical AND on the given data and the bit_length
 	// in order to get rid of the unnecessary bits.
 	// The data is AND'ed with 0xFF (1111 1111) shifted to the right by 8 - bit_length, creating the masker.
-	char data_masked = (char)(((UINT32)data & ((UINT32)(~(UINT32)(0)) >> (8 - bit_length))));
+	UINT8 data_masked = (UINT8)(((UINT32)data & ((UINT32)(~(UINT32)(0)) >> (8 - bit_length))) << (8 - bit_length));
 	
 	int remainingBits = 8 - bit_pos;
 	int overflow = bit_length - remainingBits;
-	
-	m_internalBuffer[GetBytePos()] |= (data_masked >> (overflow));
+
+	UINT8 shiftedData = (data_masked >> ((8 - bit_length) + overflow));
+
+	m_internalBuffer[GetBytePos()] |= shiftedData;
 	
 	// this byte is finished
 	if(overflow <= 0)
@@ -234,15 +247,15 @@ printf("[NetBuffer] Can't write less than one bit or more than eight bits!\n");
 		remainingBits = overflow;
 		
 		// mask off written bits
-		data_masked &= ((char)((UINT32)(~(UINT32)(0)) >> (8 - remainingBits)));
+		data_masked &= ((UINT8)((UINT32)(~(UINT32)(0)) >> (8 - remainingBits)));
 		
-		m_internalBuffer[GetBytePos()] &= (data_masked << (8 - remainingBits));
+		m_internalBuffer[GetBytePos() + 1] |= (data_masked << (8 - remainingBits));
 	}
-	
+
 	m_internalBitPos += bit_length;
 }
 
-void NetBuffer::InternalWriteBytes(const char data[], int bytes)
+void NetBuffer::InternalWriteBytes(const UINT8 data[], int bytes)
 {
 	if(m_isReadOnly)
 	{
@@ -278,16 +291,16 @@ printf("[NetBuffer] Can't write to a read-only buffer!\n");
 		{
 			// this is the last bitset
 			int rem_bits = bits - i;
-			InternalWriteByte((char)(data >> i), rem_bits);
+			InternalWriteByte((UINT8)(data >> i), rem_bits);
 		}
 		else
 		{
-			InternalWriteByte((char)(data >> i), 8);
+			InternalWriteByte((UINT8)(data >> i), 8);
 		}
 	}
 }
 
-char NetBuffer::InternalReadByte(int bit_length)
+UINT8 NetBuffer::InternalReadByte(int bit_length)
 {
 	if(bit_length < 1 || bit_length > 8)
 	{
@@ -316,7 +329,18 @@ printf("[NetBuffer] Can't read past the buffer!\n");
 	
 	int pos = GetBytePos();
 	
-	char retrieved = (char)((UINT32)m_internalBuffer[pos] & (~(UINT32)(0) >> (overflow)));
+	UINT32 masker = 0;
+
+	if(overflow < 0)
+	{
+		masker = ((UINT32)0xff) << (-overflow);
+	}
+	else
+	{
+		masker = ((UINT32)0xff) >> (overflow);
+	}
+
+	UINT32 retrieved = (UINT32)(((UINT32)m_internalBuffer[pos]) & masker);
 	
 	if(overflow <= 0)
 	{
@@ -324,17 +348,18 @@ printf("[NetBuffer] Can't read past the buffer!\n");
 	}
 	else if(overflow > 0)
 	{
-		retrieved = (char)((UINT32)(retrieved) & m_internalBuffer[GetBytePos() + 1] & (~(UINT32)(0) << (8 - overflow))); 
+		retrieved = retrieved << (overflow);
+		retrieved = (UINT8)((UINT32)(retrieved) | ((m_internalBuffer[GetBytePos() + 1] & (~(UINT32)(0) << (8 - overflow))) >> (8 - overflow))); 
 	}
 	
 	m_internalBitPos += bit_length;
-	return (char)retrieved;
+	return (UINT8)(retrieved >> (8 - bit_length));
 }
 
-char* NetBuffer::InternalReadBytes(int bytes)
+UINT8* NetBuffer::InternalReadBytes(int bytes)
 {	
 	// done like this so that the array stays alive after the function returns
-	char* retrieved = (char*)malloc(bytes);
+	UINT8* retrieved = (UINT8*)malloc(bytes);
 	
 	for(int i = 0; i < bytes; i++)
 	{
@@ -365,6 +390,11 @@ UINT64 NetBuffer::InternalReadInteger(int bits)
 	return retrieved;
 }
 
+int NetBuffer::GetBufferLength()
+{
+	return ((m_internalBitPos + 7) / 8);
+}
+
 int NetBuffer::GetBytePos()
 {
 	return (int)(m_internalBitPos / 8);
@@ -382,16 +412,16 @@ void NetBuffer::FitBufferToSize(UINT32 bits)
 	if(m_internalBuffer == NULL)
 	{
 		int len = bytes + NetBuffer::kBufferResizeOverAllocateBytes;
-		m_internalBuffer = new char[len];
+		m_internalBuffer = new UINT8[len];
 		m_internalBufferSize = len;
-		memset(m_internalBuffer, 0, sizeof(char) * len);
+		memset(m_internalBuffer, 0, sizeof(UINT8) * len);
 	}
 	else if(bytes > m_internalBufferSize)
 	{
 		int len = bytes + NetBuffer::kBufferResizeOverAllocateBytes;
-		char* newBuff = new char[len];
+		UINT8* newBuff = new UINT8[len];
 		
-		memset(newBuff, 0, sizeof(char) * len);
+		memset(newBuff, 0, sizeof(UINT8) * len);
 
 		memcpy(newBuff, m_internalBuffer, m_internalBufferSize);
 		m_internalBufferSize = len;
@@ -402,7 +432,7 @@ void NetBuffer::FitBufferToSize(UINT32 bits)
 	}
 }
 
-char* NetBuffer::GetBuffer()
+UINT8* NetBuffer::GetBuffer()
 {
 	return m_internalBuffer;
 }

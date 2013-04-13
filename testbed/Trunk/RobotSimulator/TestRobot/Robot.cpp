@@ -73,10 +73,33 @@ void Robot::StartCompetition()
 
 		ss << i++;
 
-		buff.Write((char)MessageType::AUTO_AIM_DATA);
-		buff.Write(0);
-		buff.Write(0);
-		buff.Write(valueD);
+		buff.Write((UINT8)MessageType::BACK_SHOOTER_DATA_CURRENT);
+		buff.Write(2);
+		buff.Write(false);
+		buff.WritePadBits();
+		buff.Write(2356209);
+		
+		for(int i = 0; i < buff.GetBufferLength(); i++)
+	{
+		printf("%u ", buff.GetBuffer()[i]);
+	}
+
+	printf("\n");
+
+		NetBuffer buff2(buff.GetBuffer(), buff.GetBufferLength());
+
+		for(int i = 0; i < buff.GetBufferLength(); i++)
+	{
+		printf("%u ", buff2.GetBuffer()[i]);
+	}
+
+	printf("\n");
+
+		UINT8 c = buff2.ReadChar();
+		float f = buff2.ReadInt32();
+		bool b = buff2.ReadBool();
+		buff2.SkipPadBits();
+		int f2 = buff2.ReadInt32();
 
 		server->SendToAll(&buff, NetChannel::NET_UNRELIABLE_SEQUENCED, 1);
 
