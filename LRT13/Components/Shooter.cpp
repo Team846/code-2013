@@ -46,8 +46,8 @@ Shooter::Shooter() :
 	m_proximity = new DigitalInput(RobotConfig::Digital::PROXIMITY_SHOOTER );
 
 	requiredCyclesAtSpeed = 0;
-	acceptableSpeedError[OUTER] = 0;
-	acceptableSpeedError[INNER] = 0;
+	acceptableSpeedErrorNormalized[OUTER] = 0;
+	acceptableSpeedErrorNormalized[INNER] = 0;
 	lastSpeed = 0;
 	m_speedsRPM[OUTER] = 0;
 	m_speedsRPM[INNER] = 0;
@@ -89,6 +89,7 @@ void Shooter::onDisable()
 		m_outer_file.close();
 	if (m_inner_file.is_open())
 		m_inner_file.close();
+	m_ticks = 0;
 	m_jaguars[OUTER]->SetDutyCycle(0.0F);
 	m_jaguars[INNER]->SetDutyCycle(0.0F);
 }
@@ -179,6 +180,7 @@ void Shooter::enabledPeriodic()
 					}
 					else
 					{
+					
 						m_pneumatics->setStorageExit(EXTENDED);
 						m_fireState = EXTEND_LOADER;
 						m_timer = 50;
@@ -187,13 +189,17 @@ void Shooter::enabledPeriodic()
 				case EXTEND_LOADER:
 						m_pneumatics->setStorageExit(EXTENDED);
 						m_timer--;
+						AsyncPrinter::Printf("normalized error: %f, threshold: %f\n", m_errorsNormalized[INNER], frisbeeDetectionThreshold);
 #if RELIABLE_SHOOTING
-						if (m_PIDs[INNER].getError() > frisbeeDetectionThreshold || m_timer < 0)
+						if (m_errors[INNER] > frisbeeDetectionThreshold || m_timer < 0)
 #else
-						if (m_PIDs[INNER].getError() > frisbeeDetectionThreshold)
+						if (m_errorsNormalized[INNER] > frisbeeDetectionThreshold)
 #endif
+							
 						{
-							AsyncPrinter::Printf("Fired with newSpeed = %.0f, lastSpeed = %.0f taking %d cycles\n", m_speedsRPM[INNER], lastSpeed, e - startShotTime);
+							AsyncPrinter::Printf("Outer wheel speed when shooting: %f\n", m_speedsRPM[OUTER]);
+							AsyncPrinter::Printf("Inner wheel speed when shooting: %f\n", m_speedsRPM[INNER]);
+//							AsyncPrinter::Printf("Fired with newSpeed = %.0f, lastSpeed = %.0f taking %d cycles\n", m_speedsRPM[INNER], lastSpeed, e - startShotTime);
 							m_fireState = RETRACT_LOADER_WAIT_FOR_LIFT;
 							m_cyclesToContinueRetracting = requiredCyclesDown ;
 							m_pneumatics->setStorageExit(RETRACTED);
@@ -210,7 +216,12 @@ void Shooter::enabledPeriodic()
 	//			AsyncPrinter::Printf("Out\n");
 			break;
 		case ONCE:
-			m_pneumatics->setStorageExit(RETRACTED);
+			if(atSpeed[OUTER] && atSpeed[INNER])
+			{
+				AsyncPrinter::Printf("Outer wheel speed when shooting: %f\n", m_speedsRPM[OUTER]);
+				AsyncPrinter::Printf("Inner wheel speed when shooting: %f\n", m_speedsRPM[INNER]);
+				m_pneumatics->setStorageExit(RETRACTED);
+			}
 			break;
 		case OFF:
 //				AsyncPrinter::Printf("off\n");
@@ -220,7 +231,7 @@ void Shooter::enabledPeriodic()
 			break;
 		}
 		lastSpeed = m_speedsRPM[INNER];
-		AsyncPrinter::Printf("Speed %.3f\n", m_speedsRPM[OUTER]);
+//		AsyncPrinter::Printf("Speed %.3f\n", m_speedsRPM[OUTER]);
 		
 	//	double frisbee_detected = 1;//m_proximity->Get() == 0;
 	//	if(atSpeed[OUTER] && atSpeed[INNER])
@@ -272,7 +283,6 @@ void Shooter::enabledPeriodic()
 		//m_speed_back = Util::Clamp<double>(m_speed_back, 0, m_max_speed * 1.3);
 	
 		// TODO: change shooter speed based on orientation
-		AsyncPrinter::Printf("%d\n", m_inner_file.is_open());
 		m_ticks++;
 		m_outer_file << (double)(m_ticks / 50.0) << "," << m_speedsRPM[OUTER] << "," << m_periods[OUTER] << "\n";
 		m_inner_file << (double)(m_ticks / 50.0) << "," << m_speedsRPM[INNER] << "," << m_periods[INNER] << "\n";
@@ -288,6 +298,126 @@ void Shooter::enabledPeriodic()
 
 void Shooter::ManageShooterWheel(int roller)
 {
+	const double loopPeriod = 1.0 / RobotConfig::LOOP_RATE;
+	const double measuredPeriod = m_encs[roller]->GetPeriod();
+	
+	if(measuredPeriod == 0.0)
+	{
+		AsyncPrinter::Printf("[ERROR] Shooter::ManageShooterWheel(): period=0\n");
+		return;
+	}
+	
+	double currentSpeedRPM = m_encs[roller]->GetStopped() ? (0.0) : (60.0 / measuredPeriod);
+	double currentSpeedNormalized = currentSpeedRPM / m_max_speed[roller];
+	
+	//TODO fixme, add a switch 	
+	//	m_PIDs[roller].setSetpoint(m_componentData->shooterData->GetDesiredSpeed((Roller)roller));
+//	m_PIDs[roller].setSetpoint(100000);
+	
+#if TWOSPEED
+	double speedSetpoint = m_speed_setpoints[roller][LOW];
+	
+	if (m_componentData->shooterData->ShouldLauncherBeHigh()) //low speed. meantime
+		speedSetpoint = m_speed_setpoints[roller][HIGH];
+	
+//	m_PIDs[roller].setSetpoint(speedSetpoint);
+	//		AsyncPrinter::Printf("Setpoint: %.0f\n", m_PIDs[roller].getSetpoint());
+	
+#else
+	if (!m_componentData->shooterData->ShouldLauncherBeHigh())
+	{
+		if (roller == OUTER)
+		{
+			m_PIDs[roller].setSetpoint(5300);
+		}
+		else
+		{
+			m_PIDs[roller].setSetpoint(4900);
+		}
+	}
+	else
+	{
+		m_PIDs[roller].setSetpoint(m_target_speed[roller]);
+	}
+#endif
+	
+//	m_PIDs[roller].setInput(currentSpeedRPM);
+
+	double openLoopInput = speedSetpoint / m_max_speed[roller];
+	double normalizedError = (currentSpeedRPM - speedSetpoint) / m_max_speed[roller];
+	
+	m_errorsNormalized[roller] = normalizedError;
+	
+	double gain = m_PIDs[roller].getProportionalGain();
+	
+	double out = openLoopInput - normalizedError * gain;
+	
+//	double out = m_PIDs[roller].update( loopPeriod );
+//	out /= m_max_speed[roller] ; //out is a normalized voltage
+	
+//	double maxOut = currentSpeedNormalized + m_maxNormalizedCurrent;
+//	
+//	//now lets limit the current
+//	out = Util::Min<double>(out, maxOut);
+	
+	if (out < 0.0)
+		out = 0.0;// Don't do reverse power
+	
+//	AsyncPrinter::Printf("%d: %.2f\n", out);
+	double batteryAdjustment = (DriverStation::GetInstance()->GetBatteryVoltage() / RobotConfig::MAX_VOLTAGE);
+	
+	if(batteryAdjustment < 0.2)
+	{
+		AsyncPrinter::Printf("[ERROR] Shooter::ManageShooterWheel(): batteryAdjustment<0.1");
+		return;
+	}
+	
+	out /= batteryAdjustment; // batteryAdjustment is non-zero
+	out = Util::Min<double>(out, 1.0);
+	
+	if (normalizedError > 0.1)
+		m_jaguars[roller]->ConfigNeutralMode(CANJaguar::kNeutralMode_Brake);
+	else 
+		m_jaguars[roller]->ConfigNeutralMode(CANJaguar::kNeutralMode_Coast);
+		
+#ifdef OPEN_LOOP
+	if (m_componentData->shooterData->ShouldLauncherBeHigh())
+	{
+		m_jaguars[roller]->SetDutyCycle(m_speed_setpoints[roller][HIGH] / m_max_speed[roller]);
+	}
+	else
+	{
+		m_jaguars[roller]->SetDutyCycle(m_speed_setpoints[roller][LOW] / m_max_speed[roller]);
+	}
+#else
+	m_outer_file << out << ",";
+	m_jaguars[roller]->SetDutyCycle(out);
+#endif
+	m_jaguars[roller]->SetVoltageRampRate(0.0);
+	
+//	static int e = 0;
+//	if (++e % 5 == 0)
+//		AsyncPrinter::Printf("Error %.0f\n", m_PIDs[roller].getError());
+	
+	if(fabs(normalizedError) < acceptableSpeedErrorNormalized[roller])
+	{
+		atSpeedCounter[roller]++;
+		atSpeed[roller] = atSpeedCounter[roller] >= requiredCyclesAtSpeed;
+	}
+	else
+	{
+		atSpeedCounter[roller] = 0;
+		atSpeed[roller] = false;
+	}
+	
+	m_periods[roller] = measuredPeriod;
+	m_speedsRPM[roller] = currentSpeedRPM;
+	
+}
+
+/*
+void Shooter::ManageShooterWheel(int roller)
+{
 	//TODO assert to avoid out of bounds 
 	double tempSpeedRPM = (double)(m_encs[roller]->GetStopped()) ? 0.0 : (60.0 / m_encs[roller]->GetPeriod());
 
@@ -298,7 +428,7 @@ void Shooter::ManageShooterWheel(int roller)
 #endif
 	
 	m_speedsRPM[roller] = tempSpeedRPM;
-	m_periods[roller] = (double) m_encs[roller]->GetPeriod();
+	m_periods[roller] = m_encs[roller]->GetPeriod();
 //	static int last = m_encs[roller]->Get();
 //	if (m_encs[roller]->Get() == last)
 //		AsyncPrinter::Printf("Old Shooter wheel data D:\n");
@@ -386,6 +516,7 @@ void Shooter::ManageShooterWheel(int roller)
 	}
 	
 }
+*/
 
 void Shooter::disabledPeriodic()
 {
@@ -405,6 +536,7 @@ void Shooter::disabledPeriodic()
 }
 
 void Shooter::Configure()
+
 {
 	ConfigManager * c = ConfigManager::Instance();
 	m_max_speed[OUTER] = c->Get<double> (m_configSection, "outer_maxSpeed",
@@ -424,13 +556,13 @@ void Shooter::Configure()
 	m_speed_setpoints[INNER][HIGH] = c->Get<double>(m_configSection, "inner_lowSpeedSetpoint", 2800);
 
 	//TODO: Change default values.
-	requiredCyclesAtSpeed = c->Get<int> (m_configSection, "requiredCycles", 2);
-	acceptableSpeedError[OUTER] = c->Get<double> (m_configSection,
-			"outer_acceptableSpeedError", 30);
-	acceptableSpeedError[INNER] = c->Get<double> (m_configSection,
-			"inner_acceptableSpeedError", 30);
+	requiredCyclesAtSpeed = c->Get<int> (m_configSection, "requiredCycles", 3);
+	acceptableSpeedErrorNormalized[OUTER] = c->Get<double> (m_configSection,
+			"outer_acceptableSpeedError", 0.01);
+	acceptableSpeedErrorNormalized[INNER] = c->Get<double> (m_configSection,
+			"inner_acceptableSpeedError", 0.01);
 	
-	frisbeeDetectionThreshold = c->Get<double> (m_configSection, "shooterSpeedDrop", 100);
+	frisbeeDetectionThreshold = c->Get<double> (m_configSection, "shooterSpeedDrop", 1.0 / 6.0);
 	
 	m_maxNormalizedCurrent = c->Get<double>(m_configSection, "normalizedCurrentThreshold", 1.0);
 	

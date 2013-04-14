@@ -88,8 +88,8 @@ void ShooterData::SetShooterSetting(ShooterSetting s)
 //	if (s == OFF)
 //		AsyncPrinter::Printf("WHY IS THIS THING OFF\n");
 //	
-//	if(s == CONTINOUS)
-//		AsyncPrinter::Printf("Setting to continuous\n");
+	if(s == CONTINOUS)
+		AsyncPrinter::Printf("Setting to continuous\n");
 	shooter_setting = s;
 }
 

@@ -59,6 +59,7 @@ private:
 	continuousFireState m_fireState;
 	
 	PID m_PIDs[2];
+	double m_errorsNormalized[2];
 	
 	int atSpeedCounter[2];
 	
@@ -70,7 +71,7 @@ private:
 	
 	int requiredCyclesAtSpeed;
 	int requiredCyclesDown;
-	double acceptableSpeedError[2], m_speedsRPM[2], m_periods[2];
+	double acceptableSpeedErrorNormalized[2], m_speedsRPM[2], m_periods[2];
 	double m_maxNormalizedCurrent;
 	double frisbeeDetectionThreshold, lastSpeed;
 	int startShotTime;

@@ -75,7 +75,7 @@ void LRTRobot13::RobotInit()
 
 static int TimeoutCallback(...)
 {
-	printf("Main loop execution time > 20ms\r\n");
+	//printf("Main loop execution time > 20ms\r\n");
 	return 0;
 }
 
