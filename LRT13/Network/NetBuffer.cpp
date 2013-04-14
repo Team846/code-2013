@@ -236,7 +236,7 @@ printf("[NetBuffer] Can't write less than one bit or more than eight bits!\n");
 		// mask off written bits
 		data_masked &= ((char)((UINT32)(~(UINT32)(0)) >> (8 - remainingBits)));
 		
-		m_internalBuffer[GetBytePos()] &= (data_masked << (8 - remainingBits));
+		m_internalBuffer[GetBytePos()] |= (data_masked << (8 - remainingBits));
 	}
 	
 	m_internalBitPos += bit_length;
@@ -316,7 +316,7 @@ printf("[NetBuffer] Can't read past the buffer!\n");
 	
 	int pos = GetBytePos();
 	
-	char retrieved = (char)((UINT32)m_internalBuffer[pos] & (~(UINT32)(0) >> (overflow)));
+	char retrieved = (char)(((UINT32)m_internalBuffer[pos] & (~(UINT32)(0) >> (overflow))) << (overflow));
 	
 	if(overflow <= 0)
 	{
@@ -324,11 +324,11 @@ printf("[NetBuffer] Can't read past the buffer!\n");
 	}
 	else if(overflow > 0)
 	{
-		retrieved = (char)((UINT32)(retrieved) & m_internalBuffer[GetBytePos() + 1] & (~(UINT32)(0) << (8 - overflow))); 
+		retrieved |= (char)(((UINT32)m_internalBuffer[GetBytePos() + 1] & (~(UINT32)(0) << (8 - overflow))) >> (8 - overflow)); 
 	}
 	
 	m_internalBitPos += bit_length;
-	return (char)retrieved;
+	return retrieved;
 }
 
 char* NetBuffer::InternalReadBytes(int bytes)

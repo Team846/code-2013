@@ -7,8 +7,7 @@ ClimberData::ClimberData()
 	m_desiredClimbingStep = INTENDED_IDLE;
 	m_shouldContinueClimbing = false;
 	m_shouldForceContinueClimbing = false;
-	
-	m_shouldChangeArmState = false;
+
 	m_shouldChangeAngleState = false;
 	
 	m_shouldWinchPawlGoDown = false;
@@ -18,6 +17,11 @@ ClimberData::ClimberData()
 	m_shouldPTODisEngage = false;
 
 	m_shouldPotentiallyAbort = false;
+	
+	m_shouldExtendArm = false;
+	m_shouldExtendHooks = false;
+	
+	m_winchPawlCurrent = 0.0;
 }
 
 
@@ -59,20 +63,24 @@ void ClimberData::setShouldForceContinueClimbing(bool shouldContinue)
 	m_shouldContinueClimbing = shouldContinue;
 }
 
-
-bool ClimberData::shouldChangeArmState()
+void ClimberData::extendHooks()
 {
-	if (m_shouldChangeArmState)
-	{
-		m_shouldChangeArmState = false;
-		return true;
-	}
-	return false;
+	m_shouldExtendHooks = true;
+}
+
+void ClimberData::retractHooks()
+{
+	m_shouldExtendHooks = false;
+}
+
+bool ClimberData::shouldExtendHooks()
+{
+	return m_shouldExtendHooks;
 }
 
 bool ClimberData::changeArmState()
 {
-	m_shouldChangeArmState = true;
+	m_shouldExtendArm = !m_shouldExtendArm;
 }
 
 bool ClimberData::shouldChangeAngleState()
@@ -86,6 +94,21 @@ bool ClimberData::shouldChangeAngleState()
 	return false;
 }
 
+void ClimberData::extendArm()
+{
+	m_shouldExtendArm = true;
+}
+
+void ClimberData::retractArm()
+{
+	m_shouldExtendArm = false;
+}
+
+bool ClimberData::shouldExtendArm()
+{
+	return m_shouldExtendArm;
+}
+
 void ClimberData::changeAngleState()
 {
 	m_shouldChangeAngleState = true;
@@ -93,34 +116,37 @@ void ClimberData::changeAngleState()
 
 bool ClimberData::shouldWinchPawlGoDown()
 {
-	if (m_shouldWinchPawlGoDown)
-	{
-		m_shouldWinchPawlGoDown = false;
-		return true;
-	}
-	return false;
+	return m_shouldWinchPawlGoDown;
 }
 
 bool ClimberData::shouldWinchPawlGoUp()
 {
-	if (m_shouldWinchPawlGoUp)
-	{
-		m_shouldWinchPawlGoUp = false;
-		return true;
-	}
-	return false;
-	
+	return m_shouldWinchPawlGoUp;
 }
 
 void ClimberData::winchPawlDown()
 {
-	
 	m_shouldWinchPawlGoDown = true;
 }
 
 void ClimberData::winchPawlUp()
 {
 	m_shouldWinchPawlGoUp = true;
+}
+
+void ClimberData::winchPawlInactive()
+{
+	m_shouldWinchPawlGoDown = m_shouldWinchPawlGoUp = false;
+}
+
+double ClimberData::winchPawlCurrent()
+{
+	return m_winchPawlCurrent;
+}
+
+void ClimberData::setWinchPawlCurrent(double value)
+{
+	m_winchPawlCurrent = value;
 }
 
 bool ClimberData::shouldPTOChangeDisengage()

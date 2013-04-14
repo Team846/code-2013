@@ -51,12 +51,18 @@ SmarterDashboard::~SmarterDashboard()
 
 void SmarterDashboard::Tick()
 {
+	static int counter = 0;
+	
+	if(counter++ % 50 == 0)
+		AsyncPrinter::Printf("SmarterDashboard::Tick(): %d\n", counter);
+	
 	// perhaps later, we may want to send some heartbeats or packets of the sort
 	Flush();
 }
 
 void SmarterDashboard::Flush()
 {
+	//AsyncPrinter::Printf("Flushing queue...messages: %d\n", m_netBufferQueue.size());
 	{
 		Synchronized s(m_queueSem);
 		
@@ -66,6 +72,8 @@ void SmarterDashboard::Flush()
 			m_netBufferQueue.pop();
 			
 			m_server->SendToAll(nb.nb, nb.method, nb.channel);
+			
+			AsyncPrinter::Printf("Sending message...\n");
 		}
 	} // m_queueSem
 }
@@ -82,4 +90,17 @@ void SmarterDashboard::EnqueueMessage(NetBuffer* buff, NetChannel::Enum method, 
 	
 		m_netBufferQueue.push(msg);
 	}
+}
+
+void SmarterDashboard::EnqueueShooterMessage(MessageType::Enum header, float time, float value)
+{
+	NetBuffer buff;
+	
+	buff.Write((char)header);
+	buff.Write(time);
+	buff.Write(value);
+	
+	AsyncPrinter::Printf("Enqueueing shooter message.\n");
+	
+	EnqueueMessage(&buff, NetChannel::NET_UNRELIABLE_SEQUENCED, 1);
 }

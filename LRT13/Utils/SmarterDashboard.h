@@ -33,6 +33,8 @@ public:
 	
 	void EnqueueMessage(NetBuffer* buff, NetChannel::Enum method, int channel);
 	
+	void EnqueueShooterMessage(MessageType::Enum header, float time, float value);
+	
 private:
 	static SmarterDashboard* m_instance;
 	

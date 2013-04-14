@@ -26,6 +26,7 @@
 #include "Pneumatics/Pneumatics.h"
 
 #include "Sensors/DriveEncoders.h"
+#include "Sensors/IMU.h"
 
 #include "Utils/SmarterDashboard.h"
 

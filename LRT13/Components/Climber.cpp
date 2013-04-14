@@ -28,6 +28,7 @@ Climber::Climber() :
 	m_paused = false;
 	m_previous_state = IDLE;
 	m_winch_gear_tooth.Start();
+	m_winch_worm.setCollectionFlags(AsyncCANJaguar::OUTCURR);
 }
 
 Climber::~Climber()
@@ -54,8 +55,11 @@ void Climber::onDisable()
 }	
 
 void Climber::enabledPeriodic()
-
 {
+	double curr = m_winch_worm.GetOutputCurrent();
+	
+	m_componentData->climberData->setWinchPawlCurrent(curr);
+	
 	m_componentData->ledIndicatorData->setColorRGB(255,0,0);
 	
 	m_paused = false; //we pause
@@ -85,12 +89,6 @@ void Climber::enabledPeriodic()
 				m_componentData->shooterData->SetLauncherAngleHigh();
 		}
 		
-		if (m_componentData->climberData->shouldChangeArmState())
-		{
-//			AsyncPrinter::Printf("Arm for realz\n");
-			m_pneumatics->setClimberArm(!m_pneumatics->GetClimberState());
-		}
-		
 		if (m_componentData->climberData->shouldWinchPawlGoDown())
 		{
 			AsyncPrinter::Printf("geartooth %d\n", m_winch_gear_tooth.Get());
@@ -117,6 +115,9 @@ void Climber::enabledPeriodic()
 			m_servo_left.SetMicroseconds(m_servo_left_engaged_position);
 			m_servo_right.SetMicroseconds(m_servo_right_engaged_position);
 		}
+		
+		m_pneumatics->setHookPosition(m_componentData->climberData->shouldExtendHooks(), true);
+		m_pneumatics->setClimberArm(m_componentData->climberData->shouldExtendArm(), true);
 //		AsyncPrinter::Printf("Still alive %d\n", GetFPGATime());
 		return;
 	}
@@ -200,7 +201,7 @@ void Climber::enabledPeriodic()
 	
 	static bool engaged = false;
 	static double driveSpeed = 0.0;
-	double curr;
+	
 	switch (m_state)
 	{
 	case IDLE:
@@ -239,7 +240,7 @@ void Climber::enabledPeriodic()
 		if (m_componentData->climberData->getDesiredClimbingStep() == INTENDED_CLIMBING)
 		{
 			m_state = ARM_DOWN;
-			m_winch_worm.setCollectionFlags(AsyncCANJaguar::OUTCURR);
+			
 		}
 		break;
 	case ARM_DOWN:
@@ -508,6 +509,9 @@ void Climber::enabledPeriodic()
 
 void Climber::disabledPeriodic()
 {
+	m_componentData->climberData->setWinchPawlCurrent(0.0);
+	
+	m_winch_worm.SetDutyCycle(0.0f);
 	
 	m_componentData->climberData->setDesiredClimbingStep(INTENDED_IDLE );
 	m_state = IDLE;//Restart the routine, makes debugging easier.

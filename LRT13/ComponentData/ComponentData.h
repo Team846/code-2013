@@ -29,6 +29,7 @@ namespace data
 	namespace climber
 	{
 		class ClimberData;
+		class WinchPawlData;
 	}
 	namespace indicators
 	{
@@ -49,18 +50,19 @@ namespace data
 		static ComponentData* GetInstance();
 		static void Finalize();
 	
+		~ComponentData();
 		
 		drivetrain::DrivetrainData* const drivetrainData;
 		shooter::ShooterData* const shooterData;
 		collector::CollectorData* const collectorData;
 		climber::ClimberData* const climberData;
+		climber::WinchPawlData* const winchPawlData;
 		configloader::ConfigLoaderData* const configLoaderData;
 		indicators::LEDIndicatorData* const ledIndicatorData;
 		autoaim::AutoAimData* const autoAimData;
 	
 	protected:
 		ComponentData();
-		
 		
 		DISALLOW_COPY_AND_ASSIGN(ComponentData);
 	

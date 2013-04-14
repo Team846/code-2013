@@ -29,6 +29,10 @@ Shooter::Shooter() :
 			"ShooterFront");
 	m_jaguars[INNER] = new AsyncCANJaguar(RobotConfig::CAN::SHOOTER_B,
 			"ShooterBack");
+	
+	m_jaguars[OUTER]->setCollectionFlags(AsyncCANJaguar::OUTCURR);
+	m_jaguars[INNER]->setCollectionFlags(AsyncCANJaguar::OUTCURR);
+	
 	m_encs[OUTER] = new Counter((UINT32) RobotConfig::Digital::HALL_EFFECT_A);
 	m_encs[OUTER]->Start();
 	m_encs[OUTER]->SetMaxPeriod(100 / 60.0); // Period of 100 RPM; minimum speed we can read -Raphael Chang 4/12/13
@@ -58,9 +62,10 @@ Shooter::Shooter() :
 	
 	m_fireState = FIRING_OFF;
 	m_cyclesToContinueRetracting = 0;
-	m_sensorDeNoisingCycle = 0;
-	
-	m_isSensorTrue = false;
+	// begin denoise removal
+//	m_sensorDeNoisingCycle = 0;
+//	m_isSensorTrue = false
+			// end denoise removal
 	
 	m_ticks = 0;
 	
@@ -283,6 +288,15 @@ void Shooter::enabledPeriodic()
 		//m_speed_back = Util::Clamp<double>(m_speed_back, 0, m_max_speed * 1.3);
 	
 		// TODO: change shooter speed based on orientation
+		double timenow = Timer::GetFPGATimestamp();
+		
+		SmarterDashboard::Instance()->EnqueueShooterMessage(MessageType::FRONT_SHOOTER_DATA_SPEED, timenow, m_speedsRPM[OUTER] / m_max_speed[OUTER]);
+		SmarterDashboard::Instance()->EnqueueShooterMessage(MessageType::BACK_SHOOTER_DATA_SPEED, timenow, m_speedsRPM[INNER] / m_max_speed[INNER]);
+		SmarterDashboard::Instance()->EnqueueShooterMessage(MessageType::FRONT_SHOOTER_DATA_CURRENT, timenow, m_jaguars[OUTER]->GetOutputCurrent());
+		SmarterDashboard::Instance()->EnqueueShooterMessage(MessageType::BACK_SHOOTER_DATA_CURRENT, timenow, m_jaguars[INNER]->GetOutputCurrent());
+
+		AsyncPrinter::Printf("%d\n", m_inner_file.is_open());
+
 		m_ticks++;
 		m_outer_file << (double)(m_ticks / 50.0) << "," << m_speedsRPM[OUTER] << "," << m_periods[OUTER] << "\n";
 		m_inner_file << (double)(m_ticks / 50.0) << "," << m_speedsRPM[INNER] << "," << m_periods[INNER] << "\n";
@@ -520,6 +534,11 @@ void Shooter::ManageShooterWheel(int roller)
 
 void Shooter::disabledPeriodic()
 {
+	SmarterDashboard::Instance()->EnqueueShooterMessage(MessageType::FRONT_SHOOTER_DATA_SPEED, 0.0f, 0.0f);
+	SmarterDashboard::Instance()->EnqueueShooterMessage(MessageType::BACK_SHOOTER_DATA_SPEED, 0.0f, 0.0f);
+	SmarterDashboard::Instance()->EnqueueShooterMessage(MessageType::FRONT_SHOOTER_DATA_CURRENT, 0.0f, 0.0f);
+	SmarterDashboard::Instance()->EnqueueShooterMessage(MessageType::BACK_SHOOTER_DATA_CURRENT, 0.0f, 0.0f);
+	
 	if (m_componentData->shooterData->ShouldLauncherBeHigh())
 	{
 		m_pneumatics->setShooterAngler(EXTENDED);

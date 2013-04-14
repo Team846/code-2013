@@ -180,6 +180,8 @@ void TeleopInputs::Update()
 				m_componentData->climberData->winchPawlUp();
 				
 			}
+			else
+				m_componentData->climberData->winchPawlInactive();
 		}
 		else
 			m_componentData->climberData->disableDebug();

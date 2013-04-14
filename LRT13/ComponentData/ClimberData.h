@@ -54,8 +54,7 @@ typedef enum humanState
 		bool shouldDebug();
 		void enableDebug();
 		void disableDebug();
-		
-		bool shouldChangeArmState();
+
 		bool changeArmState();
 		
 		bool shouldChangeAngleState();
@@ -65,18 +64,30 @@ typedef enum humanState
 		bool shouldWinchPawlGoUp();
 		void winchPawlDown();
 		void winchPawlUp();
+		void winchPawlInactive();
+		
+		double winchPawlCurrent();
+		void setWinchPawlCurrent(double value);
 		
 		bool shouldPTOChangeDisengage();
 		bool shouldPTOChangeEngage();
 		bool EngagePTO();
 		bool DisengagePTO();
 		
+		void extendHooks();
+		void retractHooks();
+		
+		bool shouldExtendHooks();
+		
+		void extendArm();
+		void retractArm();
+		
+		bool shouldExtendArm();
 	private:
 		humanState m_desiredClimbingStep;
 		bool m_shouldContinueClimbing, m_shouldForceContinueClimbing;
 		
 		bool m_shouldPotentiallyAbort;
-		bool m_shouldChangeArmState;
 		bool m_shouldChangeAngleState;
 		
 		bool m_shouldWinchPawlGoDown;
@@ -86,6 +97,12 @@ typedef enum humanState
 		bool m_shouldPTODisEngage;
 		
 		bool m_shoulddebug;
+		
+		bool m_shouldExtendHooks;
+		
+		bool m_shouldExtendArm;
+		
+		double m_winchPawlCurrent;
 	};
 }
 }

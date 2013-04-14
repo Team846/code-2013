@@ -35,6 +35,7 @@ LRTRobot13::~LRTRobot13()
 	LogManager::Finalize();
 	Pneumatics::Finalize();
 	DriveEncoders::Finalize();
+	IMU::Finalize();
 }
 
 void LRTRobot13::RobotInit()
@@ -68,9 +69,12 @@ void LRTRobot13::RobotInit()
 	AsyncPrinter::Println("Starting SmarterDashboard service...");
 	SmarterDashboard::Start();
 	
+	AsyncPrinter::Println("Creating the IMU...");
+	IMU::Instance()->Start();
+	
 	leds.Start();
 	
-	AsyncPrinter::Println("Reticulating splines... %d", 2);
+	AsyncPrinter::Println("Reticulating splines...");
 }
 
 static int TimeoutCallback(...)
@@ -139,6 +143,9 @@ void LRTRobot13::Tick()
 	
 	// Update LogManager
 	LogManager::Instance()->RunOneCycle();
+	
+	// Update SmarterDashboard
+	SmarterDashboard::Instance()->Tick();
 	
 	wdCancel(_watchdog);
 }

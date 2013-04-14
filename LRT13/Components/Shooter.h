@@ -13,6 +13,8 @@
 #include "../ComponentData/ShooterData.h"
 #include "../Pneumatics/Pneumatics.h"
 #include "DigitalInput.h"
+#include "../Network/MessageType.h"
+#include "../Utils/SmarterDashboard.h"
 
 using namespace data;
 

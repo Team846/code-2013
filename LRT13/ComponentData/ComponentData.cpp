@@ -7,6 +7,7 @@
 #include "CollectorData.h"
 #include "LEDIndicatorData.h"
 #include "AutoAimData.h"
+#include "WinchPawlData.h"
 
 using namespace data;
 using namespace drivetrain;
@@ -39,7 +40,20 @@ ComponentData::ComponentData()
   climberData(new ClimberData()),
   configLoaderData(new ConfigLoaderData()),
   ledIndicatorData(new LEDIndicatorData()),
-  autoAimData(new AutoAimData())
+  autoAimData(new AutoAimData()),
+  winchPawlData(new WinchPawlData())
 {
 	
+}
+
+ComponentData::~ComponentData()
+{
+	delete drivetrainData;
+	delete shooterData;
+	delete collectorData;
+	delete climberData;
+	delete configLoaderData;
+	delete ledIndicatorData;
+	delete autoAimData;
+	delete winchPawlData;
 }
