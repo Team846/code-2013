@@ -5,6 +5,8 @@
 #include "Networking\NetServer.h"
 #include "Networking\MessageType.h"
 
+#include "Stopwatch.h"
+
 int ThreadEntry(UINT32 code)
 {
 	while(true)
@@ -36,6 +38,9 @@ Robot::~Robot()
 	AsyncPrinter::Instance()->Abort();
 }
 
+#define TEST_NETWORKING 0
+#define TEST_STOPWATCH 1
+
 void Robot::StartCompetition()
 {
 	NetServer* server = new NetServer(1140);
@@ -52,41 +57,63 @@ void Robot::StartCompetition()
 
 	float totalTime = 0;
 
+	int test = TEST_NETWORKING;
+
 	int i = 0;
 	while(true)
 	{
 		printf("%d\n", i++);
-		DriverStationInput::NewData();
-
-		NetBuffer buff;
-
-		float value = fabs(sin((float)totalTime / 1000.0f));
-		value = -4.0f;
-
-		double valueD = 3.14159265;
-
-		//buff.Write((char)MessageType::FRONT_SHOOTER_DATA);
-		//buff.Write((float)totalTime / 1000.0f);
-		//buff.Write(value);
-
-		std::stringstream ss;
-
-		ss << i++;
-
-		buff.Write((UINT8)MessageType::BACK_SHOOTER_DATA_CURRENT);
-		buff.Write(1.0f);
-		buff.Write(1.0f);
-		buff.Write(true);
 		
-		server->SendToAll(&buff, NetChannel::NET_UNRELIABLE_SEQUENCED, 1);
+		switch(test)
+		{
+		case TEST_NETWORKING:
+			{
+			DriverStationInput::NewData();
 
-		printf("Sending value of %lf at time %f", valueD, (float)totalTime / 1000.0f); 
+			NetBuffer buff;
 
-		Sleep(100);
+			float value = fabs(sin((float)totalTime / 1000.0f));
+			double valueD = 3.14159265;
 
-		totalTime += 10;
+			//buff.Write((char)MessageType::FRONT_SHOOTER_DATA);
+			//buff.Write((float)totalTime / 1000.0f);
+			//buff.Write(value);
 
-		printf("\n");
+			std::stringstream ss;
+
+			ss << i++;
+
+			buff.Write((UINT8)MessageType::BACK_SHOOTER_DATA_CURRENT);
+			buff.Write(totalTime / 1000.0f);
+			buff.Write(value);
+		
+			server->SendToAll(&buff, NetChannel::NET_UNRELIABLE_SEQUENCED, 1);
+
+			printf("Sending value of %lf at time %f", valueD, (float)totalTime / 1000.0f); 
+
+			Sleep(10);
+
+			totalTime += 10;
+
+			printf("\n");
+			}
+		break;
+		case TEST_STOPWATCH:
+			{
+				Stopwatch s;
+				while(true)
+				{
+					s.Start();
+					Sleep(1000);
+					s.Stop();
+
+					Sleep(1000);
+
+					printf("Elapsed time: %f\n", s.TotalElapsedSeconds());
+				}
+			}
+			break;
+		}
 	}
 	
 }

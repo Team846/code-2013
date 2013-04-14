@@ -19,6 +19,8 @@ namespace Network
 		NetClient();
 		
 		void Connect(sockaddr_in ep);
+	private:
+		NetConnection* _server;
 	};
 };
 

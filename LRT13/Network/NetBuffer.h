@@ -34,7 +34,7 @@ namespace Network
 		/*!
 		 * @brief Initializes the NetBuffer with a buffer.
 		 */
-		NetBuffer(char* buff, int len);
+		NetBuffer(UINT8* buff, int len);
 		
 		/*!
 		 * @brief Releases the resources utilized by the NetBuffer.
@@ -44,15 +44,15 @@ namespace Network
 		/*!
 		 * @brief Writes a one-byte value to the buffer.
 		 */
-		void Write(char c);
+		void Write(UINT8 c);
 		/*!
 		 * @brief Writes a length-prefixed byte array to the buffer.
 		 */
-		void Write(char* c, UINT16 len);
+		void Write(UINT8* c, UINT16 len);
 		/*!
 		 * @brief Writes a byte array to the buffer.
 		 */
-		void WriteRaw(char* c, UINT16 len);
+		void WriteRaw(UINT8* c, UINT16 len);
 		/*!
 		 * @brief Wriets a length-prefixed string to the buffer.
 		 */
@@ -91,11 +91,11 @@ namespace Network
 		/*!
 		 * @brief Reads a one-byte value from the buffer and advances the internal pointer by 8 bits.
 		 */
-		char ReadChar();
+		UINT8 ReadChar();
 		/*!
 		 * @brief Reads a length-prefixed byte array from the buffer and advances the internal pointer.
 		 */
-		char* ReadBytes();
+		UINT8* ReadBytes();
 		/*!
 		 * @brief Reads a length-prefixed STL string from the buffer and advances the internal pointer.
 		 */
@@ -131,6 +131,8 @@ namespace Network
 		 */
 		void SkipPadBits();
 		
+		int GetBufferLength();
+
 		/*!
 		 * @brief Gets the position of the internal pointer in bytes.
 		 */
@@ -144,29 +146,29 @@ namespace Network
 		/*!
 		 * @brief Gets the internal buffer.
 		 */
-		char* GetBuffer();
+		UINT8* GetBuffer();
 		
 		//friend int NetPeer::Send(NetBuffer buff, NetChannel::Enum method, int channel);
 		
 		bool m_sent;
 	private:
-		void construct(char* buff, int size);
+		void construct(UINT8* buff, int size);
 
 		bool AssertBufferHasSpace(UINT32 bits);
 		
-		void InternalWriteByte(const char data, int bit_length);
-		void InternalWriteBytes(const char data[], int bytes);
+		void InternalWriteByte(const UINT8 data, int bit_length);
+		void InternalWriteBytes(const UINT8 data[], int bytes);
 		void InternalWriteInteger(const UINT64 data, int bits);
 		
-		char InternalReadByte(int bit_length);
-		char* InternalReadBytes(int length);
+		UINT8 InternalReadByte(int bit_length);
+		UINT8* InternalReadBytes(int length);
 		UINT64 InternalReadInteger(int bits);
 		
 		void FitBufferToSize(UINT32 bits);
 		
 		static const int kBufferResizeOverAllocateBytes; // TO-DO: make me configurable
 		
-		char * m_internalBuffer;
+		UINT8 * m_internalBuffer;
 		UINT32 m_internalBufferSize;
 		int m_internalBitPos;
 		

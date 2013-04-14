@@ -70,6 +70,7 @@
     <ClCompile Include="Networking\NetConnection.cpp" />
     <ClCompile Include="Networking\NetUtil.cpp" />
     <ClCompile Include="Process\AsyncProcess.cpp" />
+    <ClCompile Include="Stopwatch.cpp" />
     <ClCompile Include="Utils\AsyncPrinter.cpp" />
     <ClCompile Include="Networking\NetBuffer.cpp" />
     <ClCompile Include="Networking\NetClient.cpp" />
@@ -82,6 +83,7 @@
     <ClInclude Include="Networking\Includes.h" />
     <ClInclude Include="Networking\xplat_types.h" />
     <ClInclude Include="Process\AsyncProcess.h" />
+    <ClInclude Include="Stopwatch.h" />
     <ClInclude Include="Utils\AsyncPrinter.h" />
     <ClInclude Include="Networking\LibraryMessageType.h" />
     <ClInclude Include="Networking\MessageType.h" />

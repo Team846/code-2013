@@ -107,7 +107,7 @@ void NetPeer::Update()
 	
 	while((received = recvfrom(m_socket, rcv_buffer, MAX_RECEIVE_BUFFER_SIZE, 0, (sockaddr*)&from, &fromSize)) > 0)
 	{
-		NetBuffer* buff = new NetBuffer(rcv_buffer, received);
+		NetBuffer* buff = new NetBuffer((UINT8*)rcv_buffer, received);
 		
 		InternalMessageType c = (InternalMessageType)buff->ReadChar();
 		
@@ -209,7 +209,7 @@ void NetPeer::Update()
 				ack.Write(id);
 				
 				// TODO error handling in the future
-				sendto(m_socket, ack.GetBuffer(), ack.GetBytePos(), 0, (sockaddr*)&from, sizeof(from));
+				sendto(m_socket, (char*)ack.GetBuffer(), ack.GetBufferLength(), 0, (sockaddr*)&from, sizeof(from));
 
 				break;
 			}
@@ -596,9 +596,9 @@ int NetPeer::Send(NetBuffer* buff, NetConnection* to, NetChannel::Enum method, i
 	maack.recipient = to;
 	
 	NetBuffer* localBuff = new NetBuffer();
-	localBuff->Write((char)USER_DATA);
-	localBuff->Write((char)method);
-	localBuff->Write((char)channel);
+	localBuff->Write((UINT8)USER_DATA);
+	localBuff->Write((UINT8)method);
+	localBuff->Write((UINT8)channel);
 	
 	switch(method)
 	{
@@ -650,11 +650,18 @@ int NetPeer::Send(NetBuffer* buff, NetConnection* to, NetChannel::Enum method, i
 		break;
 	}
 
-	localBuff->WriteRaw(buff->GetBuffer(), buff->GetBytePos());
+	localBuff->WriteRaw(buff->GetBuffer(), buff->GetBufferLength());
 	
+	for(int i = 0; i < localBuff->GetBufferLength(); i++)
+	{
+		printf("%u ", localBuff->GetBuffer()[i]);
+	}
+
+	printf("\n");
+
 	buff->m_sent = true;
 	
-	int iResult = sendto(m_socket, localBuff->GetBuffer(), localBuff->GetBytePos(), 0, (sockaddr*)to->RemoteEndpoint(), sizeof(*(to->RemoteEndpoint())));
+	int iResult = sendto(m_socket, (char*)localBuff->GetBuffer(), localBuff->GetBufferLength(), 0, (sockaddr*)to->RemoteEndpoint(), sizeof(*(to->RemoteEndpoint())));
 	
 	return iResult;
 }
@@ -663,7 +670,7 @@ void NetPeer::SendRaw(NetBuffer* nb, NetConnection* nc)
 {
 	nb->m_sent = true;
 	
-	sendto(m_socket, nb->GetBuffer(), nb->GetBytePos(), 0, (sockaddr*)nc->RemoteEndpoint(), sizeof(*nc->RemoteEndpoint()));
+	sendto(m_socket, (char*)nb->GetBuffer(), nb->GetBufferLength(), 0, (sockaddr*)nc->RemoteEndpoint(), sizeof(*nc->RemoteEndpoint()));
 }
 
 NetBuffer* NetPeer::ReadMessage()
