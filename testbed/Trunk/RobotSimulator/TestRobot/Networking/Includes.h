@@ -8,4 +8,10 @@
 #else
 #endif
 
+#include "typedef.h"
+#include <stdio.h>
+#include <string.h>
+#include <string>
+#include <stdlib.h>
+
 #endif
