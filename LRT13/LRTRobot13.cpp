@@ -144,7 +144,7 @@ void LRTRobot13::Tick()
 	// Update LogManager
 	LogManager::Instance()->RunOneCycle();
 	
-	// Update SmarterDashboard
+	// Update SmarterDashboard -- this should be the last thing!
 	SmarterDashboard::Instance()->Tick();
 	
 	wdCancel(_watchdog);

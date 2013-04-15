@@ -10,6 +10,7 @@
 #include "../Config/DriverStationConfig.h"
 #include "../Utils/AsyncPrinter.h"
 #include "../Utils/Stopwatch.h"
+#include "../Utils/SmarterDashboard.h"
 #include "../Config/ConfigManager.h"
 #include "../Config/Configurable.h"
 #include "Component.h"

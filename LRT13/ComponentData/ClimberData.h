@@ -13,20 +13,41 @@ namespace climber
 {
 typedef enum state
 	{
-		IDLE = 1,
-		ARM_UP_INITIAL = 2,
-		WAIT = 3,
+		INACTIVE = 0,
+		BEGIN = 1,
+		LINE_UP = 2,
+		ARM_DOWN_PREPARE = 3,
 		ARM_DOWN = 4,
-		ENGAGE_PTO = 5,
-		WINCH_UP = 6,
-		ENGAGE_HOOKS = 7,
-		DISENGAGE_PTO = 8,
-		ARM_UP_FINAL = 9,
-		DUMB_ENGAGE_PTO = 10,
-		UNLOCK_PAWL = 11,
-		PREPARE_CLIMBING_POSITION = 12,
-		DO_NOTHING= 13
+		CLIMB_PREPARE = 5,
+		CLIMB = 6,
+		RETRACT_HOOKS_BEFORE_CLIMB = 7,
+		ADJUST_SHOOTER_ANGLE = 8,
+		EXTEND_HOOKS = 9,
+		CLIMBED = 10,
+		UNLOCK_WINCH_PAWL = 11
+		
+//		IDLE = 1,
+//		ARM_UP_INITIAL = 2,
+//		WAIT = 3,
+//		ARM_DOWN = 4,
+//		ENGAGE_PTO = 5,
+//		WINCH_UP = 6,
+//		ENGAGE_HOOKS = 7,
+//		DISENGAGE_PTO = 8,
+//		ARM_UP_FINAL = 9,
+//		DUMB_ENGAGE_PTO = 10,
+//		UNLOCK_PAWL = 11,
+//		PREPARE_CLIMBING_POSITION = 12,
+//		DO_NOTHING= 13
 	};
+
+typedef enum ClimbState
+{
+	GROUND = 0,
+	TEN_POINT = 1,
+	TWENTY_POINT = 2,
+	THIRTY_POINT = 3
+};
 
 typedef enum humanState
 {

@@ -14,7 +14,7 @@ namespace data
 			
 			void setDutyCyle(float f);
 			float getDutyCycle();
-			
+
 			void updateMotorCurrent(double d); // this should ONLY be used by the winch pawl component
 			double getMotorCurrent();
 			

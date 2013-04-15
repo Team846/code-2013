@@ -35,6 +35,11 @@ void SmarterDashboard::Close()
 SmarterDashboard::SmarterDashboard()
 {
 	m_queueSem = semBCreate(SEM_Q_PRIORITY, SEM_FULL);
+
+	m_telemetryTypeNames[0] = "Climber State";
+	m_telemetryTypeNames[1] = "Winch Pawl Current";
+	m_telemetryTypeNames[2] = "Winch Pawl Duty Cycle";
+	m_telemetryTypeNames[3] = "Winch Pawl Status";
 	
 	m_server = new NetServer(1140);
 	m_server->Open();
@@ -58,6 +63,12 @@ void SmarterDashboard::Tick()
 	
 	// perhaps later, we may want to send some heartbeats or packets of the sort
 	Flush();
+	
+	// clear out the telemetry
+	for(int i = TelemetryType::BEGIN; i < TelemetryType::END; i++)
+	{
+		m_telemetryData[i] = "???";
+	}
 }
 
 void SmarterDashboard::Flush()
@@ -76,6 +87,14 @@ void SmarterDashboard::Flush()
 			AsyncPrinter::Printf("Sending message...\n");
 		}
 	} // m_queueSem
+}
+
+template<class T> void SmarterDashboard::SetTelemetryData(TelemetryType::Enum type, T data)
+{
+	stringstream ss;
+	ss << std::boolalpha << data;
+	
+	m_telemetryData[type] = ss.str();
 }
 
 void SmarterDashboard::EnqueueMessage(NetBuffer* buff, NetChannel::Enum method, int channel)

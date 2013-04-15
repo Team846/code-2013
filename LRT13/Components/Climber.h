@@ -3,7 +3,10 @@
 
 #include <string>
 
+#include "../ComponentData/ShooterData.h"
 #include "../ComponentData/RobotData.h"
+#include "../ComponentData/WinchPawlData.h"
+#include "../ComponentData/ClimberData.h"
 #include "../Config/Configurable.h"
 #include "../Log/Loggable.h"
 #include "../Utils/PID.h"
@@ -40,11 +43,15 @@ public:
 	virtual void Configure();
 	virtual void Log();
 private:
+	void disengagePTO();
+	void engagePTO();
+	
+	bool m_ptoEngaged;
+	
 	string m_configSection;
 	
 	Pneumatics* m_pneumatics;
-	
-	AsyncCANJaguar m_winch_worm;
+
 	double m_winch_current_threshold;
 	double m_winch_engage_duty_cycle;
 	int m_timer;
@@ -69,8 +76,16 @@ private:
 	int m_climbing_level;
 	data::climber::state m_previous_state;
 	bool m_paused;
+	double m_driveSpeed;
+	
+	const static int m_winchPawlDownDirection = -1;
+	const static int m_winchPawlUpDirection = 1;
 	
 	data::climber::state m_state;
+	
+	data::shooter::ShooterData* m_shooterData;
+	data::climber::WinchPawlData* m_winchPawl;
+	data::climber::ClimberData* m_climberData;
 };
 
 #endif

@@ -43,7 +43,13 @@ void WinchPawl::enabledPeriodic()
 	float out = m_timedOut ? 0.0 : requestedDutyCycle;
 	m_jaguar.SetDutyCycle(out);
 	
-	m_winchPawlData->updateMotorCurrent(m_jaguar.GetOutputCurrent());
+	double current = m_jaguar.GetOutputCurrent();
+	
+	m_winchPawlData->updateMotorCurrent(current);
+	
+	SmarterDashboard::Instance()->SetTelemetryData<double>(TelemetryType::CLIMBER_WINCH_PAWL_CURRENT, current);
+	SmarterDashboard::Instance()->SetTelemetryData<float>(TelemetryType::CLIMBER_WINCH_PAWL_OUTPUT_DUTY_CYCLE, out);
+	SmarterDashboard::Instance()->SetTelemetryData<string>(TelemetryType::CLIMBER_WINCH_PAWL_TIMED_OUT, m_timedOut ? "TIMED_OUT" : "OK");
 	
 	m_lastRequestedDutyCycle = requestedDutyCycle; // keep track of the last requested duty cycle
 }

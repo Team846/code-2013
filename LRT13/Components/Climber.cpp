@@ -1,9 +1,7 @@
 #include "Climber.h"
-#include "../ComponentData/ClimberData.h"
 #include "../ComponentData/LEDIndicatorData.h"
 #include "../Config/ConfigManager.h"
 #include "../Config/RobotConfig.h"
-#include "../ComponentData/ShooterData.h"
 #include "../Config/DriverStationConfig.h"
 
 using namespace data::climber;
@@ -13,7 +11,6 @@ using namespace drivetrain;
 
 Climber::Climber() :
 	Component("Climber", DriverStationConfig::DigitalIns::CLIMBER, true), m_configSection("Climber"),
-			m_winch_worm(RobotConfig::CAN::WINCH_WORM, "WinchWorm"),
 			m_digital_input_left(RobotConfig::Digital::PTO_SWITCH_LEFT),
 			m_digital_input_right(RobotConfig::Digital::PTO_SWITCH_RIGHT),
 			m_servo_left(RobotConfig::Servo::LEFT_PTO_SERVO, "leftServo"),
@@ -22,13 +19,20 @@ Climber::Climber() :
 {
 	m_climbing_level = 0;
 	m_pneumatics = Pneumatics::Instance();
-	m_state = IDLE;
+	m_state = INACTIVE;
 	m_driving_encoders = DriveEncoders::GetInstance();
 	m_climbing_level = 0;
 	m_paused = false;
-	m_previous_state = IDLE;
+	m_previous_state = INACTIVE;
 	m_winch_gear_tooth.Start();
-	m_winch_worm.setCollectionFlags(AsyncCANJaguar::OUTCURR);
+	
+	m_winchPawl = m_componentData->winchPawlData;
+	m_climberData = m_componentData->climberData;
+	m_shooterData = m_componentData->shooterData;
+	
+	m_driveSpeed = 0.0;
+	
+	m_ptoEngaged = false;
 }
 
 Climber::~Climber()
@@ -56,27 +60,29 @@ void Climber::onDisable()
 
 void Climber::enabledPeriodic()
 {
-	double curr = m_winch_worm.GetOutputCurrent();
+	double curr;
 	
 	m_componentData->climberData->setWinchPawlCurrent(curr);
 	
 	m_componentData->ledIndicatorData->setColorRGB(255,0,0);
 	
 	m_paused = false; //we pause
-	if (m_state != IDLE && m_componentData->climberData->shouldPotentiallyAbort())
+
+	if (m_state != INACTIVE && m_componentData->climberData->shouldPotentiallyAbort())
 	{
-		m_state = IDLE;
+		m_state = INACTIVE;
 		m_componentData->drivetrainData->setOpenLoopOutput(FORWARD, 0.0);
 		m_componentData->drivetrainData->setOpenLoopOutput(TURN, 0.0);
 		m_componentData->drivetrainData->setVelocitySetpoint(FORWARD, 0.0);
 		m_componentData->drivetrainData->setVelocitySetpoint(TURN, 0.0);
 		
-		m_servo_left.SetMicroseconds(m_servo_left_disengaged_position);
-		m_servo_right.SetMicroseconds(m_servo_right_disengaged_position);
+		disengagePTO();
 		
-		m_winch_worm.SetDutyCycle(0.0);
+		m_winchPawl->setDutyCyle(0.0f);
+		
 		m_paused = false;
 	}
+	
 	static bool wasDebugging = false;
 	if (m_componentData->climberData->shouldDebug())
 	{
@@ -92,32 +98,30 @@ void Climber::enabledPeriodic()
 		if (m_componentData->climberData->shouldWinchPawlGoDown())
 		{
 			AsyncPrinter::Printf("geartooth %d\n", m_winch_gear_tooth.Get());
-			m_winch_worm.SetDutyCycle(0.4);
+			m_winchPawl->setDutyCyle(0.4);
 		}
 		else if (m_componentData->climberData->shouldWinchPawlGoUp())
 		{
 			AsyncPrinter::Printf("geartooth %d\n", m_winch_gear_tooth.Get());
-			m_winch_worm.SetDutyCycle(-0.4);
+			m_winchPawl->setDutyCyle(-0.4);
 		}
 		else
 		{
 //			AsyncPrinter::Printf("You failed a tlife!\n");
-			m_winch_worm.SetDutyCycle(0.0);
+			m_winchPawl->setDutyCyle(0.0);
 		}
 		
 		if (m_componentData->climberData->shouldPTOChangeDisengage())
 		{
-			m_servo_left.SetMicroseconds(m_servo_left_disengaged_position);
-			m_servo_right.SetMicroseconds(m_servo_right_disengaged_position);
+			disengagePTO();
 		}
 		else if (m_componentData->climberData->shouldPTOChangeEngage())
 		{
-			m_servo_left.SetMicroseconds(m_servo_left_engaged_position);
-			m_servo_right.SetMicroseconds(m_servo_right_engaged_position);
+			engagePTO();
 		}
 		
-		m_pneumatics->setHookPosition(m_componentData->climberData->shouldExtendHooks(), true);
-		m_pneumatics->setClimberArm(m_componentData->climberData->shouldExtendArm(), true);
+		m_pneumatics->setHookPosition(m_componentData->climberData->shouldExtendHooks());
+		m_pneumatics->setClimberArm(m_componentData->climberData->shouldExtendArm());
 //		AsyncPrinter::Printf("Still alive %d\n", GetFPGATime());
 		return;
 	}
@@ -129,62 +133,62 @@ void Climber::enabledPeriodic()
 	m_servo_right.SetEnabled(true);
 	//start at 24
 	//mid at 42, max at
-	if (e % 10 == 0)
-	{
-		string str = "no_state";
-	switch(m_state)
-	{
-	case IDLE:
-		AsyncPrinter::Printf("Idle\n");
-		str = "idle";
-		break;
-	case ARM_UP_INITIAL:
-		AsyncPrinter::Printf("Arm up\n");
-		str = "arm up";
-		break;
-	case WAIT:
-		AsyncPrinter::Printf("Wait\n");
-		str = "wait";
-		break;
-	case ARM_DOWN:
-		AsyncPrinter::Printf("Arm Down\n");
-		str = "arm down";
-		break;
-	case DUMB_ENGAGE_PTO:
-		AsyncPrinter::Printf("Dumb Engage PTO\n");
-		str = "dumb engage pto";
-		break;
-	case ENGAGE_PTO:
-		AsyncPrinter::Printf("Engage PTO\n");
-		AsyncPrinter::Printf("Left %d, rigt %d\n", m_digital_input_left.Get(), m_digital_input_right.Get());
-		str = "engage pto";
-		break;
-	case WINCH_UP:
-		AsyncPrinter::Printf("WINCH_UP\n");
-		str = "winch up";
-		break;
-	case ENGAGE_HOOKS:
-		AsyncPrinter::Printf("ENGAGE HOOKS\n");
-		str = "engage hooks";
-		break;
-	case DISENGAGE_PTO:
-		m_state = ARM_UP_FINAL;
-		str = "disengage pto";
-		break;
-	case ARM_UP_FINAL:
-		AsyncPrinter::Printf("ARM_UP_FINAl\n");
-		m_state = WAIT;
-		str = "arm up final";
-		break;
-	}
-	
-	NetBuffer buff;
-	
-	buff.Write((char)MessageType::ROBOT_TELEMETRY);
-	buff.Write(str);
-	
-	SmarterDashboard::Instance()->EnqueueMessage(&buff, NetChannel::NET_RELIABLE, 2);
-	}
+//	if (e % 10 == 0)
+//	{
+//		string str = "no_state";
+//	switch(m_state)
+//	{
+//	case IDLE:
+//		AsyncPrinter::Printf("Idle\n");
+//		str = "idle";
+//		break;
+//	case ARM_UP_INITIAL:
+//		AsyncPrinter::Printf("Arm up\n");
+//		str = "arm up";
+//		break;
+//	case WAIT:
+//		AsyncPrinter::Printf("Wait\n");
+//		str = "wait";
+//		break;
+//	case ARM_DOWN:
+//		AsyncPrinter::Printf("Arm Down\n");
+//		str = "arm down";
+//		break;
+//	case DUMB_ENGAGE_PTO:
+//		AsyncPrinter::Printf("Dumb Engage PTO\n");
+//		str = "dumb engage pto";
+//		break;
+//	case ENGAGE_PTO:
+//		AsyncPrinter::Printf("Engage PTO\n");
+//		AsyncPrinter::Printf("Left %d, rigt %d\n", m_digital_input_left.Get(), m_digital_input_right.Get());
+//		str = "engage pto";
+//		break;
+//	case WINCH_UP:
+//		AsyncPrinter::Printf("WINCH_UP\n");
+//		str = "winch up";
+//		break;
+//	case ENGAGE_HOOKS:
+//		AsyncPrinter::Printf("ENGAGE HOOKS\n");
+//		str = "engage hooks";
+//		break;
+//	case DISENGAGE_PTO:
+//		m_state = ARM_UP_FINAL;
+//		str = "disengage pto";
+//		break;
+//	case ARM_UP_FINAL:
+//		AsyncPrinter::Printf("ARM_UP_FINAl\n");
+//		m_state = WAIT;
+//		str = "arm up final";
+//		break;
+//	}
+//	
+//	NetBuffer buff;
+//	
+//	buff.Write((char)MessageType::ROBOT_TELEMETRY);
+//	buff.Write(str);
+//	
+//	SmarterDashboard::Instance()->EnqueueMessage(&buff, NetChannel::NET_RELIABLE, 2);
+//	}
 	
 	if (m_paused)
 	{
@@ -199,16 +203,181 @@ void Climber::enabledPeriodic()
 			return;
 	}
 	
-	static bool engaged = false;
-	static double driveSpeed = 0.0;
+	string m_stateString = "???";
 	
+	switch(m_state)
+	{
+	case INACTIVE:
+		m_stateString = "INACTIVE";
+		
+		disengagePTO();
+		
+		if(m_climbing_level == GROUND)
+		{
+			m_pneumatics->setHookPosition(RETRACTED);
+			m_pneumatics->setClimberArm(RETRACTED);
+		}
+		
+		m_winchPawl->setDutyCyle(0.0F);
+		
+		if(m_climberData->shouldContinueClimbing())
+			m_state = BEGIN;
+		
+		break;
+	case BEGIN:
+		m_stateString = "BEGIN";
+		
+		m_pneumatics->setClimberArm(EXTENDED);
+
+		if(m_climbing_level > GROUND)
+			m_shooterData->SetLauncherAngleHigh();
+		else
+			m_shooterData->SetLauncherAngleLow();
+		
+		if(m_climberData->shouldContinueClimbing())
+			m_state = LINE_UP;
+		break;
+	case LINE_UP:
+		m_stateString = "LINE_UP";
+		
+		// let the operator / autoclimb do its job!
+		
+		if(m_climberData->shouldContinueClimbing())
+			m_state = ARM_DOWN_PREPARE;
+		
+		break;
+	case ARM_DOWN_PREPARE:
+		m_stateString = "ARM_DOWN_PREPARE";
+		
+		m_timer = 10;
+		m_state = ARM_DOWN;
+		break;
+	case ARM_DOWN:
+		m_stateString = "ARM_DOWN";
+		
+		// m_timer is set to 10 in ARM_DOWN_PREPARE
+		
+		m_winchPawl->setDutyCyle(1.0f * m_winchPawlDownDirection);
+		
+		curr = m_winchPawl->getMotorCurrent();
+		
+		if(curr > m_winch_current_threshold)
+			--m_timer;
+		
+		if(m_timer <= 0)
+		{
+			if (m_climbing_level < 1)
+				m_winchPawl->setDutyCyle(m_winch_engage_duty_cycle * m_winchPawlDownDirection);
+			else
+				m_winchPawl->setDutyCyle(0.0);
+			
+			if(m_climberData->shouldContinueClimbing())
+				m_state = CLIMB_PREPARE;
+		}
+		break;
+	case CLIMB_PREPARE:
+		m_stateString = "CLIMB_PREPARE";
+		
+		engagePTO();
+		
+		m_drive_train_position = m_winch_gear_tooth.Get();
+		
+		m_driveSpeed = 0.0;
+
+		m_state = CLIMB;
+		
+		break;
+	case CLIMB:
+		m_stateString = "CLIMB";
+		
+		// m_driveSpeed is set to 0.0 in CLIMB_PREPARE
+		
+		m_winchPawl->setDutyCyle(1.0F * m_winchPawlDownDirection);
+		
+		if (fabs(m_driveSpeed) < 0.99)
+		{
+			m_driveSpeed += -0.05 * m_winchPawlDownDirection;
+		}
+		
+		m_componentData->drivetrainData->setControlMode(FORWARD, OPEN_LOOP);
+		m_componentData->drivetrainData->setControlMode(TURN, OPEN_LOOP);
+		m_componentData->drivetrainData->setOpenLoopOutput(FORWARD, m_driveSpeed);
+		m_componentData->drivetrainData->setOpenLoopOutput(TURN, 0.0);
+		
+		if (m_winch_gear_tooth.Get() - m_drive_train_position > 39)//Should be about 42
+		{
+			m_winchPawl->setDutyCyle(0.0); // all right, paul, you can take a breather now
+			
+			// stop the drivetrain now
+			m_componentData->drivetrainData->setControlMode(FORWARD, OPEN_LOOP);
+			m_componentData->drivetrainData->setControlMode(TURN, OPEN_LOOP);
+			m_componentData->drivetrainData->setOpenLoopOutput(FORWARD, 0.0);
+			m_componentData->drivetrainData->setOpenLoopOutput(TURN, 0.0);
+			
+			if(m_climberData->shouldContinueClimbing())
+				m_state = RETRACT_HOOKS_BEFORE_CLIMB;
+		}
+		break;
+	case RETRACT_HOOKS_BEFORE_CLIMB:
+		m_stateString = "RETRACT_HOOKS_BEFORE_CLIMB";
+		
+		m_pneumatics->setHookPosition(RETRACTED);
+		
+		m_state = ADJUST_SHOOTER_ANGLE;
+		
+		if(m_climberData->shouldContinueClimbing())
+			m_state = ADJUST_SHOOTER_ANGLE;
+		
+		break;
+	case ADJUST_SHOOTER_ANGLE:
+		m_stateString = "ADJUST_SHOOTER_ANGLE";
+		
+		m_winchPawl->setDutyCyle(0.0F);
+		
+		m_shooterData->SetLauncherAngleLow();
+		
+		if(m_climberData->shouldContinueClimbing())
+			m_state = EXTEND_HOOKS;
+		
+		break;
+	case EXTEND_HOOKS:
+		m_stateString = "EXTEND_HOOKS";
+		
+		m_pneumatics->setHookPosition(EXTENDED);
+		
+		if(m_climberData->shouldContinueClimbing())
+		{
+			m_climbing_level++;
+			
+			m_state = UNLOCK_WINCH_PAWL;
+		}
+		break;
+	case CLIMBED:
+		m_stateString = "CLIMBED";
+		
+		m_climbing_level++;
+		
+		m_state = UNLOCK_WINCH_PAWL;
+		break;
+	case UNLOCK_WINCH_PAWL:
+		m_stateString = "UNLOCK_WINCH_PAWL";
+		
+		if(m_climberData->shouldContinueClimbing())
+			m_state = INACTIVE;
+		
+		break;
+	}
+	
+	SmarterDashboard::Instance()->SetTelemetryData<string>(TelemetryType::CLIMBER_STATE, m_stateString);
+	
+	/*
 	switch (m_state)
 	{
 	case IDLE:
 		m_pneumatics->setHookPosition(false);
 		m_climbing_level  = 0;                       
 		m_pneumatics->setClimberArm(RETRACTED, true);
-		m_winch_worm.SetDutyCycle(0.0);
+		m_winchPawl->setDutyCyle(0.0);
 		if (m_componentData->climberData->getDesiredClimbingStep() == INTENDED_ARM_UP)
 		{
 			m_state = ARM_UP_INITIAL;
@@ -248,17 +417,17 @@ void Climber::enabledPeriodic()
 		
 		m_pneumatics->setClimberArm(EXTENDED);
 		m_componentData->shooterData->SetLauncherAngleLow();
-		m_winch_worm.SetDutyCycle(-1.0 * DIRECTION);
-		curr = m_winch_worm.GetOutputCurrent() ;
+		m_winchPawl->setDutyCyle(-1.0 * DIRECTION);
+		curr = m_winchPawl->getMotorCurrent();
 		if (curr > m_winch_current_threshold)
 		{
 			m_timer--;
 			if (m_timer < 0)
 			{
 				if (m_climbing_level < 1)
-					m_winch_worm.SetDutyCycle(-m_winch_engage_duty_cycle * DIRECTION);
+					m_winchPawl->setDutyCyle(-m_winch_engage_duty_cycle * DIRECTION);
 				else
-					m_winch_worm.SetDutyCycle(0.0);
+					m_winchPawl->setDutyCyle(0.0);
 				m_state = ENGAGE_PTO;
 				m_hasStartedEngaging = false;
 				m_timer = 25;
@@ -347,13 +516,13 @@ void Climber::enabledPeriodic()
 		}
 		else
 		{
-			m_winch_worm.SetDutyCycle(1.0 * DIRECTION);
+			m_winchPawl->setDutyCyle(1.0 * DIRECTION);
 		}
 		break;
 	case WINCH_UP:
 //		m_pneumatics->setClimberArm(RETRACTED);
 //		m_componentData->shooterData->SetLauncherAngleLow();
-		m_winch_worm.SetDutyCycle(-1.0 * DIRECTION);
+		m_winchPawl->setDutyCyle(-1.0 * DIRECTION);
 		//30:1 on worm, 4:1, 19k rpm, 158.33333333333333333333333333333 max
 		//11:1, 14-54, 5400/ 42.428571428571428571428571428571  = 130
 		if (m_climbing_level < 1 && false)
@@ -382,7 +551,7 @@ void Climber::enabledPeriodic()
 		}
 		else if (m_winch_gear_tooth.Get() - m_drive_train_position > 39)//SHould be about 42
 		{
-			m_winch_worm.SetDutyCycle(0.0);
+			m_winchPawl->setDutyCyle(0.0);
 			m_state = IDLE;
 			m_timer = 0;
 //			m_state = ENGAGE_HOOKS;
@@ -441,7 +610,7 @@ void Climber::enabledPeriodic()
 		break;
 	case ARM_UP_FINAL:
 		m_pneumatics->setClimberArm(true);
-		m_winch_worm.SetDutyCycle(-1.0 * DIRECTION);
+		m_winchPawl->setDutyCyle(-1.0 * DIRECTION);
 		
 		m_componentData->drivetrainData->setControlMode(FORWARD, OPEN_LOOP);
 		m_componentData->drivetrainData->setControlMode(TURN, OPEN_LOOP);
@@ -451,7 +620,7 @@ void Climber::enabledPeriodic()
 		
 		if (m_winch_gear_tooth.Get() - m_gear_tooth_ticks_position > 80)
 		{
-			m_winch_worm.SetDutyCycle(0.0);
+			m_winchPawl->setDutyCyle(0.0);
 			m_componentData->drivetrainData->setControlMode(FORWARD, OPEN_LOOP);
 			m_componentData->drivetrainData->setControlMode(TURN, OPEN_LOOP);
 			m_componentData->drivetrainData->setOpenLoopOutput(FORWARD, 0.0);
@@ -503,18 +672,41 @@ void Climber::enabledPeriodic()
 			break;
 		}
 	}
+	*/
 
 	m_previous_state = m_state;
+}
+
+void Climber::disengagePTO()
+{
+	if(!m_ptoEngaged)
+		return;
+	
+	m_servo_left.SetEnabled(true);
+	m_servo_right.SetEnabled(true);
+	m_servo_left.SetMicroseconds(m_servo_left_disengaged_position);
+	m_servo_right.SetMicroseconds(m_servo_right_disengaged_position);
+}
+
+void Climber::engagePTO()
+{
+	if(m_ptoEngaged)
+		return;
+	
+	m_servo_left.SetEnabled(true);
+	m_servo_right.SetEnabled(true);
+	m_servo_left.SetMicroseconds(m_servo_left_engaged_position);
+	m_servo_right.SetMicroseconds(m_servo_right_engaged_position);
 }
 
 void Climber::disabledPeriodic()
 {
 	m_componentData->climberData->setWinchPawlCurrent(0.0);
 	
-	m_winch_worm.SetDutyCycle(0.0f);
+	m_winchPawl->setDutyCyle(0.0f);
 	
 	m_componentData->climberData->setDesiredClimbingStep(INTENDED_IDLE );
-	m_state = IDLE;//Restart the routine, makes debugging easier.
+	m_state = INACTIVE;//Restart the routine, makes debugging easier.
 	static int e = 0;
 	e++;
 //	if (e % 10 == 0)
