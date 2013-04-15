@@ -69,8 +69,8 @@ void LRTRobot13::RobotInit()
 	AsyncPrinter::Println("Starting SmarterDashboard service...");
 	SmarterDashboard::Start();
 	
-	AsyncPrinter::Println("Creating the IMU...");
-	IMU::Instance()->Start();
+	//AsyncPrinter::Println("Creating the IMU...");
+	//IMU::Instance()->Start();
 	
 	leds.Start();
 	

@@ -119,7 +119,7 @@ void SmarterDashboard::EnqueueShooterMessage(MessageType::Enum header, float tim
 {
 	NetBuffer buff;
 	
-	buff.Write((char)header);
+	buff.Write((UINT8)header);
 	buff.Write(time);
 	buff.Write(value);
 	

@@ -21,7 +21,8 @@ NetBuffer::NetBuffer(UINT8* buff, int len)
 
 NetBuffer::~NetBuffer()
 {
-	DELETE_ARR(m_internalBuffer);
+	delete[] m_internalBuffer;
+	m_internalBuffer = NULL;
 }
 
 void NetBuffer::construct(UINT8* buff, int size)

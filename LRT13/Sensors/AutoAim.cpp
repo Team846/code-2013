@@ -62,7 +62,7 @@ INT32 AutoAim::Tick()
 		
 		NetBuffer buff;
 					
-		buff.Write((char)MessageType::AUTO_AIM_DATA);
+		buff.Write((UINT8)MessageType::AUTO_AIM_DATA);
 		buff.Write(strength);
 		buff.Write(true);
 		
