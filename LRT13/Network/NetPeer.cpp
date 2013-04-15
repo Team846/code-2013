@@ -311,7 +311,7 @@ void NetPeer::CheckMessages()
 		{
 			maack = it->second;
 
-			now = clock() / (double)CLOCKS_PER_SEC;
+			now = TIME_IN_SECONDS();
 			
 			if(maack.initialized && !maack.acknowledged && (now - maack.sentTime) > kResendPacketTime)
 			{
@@ -327,7 +327,7 @@ void NetPeer::CheckMessages()
 		{
 			maack = it->second;
 
-			now = clock() / (double)CLOCKS_PER_SEC;
+			now = TIME_IN_SECONDS();
 
 			if(maack.initialized && !maack.acknowledged && (now - maack.sentTime) > kResendPacketTime)
 			{
@@ -343,7 +343,7 @@ void NetPeer::CheckMessages()
 		{
 			maack = it->second;
 
-			now = clock() / (double)CLOCKS_PER_SEC;
+			now = TIME_IN_SECONDS();
 			
 			if(maack.initialized && !maack.acknowledged && (now - maack.sentTime) > kResendPacketTime)
 			{
@@ -353,16 +353,6 @@ void NetPeer::CheckMessages()
 			}
 		}
 		InternalPlatformReliableInOrderQueueSynchronizationLeave();
-	}
-
-	if(_connectionRequested && !_connected)
-	{
-		if((clock() / (double)CLOCKS_PER_SEC - _connectionRequestTime) > 1.00)
-		{
-			// TODO retry connect
-			
-			_connectionRequestTime = clock() / (double)CLOCKS_PER_SEC;
-		}
 	}
 }
 
@@ -632,11 +622,7 @@ int NetPeer::Send(NetBuffer* buff, NetConnection* to, NetChannel::Enum method, i
 	
 	maack.initialized = true;
 	maack.buff = buff;
-#ifdef __VXWORKS__
-	maack.sentTime = Timer::GetFPGATimestamp();
-#else
-	maack.sentTime = clock() / (double) CLOCKS_PER_SEC;
-#endif
+	maack.sentTime = TIME_IN_SECONDS();
 	maack.acknowledged = false;
 	maack.recipient = to;
 	

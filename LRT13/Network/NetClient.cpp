@@ -13,11 +13,7 @@ void NetClient::Connect(sockaddr_in ep)
 	if(_connectionRequested)
 		return;
 	
-#ifdef __VXWORKS__
-	_connectionRequestTime = Timer::GetFPGATimestamp();
-#else
-	_connectionRequestTime = clock() / (double) CLOCKS_PER_SEC;
-#endif
+	_connectionRequestTime = TIME_IN_SECONDS();
 	_connectionRequested = true;
 	
 	_server = new NetConnection(ep, this);
@@ -28,4 +24,26 @@ void NetClient::Connect(sockaddr_in ep)
 	netBuffer.Write((char)LibraryMessageType::CONNECTION_REQUEST);
 	
 	SendRaw(&netBuffer, _server);
+}
+
+void NetClient::CheckMessages()
+{
+	NetPeer::CheckMessages();
+	
+	if(_connectionRequested && !_connected)
+	{
+		double timeNow = TIME_IN_SECONDS();
+		
+		if((timeNow - _connectionRequestTime) > 1.00)
+		{
+			NetBuffer netBuffer;
+				
+			netBuffer.Write((char)LIBRARY_DATA);
+			netBuffer.Write((char)LibraryMessageType::CONNECTION_REQUEST);
+			
+			SendRaw(&netBuffer, _server);
+			
+			_connectionRequestTime = timeNow;
+		}
+	}
 }

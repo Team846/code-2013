@@ -38,20 +38,22 @@ typedef int8_t		INT8;
 #define INT16_DEF_
 typedef int16_t		INT16;
 #endif
-// Fix issues with libjpeg
+
+// sketchy workaround for libjpeg
+#define XMD_H
 #ifndef INT32_DEF_
 #define INT32_DEF_
-typedef long int		INT32;
+typedef int32_t		INT32;
 #endif
 // Fix issues with libjpeg
 #ifndef INT64_DEF_
 #define INT64_DEF_
-typedef long		INT64;
+typedef int64_t		INT64;
 #endif
 
 #ifndef ULONG_DEF_
 #define ULONG_DEF_
-typedef unsigned long	ULONG;
+typedef uint64_t	ULONG;
 #endif
 
 typedef int			STATUS;

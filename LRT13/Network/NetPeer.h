@@ -110,9 +110,9 @@ namespace Network
 		NetBuffer* ReadMessage();
 	protected:
 		void SendRaw(NetBuffer* nb, NetConnection* nc);
+		virtual void CheckMessages();
 		
-		double _connectionRequestTime;
-		bool _connectionRequested;
+		bool _connected;
 		
 		vector<NetConnection*> m_netConnections;
 		void InternalPlatformConnectionListSynchronizationEnter();
@@ -132,7 +132,6 @@ namespace Network
 		void InternalPlatformQueueSynchronizationCreate();
 		void InternalPlatformQueueSynchronizationEnter();
 		void Update();
-		void CheckMessages();
 		void InternalPlatformQueueSynchronizationLeave();
 	
 		void InternalPlatformConnectionListSynchronizationCreate();
@@ -158,8 +157,6 @@ namespace Network
 		
 		char* m_ip;
 		int m_port;
-		
-		bool _connected;
 		
 #ifdef __VXWORKS__
 		SEM_ID m_msgQueueMutex;
