@@ -1,7 +1,8 @@
 #include "LEDIndicators.h"
+#include "../Config/RobotConfig.h"
 
 LEDIndicators::LEDIndicators() :
-	AsyncProcess("LED Indicators"), m_clockOut(8), m_dataOut(13)
+	AsyncProcess("LED Indicators"), m_clockOut(RobotConfig::Digital::LED_CLOCK_OUT), m_dataOut(RobotConfig::Digital::LED_DATA_OUT)
 {
 	numLEDs = 16;
 
@@ -15,8 +16,8 @@ LEDIndicators::~LEDIndicators()
 INT32 LEDIndicators::Tick()
 {
 	//	AsyncPrinter::Printf("Alive\n");
-	int g = ComponentData::GetInstance()->ledIndicatorData->getColorG();
 	int r = ComponentData::GetInstance()->ledIndicatorData->getColorR();
+	int g = ComponentData::GetInstance()->ledIndicatorData->getColorG();
 	int b = ComponentData::GetInstance()->ledIndicatorData->getColorB();
 
 	uint16_t i;
@@ -27,9 +28,9 @@ INT32 LEDIndicators::Tick()
 	// write 24 bits per pixel
 	for (i = 0; i < numLEDs; i++)
 	{
-		write8(g); //chinese led strips like to 
-		write8(r); //use grb instead of rgb for
-		write8(b); //some reason >_>
+		write8(r | 0x80);
+		write8(g | 0x80);
+		write8(b | 0x80);
 	}
 
 	// to 'latch' the data, we send just zeros
@@ -43,12 +44,14 @@ void LEDIndicators::write8(uint8_t d)
 {
 	for (uint8_t i = 0; i < 8; i++)
 	{
-		if (d & 1 << (7 - i))
+		if (d & (1 << (7 - i)))
 			m_dataOut.Set(1);
 		else
 			m_dataOut.Set(0);
 		m_clockOut.Set(1);
+		taskDelay(sysClkRateGet() / 1000);
 		m_clockOut.Set(0);
+		taskDelay(sysClkRateGet() / 1000);
 	}
 }
 
@@ -59,6 +62,8 @@ void LEDIndicators::writezeros(uint16_t n)
 	for (uint16_t i = 0; i < 8 * n; i++)
 	{
 		m_clockOut.Set(1);
+		taskDelay(sysClkRateGet() / 1000);
 		m_clockOut.Set(0);
+		taskDelay(sysClkRateGet() / 1000);
 	}
 }

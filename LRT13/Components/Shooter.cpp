@@ -126,11 +126,12 @@ void Shooter::enabledPeriodic()
 		e++;
 	//	AsyncPrinter::Printf("%d: inner Speed %.2f, inner error %.2f, inner out %.2f\n", ++e, m_PIDs[INNER].getInput(), m_PIDs[INNER].getError(), m_PIDs[INNER].getOutput()/ m_max_speed[INNER] );
 	//	AsyncPrinter::Printf("%d: inner Speed %.2f, inner error %.2f, inner out %.2f\n", ++e, m_PIDs[OUTER].getInput(), m_PIDs[OUTER].getError(), m_PIDs[OUTER].getOutput()/ m_max_speed[OUTER] );
-		
+		static bool lastFiring = false;
 		switch (m_componentData->shooterData->GetShooterSetting())
 		{
 		case CONTINOUS:
 				m_pneumatics->setStorageExit(EXTENDED);
+				AsyncPrinter::Printf("FireState: %d\n", m_fireState);
 				switch(m_fireState)
 				{
 				case FIRING_OFF:
@@ -223,18 +224,25 @@ void Shooter::enabledPeriodic()
 		case ONCE:
 			if(atSpeed[OUTER] && atSpeed[INNER])
 			{
-				AsyncPrinter::Printf("Outer wheel speed when shooting: %f\n", m_speedsRPM[OUTER]);
-				AsyncPrinter::Printf("Inner wheel speed when shooting: %f\n", m_speedsRPM[INNER]);
+				lastFiring = true;
 				m_pneumatics->setStorageExit(RETRACTED);
 			}
 			break;
 		case OFF:
+		if(lastFiring)
+		{
+			lastFiring = false;
+			AsyncPrinter::Printf("\t---Outer wheel speed when shooting: %f\n", m_speedsRPM[OUTER]);
+			AsyncPrinter::Printf("\t---Inner wheel speed when shooting: %f\n", m_speedsRPM[INNER]);
+		}
 //				AsyncPrinter::Printf("off\n");
 	//			AsyncPrinter::Printf("IN\n");
 				m_pneumatics->setStorageExit(EXTENDED);
 				m_fireState = FIRING_OFF;
 			break;
 		}
+		
+		
 		lastSpeed = m_speedsRPM[INNER];
 //		AsyncPrinter::Printf("Speed %.3f\n", m_speedsRPM[OUTER]);
 		
@@ -385,7 +393,7 @@ void Shooter::ManageShooterWheel(int roller)
 		AsyncPrinter::Printf("[ERROR] Shooter::ManageShooterWheel(): batteryAdjustment<0.1");
 		return;
 	}
-	
+
 	out /= batteryAdjustment; // batteryAdjustment is non-zero
 	out = Util::Min<double>(out, 1.0);
 	
@@ -404,7 +412,14 @@ void Shooter::ManageShooterWheel(int roller)
 		m_jaguars[roller]->SetDutyCycle(m_speed_setpoints[roller][LOW] / m_max_speed[roller]);
 	}
 #else
-	m_outer_file << out << ",";
+	if (roller == OUTER)
+	{
+		m_outer_file << out << ",";
+	}
+	if (roller == INNER)
+	{
+		m_inner_file << out << ",";
+	}
 	m_jaguars[roller]->SetDutyCycle(out);
 #endif
 	m_jaguars[roller]->SetVoltageRampRate(0.0);

@@ -89,6 +89,10 @@ void SmarterDashboard::Flush()
 	} // m_queueSem
 }
 
+template void SmarterDashboard::SetTelemetryData<double>(TelemetryType::Enum type, double data);
+template void SmarterDashboard::SetTelemetryData<string>(TelemetryType::Enum type, string data);
+template void SmarterDashboard::SetTelemetryData<float>(TelemetryType::Enum type, float data);
+
 template<class T> void SmarterDashboard::SetTelemetryData(TelemetryType::Enum type, T data)
 {
 	stringstream ss;

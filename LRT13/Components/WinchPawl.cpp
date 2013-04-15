@@ -15,6 +15,11 @@ WinchPawl::WinchPawl()
 	m_lastEnabled = false;
 }
 
+WinchPawl::~WinchPawl()
+{
+	
+}
+
 void WinchPawl::enabledPeriodic()
 {
 	m_lastEnabled = true;

@@ -53,6 +53,7 @@ INT32 AutoAim::Tick()
 		
 		double strength = msg->ReadDouble();
 		
+		AsyncPrinter::Printf("AutoAim: %d %d\n", x, y);
 		m_componentData->autoAimData->setCurrentX(x);
 		m_componentData->autoAimData->setCurrentY(y);
 		m_componentData->autoAimData->setDesiredX(desiredX);
