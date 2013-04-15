@@ -3,6 +3,7 @@
 //stupid hack
 #include "Includes.h"
 #include <string.h>
+#include <string>
 
 #ifdef __VXWORKS__
 #include "../Utils/AsyncPrinter.h"

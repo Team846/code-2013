@@ -72,6 +72,40 @@ INT32 NetPeer::InternalPlatformMessageVerificationTaskWrapper(UINT32 instance)
 	
 	return 0;
 }
+#else #ifdef USE_BOOST
+INT32 NetPeer:: InternalPlatformUpdateTaskWrapper(NetPeer* instance)
+{
+	// vxworks specific code
+
+	printf("Update task started. \n");
+
+	NetPeer* conn = (NetPeer*)instance;
+
+	while(conn->m_isRunning)
+	{
+		conn->Update();
+		NET_SLEEP(10);
+	}
+
+	return 0;
+}
+
+INT32 NetPeer::InternalPlatformMessageVerificationTaskWrapper(NetPeer* instance)
+{
+	// vxworks specific code
+
+	printf("Message check task started. \n");
+
+	NetPeer* conn = (NetPeer*)instance;
+
+	while(conn->m_isRunning)
+	{
+		conn->CheckMessages();
+		NET_SLEEP(10);
+	}
+
+	return 0;
+}
 #endif
 
 void NetPeer::InternalPlatformQueueSynchronizationCreate()
@@ -155,11 +189,18 @@ void NetPeer::Update()
 				{
 					if(m_connType == CLIENT)
 					{
+#ifdef __VXWORKS__
 						AsyncPrinter::Printf("Somebody tried to connect to us..\n");
+#else
+						printf("Somebody tried to connect to us..\n");
+#endif
 						break;
 					}
-					
+#ifdef __VXWORKS__
 					AsyncPrinter::Printf("Connection request receieved.\n");
+#else
+						printf("Somebody tried to connect to us..\n");
+#endif
 					
 					NetConnection* nc = new NetConnection(from, this);
 					
@@ -591,7 +632,11 @@ int NetPeer::Send(NetBuffer* buff, NetConnection* to, NetChannel::Enum method, i
 	
 	maack.initialized = true;
 	maack.buff = buff;
+#ifdef __VXWORKS__
 	maack.sentTime = Timer::GetFPGATimestamp();
+#else
+	maack.sentTime = clock() / (double) CLOCKS_PER_SEC;
+#endif
 	maack.acknowledged = false;
 	maack.recipient = to;
 	
@@ -651,13 +696,6 @@ int NetPeer::Send(NetBuffer* buff, NetConnection* to, NetChannel::Enum method, i
 	}
 
 	localBuff->WriteRaw(buff->GetBuffer(), buff->GetBufferLength());
-	
-	for(int i = 0; i < localBuff->GetBufferLength(); i++)
-	{
-		printf("%u ", localBuff->GetBuffer()[i]);
-	}
-
-	printf("\n");
 
 	buff->m_sent = true;
 	

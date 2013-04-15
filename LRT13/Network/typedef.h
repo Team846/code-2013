@@ -1,6 +1,8 @@
 #ifndef TYPEDEF_H_
 #define TYPEDEF_H_
 
+#ifdef __VXWORKS__
+#else
 #include <stdint.h>
 
 #define NULL		0
@@ -53,5 +55,6 @@ typedef unsigned long	ULONG;
 #endif
 
 typedef int			STATUS;
+#endif
 
 #endif
