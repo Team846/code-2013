@@ -13,6 +13,7 @@ namespace climber
 {
 typedef enum state
 	{
+		NOTHING = -1,
 		INACTIVE = 0,
 		BEGIN = 1,
 		LINE_UP = 2,
@@ -24,7 +25,8 @@ typedef enum state
 		ADJUST_SHOOTER_ANGLE = 8,
 		EXTEND_HOOKS = 9,
 		CLIMBED = 10,
-		UNLOCK_WINCH_PAWL = 11
+		UNLOCK_WINCH_PAWL = 11,
+		WAIT = 12, // this is used when rewinding/fast forwarding operations
 		
 //		IDLE = 1,
 //		ARM_UP_INITIAL = 2,
@@ -104,6 +106,9 @@ typedef enum humanState
 		void retractArm();
 		
 		bool shouldExtendArm();
+		
+		void setDesiredStep(state target);
+		state getDesiredStep();
 	private:
 		humanState m_desiredClimbingStep;
 		bool m_shouldContinueClimbing, m_shouldForceContinueClimbing;
@@ -124,6 +129,8 @@ typedef enum humanState
 		bool m_shouldExtendArm;
 		
 		double m_winchPawlCurrent;
+		
+		state m_desiredState;
 	};
 }
 }

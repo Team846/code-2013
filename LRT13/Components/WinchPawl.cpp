@@ -10,10 +10,15 @@ WinchPawl::WinchPawl()
 	m_timedOut = false;
 	
 	m_jaguar.setCollectionFlags(AsyncCANJaguar::OUTCURR);
+	
+	m_lastRequestedDutyCycle = 0.0;
+	m_lastEnabled = false;
 }
 
 void WinchPawl::enabledPeriodic()
 {
+	m_lastEnabled = true;
+	
 	const float requestedDutyCycle = m_winchPawlData->getDutyCycle();
 	
 	// request to stop the winch pawl

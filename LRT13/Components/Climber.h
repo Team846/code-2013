@@ -82,6 +82,7 @@ private:
 	const static int m_winchPawlUpDirection = 1;
 	
 	data::climber::state m_state;
+	data::climber::state m_waitGoToState; // when the operator wishes to skip to some state
 	
 	data::shooter::ShooterData* m_shooterData;
 	data::climber::WinchPawlData* m_winchPawl;

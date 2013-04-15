@@ -33,6 +33,8 @@ Climber::Climber() :
 	m_driveSpeed = 0.0;
 	
 	m_ptoEngaged = false;
+	
+	m_waitGoToState = INACTIVE;
 }
 
 Climber::~Climber()
@@ -60,7 +62,7 @@ void Climber::onDisable()
 
 void Climber::enabledPeriodic()
 {
-	double curr;
+	const double curr = m_winchPawl->getMotorCurrent();
 	
 	m_componentData->climberData->setWinchPawlCurrent(curr);
 	
@@ -125,6 +127,15 @@ void Climber::enabledPeriodic()
 //		AsyncPrinter::Printf("Still alive %d\n", GetFPGATime());
 		return;
 	}
+	
+	state desiredStep = m_climberData->getDesiredStep();
+	
+	if(desiredStep > NOTHING)
+	{
+		m_state = WAIT;
+		m_waitGoToState = desiredStep;
+	}
+	
 //	AsyncPrinter::Printf("WTF\n");
 	
 	static int e = 0;
@@ -259,8 +270,6 @@ void Climber::enabledPeriodic()
 		
 		m_winchPawl->setDutyCyle(1.0f * m_winchPawlDownDirection);
 		
-		curr = m_winchPawl->getMotorCurrent();
-		
 		if(curr > m_winch_current_threshold)
 			--m_timer;
 		
@@ -366,7 +375,18 @@ void Climber::enabledPeriodic()
 			m_state = INACTIVE;
 		
 		break;
+	case WAIT: // this should never be set by the routine -- only the human operator should set it
+		m_stateString = "WAIT";
+		
+		if(m_climberData->shouldContinueClimbing())
+			m_state = m_waitGoToState;
+		break;
 	}
+	
+	static int printCounter = 0;
+	
+	if(printCounter++ % 10 == 0)
+		AsyncPrinter::Println("Climb state: %s\n", m_stateString);
 	
 	SmarterDashboard::Instance()->SetTelemetryData<string>(TelemetryType::CLIMBER_STATE, m_stateString);
 	

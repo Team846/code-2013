@@ -22,6 +22,8 @@ ClimberData::ClimberData()
 	m_shouldExtendHooks = false;
 	
 	m_winchPawlCurrent = 0.0;
+	
+	m_desiredState = NOTHING;
 }
 
 
@@ -192,5 +194,23 @@ void ClimberData::enableDebug()
 void ClimberData::disableDebug()
 {
 	m_shoulddebug = false;
+}
+
+void ClimberData::setDesiredStep(state target)
+{
+	
+}
+
+state ClimberData::getDesiredStep()
+{
+	if(m_desiredState > NOTHING)
+	{
+		state temp = m_desiredState;
+		m_desiredState = NOTHING;
+		
+		return temp;
+	}
+	
+	return NOTHING;
 }
 		
