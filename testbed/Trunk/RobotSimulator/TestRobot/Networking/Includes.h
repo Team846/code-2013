@@ -8,6 +8,12 @@
 #else
 #endif
 
+#ifdef __VXWORKS__
+#define TIME_IN_SECONDS() Timer::GetFPGATimestamp();
+#else
+#define TIME_IN_SECONDS() clock() / (double) CLOCKS_PER_SEC;
+#endif
+
 #include "typedef.h"
 #include <stdio.h>
 #include <string.h>

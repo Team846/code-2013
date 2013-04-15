@@ -20,7 +20,12 @@ namespace Network
 		
 		void Connect(sockaddr_in ep);
 	private:
+		void CheckMessages();
+		
 		NetConnection* _server;
+		
+		double _connectionRequestTime;
+		bool _connectionRequested;
 	};
 };
 
