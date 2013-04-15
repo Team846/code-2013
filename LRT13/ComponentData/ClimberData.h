@@ -21,12 +21,10 @@ typedef enum state
 		ARM_DOWN = 4,
 		CLIMB_PREPARE = 5,
 		CLIMB = 6,
-		RETRACT_HOOKS_BEFORE_CLIMB = 7,
-		ADJUST_SHOOTER_ANGLE = 8,
-		EXTEND_HOOKS = 9,
-		CLIMBED = 10,
-		UNLOCK_WINCH_PAWL = 11,
-		WAIT = 12, // this is used when rewinding/fast forwarding operations
+		TURN_WINCH_PAWL_OFF = 7,
+		EXTEND_HOOKS = 8,
+		CLIMBED = 9,
+		WAIT = 10, // this is used when rewinding/fast forwarding operations
 		
 //		IDLE = 1,
 //		ARM_UP_INITIAL = 2,

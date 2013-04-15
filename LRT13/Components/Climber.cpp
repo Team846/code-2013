@@ -275,7 +275,7 @@ void Climber::enabledPeriodic()
 		
 		if(m_timer <= 0)
 		{
-			if (m_climbing_level < 1)
+			if (m_climbing_level == GROUND)
 				m_winchPawl->setDutyCyle(m_winch_engage_duty_cycle * m_winchPawlDownDirection);
 			else
 				m_winchPawl->setDutyCyle(0.0);
@@ -286,6 +286,9 @@ void Climber::enabledPeriodic()
 		break;
 	case CLIMB_PREPARE:
 		m_stateString = "CLIMB_PREPARE";
+		
+		m_pneumatics->setHookPosition(RETRACTED);
+		m_shooterData->SetLauncherAngleLow();
 		
 		engagePTO();
 		
@@ -324,26 +327,13 @@ void Climber::enabledPeriodic()
 			m_componentData->drivetrainData->setOpenLoopOutput(TURN, 0.0);
 			
 			if(m_climberData->shouldContinueClimbing())
-				m_state = RETRACT_HOOKS_BEFORE_CLIMB;
+				m_state = TURN_WINCH_PAWL_OFF;
 		}
 		break;
-	case RETRACT_HOOKS_BEFORE_CLIMB:
-		m_stateString = "RETRACT_HOOKS_BEFORE_CLIMB";
-		
-		m_pneumatics->setHookPosition(RETRACTED);
-		
-		m_state = ADJUST_SHOOTER_ANGLE;
-		
-		if(m_climberData->shouldContinueClimbing())
-			m_state = ADJUST_SHOOTER_ANGLE;
-		
-		break;
-	case ADJUST_SHOOTER_ANGLE:
-		m_stateString = "ADJUST_SHOOTER_ANGLE";
+	case TURN_WINCH_PAWL_OFF:
+		m_stateString = "TURN_WINCH_PAWL_OFF";
 		
 		m_winchPawl->setDutyCyle(0.0F);
-		
-		m_shooterData->SetLauncherAngleLow();
 		
 		if(m_climberData->shouldContinueClimbing())
 			m_state = EXTEND_HOOKS;
@@ -356,9 +346,7 @@ void Climber::enabledPeriodic()
 		
 		if(m_climberData->shouldContinueClimbing())
 		{
-			m_climbing_level++;
-			
-			m_state = UNLOCK_WINCH_PAWL;
+			m_state = CLIMBED;
 		}
 		break;
 	case CLIMBED:
@@ -366,14 +354,8 @@ void Climber::enabledPeriodic()
 		
 		m_climbing_level++;
 		
-		m_state = UNLOCK_WINCH_PAWL;
-		break;
-	case UNLOCK_WINCH_PAWL:
-		m_stateString = "UNLOCK_WINCH_PAWL";
-		
 		if(m_climberData->shouldContinueClimbing())
 			m_state = INACTIVE;
-		
 		break;
 	case WAIT: // this should never be set by the routine -- only the human operator should set it
 		m_stateString = "WAIT";

@@ -82,7 +82,6 @@
     <ClInclude Include="Networking\NetUtil.h" />
     <ClInclude Include="Networking\Includes.h" />
     <ClInclude Include="Networking\typedef.h" />
-    <ClInclude Include="Networking\xplat_types.h" />
     <ClInclude Include="Process\AsyncProcess.h" />
     <ClInclude Include="Stopwatch.h" />
     <ClInclude Include="Utils\AsyncPrinter.h" />

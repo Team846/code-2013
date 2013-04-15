@@ -20,8 +20,8 @@ void NetClient::Connect(sockaddr_in ep)
 	
 	NetBuffer netBuffer;
 	
-	netBuffer.Write((char)LIBRARY_DATA);
-	netBuffer.Write((char)LibraryMessageType::CONNECTION_REQUEST);
+	netBuffer.Write((UINT8)LIBRARY_DATA);
+	netBuffer.Write((UINT8)LibraryMessageType::CONNECTION_REQUEST);
 	
 	SendRaw(&netBuffer, _server);
 }
@@ -38,8 +38,8 @@ void NetClient::CheckMessages()
 		{
 			NetBuffer netBuffer;
 				
-			netBuffer.Write((char)LIBRARY_DATA);
-			netBuffer.Write((char)LibraryMessageType::CONNECTION_REQUEST);
+			netBuffer.Write((UINT8)LIBRARY_DATA);
+			netBuffer.Write((UINT8)LibraryMessageType::CONNECTION_REQUEST);
 			
 			SendRaw(&netBuffer, _server);
 			

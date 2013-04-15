@@ -55,6 +55,18 @@ void WinchPawl::enabledPeriodic()
 	
 	double current = m_jaguar.GetOutputCurrent();
 	
+	if(current >= m_overCurrentThreshold)
+	{
+		AsyncPrinter::Printf("[SEVERE] WinchPawl::enabledPeriodic(): Over current!\n");
+		m_timedOut = true;
+		
+		if(m_stopWatch.Running())
+		{
+			m_stopWatch.Stop();
+			m_stopWatch.Reset();
+		}
+	}
+	
 	m_winchPawlData->updateMotorCurrent(current);
 	
 	SmarterDashboard::Instance()->SetTelemetryData<double>(TelemetryType::CLIMBER_WINCH_PAWL_CURRENT, current);
@@ -88,4 +100,5 @@ void WinchPawl::onDisable()
 void WinchPawl::Configure()
 {
 	m_timeout = m_config->Get<double>(m_configSection, "timeout", 5.0);
+	m_overCurrentThreshold = m_config->Get<double>(m_configSection, "abortCurrentThreshold", 38.0);
 }

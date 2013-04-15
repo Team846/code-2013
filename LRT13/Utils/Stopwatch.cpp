@@ -52,6 +52,11 @@ void Stopwatch::Restart()
 	Start();
 }
 
+bool Stopwatch::Running()
+{
+	return !m_stopped;
+}
+
 double Stopwatch::TotalElapsedMinutes()
 {
 	return TotalElapsedSeconds() / 60.0;

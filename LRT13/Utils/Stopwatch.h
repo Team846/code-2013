@@ -15,6 +15,8 @@ public:
 	void Restart();
 	void Reset();
 	
+	bool Running();
+	
 	double TotalElapsedMinutes();
 	double TotalElapsedSeconds();
 	double TotalElapsedMilliseconds();

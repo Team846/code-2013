@@ -211,8 +211,8 @@ void NetPeer::Update()
 					
 					NetBuffer confirm;
 					
-					confirm.Write((char)LIBRARY_DATA);
-					confirm.Write((char)LibraryMessageType::CONNECTION_CONFIRM);
+					confirm.Write((UINT8)LIBRARY_DATA);
+					confirm.Write((UINT8)LibraryMessageType::CONNECTION_CONFIRM);
 					
 					SendRaw(&confirm, nc);
 				}
@@ -243,10 +243,10 @@ void NetPeer::Update()
 				// reliable needs an ACK
 				NetBuffer ack;
 				
-				ack.Write((char)LIBRARY_DATA);
-				ack.Write((char)LibraryMessageType::MESSAGE_ACK);
-				ack.Write((char)chann);
-				ack.Write((char)channel);
+				ack.Write((UINT8)LIBRARY_DATA);
+				ack.Write((UINT8)LibraryMessageType::MESSAGE_ACK);
+				ack.Write((UINT8)chann);
+				ack.Write((UINT8)channel);
 				ack.Write(id);
 				
 				// TODO error handling in the future

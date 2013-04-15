@@ -46,6 +46,8 @@ private:
 	
 	float m_lastRequestedDutyCycle;
 	
+	double m_overCurrentThreshold;
+	
 	bool m_lastEnabled;
 	double m_timeout;
 };
