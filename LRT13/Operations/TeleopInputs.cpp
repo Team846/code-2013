@@ -134,7 +134,18 @@ void TeleopInputs::Update()
 			AsyncPrinter::Printf("Arm\n");
 			//change arm position
 		}
-		/************************Climber Functions************************/\
+		/************************Climber Functions************************/
+		
+		if (m_operator_stick->IsButtonDown(DriverStationConfig::JoystickButtons::CLIMB_STEP_FORWARD))
+		{
+			if ((m_componentData->climberData->getWaitingState() + 1) % 10 + 10 < CLIMBED)
+				m_componentData->climberData->setDesiredState((climber::state)((m_componentData->climberData->getWaitingState() + 1) % 10 + 10 + 1));
+		}
+		else if (m_operator_stick->IsButtonDown(DriverStationConfig::JoystickButtons::CLIMB_STEP_BACKWARD))
+		{
+			if ((m_componentData->climberData->getWaitingState() + 1) % 10 + 10 > INACTIVE)
+				m_componentData->climberData->setDesiredState((climber::state)((m_componentData->climberData->getWaitingState() + 1) % 10 + 10 - 1));
+		}
 		if (m_operator_stick->IsButtonDown(DriverStationConfig::JoystickButtons::CONDITIONAL_ABORT))
 		{
 			m_componentData->climberData->setShouldPotentiallyAbort(true);

@@ -24,7 +24,17 @@ typedef enum state
 		TURN_WINCH_PAWL_OFF = 7,
 		EXTEND_HOOKS = 8,
 		CLIMBED = 9,
-		WAIT = 10, // this is used when rewinding/fast forwarding operations
+		WAIT = 10,
+		RESET_INACTIVE = 11,
+		RESET_BEGIN = 12,
+		RESET_LINE_UP = 13,
+		RESET_ARM_DOWN_PREPARE = 14,
+		RESET_ARM_DOWN = 15,
+		RESET_CLIMB_PREPARE = 16,
+		RESET_CLIMB = 17,
+		RESET_TURN_WINCH_PAWL_OFF = 18,
+		RESET_EXTEND_HOOKS = 19,
+		RESET_CLIMBED = 20,
 		
 //		IDLE = 1,
 //		ARM_UP_INITIAL = 2,
@@ -107,6 +117,10 @@ typedef enum humanState
 		
 		void setDesiredState(state target);
 		state getDesiredState();
+		void setCurrentState(state newState);
+		state getCurrentState();
+		void setWaitingState(state newState);
+		state getWaitingState();
 	private:
 		humanState m_desiredClimbingStep;
 		bool m_shouldContinueClimbing, m_shouldForceContinueClimbing;
@@ -129,6 +143,8 @@ typedef enum humanState
 		double m_winchPawlCurrent;
 		
 		state m_desiredState;
+		state m_currentState;
+		state m_waitingState;
 	};
 }
 }

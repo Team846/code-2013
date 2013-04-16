@@ -24,6 +24,8 @@ ClimberData::ClimberData()
 	m_winchPawlCurrent = 0.0;
 	
 	m_desiredState = NOTHING;
+	m_currentState = INACTIVE;
+	m_waitingState = NOTHING;
 }
 
 
@@ -205,4 +207,23 @@ state ClimberData::getDesiredState()
 {
 	return m_desiredState;
 }
-		
+
+void ClimberData::setCurrentState(state newState)
+{
+	m_currentState = newState;
+}
+
+state ClimberData::getCurrentState()
+{
+	return m_currentState;
+}
+
+void ClimberData::setWaitingState(state newState)
+{
+	m_waitingState = newState;
+}
+
+state ClimberData::getWaitingState()
+{
+	return m_waitingState;
+}

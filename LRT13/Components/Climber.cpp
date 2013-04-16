@@ -127,17 +127,20 @@ void Climber::enabledPeriodic()
 //		AsyncPrinter::Printf("Still alive %d\n", GetFPGATime());
 		return;
 	}
-	
+
+	m_climberData->setWaitingState(m_state); // for access from TeleopInputs to scroll starting from current state
 	state desiredStep = m_climberData->getDesiredState();
 	
 	if(desiredStep > NOTHING)
 	{
 		m_state = WAIT;
 		m_waitGoToState = desiredStep;
+		m_climberData->setWaitingState(m_waitGoToState);
 	}
 	
+	m_climberData->setCurrentState(m_state);
 	m_climberData->setDesiredState(NOTHING); // reset back to nothing
-	
+
 //	AsyncPrinter::Printf("WTF\n");
 	
 	static int e = 0;
@@ -362,8 +365,225 @@ void Climber::enabledPeriodic()
 	case WAIT: // this should never be set by the routine -- only the human operator should set it
 		m_stateString = "WAIT";
 		
+		AsyncPrinter::Printf("Waiting for next state: %d\n", m_waitGoToState);
+		
 		if(m_climberData->shouldContinueClimbing())
 			m_state = m_waitGoToState;
+		break;
+	case RESET_INACTIVE:
+		m_stateString = "RESET_INACTIVE";
+
+		m_winchPawl->setDutyCyle(0.0F);
+		m_componentData->drivetrainData->setControlMode(FORWARD, OPEN_LOOP);
+		m_componentData->drivetrainData->setControlMode(TURN, OPEN_LOOP);
+		m_componentData->drivetrainData->setOpenLoopOutput(FORWARD, 0.0);
+		m_componentData->drivetrainData->setOpenLoopOutput(TURN, 0.0);
+		
+		if(m_climberData->shouldContinueClimbing())
+			m_state = INACTIVE;
+		break;
+	case RESET_BEGIN:
+		m_stateString = "RESET_BEGIN";
+
+		disengagePTO();
+				
+		if(m_climbing_level == GROUND)
+		{
+			m_pneumatics->setHookPosition(RETRACTED);
+			m_pneumatics->setClimberArm(RETRACTED);
+		}
+		
+		m_winchPawl->setDutyCyle(0.0F);
+		m_componentData->drivetrainData->setControlMode(FORWARD, OPEN_LOOP);
+		m_componentData->drivetrainData->setControlMode(TURN, OPEN_LOOP);
+		m_componentData->drivetrainData->setOpenLoopOutput(FORWARD, 0.0);
+		m_componentData->drivetrainData->setOpenLoopOutput(TURN, 0.0);
+		
+		if(m_climberData->shouldContinueClimbing())
+			m_state = BEGIN;
+		break;
+	case RESET_LINE_UP:
+		m_stateString = "RESET_LINE_UP";
+
+		disengagePTO();
+		
+		if(m_climbing_level == GROUND)
+		{
+			m_pneumatics->setHookPosition(RETRACTED);
+		}
+		m_pneumatics->setClimberArm(EXTENDED);
+
+		if(m_climbing_level > GROUND)
+			m_shooterData->SetLauncherAngleHigh();
+		else
+			m_shooterData->SetLauncherAngleLow();
+				
+		m_winchPawl->setDutyCyle(0.0F);
+		m_componentData->drivetrainData->setControlMode(FORWARD, OPEN_LOOP);
+		m_componentData->drivetrainData->setControlMode(TURN, OPEN_LOOP);
+		m_componentData->drivetrainData->setOpenLoopOutput(FORWARD, 0.0);
+		m_componentData->drivetrainData->setOpenLoopOutput(TURN, 0.0);
+		
+		if(m_climberData->shouldContinueClimbing())
+			m_state = LINE_UP;
+		break;
+	case RESET_ARM_DOWN_PREPARE:
+		m_stateString = "RESET_ARM_DOWN_PREPARE";
+		
+		disengagePTO();
+				
+		if(m_climbing_level == GROUND)
+		{
+			m_pneumatics->setHookPosition(RETRACTED);
+		}
+		m_pneumatics->setClimberArm(EXTENDED);
+
+		if(m_climbing_level > GROUND)
+			m_shooterData->SetLauncherAngleHigh();
+		else
+			m_shooterData->SetLauncherAngleLow();
+				
+		m_winchPawl->setDutyCyle(0.0F);
+		m_componentData->drivetrainData->setControlMode(FORWARD, OPEN_LOOP);
+		m_componentData->drivetrainData->setControlMode(TURN, OPEN_LOOP);
+		m_componentData->drivetrainData->setOpenLoopOutput(FORWARD, 0.0);
+		m_componentData->drivetrainData->setOpenLoopOutput(TURN, 0.0);
+		
+		if(m_climberData->shouldContinueClimbing())
+			m_state = ARM_DOWN_PREPARE;
+		break;
+	case RESET_ARM_DOWN:
+		m_stateString = "RESET_ARM_DOWN";
+		
+		disengagePTO();
+						
+		if(m_climbing_level == GROUND)
+		{
+			m_pneumatics->setHookPosition(RETRACTED);
+		}
+		m_pneumatics->setClimberArm(EXTENDED);
+
+		if(m_climbing_level > GROUND)
+			m_shooterData->SetLauncherAngleHigh();
+		else
+			m_shooterData->SetLauncherAngleLow();
+				
+		m_winchPawl->setDutyCyle(0.0F);
+		m_timer = 10;
+		m_componentData->drivetrainData->setControlMode(FORWARD, OPEN_LOOP);
+		m_componentData->drivetrainData->setControlMode(TURN, OPEN_LOOP);
+		m_componentData->drivetrainData->setOpenLoopOutput(FORWARD, 0.0);
+		m_componentData->drivetrainData->setOpenLoopOutput(TURN, 0.0);
+		
+		if(m_climberData->shouldContinueClimbing())
+			m_state = ARM_DOWN;
+		break;
+	case RESET_CLIMB_PREPARE:
+		m_stateString = "RESET_CLIMB_PREPARE";
+		
+		disengagePTO();
+								
+		if(m_climbing_level == GROUND)
+		{
+			m_pneumatics->setHookPosition(RETRACTED);
+		}
+		m_pneumatics->setClimberArm(EXTENDED);
+
+		if(m_climbing_level > GROUND)
+			m_shooterData->SetLauncherAngleHigh();
+		else
+			m_shooterData->SetLauncherAngleLow();
+				
+		if (m_climbing_level == GROUND)
+			m_winchPawl->setDutyCyle(m_winch_engage_duty_cycle * m_winchPawlDownDirection);
+		else
+			m_winchPawl->setDutyCyle(0.0);
+		m_componentData->drivetrainData->setControlMode(FORWARD, OPEN_LOOP);
+		m_componentData->drivetrainData->setControlMode(TURN, OPEN_LOOP);
+		m_componentData->drivetrainData->setOpenLoopOutput(FORWARD, 0.0);
+		m_componentData->drivetrainData->setOpenLoopOutput(TURN, 0.0);
+		
+		if(m_climberData->shouldContinueClimbing())
+			m_state = CLIMB_PREPARE;
+		break;
+	case RESET_CLIMB:
+		m_stateString = "RESET_CLIMB";
+		
+		m_pneumatics->setClimberArm(EXTENDED);
+		m_pneumatics->setHookPosition(RETRACTED);
+		m_shooterData->SetLauncherAngleLow();
+		
+		engagePTO();
+		
+		m_drive_train_position = m_winch_gear_tooth.Get();
+		
+		m_driveSpeed = 0.0;
+		
+		if (m_climbing_level == GROUND)
+			m_winchPawl->setDutyCyle(m_winch_engage_duty_cycle * m_winchPawlDownDirection);
+		else
+			m_winchPawl->setDutyCyle(0.0);
+		m_componentData->drivetrainData->setControlMode(FORWARD, OPEN_LOOP);
+		m_componentData->drivetrainData->setControlMode(TURN, OPEN_LOOP);
+		m_componentData->drivetrainData->setOpenLoopOutput(FORWARD, 0.0);
+		m_componentData->drivetrainData->setOpenLoopOutput(TURN, 0.0);
+				
+		if(m_climberData->shouldContinueClimbing())
+			m_state = CLIMB;
+		break;
+	case RESET_TURN_WINCH_PAWL_OFF:
+		m_stateString = "RESET_TURN_WINCH_PAWL_OFF";
+		
+		m_pneumatics->setClimberArm(EXTENDED);
+		m_pneumatics->setHookPosition(RETRACTED);
+		m_shooterData->SetLauncherAngleLow();
+		
+		engagePTO();
+		
+		m_winchPawl->setDutyCyle(0.0);
+		m_componentData->drivetrainData->setControlMode(FORWARD, OPEN_LOOP);
+		m_componentData->drivetrainData->setControlMode(TURN, OPEN_LOOP);
+		m_componentData->drivetrainData->setOpenLoopOutput(FORWARD, 0.0);
+		m_componentData->drivetrainData->setOpenLoopOutput(TURN, 0.0);
+		
+		if(m_climberData->shouldContinueClimbing())
+			m_state = TURN_WINCH_PAWL_OFF;
+		break;
+	case RESET_EXTEND_HOOKS:
+		m_stateString = "RESET_EXTEND_HOOKS";
+		
+		m_pneumatics->setClimberArm(EXTENDED);
+		m_pneumatics->setHookPosition(RETRACTED);
+		m_shooterData->SetLauncherAngleLow();
+		
+		engagePTO();
+		
+		m_winchPawl->setDutyCyle(0.0);
+		m_componentData->drivetrainData->setControlMode(FORWARD, OPEN_LOOP);
+		m_componentData->drivetrainData->setControlMode(TURN, OPEN_LOOP);
+		m_componentData->drivetrainData->setOpenLoopOutput(FORWARD, 0.0);
+		m_componentData->drivetrainData->setOpenLoopOutput(TURN, 0.0);
+
+		if(m_climberData->shouldContinueClimbing())
+			m_state = EXTEND_HOOKS;
+		break;
+	case RESET_CLIMBED:
+		m_stateString = "RESET_CLIMBED";
+
+		m_pneumatics->setClimberArm(EXTENDED);
+		m_pneumatics->setHookPosition(EXTENDED);
+		m_shooterData->SetLauncherAngleLow();
+		
+		engagePTO();
+		
+		m_winchPawl->setDutyCyle(0.0);
+		m_componentData->drivetrainData->setControlMode(FORWARD, OPEN_LOOP);
+		m_componentData->drivetrainData->setControlMode(TURN, OPEN_LOOP);
+		m_componentData->drivetrainData->setOpenLoopOutput(FORWARD, 0.0);
+		m_componentData->drivetrainData->setOpenLoopOutput(TURN, 0.0);
+		
+		if(m_climberData->shouldContinueClimbing())
+			m_state = CLIMBED;
 		break;
 	}
 	
