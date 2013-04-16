@@ -367,8 +367,8 @@ void Climber::enabledPeriodic()
 	
 	static int printCounter = 0;
 	
-	if(printCounter++ % 10 == 0)
-		AsyncPrinter::Println("Climb state: %s\n", m_stateString);
+	if(printCounter++ % 20 == 0 || m_state != m_previous_state)
+		AsyncPrinter::Printf("Climb state: %s\n", m_stateString.c_str());
 	
 	SmarterDashboard::Instance()->SetTelemetryData<string>(TelemetryType::CLIMBER_STATE, m_stateString);
 	

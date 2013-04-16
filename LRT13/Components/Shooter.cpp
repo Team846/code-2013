@@ -60,6 +60,9 @@ Shooter::Shooter() :
 	
 	m_maxNormalizedCurrent = 0.0;
 	
+	m_sensorDeNoisingCycle = 0;
+	m_isSensorTrue = false;
+	
 	m_fireState = FIRING_OFF;
 	m_cyclesToContinueRetracting = 0;
 	// begin denoise removal

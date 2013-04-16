@@ -4,6 +4,7 @@
 #include "Drivetrain.h"
 #include "Collector.h"
 #include "Shooter.h"
+#include "WinchPawl.h"
 #include "../ComponentData/RobotData.h"
 #include "../Utils/AsyncPrinter.h"
 #include "../Pneumatics/Pneumatics.h"
@@ -25,6 +26,7 @@ ComponentManager::~ComponentManager()
 
 void ComponentManager::CreateComponents()
 {
+	AddComponent(new WinchPawl());
 	AddComponent(new Collector());//must be before the shooter
 	AddComponent(new Climber()); //climber must be before drivetrain
 	AddComponent(new Shooter()); //must be after climber

@@ -83,8 +83,6 @@ void SmarterDashboard::Flush()
 			m_netBufferQueue.pop();
 			
 			m_server->SendToAll(nb.nb, nb.method, nb.channel);
-			
-			AsyncPrinter::Printf("Sending message...\n");
 		}
 	} // m_queueSem
 }
@@ -122,8 +120,6 @@ void SmarterDashboard::EnqueueShooterMessage(MessageType::Enum header, float tim
 	buff.Write((UINT8)header);
 	buff.Write(time);
 	buff.Write(value);
-	
-	AsyncPrinter::Printf("Enqueueing shooter message.\n");
-	
+
 	EnqueueMessage(&buff, NetChannel::NET_UNRELIABLE_SEQUENCED, 1);
 }

@@ -48,6 +48,9 @@ private:
 	
 	double m_overCurrentThreshold;
 	
+	int m_overCurrentCounter;
+	int m_maxOverCurrentCounter;
+	
 	bool m_lastEnabled;
 	double m_timeout;
 };

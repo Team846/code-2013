@@ -13,6 +13,10 @@ WinchPawl::WinchPawl()
 	
 	m_lastRequestedDutyCycle = 0.0;
 	m_lastEnabled = false;
+	
+	m_overCurrentCounter = 0;
+	
+	m_winchPawlData = ComponentData::GetInstance()->winchPawlData;
 }
 
 WinchPawl::~WinchPawl()
@@ -29,7 +33,9 @@ void WinchPawl::enabledPeriodic()
 	// request to stop the winch pawl
 	if(requestedDutyCycle == 0.0)
 	{
-		m_stopWatch.Stop();
+		if(m_stopWatch.Running())
+			m_stopWatch.Stop();
+		
 		m_stopWatch.Reset();
 		
 		m_timedOut = false; // set the timed out flag to false
@@ -46,9 +52,14 @@ void WinchPawl::enabledPeriodic()
 		AsyncPrinter::Printf("[SEVERE] WinchPawl::enabledPeriodic(): Timeout!\n");
 		
 		m_timedOut = true;
-		m_stopWatch.Stop();
+		
+		if(m_stopWatch.Running())
+			m_stopWatch.Stop();
+		
 		m_stopWatch.Reset();
 	}
+	
+	//AsyncPrinter::Printf("Timer: %f\n", m_stopWatch.TotalElapsedSeconds());
 	
 	float out = m_timedOut ? 0.0 : requestedDutyCycle;
 	m_jaguar.SetDutyCycle(out);
@@ -57,14 +68,21 @@ void WinchPawl::enabledPeriodic()
 	
 	if(current >= m_overCurrentThreshold)
 	{
-		AsyncPrinter::Printf("[SEVERE] WinchPawl::enabledPeriodic(): Over current!\n");
-		m_timedOut = true;
-		
-		if(m_stopWatch.Running())
+		if(m_overCurrentCounter++ > m_maxOverCurrentCounter)
 		{
-			m_stopWatch.Stop();
-			m_stopWatch.Reset();
+			AsyncPrinter::Printf("[SEVERE] WinchPawl::enabledPeriodic(): Over current! Threshold: %f, Actual: %f \n", m_overCurrentThreshold, current);
+			m_timedOut = true;
+			
+			if(m_stopWatch.Running())
+			{
+				m_stopWatch.Stop();
+				m_stopWatch.Reset();
+			}
 		}
+	}
+	else
+	{
+		m_overCurrentCounter = 0;
 	}
 	
 	m_winchPawlData->updateMotorCurrent(current);
@@ -100,5 +118,6 @@ void WinchPawl::onDisable()
 void WinchPawl::Configure()
 {
 	m_timeout = m_config->Get<double>(m_configSection, "timeout", 5.0);
-	m_overCurrentThreshold = m_config->Get<double>(m_configSection, "abortCurrentThreshold", 38.0);
+	m_overCurrentThreshold = m_config->Get<double>(m_configSection, "abortCurrentThreshold", 80.0);
+	m_maxOverCurrentCounter = m_config->Get<int>(m_configSection, "maxOverCurrentCounter", 50);
 }
