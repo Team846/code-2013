@@ -128,7 +128,6 @@ void Climber::enabledPeriodic()
 		return;
 	}
 
-	m_climberData->setWaitingState(m_state); // for access from TeleopInputs to scroll starting from current state
 	state desiredStep = m_climberData->getDesiredState();
 	
 	if(desiredStep > NOTHING)
@@ -138,6 +137,7 @@ void Climber::enabledPeriodic()
 		m_climberData->setWaitingState(m_waitGoToState);
 	}
 	
+	m_climberData->setWaitingState((m_state + 1) % 10 + 10); // for access from TeleopInputs to scroll starting from current state
 	m_climberData->setCurrentState(m_state);
 	m_climberData->setDesiredState(NOTHING); // reset back to nothing
 
