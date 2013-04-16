@@ -196,21 +196,13 @@ void ClimberData::disableDebug()
 	m_shoulddebug = false;
 }
 
-void ClimberData::setDesiredStep(state target)
+void ClimberData::setDesiredState(state target)
 {
-	
+	m_desiredState = target;
 }
 
-state ClimberData::getDesiredStep()
+state ClimberData::getDesiredState()
 {
-	if(m_desiredState > NOTHING)
-	{
-		state temp = m_desiredState;
-		m_desiredState = NOTHING;
-		
-		return temp;
-	}
-	
-	return NOTHING;
+	return m_desiredState;
 }
 		

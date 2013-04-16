@@ -128,13 +128,15 @@ void Climber::enabledPeriodic()
 		return;
 	}
 	
-	state desiredStep = m_climberData->getDesiredStep();
+	state desiredStep = m_climberData->getDesiredState();
 	
 	if(desiredStep > NOTHING)
 	{
 		m_state = WAIT;
 		m_waitGoToState = desiredStep;
 	}
+	
+	m_climberData->setDesiredState(NOTHING); // reset back to nothing
 	
 //	AsyncPrinter::Printf("WTF\n");
 	

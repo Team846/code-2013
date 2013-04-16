@@ -105,8 +105,8 @@ typedef enum humanState
 		
 		bool shouldExtendArm();
 		
-		void setDesiredStep(state target);
-		state getDesiredStep();
+		void setDesiredState(state target);
+		state getDesiredState();
 	private:
 		humanState m_desiredClimbingStep;
 		bool m_shouldContinueClimbing, m_shouldForceContinueClimbing;
