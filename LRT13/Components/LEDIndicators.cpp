@@ -28,9 +28,9 @@ INT32 LEDIndicators::Tick()
 	// write 24 bits per pixel
 	for (i = 0; i < numLEDs; i++)
 	{
-		write8(r | 0x80);
-		write8(g | 0x80);
-		write8(b | 0x80);
+		write8(64 | 0x80);
+		write8(127 | 0x80);
+		write8(127 | 0x80);
 	}
 
 	// to 'latch' the data, we send just zeros
@@ -48,6 +48,8 @@ void LEDIndicators::write8(uint8_t d)
 			m_dataOut.Set(1);
 		else
 			m_dataOut.Set(0);
+			
+		taskDelay(sysClkRateGet() / 1000);
 		m_clockOut.Set(1);
 		taskDelay(sysClkRateGet() / 1000);
 		m_clockOut.Set(0);
@@ -59,6 +61,7 @@ void LEDIndicators::write8(uint8_t d)
 void LEDIndicators::writezeros(uint16_t n)
 {
 	m_dataOut.Set(0);
+	taskDelay(sysClkRateGet() / 1000);
 	for (uint16_t i = 0; i < 8 * n; i++)
 	{
 		m_clockOut.Set(1);
