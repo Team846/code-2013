@@ -128,6 +128,8 @@ void LRTRobot13::Tick()
 	{
 		if ((*it)->StatusOK())
 			(*it)->RunOneCycle();
+		else
+			AsyncPrinter::Printf("[Error] Cannot communicate with jaguar: %d\n", (*it)->GetChannel());
 	}
 
 	// Update pneumatics

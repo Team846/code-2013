@@ -356,6 +356,11 @@ void AsyncCANJaguar::SetVelocity(float velocity)
 	m_setpoint.setValue(velocity);
 }
 
+int AsyncCANJaguar::GetChannel()
+{
+	return m_channel;
+}
+
 void AsyncCANJaguar::Set(float setpoint, UINT8 syncGroup)
 {
 	printf("ERROR: Calling Set() in ProxiedCANJaguar: %s\n;", m_name);

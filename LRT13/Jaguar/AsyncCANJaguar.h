@@ -138,6 +138,8 @@ public:
 	 * @param velocity
 	 */
 	void SetVelocity(float velocity);
+	
+	int GetChannel();
 protected:
 	/*!
 	 * @brief Does the actual CommTask communication, not including timing
