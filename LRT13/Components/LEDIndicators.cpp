@@ -28,6 +28,9 @@ INT32 LEDIndicators::Tick()
 	// write 24 bits per pixel
 	for (i = 0; i < numLEDs; i++)
 	{
+		//replace values with
+		//g, r, b; currently testing
+		//yes, that's the correct order
 		write8(64 | 0x80);
 		write8(127 | 0x80);
 		write8(127 | 0x80);
