@@ -370,7 +370,7 @@ void Climber::enabledPeriodic()
 		if(m_climberData->shouldContinueClimbing())
 			m_state = m_waitGoToState;
 		break;
-	case RESET_INACTIVE:
+	case RESET_FOR_INACTIVE:
 		m_stateString = "RESET_INACTIVE";
 
 		m_winchPawl->setDutyCyle(0.0F);
@@ -382,7 +382,7 @@ void Climber::enabledPeriodic()
 		if(m_climberData->shouldContinueClimbing())
 			m_state = INACTIVE;
 		break;
-	case RESET_BEGIN:
+	case RESET_FOR_BEGIN:
 		m_stateString = "RESET_BEGIN";
 
 		disengagePTO();
@@ -402,7 +402,7 @@ void Climber::enabledPeriodic()
 		if(m_climberData->shouldContinueClimbing())
 			m_state = BEGIN;
 		break;
-	case RESET_LINE_UP:
+	case RESET_FOR_LINE_UP:
 		m_stateString = "RESET_LINE_UP";
 
 		disengagePTO();
@@ -427,7 +427,7 @@ void Climber::enabledPeriodic()
 		if(m_climberData->shouldContinueClimbing())
 			m_state = LINE_UP;
 		break;
-	case RESET_ARM_DOWN_PREPARE:
+	case RESET_FOR_ARM_DOWN_PREPARE:
 		m_stateString = "RESET_ARM_DOWN_PREPARE";
 		
 		disengagePTO();
@@ -452,7 +452,7 @@ void Climber::enabledPeriodic()
 		if(m_climberData->shouldContinueClimbing())
 			m_state = ARM_DOWN_PREPARE;
 		break;
-	case RESET_ARM_DOWN:
+	case RESET_FOR_ARM_DOWN:
 		m_stateString = "RESET_ARM_DOWN";
 		
 		disengagePTO();
@@ -478,7 +478,7 @@ void Climber::enabledPeriodic()
 		if(m_climberData->shouldContinueClimbing())
 			m_state = ARM_DOWN;
 		break;
-	case RESET_CLIMB_PREPARE:
+	case RESET_FOR_CLIMB_PREPARE:
 		m_stateString = "RESET_CLIMB_PREPARE";
 		
 		disengagePTO();
@@ -506,7 +506,7 @@ void Climber::enabledPeriodic()
 		if(m_climberData->shouldContinueClimbing())
 			m_state = CLIMB_PREPARE;
 		break;
-	case RESET_CLIMB:
+	case RESET_FOR_CLIMB:
 		m_stateString = "RESET_CLIMB";
 		
 		m_pneumatics->setClimberArm(EXTENDED);
@@ -531,7 +531,7 @@ void Climber::enabledPeriodic()
 		if(m_climberData->shouldContinueClimbing())
 			m_state = CLIMB;
 		break;
-	case RESET_TURN_WINCH_PAWL_OFF:
+	case RESET_FOR_TURN_WINCH_PAWL_OFF:
 		m_stateString = "RESET_TURN_WINCH_PAWL_OFF";
 		
 		m_pneumatics->setClimberArm(EXTENDED);
@@ -549,7 +549,7 @@ void Climber::enabledPeriodic()
 		if(m_climberData->shouldContinueClimbing())
 			m_state = TURN_WINCH_PAWL_OFF;
 		break;
-	case RESET_EXTEND_HOOKS:
+	case RESET_FOR_EXTEND_HOOKS:
 		m_stateString = "RESET_EXTEND_HOOKS";
 		
 		m_pneumatics->setClimberArm(EXTENDED);
@@ -567,7 +567,7 @@ void Climber::enabledPeriodic()
 		if(m_climberData->shouldContinueClimbing())
 			m_state = EXTEND_HOOKS;
 		break;
-	case RESET_CLIMBED:
+	case RESET_FOR_CLIMBED:
 		m_stateString = "RESET_CLIMBED";
 
 		m_pneumatics->setClimberArm(EXTENDED);
