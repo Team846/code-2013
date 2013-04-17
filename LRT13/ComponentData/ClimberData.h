@@ -91,10 +91,10 @@ typedef enum humanState
 		bool shouldChangeAngleState();
 		void changeAngleState();
 		
-		bool shouldWinchPawlGoDown();
 		bool shouldWinchPawlGoUp();
-		void winchPawlDown();
+		bool shouldWinchPawlGoDown();
 		void winchPawlUp();
+		void winchPawlDown();
 		void winchPawlInactive();
 		
 		double winchPawlCurrent();
@@ -128,8 +128,8 @@ typedef enum humanState
 		bool m_shouldPotentiallyAbort;
 		bool m_shouldChangeAngleState;
 		
-		bool m_shouldWinchPawlGoDown;
 		bool m_shouldWinchPawlGoUp;
+		bool m_shouldWinchPawlGoDown;
 		
 		bool m_shouldPTOEngage;
 		bool m_shouldPTODisEngage;

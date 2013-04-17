@@ -2,6 +2,7 @@
 #define LED_INDICATOR_H_
 
 #include <DigitalOutput.h>
+#include <SPI.h>
 
 #include "../ComponentData/ComponentData.h"
 #include "../ComponentData/LEDIndicatorData.h"
@@ -21,7 +22,7 @@ public:
 	void writezeros(uint16_t n);
 	
 private:
-	int numLEDs;
+	SPI m_spi;
 	DigitalOutput m_clockOut;
 	DigitalOutput m_dataOut;
 };

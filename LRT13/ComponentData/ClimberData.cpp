@@ -10,8 +10,8 @@ ClimberData::ClimberData()
 
 	m_shouldChangeAngleState = false;
 	
-	m_shouldWinchPawlGoDown = false;
 	m_shouldWinchPawlGoUp = false;
+	m_shouldWinchPawlGoDown = false;
 	
 	m_shouldPTOEngage = false;
 	m_shouldPTODisEngage = false;
@@ -118,19 +118,14 @@ void ClimberData::changeAngleState()
 	m_shouldChangeAngleState = true;
 }
 
-bool ClimberData::shouldWinchPawlGoDown()
-{
-	return m_shouldWinchPawlGoDown;
-}
-
 bool ClimberData::shouldWinchPawlGoUp()
 {
 	return m_shouldWinchPawlGoUp;
 }
 
-void ClimberData::winchPawlDown()
+bool ClimberData::shouldWinchPawlGoDown()
 {
-	m_shouldWinchPawlGoDown = true;
+	return m_shouldWinchPawlGoDown;
 }
 
 void ClimberData::winchPawlUp()
@@ -138,9 +133,14 @@ void ClimberData::winchPawlUp()
 	m_shouldWinchPawlGoUp = true;
 }
 
+void ClimberData::winchPawlDown()
+{
+	m_shouldWinchPawlGoDown = true;
+}
+
 void ClimberData::winchPawlInactive()
 {
-	m_shouldWinchPawlGoDown = m_shouldWinchPawlGoUp = false;
+	m_shouldWinchPawlGoUp = m_shouldWinchPawlGoDown = false;
 }
 
 double ClimberData::winchPawlCurrent()

@@ -33,6 +33,10 @@ void AutoAim::Configure()
 
 INT32 AutoAim::Tick()
 {
+	m_componentData->autoAimData->setDesiredX(m_desiredX);
+	m_componentData->autoAimData->setDesiredY(m_desiredY);
+	m_componentData->autoAimData->setErrorThreshold(m_maxError);
+	
 	NetBuffer* msg;
 	
 	while((msg = m_client->ReadMessage()) != NULL)
@@ -48,16 +52,11 @@ INT32 AutoAim::Tick()
 		int x = msg->ReadInt32();
 		int y = msg->ReadInt32();
 		
-		int desiredX = msg->ReadInt32();
-		int desiredY = msg->ReadInt32();
-		
 		double strength = msg->ReadDouble();
 		
 		AsyncPrinter::Printf("AutoAim: %d %d\n", x, y);
 		m_componentData->autoAimData->setCurrentX(x);
 		m_componentData->autoAimData->setCurrentY(y);
-		m_componentData->autoAimData->setDesiredX(desiredX);
-		m_componentData->autoAimData->setDesiredY(desiredY);
 		m_componentData->autoAimData->setStrength(strength);
 		
 		NetBuffer buff;

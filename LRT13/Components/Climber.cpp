@@ -49,7 +49,6 @@ void Climber::onEnable()
 void Climber::onDisable()
 {
 	disabledPeriodic();
-	m_componentData->ledIndicatorData->setColorRGB(255,0,0);
 //	static int e = 0;
 //	e++;
 //		if (e % 10 == 0)
@@ -65,8 +64,6 @@ void Climber::enabledPeriodic()
 	const double curr = m_winchPawl->getMotorCurrent();
 	
 	m_componentData->climberData->setWinchPawlCurrent(curr);
-	
-	m_componentData->ledIndicatorData->setColorRGB(255,0,0);
 	
 	m_paused = false; //we pause
 
@@ -97,15 +94,15 @@ void Climber::enabledPeriodic()
 				m_componentData->shooterData->SetLauncherAngleHigh();
 		}
 		
-		if (m_componentData->climberData->shouldWinchPawlGoDown())
+		if (m_componentData->climberData->shouldWinchPawlGoUp())
 		{
 			AsyncPrinter::Printf("geartooth %d\n", m_winch_gear_tooth.Get());
-			m_winchPawl->setDutyCyle(0.4);
+			m_winchPawl->setDutyCyle(0.4 * m_winchPawlUpDirection);
 		}
-		else if (m_componentData->climberData->shouldWinchPawlGoUp())
+		else if (m_componentData->climberData->shouldWinchPawlGoDown())
 		{
 			AsyncPrinter::Printf("geartooth %d\n", m_winch_gear_tooth.Get());
-			m_winchPawl->setDutyCyle(-0.4);
+			m_winchPawl->setDutyCyle(0.4 * m_winchPawlDownDirection);
 		}
 		else
 		{
@@ -239,12 +236,14 @@ void Climber::enabledPeriodic()
 		if(m_climberData->shouldContinueClimbing())
 			m_state = BEGIN;
 		
+		m_driveSpeed = 0.0;
+		
 		break;
 	case BEGIN:
 		m_stateString = "BEGIN";
 		
 		m_pneumatics->setClimberArm(EXTENDED);
-
+		
 		if(m_climbing_level > GROUND)
 			m_shooterData->SetLauncherAngleHigh();
 		else
@@ -311,9 +310,9 @@ void Climber::enabledPeriodic()
 		
 		m_winchPawl->setDutyCyle(1.0F * m_winchPawlDownDirection);
 		
-		if (fabs(m_driveSpeed) < 0.99)
+		if (fabs(m_driveSpeed) < 0.1)
 		{
-			m_driveSpeed += -0.05 * m_winchPawlDownDirection;
+			m_driveSpeed += 0.05 * m_winchPawlUpDirection; // drivetrain goes in the opposite direction of the pawl
 		}
 		
 		m_componentData->drivetrainData->setControlMode(FORWARD, OPEN_LOOP);
@@ -914,6 +913,8 @@ void Climber::disengagePTO()
 
 void Climber::engagePTO()
 {
+	return;
+	
 	if(m_ptoEngaged)
 		return;
 	

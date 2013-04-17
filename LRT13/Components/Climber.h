@@ -78,8 +78,8 @@ private:
 	bool m_paused;
 	double m_driveSpeed;
 	
-	const static int m_winchPawlDownDirection = -1;
 	const static int m_winchPawlUpDirection = 1;
+	const static int m_winchPawlDownDirection = -1;
 	
 	data::climber::state m_state;
 	data::climber::state m_waitGoToState; // when the operator wishes to skip to some state

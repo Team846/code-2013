@@ -318,13 +318,13 @@ void AutonomousRoutines::ServiceAutoAimBackBoard()
 {
 	if(m_componentData->autoAimData->getDesiredX() - m_componentData->autoAimData->getCurrentX() < -m_componentData->autoAimData->getErrorThreshold())
 	{
-		// we're to the left
+		// we're to the right
 		m_componentData->drivetrainData->setControlMode(TURN, VELOCITY_CONTROL);
 		m_componentData->drivetrainData->setVelocitySetpoint(TURN, m_componentData->autoAimData->getDesiredX() - m_componentData->autoAimData->getCurrentX());
 	}
 	else if(m_componentData->autoAimData->getDesiredX() - m_componentData->autoAimData->getCurrentX() > m_componentData->autoAimData->getErrorThreshold())
 	{
-		// we're to the right
+		// we're to the left
 		m_componentData->drivetrainData->setControlMode(TURN, VELOCITY_CONTROL);
 		m_componentData->drivetrainData->setVelocitySetpoint(TURN, m_componentData->autoAimData->getDesiredX() - m_componentData->autoAimData->getCurrentX());
 	}

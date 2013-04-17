@@ -29,6 +29,7 @@
 #include "Sensors/IMU.h"
 
 #include "Utils/SmarterDashboard.h"
+#include "Sensors/AutoAim.h"
 
 #include "Components/LEDIndicators.h"
 class LRTRobot13 : public LRTRobotBase
@@ -48,6 +49,7 @@ class LRTRobot13 : public LRTRobotBase
 		ComponentManager* m_componentManager;
 		TeleopInputs* m_teleop;
 		AutonomousRoutines* m_auton;
+		AutoAim* m_autoaim;
 		
 		LEDIndicators leds;
 		

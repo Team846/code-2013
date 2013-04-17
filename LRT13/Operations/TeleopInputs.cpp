@@ -33,6 +33,7 @@ TeleopInputs::TeleopInputs(char * taskName, INT32 priority)
 			DriverStationConfig::JoystickConfig::NUM_WHEEL_AXES);
 
 	m_autoActions = new AutoActions();
+	r = 0, g = 64, b = 127;
 }
 
 TeleopInputs::~TeleopInputs()
@@ -136,12 +137,12 @@ void TeleopInputs::Update()
 		}
 		/************************Climber Functions************************/
 		
-		if (m_operator_stick->IsButtonDown(DriverStationConfig::JoystickButtons::CLIMB_STEP_FORWARD))
+		if (m_operator_stick->IsButtonDown(DriverStationConfig::JoystickButtons::CLIMB_STEP_BACKWARD))
 		{
 			if (m_componentData->climberData->getWaitingState() < RESET_FOR_CLIMBED)
 				m_componentData->climberData->setDesiredState((climber::state)(m_componentData->climberData->getWaitingState() + 1));
 		}
-		else if (m_operator_stick->IsButtonDown(DriverStationConfig::JoystickButtons::CLIMB_STEP_BACKWARD))
+		else if (m_operator_stick->IsButtonDown(DriverStationConfig::JoystickButtons::CLIMB_STEP_FORWARD))
 		{
 			if (m_componentData->climberData->getWaitingState() > RESET_FOR_INACTIVE)
 				m_componentData->climberData->setDesiredState((climber::state)(m_componentData->climberData->getWaitingState() - 1));
@@ -181,14 +182,14 @@ void TeleopInputs::Update()
 			
 			
 			
-			if (m_operator_stick->IsButtonDown(DriverStationConfig::JoystickButtons::PAWL_DOWN))
-			{
-				m_componentData->climberData->winchPawlDown();
-				
-			}
-			else if (m_operator_stick->IsButtonDown(DriverStationConfig::JoystickButtons::PAWL_UP))
+			if (m_operator_stick->IsButtonDown(DriverStationConfig::JoystickButtons::PAWL_UP))
 			{
 				m_componentData->climberData->winchPawlUp();
+				
+			}
+			else if (m_operator_stick->IsButtonDown(DriverStationConfig::JoystickButtons::PAWL_DOWN))
+			{
+				m_componentData->climberData->winchPawlDown();
 				
 			}
 			else
@@ -257,21 +258,6 @@ void TeleopInputs::Update()
 	
 		/************************Automatic Functions************************/
 	
-		if(m_componentData->autoAimData->getDesiredX() - m_componentData->autoAimData->getCurrentX() < -m_componentData->autoAimData->getErrorThreshold())
-		{
-			// we're to the left
-			m_componentData->ledIndicatorData->setColorRGB(255, 0, 0);
-		}
-		else if(m_componentData->autoAimData->getDesiredX() - m_componentData->autoAimData->getCurrentX() > m_componentData->autoAimData->getErrorThreshold())
-		{
-			// we're to the right
-			m_componentData->ledIndicatorData->setColorRGB(0, 0, 255);
-		}
-		else
-		{
-			// we're lined up!
-			m_componentData->ledIndicatorData->setColorRGB(0, 255, 0);
-		}
 		if (m_driver_stick->IsButtonDown(
 				DriverStationConfig::JoystickButtons::AUTO_AIM_BACKBOARD))
 		{
@@ -318,7 +304,32 @@ void TeleopInputs::Update()
 			m_componentData->collectorData->RunRollersBackwards();
 		}
 	}
-		
+	
+	if(m_componentData->autoAimData->getDesiredX() - m_componentData->autoAimData->getCurrentX() < -m_componentData->autoAimData->getErrorThreshold())
+	{
+		// we're to the right
+		m_componentData->ledIndicatorData->setColorRGB(0, 0, 127, data::indicators::LEFT_ARROW);
+		m_componentData->ledIndicatorData->setColorRGB(0, 0, 0, data::indicators::RIGHT_ARROW);
+		m_componentData->ledIndicatorData->setColorRGB(0, 0, 0, data::indicators::DOWN_ARROW);
+		m_componentData->ledIndicatorData->setColorRGB(0, 0, 0, data::indicators::UP_ARROW);
+	}
+	else if(m_componentData->autoAimData->getDesiredX() - m_componentData->autoAimData->getCurrentX() > m_componentData->autoAimData->getErrorThreshold())
+	{
+		// we're to the left
+		m_componentData->ledIndicatorData->setColorRGB(127, 0, 0, data::indicators::RIGHT_ARROW);
+		m_componentData->ledIndicatorData->setColorRGB(0, 0, 0, data::indicators::LEFT_ARROW);
+		m_componentData->ledIndicatorData->setColorRGB(0, 0, 0, data::indicators::DOWN_ARROW);
+		m_componentData->ledIndicatorData->setColorRGB(0, 0, 0, data::indicators::UP_ARROW);
+	}
+	else
+	{
+		// we're lined up!
+		m_componentData->ledIndicatorData->setColorRGB(0, 127, 0, data::indicators::LEFT_ARROW);
+		m_componentData->ledIndicatorData->setColorRGB(0, 127, 0, data::indicators::RIGHT_ARROW);
+		m_componentData->ledIndicatorData->setColorRGB(0, 0, 0, data::indicators::DOWN_ARROW);
+		m_componentData->ledIndicatorData->setColorRGB(0, 0, 0, data::indicators::UP_ARROW);
+	}
+	
 	/************************Config************************/
 
 	if (m_driver_stick->IsButtonJustPressed(

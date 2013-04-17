@@ -5,29 +5,29 @@ using namespace data::indicators;
 
 LEDIndicatorData::LEDIndicatorData()
 {
-	r = 0;
-	g = 0;
-	b = 0;
+	memset(r, 0, sizeof(r));
+	memset(g, 0, sizeof(g));
+	memset(b, 0, sizeof(b));
 }
 
-void LEDIndicatorData::setColorRGB(INT8 red, INT8 green, INT8 blue)
+void LEDIndicatorData::setColorRGB(INT8 red, INT8 green, INT8 blue, Indicator arrow)
 {
-	r = red;
-	g = green;
-	b = blue;
+	r[arrow] = red;
+	g[arrow] = green;
+	b[arrow] = blue;
 }
 
-INT8 LEDIndicatorData::getColorR()
+INT8 LEDIndicatorData::getColorR(Indicator arrow)
 {
-	return r;
+	return r[arrow];
 }
 
-INT8 LEDIndicatorData::getColorG()
+INT8 LEDIndicatorData::getColorG(Indicator arrow)
 {
-	return g;
+	return g[arrow];
 }
 
-INT8 LEDIndicatorData::getColorB()
+INT8 LEDIndicatorData::getColorB(Indicator arrow)
 {
-	return b;
+	return b[arrow];
 }

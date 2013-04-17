@@ -45,6 +45,7 @@ private:
 	DebouncedJoystick* m_driver_wheel;
 	
 	AutoActions* m_autoActions;
+	int r, g, b;
 };
 
 #endif
