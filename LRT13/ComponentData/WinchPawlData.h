@@ -18,9 +18,14 @@ namespace data
 			void updateMotorCurrent(double d); // this should ONLY be used by the winch pawl component
 			double getMotorCurrent();
 			
+			bool isWinchPawlTimedOut();
+			void setWinchPawlTimedOut(bool b); // this should ONLY be used by the winch pawl component
+			
 		private:
 			float m_dutyCycle;
 			double m_current;
+			
+			bool m_isWinchPawlTimedOut;
 		};
 	}
 }

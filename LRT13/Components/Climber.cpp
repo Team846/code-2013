@@ -15,7 +15,8 @@ Climber::Climber() :
 			m_digital_input_right(RobotConfig::Digital::PTO_SWITCH_RIGHT),
 			m_servo_left(RobotConfig::Servo::LEFT_PTO_SERVO, "leftServo"),
 			m_servo_right(RobotConfig::Servo::RIGHT_PTO_SERVO, "rightServo"),
-			m_winch_gear_tooth((UINT32) RobotConfig::Digital::WINCH_GEAR_TOOTH)
+			m_winch_gear_tooth((UINT32) RobotConfig::Digital::WINCH_GEAR_TOOTH),
+			m_logFile()
 {
 	m_climbing_level = 0;
 	m_pneumatics = Pneumatics::Instance();
@@ -44,10 +45,15 @@ Climber::~Climber()
 
 void Climber::onEnable()
 {
+	if (!m_logFile.is_open())
+		m_logFile.open("climber.log");
 }
 
 void Climber::onDisable()
 {
+	if(m_logFile.is_open())
+		m_logFile.close();
+	
 	disabledPeriodic();
 //	static int e = 0;
 //	e++;
@@ -61,12 +67,19 @@ void Climber::onDisable()
 
 void Climber::enabledPeriodic()
 {
+	m_logFile << "Time: " << Timer::GetFPGATimestamp() << endl;
+	
 	const double curr = m_winchPawl->getMotorCurrent();
 	
 	m_componentData->climberData->setWinchPawlCurrent(curr);
 	
 	m_paused = false; //we pause
 
+	if(m_state != INACTIVE && m_winchPawl->isWinchPawlTimedOut())
+	{
+		m_climberData->setShouldPotentiallyAbort(true);
+	}
+	
 	if (m_state != INACTIVE && m_componentData->climberData->shouldPotentiallyAbort())
 	{
 		m_state = INACTIVE;
@@ -298,6 +311,8 @@ void Climber::enabledPeriodic()
 		
 		m_drive_train_position = m_winch_gear_tooth.Get();
 		
+		m_logFile << "m_drive_train_position: " << m_drive_train_position << endl;
+		
 		m_driveSpeed = 0.0;
 
 		m_state = CLIMB;
@@ -310,9 +325,11 @@ void Climber::enabledPeriodic()
 		
 		m_winchPawl->setDutyCyle(1.0F * m_winchPawlDownDirection);
 		
-		if (fabs(m_driveSpeed) < 0.1)
+		if (fabs(m_driveSpeed) < 1.0)
 		{
-			m_driveSpeed += 0.05 * m_winchPawlUpDirection; // drivetrain goes in the opposite direction of the pawl
+			m_driveSpeed += 0.05 * m_winchPawlUpDirection; // drivetrain goes in the opposite direction of the pawl\
+			
+			m_logFile << "m_driveSpeed: " << m_driveSpeed << endl;
 		}
 		
 		m_componentData->drivetrainData->setControlMode(FORWARD, OPEN_LOOP);
@@ -320,8 +337,12 @@ void Climber::enabledPeriodic()
 		m_componentData->drivetrainData->setOpenLoopOutput(FORWARD, m_driveSpeed);
 		m_componentData->drivetrainData->setOpenLoopOutput(TURN, 0.0);
 		
+		m_logFile << "gear tooth: " << m_winch_gear_tooth.Get() << endl;
+		
 		if (m_winch_gear_tooth.Get() - m_drive_train_position > 39)//Should be about 42
 		{
+			m_logFile << "stopping" << endl;
+			
 			m_winchPawl->setDutyCyle(0.0); // all right, paul, you can take a breather now
 			
 			// stop the drivetrain now
@@ -592,6 +613,12 @@ void Climber::enabledPeriodic()
 		AsyncPrinter::Printf("Climb state: %s\n", m_stateString.c_str());
 	
 	SmarterDashboard::Instance()->SetTelemetryData<string>(TelemetryType::CLIMBER_STATE, m_stateString);
+	
+	m_logFile << "State: " << m_stateString << endl;
+	m_logFile << "Winch Pawl Current: " << m_winchPawl->getMotorCurrent() << " amps" << endl;
+	m_logFile << "Winch Pawl Requested Out: " << m_winchPawl->getDutyCycle() << endl;
+	m_logFile << "Drivetrain Forward Open Loop Out: " << m_componentData->drivetrainData->getOpenLoopOutput(FORWARD) << endl;
+	m_logFile << endl;
 	
 	/*
 	switch (m_state)
@@ -900,28 +927,36 @@ void Climber::enabledPeriodic()
 	m_previous_state = m_state;
 }
 
-void Climber::disengagePTO()
+void Climber::disengagePTO(bool force)
 {
-	if(!m_ptoEngaged)
+	if(!m_ptoEngaged && !force)
 		return;
 	
 	m_servo_left.SetEnabled(true);
 	m_servo_right.SetEnabled(true);
 	m_servo_left.SetMicroseconds(m_servo_left_disengaged_position);
 	m_servo_right.SetMicroseconds(m_servo_right_disengaged_position);
+	
+	m_ptoEngaged = false;
+	
+	m_logFile << "PTO disengaged." << endl;
 }
 
-void Climber::engagePTO()
+void Climber::engagePTO(bool force)
 {
 	return;
 	
-	if(m_ptoEngaged)
+	if(m_ptoEngaged && !force)
 		return;
 	
 	m_servo_left.SetEnabled(true);
 	m_servo_right.SetEnabled(true);
 	m_servo_left.SetMicroseconds(m_servo_left_engaged_position);
 	m_servo_right.SetMicroseconds(m_servo_right_engaged_position);
+	
+	m_ptoEngaged = true;
+	
+	m_logFile << "PTO engaged." << endl;
 }
 
 void Climber::disabledPeriodic()
@@ -936,10 +971,8 @@ void Climber::disabledPeriodic()
 	e++;
 //	if (e % 10 == 0)
 //		AsyncPrinter::Printf("Climber Disabled\n");
-	m_servo_left.SetEnabled(true);
-	m_servo_right.SetEnabled(true);
-	m_servo_left.SetMicroseconds(m_servo_left_disengaged_position);
-	m_servo_right.SetMicroseconds(m_servo_right_disengaged_position);
+	
+	disengagePTO(true);
 	
 	m_pneumatics->setHookPosition(false);
 //	if (e % 50 == 0)

@@ -28,3 +28,13 @@ double WinchPawlData::getMotorCurrent()
 {
 	return m_current;
 }
+
+bool WinchPawlData::isWinchPawlTimedOut()
+{
+	return m_isWinchPawlTimedOut;
+}
+
+void WinchPawlData::setWinchPawlTimedOut(bool b)
+{
+	m_isWinchPawlTimedOut = b;
+}

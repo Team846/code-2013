@@ -61,9 +61,6 @@ void WinchPawl::enabledPeriodic()
 	
 	//AsyncPrinter::Printf("Timer: %f\n", m_stopWatch.TotalElapsedSeconds());
 	
-	float out = m_timedOut ? 0.0 : requestedDutyCycle;
-	m_jaguar.SetDutyCycle(out);
-	
 	double current = m_jaguar.GetOutputCurrent();
 	
 	if(current >= m_overCurrentThreshold)
@@ -85,7 +82,11 @@ void WinchPawl::enabledPeriodic()
 		m_overCurrentCounter = 0;
 	}
 	
+	float out = m_timedOut ? 0.0 : requestedDutyCycle;
+	m_jaguar.SetDutyCycle(out);
+	
 	m_winchPawlData->updateMotorCurrent(current);
+	m_winchPawlData->setWinchPawlTimedOut(m_timedOut);
 	
 	SmarterDashboard::Instance()->SetTelemetryData<double>(TelemetryType::CLIMBER_WINCH_PAWL_CURRENT, current);
 	SmarterDashboard::Instance()->SetTelemetryData<float>(TelemetryType::CLIMBER_WINCH_PAWL_OUTPUT_DUTY_CYCLE, out);

@@ -43,8 +43,8 @@ public:
 	virtual void Configure();
 	virtual void Log();
 private:
-	void disengagePTO();
-	void engagePTO();
+	void disengagePTO(bool force=false);
+	void engagePTO(bool force=false);
 	
 	bool m_ptoEngaged;
 	
@@ -77,6 +77,8 @@ private:
 	data::climber::state m_previous_state;
 	bool m_paused;
 	double m_driveSpeed;
+	
+	ofstream m_logFile;
 	
 	const static int m_winchPawlUpDirection = 1;
 	const static int m_winchPawlDownDirection = -1;
