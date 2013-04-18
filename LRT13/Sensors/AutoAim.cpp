@@ -70,5 +70,7 @@ INT32 AutoAim::Tick()
 		DELETE(msg);
 	}
 	
+	taskDelay(sysClkRateGet() / 100);
+	
 	return 0;
 }

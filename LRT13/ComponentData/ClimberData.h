@@ -105,10 +105,9 @@ typedef enum humanState
 		bool EngagePTO();
 		bool DisengagePTO();
 		
-		void extendHooks();
-		void retractHooks();
+		void changeHooks();
 		
-		bool shouldExtendHooks();
+		bool shouldChangeHooks();
 		
 		void extendArm();
 		void retractArm();
@@ -136,7 +135,7 @@ typedef enum humanState
 		
 		bool m_shoulddebug;
 		
-		bool m_shouldExtendHooks;
+		bool m_shouldChangeHooks;
 		
 		bool m_shouldExtendArm;
 		

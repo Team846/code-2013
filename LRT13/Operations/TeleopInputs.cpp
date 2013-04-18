@@ -147,24 +147,7 @@ void TeleopInputs::Update()
 			if (m_componentData->climberData->getWaitingState() > RESET_FOR_INACTIVE)
 				m_componentData->climberData->setDesiredState((climber::state)(m_componentData->climberData->getWaitingState() - 1));
 		}
-		if (m_operator_stick->IsButtonDown(DriverStationConfig::JoystickButtons::CONDITIONAL_ABORT))
-		{
-			m_componentData->climberData->setShouldPotentiallyAbort(true);
-		}
-		else
-		{
-			m_componentData->climberData->setShouldPotentiallyAbort(false);
-		}
 		
-		if (m_operator_stick->IsButtonJustPressed(DriverStationConfig::JoystickButtons::ARM_ANGLE))
-		{
-	//		m_componentData->climberData->changeAngleState();
-			//change angle
-			if (m_componentData->shooterData->ShouldLauncherBeHigh())
-						m_componentData->shooterData->SetLauncherAngleLow();
-					else
-						m_componentData->shooterData->SetLauncherAngleHigh();
-		}
 		if (m_operator_stick->IsButtonDown(DriverStationConfig::JoystickButtons::DEBUG_CLIMBER))
 		{
 			m_componentData->climberData->enableDebug();
@@ -180,7 +163,10 @@ void TeleopInputs::Update()
 				m_componentData->climberData->DisengagePTO();
 			}
 			
-			
+			if(m_operator_stick->IsButtonJustPressed(DriverStationConfig::JoystickButtons::ARM_ANGLE))
+			{
+				m_componentData->climberData->changeHooks();
+			}
 			
 			if (m_operator_stick->IsButtonDown(DriverStationConfig::JoystickButtons::PAWL_UP))
 			{
@@ -194,9 +180,39 @@ void TeleopInputs::Update()
 			}
 			else
 				m_componentData->climberData->winchPawlInactive();
+			
+			if (m_operator_stick->IsButtonDown(DriverStationConfig::JoystickButtons::CONDITIONAL_ABORT))
+			{
+				m_componentData->climberData->setShouldPotentiallyAbort(true);
+			}
+			else
+			{
+				m_componentData->climberData->setShouldPotentiallyAbort(false);
+			}
 		}
 		else
+		{
 			m_componentData->climberData->disableDebug();
+		
+			if (m_operator_stick->IsButtonJustPressed(DriverStationConfig::JoystickButtons::ARM_ANGLE))
+			{
+		//		m_componentData->climberData->changeAngleState();
+				//change angle
+				if (m_componentData->shooterData->ShouldLauncherBeHigh())
+							m_componentData->shooterData->SetLauncherAngleLow();
+						else
+							m_componentData->shooterData->SetLauncherAngleHigh();
+			}
+			
+			if (m_operator_stick->IsButtonJustPressed(DriverStationConfig::JoystickButtons::SHOOTER_ON))
+			{
+				m_componentData->shooterData->SetEnabled(true);
+			}
+			else if (m_operator_stick->IsButtonJustPressed(DriverStationConfig::JoystickButtons::DEBUG_CLIMBER))
+			{
+				m_componentData->shooterData->SetEnabled(false);
+			}
+		}
 		
 		if (m_driver_stick->IsButtonJustPressed(
 				DriverStationConfig::JoystickButtons::START_CLIMB))
@@ -247,14 +263,6 @@ void TeleopInputs::Update()
 				m_componentData->shooterData->SetLauncherAngleHigh();
 		}
 		
-		if (m_operator_stick->IsButtonJustPressed(DriverStationConfig::JoystickButtons::SHOOTER_ON))
-		{
-			m_componentData->shooterData->SetEnabled(true);
-		}
-		else if (m_operator_stick->IsButtonJustPressed(DriverStationConfig::JoystickButtons::DEBUG_CLIMBER))
-		{
-			m_componentData->shooterData->SetEnabled(false);
-		}
 	
 		/************************Automatic Functions************************/
 	

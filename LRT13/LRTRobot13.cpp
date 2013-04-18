@@ -43,8 +43,8 @@ void LRTRobot13::RobotInit()
 	m_componentManager = new ComponentManager();
 	m_componentManager->CreateComponents();
 	
-	m_autoaim = new AutoAim();
-	m_autoaim->Start();
+	//m_autoaim = new AutoAim();
+	//m_autoaim->Start();
 	
 	AsyncPrinter::Println("Starting TeleopInputs Task...");
 	m_teleop = new TeleopInputs("TeleopInputs");

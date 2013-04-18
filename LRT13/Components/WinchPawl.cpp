@@ -85,6 +85,8 @@ void WinchPawl::enabledPeriodic()
 	float out = m_timedOut ? 0.0 : requestedDutyCycle;
 	m_jaguar.SetDutyCycle(out);
 	
+	AsyncPrinter::Printf("Winch Pawl Actual: %f\n", out);
+	
 	m_winchPawlData->updateMotorCurrent(current);
 	m_winchPawlData->setWinchPawlTimedOut(m_timedOut);
 	

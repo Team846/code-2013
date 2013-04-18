@@ -60,8 +60,8 @@ private:
 	DigitalInput m_digital_input_left, m_digital_input_right;
 	bool m_hasStartedEngaging;
 	bool m_isEnabled;
-	double m_drive_train_position;
-	double  m_drive_train_position_threshold;
+	int m_drive_train_position;
+	int  m_drive_train_position_threshold;
 	DriveEncoders* m_driving_encoders;
 	LRTServo m_servo_left;
 	LRTServo m_servo_right;
@@ -77,6 +77,8 @@ private:
 	data::climber::state m_previous_state;
 	bool m_paused;
 	double m_driveSpeed;
+	
+	int m_climbingLevelGearToothTicks[3];
 	
 	ofstream m_logFile;
 	
