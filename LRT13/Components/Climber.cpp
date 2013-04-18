@@ -20,11 +20,11 @@ Climber::Climber() :
 {
 	m_climbing_level = 0;
 	m_pneumatics = Pneumatics::Instance();
-	m_state = INACTIVE;
+	m_state = NOTHING;
 	m_driving_encoders = DriveEncoders::GetInstance();
 	m_climbing_level = 0;
 	m_paused = false;
-	m_previous_state = INACTIVE;
+	m_previous_state = NOTHING;
 	m_winch_gear_tooth.Start();
 	
 	m_winchPawl = m_componentData->winchPawlData;
@@ -98,6 +98,7 @@ void Climber::enabledPeriodic()
 	static bool wasDebugging = false;
 	if (m_componentData->climberData->shouldDebug())
 	{
+		m_climberData->setCurrentState(DEBUG_MODE);
 		AsyncPrinter::Printf("Debug\n");
 		if (m_componentData->climberData->shouldChangeAngleState())
 		{
@@ -110,12 +111,12 @@ void Climber::enabledPeriodic()
 		if (m_componentData->climberData->shouldWinchPawlGoUp())
 		{
 			AsyncPrinter::Printf("winchpawl up %d\n", m_winch_gear_tooth.Get());
-			m_winchPawl->setDutyCyle(1.0 * m_winchPawlUpDirection);
+			m_winchPawl->setDutyCyle(1.0f * m_winchPawlUpDirection);
 		}
 		else if (m_componentData->climberData->shouldWinchPawlGoDown())
 		{
 			AsyncPrinter::Printf("winch pawl down %d\n", m_winch_gear_tooth.Get());
-			m_winchPawl->setDutyCyle(1.0 * m_winchPawlDownDirection);
+			m_winchPawl->setDutyCyle(1.0f * m_winchPawlDownDirection);
 		}
 		else
 		{
@@ -137,6 +138,10 @@ void Climber::enabledPeriodic()
 			m_pneumatics->setHookPosition(!m_pneumatics->GetHookState());
 		}
 		
+		if(m_climberData->shouldChangeArm())
+		{
+			m_pneumatics->setClimberArm(!m_pneumatics->GetClimberState(), true);
+		}
 //		m_pneumatics->setHookPosition(m_componentData->climberData->shouldExtendHooks());
 //		m_pneumatics->setClimberArm(m_componentData->climberData->shouldExtendArm());
 //		AsyncPrinter::Printf("Still alive %d\n", GetFPGATime());
@@ -241,6 +246,9 @@ void Climber::enabledPeriodic()
 	
 	switch(m_state)
 	{
+	case NOTHING:
+		if(m_climberData->shouldContinueClimbing())
+			m_state = INACTIVE;
 	case INACTIVE:
 		m_stateString = "INACTIVE";
 		
@@ -265,22 +273,42 @@ void Climber::enabledPeriodic()
 		
 		m_pneumatics->setClimberArm(EXTENDED, true);
 		
-		if(m_climbing_level > GROUND)
-			m_shooterData->SetLauncherAngleHigh();
-		else
-			m_shooterData->SetLauncherAngleLow();
+		m_shooterData->SetLauncherAngleLow();
+		
+		if(m_climberData->shouldContinueClimbing())
+			m_state = m_climbing_level > GROUND ? ARM_UP : COLLECTOR_DOWN;
+		break;
+	case ARM_UP:
+		m_stateString = "ARM_UP";
+		
+		// let the operator / autoclimb do its job!
+		
+		if(m_climberData->shouldContinueClimbing())
+			m_state = COLLECTOR_DOWN;
+		
+		break;
+	case COLLECTOR_DOWN:
+		m_stateString = "COLLECTOR_DOWN";
+		
+		m_shooterData->SetLauncherAngleLow();
+		m_pneumatics->setCollector(EXTENDED, true);
 		
 		if(m_climberData->shouldContinueClimbing())
 			m_state = LINE_UP;
-		break;
 	case LINE_UP:
 		m_stateString = "LINE_UP";
+
+		if(m_climbing_level > GROUND)
+			m_shooterData->SetLauncherAngleHigh();
+		else
+		{
+			m_shooterData->SetLauncherAngleLow();
+		}
 		
 		// let the operator / autoclimb do its job!
 		
 		if(m_climberData->shouldContinueClimbing())
 			m_state = ARM_DOWN_PREPARE;
-		
 		break;
 	case ARM_DOWN_PREPARE:
 		m_stateString = "ARM_DOWN_PREPARE";
@@ -314,6 +342,8 @@ void Climber::enabledPeriodic()
 		
 		m_pneumatics->setHookPosition(RETRACTED, true);
 		m_shooterData->SetLauncherAngleLow();
+		if (m_climbing_level > GROUND)
+			m_pneumatics->setCollector(RETRACTED, true);
 		
 		engagePTO();
 		
@@ -456,7 +486,7 @@ void Climber::enabledPeriodic()
 		m_componentData->drivetrainData->setOpenLoopOutput(TURN, 0.0);
 		
 		if(m_climberData->shouldContinueClimbing())
-			m_state = LINE_UP;
+			m_state = ARM_UP;
 		break;
 	case RESET_FOR_ARM_DOWN_PREPARE:
 		m_stateString = "RESET_ARM_DOWN_PREPARE";
@@ -978,6 +1008,7 @@ void Climber::disabledPeriodic()
 	
 	m_componentData->climberData->setDesiredClimbingStep(INTENDED_IDLE );
 	m_state = INACTIVE;//Restart the routine, makes debugging easier.
+	m_climbing_level = GROUND;
 	static int e = 0;
 	e++;
 //	if (e % 10 == 0)

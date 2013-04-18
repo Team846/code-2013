@@ -18,7 +18,7 @@ ClimberData::ClimberData()
 
 	m_shouldPotentiallyAbort = false;
 	
-	m_shouldExtendArm = false;
+	m_shouldChangeArm = false;
 	m_shouldChangeHooks = false;
 	
 	m_winchPawlCurrent = 0.0;
@@ -84,7 +84,7 @@ bool ClimberData::shouldChangeHooks()
 
 bool ClimberData::changeArmState()
 {
-	m_shouldExtendArm = !m_shouldExtendArm;
+	m_shouldChangeArm = !m_shouldChangeArm;
 }
 
 bool ClimberData::shouldChangeAngleState()
@@ -99,17 +99,23 @@ bool ClimberData::shouldChangeAngleState()
 
 void ClimberData::extendArm()
 {
-	m_shouldExtendArm = true;
+	m_shouldChangeArm = true;
 }
 
 void ClimberData::retractArm()
 {
-	m_shouldExtendArm = false;
+	m_shouldChangeArm = false;
 }
 
-bool ClimberData::shouldExtendArm()
+bool ClimberData::shouldChangeArm()
 {
-	return m_shouldExtendArm;
+	if(m_shouldChangeArm)
+	{
+		m_shouldChangeArm = false;
+		return true;
+	}
+	
+	return false;
 }
 
 void ClimberData::changeAngleState()

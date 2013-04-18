@@ -192,6 +192,7 @@ void TeleopInputs::Update()
 		}
 		else
 		{
+			m_componentData->climberData->winchPawlInactive();
 			m_componentData->climberData->disableDebug();
 		
 			if (m_operator_stick->IsButtonJustPressed(DriverStationConfig::JoystickButtons::ARM_ANGLE))

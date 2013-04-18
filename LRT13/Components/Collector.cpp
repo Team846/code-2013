@@ -4,6 +4,7 @@
 #include "../Config/RobotConfig.h"
 #include "../Config/DriverStationConfig.h"
 #include "../ComponentData/ShooterData.h"
+#include "../ComponentData/ClimberData.h"
 
 Collector::Collector()
 : Component("Collector", DriverStationConfig::DigitalIns::COLLECTOR, true),
@@ -41,6 +42,8 @@ void Collector::onDisable()
 
 void Collector::enabledPeriodic()
 {
+	if (m_componentData->climberData->getCurrentState() != climber::NOTHING)
+		return;
 	if (m_componentData->collectorData->ShouldRunRollers())
 	{
 		m_jaguar->SetDutyCycle(m_dutyCycle * m_componentData->collectorData->RollerDirection());

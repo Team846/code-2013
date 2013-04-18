@@ -16,25 +16,28 @@ typedef enum state
 		NOTHING = -1,
 		INACTIVE = 0,
 		BEGIN = 1,
-		LINE_UP = 2,
-		ARM_DOWN_PREPARE = 3,
-		ARM_DOWN = 4,
-		CLIMB_PREPARE = 5,
-		CLIMB = 6,
-		TURN_WINCH_PAWL_OFF = 7,
-		EXTEND_HOOKS = 8,
-		CLIMBED = 9,
-		WAIT = 10,
-		RESET_FOR_INACTIVE = 11,
-		RESET_FOR_BEGIN = 12,
-		RESET_FOR_LINE_UP = 13,
-		RESET_FOR_ARM_DOWN_PREPARE = 14,
-		RESET_FOR_ARM_DOWN = 15,
-		RESET_FOR_CLIMB_PREPARE = 16,
-		RESET_FOR_CLIMB = 17,
-		RESET_FOR_TURN_WINCH_PAWL_OFF = 18,
-		RESET_FOR_EXTEND_HOOKS = 19,
-		RESET_FOR_CLIMBED = 20,
+		ARM_UP = 2,
+		COLLECTOR_DOWN = 3,
+		LINE_UP = 4,
+		ARM_DOWN_PREPARE = 5,
+		ARM_DOWN = 6,
+		CLIMB_PREPARE = 7,
+		CLIMB = 8,
+		TURN_WINCH_PAWL_OFF = 9,
+		EXTEND_HOOKS = 10,
+		CLIMBED = 11,
+		WAIT = 12,
+		RESET_FOR_INACTIVE = 13,
+		RESET_FOR_BEGIN = 14,
+		RESET_FOR_LINE_UP = 15,
+		RESET_FOR_ARM_DOWN_PREPARE = 16,
+		RESET_FOR_ARM_DOWN = 17,
+		RESET_FOR_CLIMB_PREPARE = 18,
+		RESET_FOR_CLIMB = 19,
+		RESET_FOR_TURN_WINCH_PAWL_OFF = 20,
+		RESET_FOR_EXTEND_HOOKS = 21,
+		RESET_FOR_CLIMBED = 22,
+		DEBUG_MODE = 100,
 		
 //		IDLE = 1,
 //		ARM_UP_INITIAL = 2,
@@ -112,7 +115,7 @@ typedef enum humanState
 		void extendArm();
 		void retractArm();
 		
-		bool shouldExtendArm();
+		bool shouldChangeArm();
 		
 		void setDesiredState(state target);
 		state getDesiredState();
@@ -137,7 +140,7 @@ typedef enum humanState
 		
 		bool m_shouldChangeHooks;
 		
-		bool m_shouldExtendArm;
+		bool m_shouldChangeArm;
 		
 		double m_winchPawlCurrent;
 		

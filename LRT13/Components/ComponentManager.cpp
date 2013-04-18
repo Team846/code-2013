@@ -28,7 +28,7 @@ void ComponentManager::CreateComponents()
 {
 	AddComponent(new Collector());//must be before the shooter
 	AddComponent(new Climber()); //climber must be before drivetrain
-`	AddComponent(new WinchPawl());
+	AddComponent(new WinchPawl());
 	AddComponent(new Shooter()); //must be after climber
 	AddComponent(new Drivetrain());
 	AddComponent(new ConfigLoader());

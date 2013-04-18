@@ -147,6 +147,9 @@ void LRTRobot13::Tick()
 	// Update LogManager
 	LogManager::Instance()->RunOneCycle();
 	
+	if(DriverStation::GetInstance()->GetBatteryVoltage() < 7.5)
+		AsyncPrinter::Printf("[WARNING] Battery voltage: %f\n", DriverStation::GetInstance()->GetBatteryVoltage());
+	
 	// Update SmarterDashboard -- this should be the last thing!
 	SmarterDashboard::Instance()->Tick();
 	
