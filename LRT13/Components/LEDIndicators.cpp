@@ -3,11 +3,8 @@
 
 #define NUM_LEDS 16
 LEDIndicators::LEDIndicators() :
-	AsyncProcess("LED Indicators"), m_clockOut(RobotConfig::Digital::LED_CLOCK_OUT), m_dataOut(RobotConfig::Digital::LED_DATA_OUT), m_spi(new DigitalOutput(RobotConfig::Digital::LED_CLOCK_OUT), new DigitalOutput(RobotConfig::Digital::LED_DATA_OUT))
+	AsyncProcess("LED Indicators"), m_clockOut(RobotConfig::Digital::LED_CLOCK_OUT), m_dataOut(RobotConfig::Digital::LED_DATA_OUT)
 {
-	m_spi.SetMSBFirst();
-	m_spi.SetClockRate(2000000);
-	m_spi.SetSampleDataOnRising();
 	// get the strip's attention
 	writezeros(4);
 }
@@ -55,9 +52,9 @@ void LEDIndicators::write8(uint8_t d)
 			
 		//taskDelay(sysClkRateGet() / 1000);
 		m_clockOut.Set(1);
-		taskDelay(sysClkRateGet() / 10000);
+		taskDelay(sysClkRateGet() / 1000);
 		m_clockOut.Set(0);
-		taskDelay(sysClkRateGet() / 10000);
+		taskDelay(sysClkRateGet() / 1000);
 	}
 }
 

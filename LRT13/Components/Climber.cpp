@@ -3,6 +3,7 @@
 #include "../Config/ConfigManager.h"
 #include "../Config/RobotConfig.h"
 #include "../Config/DriverStationConfig.h"
+#include "../ComponentData/CollectorData.h"
 
 using namespace data::climber;
 using namespace data;
@@ -80,9 +81,9 @@ void Climber::enabledPeriodic()
 //		m_climberData->setShouldPotentiallyAbort(true);
 //	}
 	
-	if (m_state != INACTIVE && m_componentData->climberData->shouldPotentiallyAbort())
+	if (m_state != NOTHING && m_componentData->climberData->shouldPotentiallyAbort())
 	{
-		m_state = INACTIVE;
+		m_state = NOTHING;
 		m_componentData->drivetrainData->setOpenLoopOutput(FORWARD, 0.0);
 		m_componentData->drivetrainData->setOpenLoopOutput(TURN, 0.0);
 		m_componentData->drivetrainData->setVelocitySetpoint(FORWARD, 0.0);
@@ -112,16 +113,40 @@ void Climber::enabledPeriodic()
 		{
 			AsyncPrinter::Printf("winchpawl up %d\n", m_winch_gear_tooth.Get());
 			m_winchPawl->setDutyCyle(1.0f * m_winchPawlUpDirection);
+			
+			if(m_ptoEngaged)
+			{
+				m_componentData->drivetrainData->setControlMode(FORWARD, OPEN_LOOP);
+				m_componentData->drivetrainData->setControlMode(TURN, OPEN_LOOP);
+				m_componentData->drivetrainData->setOpenLoopOutput(FORWARD, 1.0F * m_winchPawlDownDirection);
+				m_componentData->drivetrainData->setOpenLoopOutput(TURN, 0.0);
+			}
 		}
 		else if (m_componentData->climberData->shouldWinchPawlGoDown())
 		{
 			AsyncPrinter::Printf("winch pawl down %d\n", m_winch_gear_tooth.Get());
 			m_winchPawl->setDutyCyle(1.0f * m_winchPawlDownDirection);
+		
+			if(m_ptoEngaged)
+			{
+				m_componentData->drivetrainData->setControlMode(FORWARD, OPEN_LOOP);
+				m_componentData->drivetrainData->setControlMode(TURN, OPEN_LOOP);
+				m_componentData->drivetrainData->setOpenLoopOutput(FORWARD, 1.0F * m_winchPawlUpDirection);
+				m_componentData->drivetrainData->setOpenLoopOutput(TURN, 0.0);
+			}
 		}
 		else
 		{
 //			AsyncPrinter::Printf("You failed a tlife!\n");
 			m_winchPawl->setDutyCyle(0.0);
+		
+			if(m_ptoEngaged)
+			{
+				m_componentData->drivetrainData->setControlMode(FORWARD, OPEN_LOOP);
+				m_componentData->drivetrainData->setControlMode(TURN, OPEN_LOOP);
+				m_componentData->drivetrainData->setOpenLoopOutput(FORWARD, 0.0);
+				m_componentData->drivetrainData->setOpenLoopOutput(TURN, 0.0);
+			}
 		}
 		
 		if (m_componentData->climberData->shouldPTOChangeDisengage())
@@ -247,12 +272,20 @@ void Climber::enabledPeriodic()
 	switch(m_state)
 	{
 	case NOTHING:
+		m_stateString = "NOTHING";
+		
+		disengagePTO(true);
+		
+		m_winchPawl->setDutyCyle(0.0F);
+		
 		if(m_climberData->shouldContinueClimbing())
 			m_state = INACTIVE;
+		
+		break;
 	case INACTIVE:
 		m_stateString = "INACTIVE";
 		
-		disengagePTO();
+//		disengagePTO(true);
 		
 		if(m_climbing_level == GROUND)
 		{
@@ -274,24 +307,52 @@ void Climber::enabledPeriodic()
 		m_pneumatics->setClimberArm(EXTENDED, true);
 		
 		m_shooterData->SetLauncherAngleLow();
+		m_drive_train_position = m_winch_gear_tooth.Get();
 		
 		if(m_climberData->shouldContinueClimbing())
 			m_state = m_climbing_level > GROUND ? ARM_UP : COLLECTOR_DOWN;
 		break;
 	case ARM_UP:
 		m_stateString = "ARM_UP";
+
+//		disengagePTO(true);
 		
-		// let the operator / autoclimb do its job!
+		m_componentData->collectorData->SlideUp();
+//		m_pneumatics->setCollector(RETRACTED, true);
+
+		m_winchPawl->setDutyCyle(1.0F * m_winchPawlUpDirection);
+		m_componentData->drivetrainData->setControlMode(FORWARD, OPEN_LOOP);
+		m_componentData->drivetrainData->setControlMode(TURN, OPEN_LOOP);
+		m_componentData->drivetrainData->setOpenLoopOutput(FORWARD, 1.0F * m_winchPawlDownDirection);
+		m_componentData->drivetrainData->setOpenLoopOutput(TURN, 0.0);
 		
-		if(m_climberData->shouldContinueClimbing())
-			m_state = COLLECTOR_DOWN;
+		m_logFile << "gear tooth: " << m_winch_gear_tooth.Get() << endl;
+		AsyncPrinter::Printf("Start pos: %d, Gear tooth: %d\n", m_drive_train_position, m_winch_gear_tooth.Get());
+		
+		if (abs(m_winch_gear_tooth.Get() - m_drive_train_position) > 155)
+		{
+			m_logFile << "stopping" << endl;
+			
+			m_winchPawl->setDutyCyle(0.0); // all right, paul, you can take a breather now
+			
+			// stop the drivetrain now
+			m_componentData->drivetrainData->setControlMode(FORWARD, OPEN_LOOP);
+			m_componentData->drivetrainData->setControlMode(TURN, OPEN_LOOP);
+			m_componentData->drivetrainData->setOpenLoopOutput(FORWARD, 0.0);
+			m_componentData->drivetrainData->setOpenLoopOutput(TURN, 0.0);
+			
+			if(m_climberData->shouldContinueClimbing())
+				m_state = COLLECTOR_DOWN;
+		}
 		
 		break;
 	case COLLECTOR_DOWN:
 		m_stateString = "COLLECTOR_DOWN";
 		
 		m_shooterData->SetLauncherAngleLow();
-		m_pneumatics->setCollector(EXTENDED, true);
+		if (m_climbing_level > GROUND)
+			m_componentData->collectorData->SlideDown();
+//			m_pneumatics->setCollector(EXTENDED, true);
 		
 		if(m_climberData->shouldContinueClimbing())
 			m_state = LINE_UP;
@@ -343,7 +404,8 @@ void Climber::enabledPeriodic()
 		m_pneumatics->setHookPosition(RETRACTED, true);
 		m_shooterData->SetLauncherAngleLow();
 		if (m_climbing_level > GROUND)
-			m_pneumatics->setCollector(RETRACTED, true);
+			m_componentData->collectorData->SlideUp();
+//			m_pneumatics->setCollector(RETRACTED, true);
 		
 		engagePTO();
 		
@@ -1007,7 +1069,7 @@ void Climber::disabledPeriodic()
 	m_winchPawl->setDutyCyle(0.0f);
 	
 	m_componentData->climberData->setDesiredClimbingStep(INTENDED_IDLE );
-	m_state = INACTIVE;//Restart the routine, makes debugging easier.
+	m_state = NOTHING;//Restart the routine, makes debugging easier.
 	m_climbing_level = GROUND;
 	static int e = 0;
 	e++;

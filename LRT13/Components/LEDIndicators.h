@@ -22,7 +22,6 @@ public:
 	void writezeros(uint16_t n);
 	
 private:
-	SPI m_spi;
 	DigitalOutput m_clockOut;
 	DigitalOutput m_dataOut;
 };

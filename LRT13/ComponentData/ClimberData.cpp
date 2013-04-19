@@ -24,7 +24,7 @@ ClimberData::ClimberData()
 	m_winchPawlCurrent = 0.0;
 	
 	m_desiredState = NOTHING;
-	m_currentState = INACTIVE;
+	m_currentState = NOTHING;
 	m_waitingState = NOTHING;
 }
 

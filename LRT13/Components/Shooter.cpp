@@ -202,7 +202,7 @@ void Shooter::enabledPeriodic()
 #if RELIABLE_SHOOTING
 						if (m_errors[INNER] > frisbeeDetectionThreshold || m_timer < 0)
 #else
-						if (m_errorsNormalized[INNER] > frisbeeDetectionThreshold)
+						if (fabs(m_errorsNormalized[INNER]) > frisbeeDetectionThreshold)
 #endif
 							
 						{

@@ -82,7 +82,7 @@ void TeleopInputs::Update()
 		{
 			double turn = 0.0;
 			turn = -m_driver_wheel->GetAxis(Joystick::kXAxis);
-			turn *= 2;
+			turn *= 3;
 			//turn = -m_driver_stick->GetAxis(Joystick::kZAxis);
 
 			double forward = pow(-m_driver_stick->GetAxis(Joystick::kYAxis),
@@ -152,6 +152,7 @@ void TeleopInputs::Update()
 		{
 			m_componentData->climberData->enableDebug();
 	
+			m_componentData->shooterData->SetEnabled(false);
 			
 			if (m_operator_stick->IsButtonJustPressed(DriverStationConfig::JoystickButtons::ENGAGE_PTO))
 			{
@@ -208,10 +209,6 @@ void TeleopInputs::Update()
 			if (m_operator_stick->IsButtonJustPressed(DriverStationConfig::JoystickButtons::SHOOTER_ON))
 			{
 				m_componentData->shooterData->SetEnabled(true);
-			}
-			else if (m_operator_stick->IsButtonJustPressed(DriverStationConfig::JoystickButtons::DEBUG_CLIMBER))
-			{
-				m_componentData->shooterData->SetEnabled(false);
 			}
 		}
 		
