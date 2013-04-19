@@ -58,7 +58,7 @@ void SmarterDashboard::Tick()
 {
 	static int counter = 0;
 	
-	if(counter++ % 50 == 0)
+	if(counter++ % 150 == 0)
 		AsyncPrinter::Printf("SmarterDashboard::Tick(): %d\n", counter);
 	
 	// perhaps later, we may want to send some heartbeats or packets of the sort

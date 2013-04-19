@@ -14,6 +14,7 @@ ESC::ESC(int channel, LRTEncoder *encoder, string name) :
 	m_jag2 = NULL;
 	m_cycle_count = 0;
 	m_delta_voltage_limit = 13.0;
+	maxVDiff = 2.0;
 }
 
 ESC::ESC(int channelA, int channelB, LRTEncoder* encoder, string name) :
@@ -38,6 +39,23 @@ ESC::~ESC()
 {
 	DELETE(m_jag1);
 	DELETE(m_jag2);
+}
+
+void ESC::DecrementMaxVDiff()
+{
+	maxVDiff *= 0.99;
+}
+
+void ESC::IncrementMaxVDiff()
+{
+	maxVDiff *= 1.02;
+	if (maxVDiff > 2.0)
+		maxVDiff = 2.0;
+}
+
+void ESC::ResetMaxVDiff()
+{
+	maxVDiff = 2.0;
 }
 
 void ESC::Configure()
@@ -155,13 +173,40 @@ void ESC::SetDutyCycle(float dutyCycle)
 //#define CURRENT_LIMIT
 #ifdef CURRENT_LIMIT
 	// TODO: change delta voltage based on battery
-	float dutyCycleLimit = (m_encoder->GetRate() / DriveEncoders::GetInstance()->getMaxEncoderRate() + m_delta_voltage_limit) / (DriverStation::GetInstance()->GetBatteryVoltage() / RobotConfig::MAX_VOLTAGE);
+	float dutyCycleLimitSameDir = fabs(speed) + maxVDiff;
+	float dutyCycleLimitReverse = maxVDiff - fabs(speed);
+	if (dutyCycleLimitReverse < 0)
+		dutyCycleLimitReverse = 0.0;
 #endif
 #define LINEARIZE 1
 #if LINEARIZE
 #ifdef CURRENT_LIMIT
-	m_jag1->SetDutyCycle(min(command.dutyCycle, dutyCycleLimit));
-	m_jag2->SetDutyCycle(min(command.dutyCycle, dutyCycleLimit));
+	if (speed > 0)
+	{
+		if (command.dutyCycle > 0)
+		{
+			m_jag1->SetDutyCycle(min(command.dutyCycle, dutyCycleLimitSameDir));
+			m_jag2->SetDutyCycle(min(command.dutyCycle, dutyCycleLimitSameDir));
+		}
+		else
+		{
+			m_jag1->SetDutyCycle(max(command.dutyCycle, -dutyCycleLimitReverse));
+			m_jag2->SetDutyCycle(max(command.dutyCycle, -dutyCycleLimitReverse));
+		}
+	}
+	else
+	{
+		if (command.dutyCycle < 0)
+		{
+			m_jag1->SetDutyCycle(max(command.dutyCycle, -dutyCycleLimitSameDir));
+			m_jag2->SetDutyCycle(max(command.dutyCycle, -dutyCycleLimitSameDir));
+		}
+		else
+		{
+			m_jag1->SetDutyCycle(min(command.dutyCycle, dutyCycleLimitReverse));
+			m_jag2->SetDutyCycle(min(command.dutyCycle, dutyCycleLimitReverse));
+		}
+	}
 #else
 	m_jag1->SetDutyCycle(command.dutyCycle);
 	m_jag2->SetDutyCycle(command.dutyCycle);

@@ -87,6 +87,17 @@ void Drivetrain::enabledPeriodic()
 	}
 //	AsyncPrinter::Printf("Encoders left: %.3f, %.2f\n", m_driveEncoders->getNormalizedSpeed(drivetrain::LEFT), DriverStation::GetInstance()->GetBatteryVoltage());
 //	AsyncPrinter::Printf("Encoders right: %.3f\n", m_driveEncoders->getNormalizedSpeed(drivetrain::RIGHT));
+	if (DriverStation::GetInstance()->GetBatteryVoltage() < 7.0)
+	{
+		AsyncPrinter::Printf("Decreasing current\n");
+		m_escs[LEFT]->DecrementMaxVDiff();
+		m_escs[RIGHT]->DecrementMaxVDiff();
+	}
+	else
+	{
+		m_escs[LEFT]->IncrementMaxVDiff();
+		m_escs[RIGHT]->IncrementMaxVDiff();
+	}
 	m_escs[LEFT]->SetDutyCycle(leftOutput);
 	m_escs[RIGHT]->SetDutyCycle(rightOutput);
 	

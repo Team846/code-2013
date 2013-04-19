@@ -53,12 +53,18 @@ public:
 	 * @brief Resets the caching.
 	 */
 	void ResetCache();
+	
+	void DecrementMaxVDiff();
+	void IncrementMaxVDiff();
+	void ResetMaxVDiff();
 
 	void Disable();
 	LRTEncoder* m_encoder;
 private:
 	AsyncCANJaguar *m_jag1, *m_jag2;
 	std::string namea, nameb;
+	
+	float maxVDiff;
 	//	CANJaguar *m_jag1, *m_jag2;
 
 	float m_delta_voltage_limit;
