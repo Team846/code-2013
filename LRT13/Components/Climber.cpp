@@ -278,23 +278,24 @@ void Climber::enabledPeriodic()
 		
 		m_winchPawl->setDutyCyle(0.0F);
 		
-		if(m_climberData->shouldContinueClimbing())
-			m_state = INACTIVE;
-		
-		break;
-	case INACTIVE:
-		m_stateString = "INACTIVE";
-		
-//		disengagePTO(true);
 		
 		if(m_climbing_level == GROUND)
 		{
 			m_pneumatics->setHookPosition(RETRACTED, true);
 			m_pneumatics->setClimberArm(RETRACTED, true);
 		}
+		m_winchPawl->setDutyCyle(0.0F);
+
+		m_driveSpeed = 0.0;
+		if(m_climberData->shouldContinueClimbing())
+			m_state = BEGIN;
+		break;
+	case INACTIVE:
+		m_stateString = "INACTIVE";
+		
+//		disengagePTO(true);
 		
 		m_winchPawl->setDutyCyle(0.0F);
-		
 		if(m_climberData->shouldContinueClimbing())
 			m_state = BEGIN;
 		
@@ -307,11 +308,13 @@ void Climber::enabledPeriodic()
 		m_pneumatics->setClimberArm(EXTENDED, true);
 		
 		m_shooterData->SetLauncherAngleLow();
+		m_shooterData->SetEnabled(false);
 		m_drive_train_position = m_winch_gear_tooth.Get();
 		
 		if(m_climberData->shouldContinueClimbing())
-			m_state = m_climbing_level > GROUND ? ARM_UP : COLLECTOR_DOWN;
+			m_state = m_climbing_level > GROUND ? ARM_UP : LINE_UP;
 		break;
+
 	case ARM_UP:
 		m_stateString = "ARM_UP";
 
@@ -374,12 +377,31 @@ void Climber::enabledPeriodic()
 	case ARM_DOWN_PREPARE:
 		m_stateString = "ARM_DOWN_PREPARE";
 		
-		m_timer = 10;
+		if (m_climbing_level > GROUND)
+			m_timer = 25;
+		else
+			m_timer = 10;
+			
 		m_state = ARM_DOWN;
 		break;
 	case ARM_DOWN:
 		m_stateString = "ARM_DOWN";
 		
+		if(!m_ptoEngaged)
+		{
+			m_componentData->drivetrainData->setControlMode(FORWARD, OPEN_LOOP);
+			m_componentData->drivetrainData->setControlMode(TURN, OPEN_LOOP);
+			m_componentData->drivetrainData->setOpenLoopOutput(FORWARD, 0.0);
+			m_componentData->drivetrainData->setOpenLoopOutput(TURN, 0.0);
+		}
+		else
+		{
+			m_componentData->drivetrainData->setControlMode(FORWARD, OPEN_LOOP);
+			m_componentData->drivetrainData->setControlMode(TURN, OPEN_LOOP);
+			m_componentData->drivetrainData->setOpenLoopOutput(FORWARD, 0.0);
+			m_componentData->drivetrainData->setOpenLoopOutput(TURN, 0.0);
+		}
+
 		// m_timer is set to 10 in ARM_DOWN_PREPARE
 		
 		m_winchPawl->setDutyCyle(1.0f * m_winchPawlDownDirection);
