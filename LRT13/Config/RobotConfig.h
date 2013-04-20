@@ -70,6 +70,7 @@ namespace Solenoid // Ports 1-8
 namespace Relay // Ports 1-8
 {
 	const uint32_t COMPRESSOR_RELAY = 1;
+	const uint32_t FLASHLIGHT = 2;
 }
 
 namespace CAN // Ports 1-16 (2CAN limitation)

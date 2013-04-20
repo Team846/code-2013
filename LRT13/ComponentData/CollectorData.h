@@ -47,7 +47,17 @@ namespace collector
 		
 		bool IsDown();
 		bool IsUp();
+		
+		void SetExtendTime(int ticks);
+		void SetRetractTime(int ticks);
+		
+		int GetExtendTime();
+		int GetRetractTime();
+		
 	private:
+		int m_extendTicks;
+		int m_retractTicks;
+		
 		bool m_running;
 		int dir;
 		CollectorState::Enum m_collectorState;

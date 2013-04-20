@@ -148,6 +148,9 @@ void Collector::enabledPeriodic()
 //		}
 //	}
 //	m_lastReverseState = m_reverse;
+	
+	m_componentData->collectorData->SetExtendTime(m_time_before_extend);
+	m_componentData->collectorData->SetRetractTime(m_time_before_retract);
 }
 
 void Collector::disabledPeriodic()

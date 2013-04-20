@@ -72,6 +72,8 @@ Shooter::Shooter() :
 	
 	m_ticks = 0;
 	
+	m_flashlight = new Relay(RobotConfig::Relay::FLASHLIGHT, Relay::kReverseOnly);
+	
 	Configure();
 	
 	m_sensorProcessingNotifier.StartPeriodic(1.0 / SENSOR_DENOISE_RATE);
@@ -109,6 +111,7 @@ void Shooter::enabledPeriodic()
 {	
 	if (m_componentData->shooterData->IsEnabled())
 	{
+		m_flashlight->Set(Relay::kOn);
 		if (m_componentData->shooterData->ShouldLauncherBeHigh())
 		{
 			m_pneumatics->setShooterAngler(EXTENDED);
@@ -305,8 +308,6 @@ void Shooter::enabledPeriodic()
 		SmarterDashboard::Instance()->EnqueueShooterMessage(MessageType::BACK_SHOOTER_DATA_SPEED, timenow, m_speedsRPM[INNER] / m_max_speed[INNER]);
 		SmarterDashboard::Instance()->EnqueueShooterMessage(MessageType::FRONT_SHOOTER_DATA_CURRENT, timenow, m_jaguars[OUTER]->GetOutputCurrent());
 		SmarterDashboard::Instance()->EnqueueShooterMessage(MessageType::BACK_SHOOTER_DATA_CURRENT, timenow, m_jaguars[INNER]->GetOutputCurrent());
-
-		AsyncPrinter::Printf("%d\n", m_inner_file.is_open());
 
 		m_ticks++;
 		m_outer_file << (double)(m_ticks / 50.0) << "," << m_speedsRPM[OUTER] << "," << m_periods[OUTER] << "\n";
@@ -552,6 +553,7 @@ void Shooter::ManageShooterWheel(int roller)
 
 void Shooter::disabledPeriodic()
 {
+	m_flashlight->Set(Relay::kOff);
 	SmarterDashboard::Instance()->EnqueueShooterMessage(MessageType::FRONT_SHOOTER_DATA_SPEED, 0.0f, 0.0f);
 	SmarterDashboard::Instance()->EnqueueShooterMessage(MessageType::BACK_SHOOTER_DATA_SPEED, 0.0f, 0.0f);
 	SmarterDashboard::Instance()->EnqueueShooterMessage(MessageType::FRONT_SHOOTER_DATA_CURRENT, 0.0f, 0.0f);

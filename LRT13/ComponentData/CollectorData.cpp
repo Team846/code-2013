@@ -64,3 +64,23 @@ bool CollectorData::IsUp()
 {
 	return GetCollectorPosition() == CollectorState::UP;
 }
+
+void CollectorData::SetExtendTime(int ticks)
+{
+	m_extendTicks = ticks;
+}
+
+void CollectorData::SetRetractTime(int ticks)
+{
+	m_retractTicks = ticks;
+}
+
+int CollectorData::GetExtendTime()
+{
+	return m_extendTicks;
+}
+
+int CollectorData::GetRetractTime()
+{
+	return m_retractTicks;
+}

@@ -46,6 +46,10 @@ private:
 	void disengagePTO(bool force=false);
 	void engagePTO(bool force=false);
 	
+	void winchPawlUp(bool fast=true);
+	void winchPawlDown(bool fast=true);
+	void winchPawlOff();
+	
 	bool m_ptoEngaged;
 	
 	string m_configSection;

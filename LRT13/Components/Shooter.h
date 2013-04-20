@@ -15,6 +15,7 @@
 #include "DigitalInput.h"
 #include "../Network/MessageType.h"
 #include "../Utils/SmarterDashboard.h"
+#include "Relay.h"
 
 using namespace data;
 
@@ -84,6 +85,8 @@ private:
 	int m_cyclesToContinueRetracting;
 	
 	Notifier m_sensorProcessingNotifier;
+	
+	Relay* m_flashlight;
 	
 	static void DeNoiseSensorEntry(void *param);
 	
