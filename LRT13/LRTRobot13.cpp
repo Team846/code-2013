@@ -43,8 +43,8 @@ void LRTRobot13::RobotInit()
 	m_componentManager = new ComponentManager();
 	m_componentManager->CreateComponents();
 	
-	//m_autoaim = new AutoAim();
-	//m_autoaim->Start();
+	m_autoaim = new AutoAim();
+	m_autoaim->Start();
 	
 	AsyncPrinter::Println("Starting TeleopInputs Task...");
 	m_teleop = new TeleopInputs("TeleopInputs");
@@ -127,10 +127,16 @@ void LRTRobot13::Tick()
 	// Update all jaguars
 	for (vector<AsyncCANJaguar*>::iterator it = AsyncCANJaguar::jaguar_vector.begin(); it < AsyncCANJaguar::jaguar_vector.end(); it++)
 	{
-		if ((*it)->StatusOK())
-			(*it)->RunOneCycle();
-		else
-			AsyncPrinter::Printf("[Error] Cannot communicate with jaguar: %d with error: %s\n", (*it)->GetChannel(), (*it)->GetError().GetMessage());
+		(*it)->RunOneCycle();
+		if (!(*it)->StatusOK())
+		{
+			AsyncPrinter::Printf("[Error] Jaguar %d (%s): ", (*it)->GetChannel(), (*it)->GetName());
+			for (int i = 16; i < 0; i++)
+			{
+				AsyncPrinter::Printf("%d", ((*it)->GetFaults() & ( 1 << i )) >> i);
+			}
+			AsyncPrinter::Printf("\n");
+		}
 	}
 
 	// Update pneumatics

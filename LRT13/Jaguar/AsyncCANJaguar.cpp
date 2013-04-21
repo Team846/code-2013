@@ -361,6 +361,11 @@ int AsyncCANJaguar::GetChannel()
 	return m_channel;
 }
 
+char* AsyncCANJaguar::GetName()
+{
+	return m_name;
+}
+
 void AsyncCANJaguar::Set(float setpoint, UINT8 syncGroup)
 {
 	printf("ERROR: Calling Set() in ProxiedCANJaguar: %s\n;", m_name);

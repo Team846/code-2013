@@ -140,6 +140,8 @@ public:
 	void SetVelocity(float velocity);
 	
 	int GetChannel();
+	
+	char* GetName();
 protected:
 	/*!
 	 * @brief Does the actual CommTask communication, not including timing

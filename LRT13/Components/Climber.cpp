@@ -127,11 +127,11 @@ void Climber::enabledPeriodic()
 		
 		if (m_componentData->climberData->shouldPTOChangeDisengage())
 		{
-			disengagePTO();
+			disengagePTO(true);
 		}
 		else if (m_componentData->climberData->shouldPTOChangeEngage())
 		{
-			engagePTO();
+			engagePTO(true);
 		}
 		
 		if(m_climberData->shouldChangeHooks())
@@ -296,7 +296,6 @@ void Climber::enabledPeriodic()
 		
 		m_componentData->collectorData->SlideUp();
 //		m_pneumatics->setCollector(RETRACTED, true);
-
 		
 		winchPawlUp();
 		
@@ -340,7 +339,12 @@ void Climber::enabledPeriodic()
 		// let the operator / autoclimb do its job!
 		
 		if(m_climberData->shouldContinueClimbing())
-			m_state = ARM_DOWN_PREPARE;
+		{
+			if (m_climbing_level > GROUND)
+				m_state = CLIMB_PREPARE;
+			else
+				m_state = ARM_DOWN_PREPARE;
+		}
 		break;
 	case ARM_DOWN_PREPARE:
 		m_stateString = "ARM_DOWN_PREPARE";
@@ -426,7 +430,7 @@ void Climber::enabledPeriodic()
 		{
 			m_logFile << "stopping" << endl;
 			
-			winchPawlOff(); // all right, paul, you can take a breather now
+			winchPawlOff();
 			
 			if(m_climberData->shouldContinueClimbing())
 				m_state = EXTEND_HOOKS;
