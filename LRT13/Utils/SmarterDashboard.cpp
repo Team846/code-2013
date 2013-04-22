@@ -92,7 +92,7 @@ template void SmarterDashboard::SetTelemetryData<string>(TelemetryType::Enum typ
 template void SmarterDashboard::SetTelemetryData<float>(TelemetryType::Enum type, float data);
 
 template<class T> void SmarterDashboard::SetTelemetryData(TelemetryType::Enum type, T data)
-{
+{		
 	stringstream ss;
 	ss << std::boolalpha << data;
 	
@@ -114,12 +114,12 @@ void SmarterDashboard::EnqueueMessage(NetBuffer* buff, NetChannel::Enum method, 
 }
 
 void SmarterDashboard::EnqueueShooterMessage(MessageType::Enum header, float time, float value)
-{
-	NetBuffer buff;
+{	
+	NetBuffer* buff = new NetBuffer();
 	
-	buff.Write((UINT8)header);
-	buff.Write(time);
-	buff.Write(value);
+	buff->Write((UINT8)header);
+	buff->Write(time);
+	buff->Write(value);
 
-	EnqueueMessage(&buff, NetChannel::NET_UNRELIABLE_SEQUENCED, 1);
+	EnqueueMessage(buff, NetChannel::NET_UNRELIABLE_SEQUENCED, 1);
 }

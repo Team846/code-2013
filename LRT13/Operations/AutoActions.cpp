@@ -2,9 +2,29 @@
 #include "../ComponentData/ComponentData.h"
 #include "../Config/RobotConfig.h"
 
+AutoActions* AutoActions::m_instance = NULL;
+
+AutoActions* AutoActions::Instance()
+{
+	if (m_instance == NULL)
+		m_instance = new AutoActions();
+	return m_instance;
+}
+
+void AutoActions::Finalize()
+{
+	DELETE(m_instance);
+}
+
 AutoActions::AutoActions()
 {
+	m_currentAction = NO_ADV_AUTOMATION;
 	m_componentData = ComponentData::GetInstance();
+}
+
+AutoActions::~AutoActions()
+{
+	
 }
 
 void AutoActions::EnableAutoAimBackboard()

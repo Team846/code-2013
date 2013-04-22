@@ -32,7 +32,7 @@ TeleopInputs::TeleopInputs(char * taskName, INT32 priority)
 			DriverStationConfig::JoystickConfig::NUM_WHEEL_BUTTONS,
 			DriverStationConfig::JoystickConfig::NUM_WHEEL_AXES);
 
-	m_autoActions = new AutoActions();
+	m_autoActions = AutoActions::Instance();
 	r = 0, g = 64, b = 127;
 }
 
@@ -234,7 +234,7 @@ void TeleopInputs::Update()
 			}
 		}
 		m_componentData->climberData->setShouldContinueClimbing(
-				m_driver_stick->IsButtonJustPressed(DriverStationConfig::JoystickButtons::CONTINUE_CLIMB));
+				m_operator_stick->IsButtonJustPressed(DriverStationConfig::JoystickButtons::CONTINUE_CLIMB));
 		
 	//	m_componentData->climberData->setShouldContinueClimbing(
 	//			m_driver_stick->IsButtonJustPressed(DriverStationConfig::JoystickButtons::FORCE_CLIMB_ADVANCE));

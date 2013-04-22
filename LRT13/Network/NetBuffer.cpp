@@ -65,6 +65,7 @@ void NetBuffer::WriteRaw(UINT8* c, UINT16 len)
 void NetBuffer::Write(string str)
 {
 	InternalWriteInteger((ULONG)str.length(), sizeof(UINT16) * 8);
+	AsyncPrinter::Printf("size: %d\n", str.length());
 	InternalWriteBytes((UINT8*)str.c_str(), str.length());
 }
 

@@ -19,7 +19,7 @@ AutonomousRoutines::AutonomousRoutines()
 {
 	m_componentData = ComponentData::GetInstance();
 	
-	m_autoActions = new AutoActions();
+	m_autoActions = AutoActions::Instance();
 	
 	m_isRunning = false;
 }
@@ -92,9 +92,8 @@ void AutonomousRoutines::Autonomous()
 		break;
 		
 	case 3://start in back and do the fancy driving back routine
-		m_componentData->shooterData->SetNumFrisbeesInStorage(6);
+		m_componentData->shooterData->SetNumFrisbeesInStorage(4);
 		FireAllFrisbees(7.0);
-		m_componentData->shooterData->SetShooterSetting(OFF);
 //		FireAllFrisbees(6.0);
 		
 		AsyncPrinter::Printf("Starting driving back\n");
@@ -119,7 +118,7 @@ void AutonomousRoutines::Autonomous()
 		m_componentData->drivetrainData->setMaxPositionControlSpeed(FORWARD, 0.5);
 		m_componentData->drivetrainData->cleanWaitForSem(m_componentData->drivetrainData->createPositionOperationSemaphore(FORWARD, 0.5));
 
-		SafeWait(0.3, 10);
+		SafeWait(0.2, 10);
 		AsyncPrinter::Printf("Starting second turn\n");
 #if USE_COLLECTOR
 		m_componentData->collectorData->SlideDown();
@@ -127,7 +126,7 @@ void AutonomousRoutines::Autonomous()
 #endif
 		m_componentData->drivetrainData->setRelativePositionSetpoint(TURN, 35 + 90 + 8 - 3.0 + 1, 0.8);
 		m_componentData->drivetrainData->cleanWaitForSem(m_componentData->drivetrainData->createPositionOperationSemaphore(TURN, 6));
-		SafeWait(0.3, 10);
+		SafeWait(0.2, 10);
  
 		driveBackDistance = 94;
 		AsyncPrinter::Printf("Starting straight run\n");
@@ -163,7 +162,7 @@ void AutonomousRoutines::Autonomous()
 		
 		m_componentData->drivetrainData->setRelativePositionSetpoint(TURN, -91.5, 0.8);
 		m_componentData->drivetrainData->cleanWaitForSem(m_componentData->drivetrainData->createPositionOperationSemaphore(TURN, 5));
-		SafeWait(0.3, 10);
+		SafeWait(0.2, 10);
 		AsyncPrinter::Printf("going back to starting pos\n");
 		m_componentData->drivetrainData->setRelativePositionSetpoint(FORWARD, -5 * 12.0 - 54 + 11, 0.9);
 		m_componentData->drivetrainData->cleanWaitForSem(m_componentData->drivetrainData->createPositionOperationSemaphore(FORWARD, 50));
@@ -173,6 +172,12 @@ void AutonomousRoutines::Autonomous()
 //		m_componentData->drivetrainData->setRelativePositionSetpoint(FORWARD, 12.0 * 8.0 - 2.0, 0.90);
 //		m_componentData->drivetrainData->cleanWaitForSem(m_componentData->drivetrainData->createPositionOperationSemaphore(FORWARD, 0.5));
 //		
+		AsyncPrinter::Printf("Firing frisbees...\n");
+		
+		FireAllFrisbees(3.0);
+		
+		m_componentData->shooterData->SetShooterSetting(OFF);
+		
 		AsyncPrinter::Printf("done with\n");
 //		m_componentData->drivetrainData->setControlMode(FORWARD, POSITION_CONTROL);
 //		m_componentData->drivetrainData->setRelativePositionSetpoint(FORWARD, 12.0 * 8, 0.55);
@@ -320,13 +325,13 @@ void AutonomousRoutines::ServiceAutoAimBackBoard()
 	{
 		// we're to the right
 		m_componentData->drivetrainData->setControlMode(TURN, VELOCITY_CONTROL);
-		m_componentData->drivetrainData->setVelocitySetpoint(TURN, m_componentData->autoAimData->getDesiredX() - m_componentData->autoAimData->getCurrentX());
+		m_componentData->drivetrainData->setVelocitySetpoint(TURN, (m_componentData->autoAimData->getDesiredX() - m_componentData->autoAimData->getCurrentX() + m_componentData->autoAimData->getErrorThreshold()) / 100.0);
 	}
 	else if(m_componentData->autoAimData->getDesiredX() - m_componentData->autoAimData->getCurrentX() > m_componentData->autoAimData->getErrorThreshold())
 	{
 		// we're to the left
 		m_componentData->drivetrainData->setControlMode(TURN, VELOCITY_CONTROL);
-		m_componentData->drivetrainData->setVelocitySetpoint(TURN, m_componentData->autoAimData->getDesiredX() - m_componentData->autoAimData->getCurrentX());
+		m_componentData->drivetrainData->setVelocitySetpoint(TURN, (m_componentData->autoAimData->getDesiredX() - m_componentData->autoAimData->getCurrentX() + m_componentData->autoAimData->getErrorThreshold()) / 100.0);
 	}
 	else
 	{

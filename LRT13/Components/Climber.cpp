@@ -271,8 +271,7 @@ void Climber::enabledPeriodic()
 
 		m_driveSpeed = 0.0;
 		
-		if(m_climberData->shouldContinueClimbing())
-			m_state = BEGIN;
+		m_state = BEGIN;
 		break;
 	case BEGIN:
 		m_stateString = "BEGIN";
@@ -308,18 +307,13 @@ void Climber::enabledPeriodic()
 			
 			winchPawlOff(); // all right, paul, you can take a breather now
 			
-			if(m_climberData->shouldContinueClimbing())
-				m_state = COLLECTOR_DOWN;
+			m_state = LINE_UP;
 		}
 		
 		break;
 	case COLLECTOR_DOWN:
 		m_stateString = "COLLECTOR_DOWN";
 		
-//		m_shooterData->SetLauncherAngleLow();
-		if (m_climbing_level > GROUND)
-			m_componentData->collectorData->SlideDown();
-//			m_pneumatics->setCollector(EXTENDED, true);
 		
 		if(m_timer-- <= 0)
 			m_state = LINE_UP;
@@ -327,14 +321,15 @@ void Climber::enabledPeriodic()
 		m_stateString = "LINE_UP";
 
 		if(m_climbing_level > GROUND)
+		{
 			m_shooterData->SetLauncherAngleHigh();
+			m_pneumatics->setHookPosition(RETRACTED, true);
+		}
 		else
 		{
 			m_shooterData->SetLauncherAngleLow();
 		}
 		
-		if (m_climbing_level > GROUND)
-			m_componentData->collectorData->SlideDown();
 		
 		// let the operator / autoclimb do its job!
 		
@@ -349,8 +344,6 @@ void Climber::enabledPeriodic()
 	case ARM_DOWN_PREPARE:
 		m_stateString = "ARM_DOWN_PREPARE";
 		
-		if (m_climbing_level > GROUND)
-			m_componentData->collectorData->SlideDown();
 		
 		if (m_climbing_level == GROUND)
 			m_timer = 25;
@@ -362,8 +355,6 @@ void Climber::enabledPeriodic()
 	case ARM_DOWN:
 		m_stateString = "ARM_DOWN";
 		
-		if (m_climbing_level > GROUND)
-			m_componentData->collectorData->SlideDown();
 		
 		// m_timer is set to 10 in ARM_DOWN_PREPARE
 		winchPawlDown();
@@ -378,8 +369,7 @@ void Climber::enabledPeriodic()
 //			else
 				winchPawlOff();
 			
-			if(m_climberData->shouldContinueClimbing())
-				m_state = CLIMB_PREPARE;
+			m_state = CLIMB_PREPARE;
 		}
 		break;
 	case CLIMB_PREPARE:
@@ -401,8 +391,8 @@ void Climber::enabledPeriodic()
 
 		//m_state = CLIMB;
 		
-		if(m_climberData->shouldContinueClimbing())
-			m_state = CLIMB;
+		m_state = CLIMB;
+		
 		break;
 	case CLIMB:
 		m_stateString = "CLIMB";
@@ -432,8 +422,7 @@ void Climber::enabledPeriodic()
 			
 			winchPawlOff();
 			
-			if(m_climberData->shouldContinueClimbing())
-				m_state = EXTEND_HOOKS;
+			m_state = EXTEND_HOOKS;
 		}
 		break;
 	case EXTEND_HOOKS:
@@ -441,10 +430,7 @@ void Climber::enabledPeriodic()
 		
 		m_pneumatics->setHookPosition(EXTENDED, true);
 		
-		if(m_climberData->shouldContinueClimbing())
-		{
-			m_state = CLIMBED;
-		}
+		m_state = CLIMBED;
 		break;
 	case CLIMBED:
 		m_stateString = "CLIMBED";

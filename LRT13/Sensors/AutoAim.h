@@ -6,7 +6,7 @@
 #include "../Config/ConfigManager.h"
 #include "../Config/Configurable.h"
 #include "../Network/NetBuffer.h"
-#include "../Network/NetClient.h"
+#include "../Network/NetServer.h"
 #include "../Network/MessageType.h"
 #include "../Utils/Util.h"
 #include "../Utils/SmarterDashboard.h"
@@ -28,7 +28,7 @@ public:
 	virtual INT32 Tick();
 	
 private:
-	NetClient* m_client;
+	NetServer* m_server;
 	data::ComponentData* m_componentData;
 	int m_maxError;
 	int m_desiredX;

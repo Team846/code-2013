@@ -34,6 +34,7 @@ LRTRobot13::~LRTRobot13()
 	LogManager::Finalize();
 	Pneumatics::Finalize();
 	DriveEncoders::Finalize();
+	AutoActions::Finalize();
 	IMU::Finalize();
 }
 
@@ -80,7 +81,7 @@ void LRTRobot13::RobotInit()
 
 static int TimeoutCallback(...)
 {
-	//printf("Main loop execution time > 20ms\r\n");
+	printf("Main loop execution time > 20ms\r\n");
 	return 0;
 }
 
@@ -100,6 +101,7 @@ void LRTRobot13::Tick()
 	}
 	else if (RobotData::GetCurrentState() == RobotData::TELEOP)
 	{
+		m_teleop->Tick();
 		m_auton->TeleopTick(); // Handles the automation involving vision
 		if (m_auton->IsRunning())
 		{
@@ -108,7 +110,6 @@ void LRTRobot13::Tick()
 		}
 //		m_teleop->RunOneCycle();
 //		AsyncPrinter::Printf("TELEOP!\n");
-		m_teleop->Tick();
 	}
 	else // Disabled
 	{

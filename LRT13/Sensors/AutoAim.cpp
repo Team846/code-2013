@@ -6,22 +6,15 @@ using namespace drivetrain;
 AutoAim::AutoAim()
 : AsyncProcess("AutoAim")
 {
-	m_client = new NetClient();
-	m_client->Open();
-	
-	sockaddr_in endpoint;
-	endpoint.sin_family = AF_INET;
-	endpoint.sin_addr.s_addr = inet_addr("10.8.46.8");
-	endpoint.sin_port = htons(8000);
-	
-	m_client->Connect(endpoint);
+	m_server = new NetServer(8000);
+	m_server->Open();
 	
 	m_componentData = ComponentData::GetInstance();
 }
 
 AutoAim::~AutoAim()
 {
-	DELETE(m_client);
+	DELETE(m_server);
 }
 
 void AutoAim::Configure()
@@ -39,7 +32,7 @@ INT32 AutoAim::Tick()
 	
 	NetBuffer* msg;
 	
-	while((msg = m_client->ReadMessage()) != NULL)
+	while((msg = m_server->ReadMessage()) != NULL)
 	{
 		// verify that this is what we want
 		MessageType::Enum msgtype = (MessageType::Enum)msg->ReadChar();
@@ -54,7 +47,7 @@ INT32 AutoAim::Tick()
 		
 		double strength = msg->ReadDouble();
 		
-		AsyncPrinter::Printf("AutoAim: %d %d\n", x, y);
+//		AsyncPrinter::Printf("AutoAim: %d %d\n", x, y);
 		m_componentData->autoAimData->setCurrentX(x);
 		m_componentData->autoAimData->setCurrentY(y);
 		m_componentData->autoAimData->setStrength(strength);

@@ -17,10 +17,10 @@ class AutoActions
 public:
 	enum actions
 	{
-		AUTO_AIM_BACKBOARD,
-		AUTO_AIM_PYRAMID,
-		FEEDER_STATION_APPROACH,
-		NO_ADV_AUTOMATION
+		AUTO_AIM_BACKBOARD = 1,
+		AUTO_AIM_PYRAMID = 2,
+		FEEDER_STATION_APPROACH = 3,
+		NO_ADV_AUTOMATION = 4
 	};
 	
 	enum routines
@@ -29,7 +29,11 @@ public:
 		BACK
 	};
 	
+	static AutoActions* Instance();
+	static void Finalize();
+	
 	AutoActions();
+	~AutoActions();
 	
 	void EnableAutoAimBackboard();
 	void EnableAutoAimPyramid();
@@ -45,6 +49,7 @@ public:
 	int getNumFrisbeesToPickUp();
 	
 private:
+	static AutoActions* m_instance;
 	ComponentData* m_componentData;
 	routines m_currentAutoRoutine;
 	actions m_currentAction;

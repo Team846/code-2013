@@ -30,6 +30,7 @@
 
 #include "Utils/SmarterDashboard.h"
 #include "Sensors/AutoAim.h"
+#include "Operations/AutoActions.h"
 
 #include "Components/LEDIndicators.h"
 class LRTRobot13 : public LRTRobotBase

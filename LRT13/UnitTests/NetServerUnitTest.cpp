@@ -4,7 +4,7 @@ NetServerUnitTest::NetServerUnitTest()
 	: UnitTest()
 {
 	printf("Creating NetConnection\n");
-	m_conn = new NetServer(846);
+	m_conn = new NetServer(1140);
 }
 
 void NetServerUnitTest::Run()
@@ -28,15 +28,22 @@ void NetServerUnitTest::Run()
 		
 		ss << counter;
 		
-		b.Write((char)MessageType::ROBOT_TELEMETRY);
+		b.Write((UINT8)MessageType::ROBOT_TELEMETRY);
 		b.Write(ss.str());
+		
+		for(int i = 0; i < b.GetBufferLength(); i++)
+		{
+			AsyncPrinter::Printf("%d ", b.GetBuffer()[i]);
+		}
+		
+		AsyncPrinter::Printf("\n");
 		
 		m_conn->SendToAll(&b, NetChannel::NET_UNRELIABLE_SEQUENCED, 1);
 		//m_conn->Send(b, NetChannel::NET_UNRELIABLE_SEQUENCED, 0);
 		
 		//printf("Sending packet...%d\n", counter);
 		
-		if(counter++ % 10)
+		if(counter++ % 10 == 0)
 			printf("Tick: %d", counter - 1);
 		
 		taskDelay(sysClkRateGet() / 10);
