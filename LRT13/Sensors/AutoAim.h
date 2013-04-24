@@ -15,7 +15,7 @@
 /*!
  * @brief Interfaces with the auto-aim sensor on the offboard processor
  * 
- * @author Tony Peng
+ * @author Raphael Chang, Tony Peng
  */
 class AutoAim : public Configurable, public AsyncProcess
 {
