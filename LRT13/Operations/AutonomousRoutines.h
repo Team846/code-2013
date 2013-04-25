@@ -51,6 +51,8 @@ private:
 	void SafeGrabSem(SEM_ID sem);
 	void SafeWait(double seconds, int safeCheckFrequency);
 	
+	double m_autonomousStartTime;
+	
 	data::ComponentData* m_componentData;
 	
 	AutoActions* m_autoActions;
