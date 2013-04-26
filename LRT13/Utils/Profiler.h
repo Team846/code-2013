@@ -21,13 +21,13 @@ public:
 	static void BeginActivity(string name);
 	
 	/*!
-	 * @brief Ends the last created activity.
-	 * @returns The time, in microseconds, that the activity took.
+	 * @brief Ends an activity.
+	 * @returns The time, in seconds, that the activity took.
 	 */
-	static double EndLast();
+	static double End(string name);
 	
 private:
-	static stack<pair<string, double> > m_activites;
+	static map<string, double> m_activities;
 	static map<string, pair<double, int> > m_averageTime;
 };
 

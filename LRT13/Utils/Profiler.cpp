@@ -1,6 +1,6 @@
 #include "Profiler.h"
 
-stack<pair<string, double> > Profiler::m_activites;
+map<string, double> Profiler::m_activities;
 map<string, pair<double, int> > Profiler::m_averageTime;
 
 void Profiler::BeginActivity(string name)
@@ -18,26 +18,20 @@ void Profiler::BeginActivity(string name)
 	
 	double now = Timer::GetFPGATimestamp();
 	
-	pair<string, uint64_t> p;
-	
-	p.first = name;
-	p.second = now;
-	
-	m_activites.push(p);
+	m_activities[name] = now;
 }
 
-double Profiler::EndLast()
+double Profiler::End(string name)
 {
-	pair<string, double> p = m_activites.top();
+	double startTime = m_activities[name];
 	
-	m_activites.pop();
+	m_activities.erase(name);
 	
-	double timeTook = Timer::GetFPGATimestamp() - p.second;
+	double timeTook = Timer::GetFPGATimestamp() - startTime;
 	
-	pair<double, int> timePair = m_averageTime[p.first];
-	m_averageTime[p.first].first = (m_averageTime[p.first].first + timeTook) / m_averageTime[p.first].second;
-	++m_averageTime[p.first].second;
+	pair<double, int> timePair = m_averageTime[name];
+	m_averageTime[name].first = (m_averageTime[name].first + timeTook) / m_averageTime[name].second;
+	++m_averageTime[name].second;
 	
 	return timeTook;
 }
-
