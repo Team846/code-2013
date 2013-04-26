@@ -83,6 +83,8 @@ void SmarterDashboard::Flush()
 			m_netBufferQueue.pop();
 			
 			m_server->SendToAll(nb.nb, nb.method, nb.channel);
+			
+			delete nb.nb;
 		}
 	} // m_queueSem
 }
