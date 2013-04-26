@@ -1,6 +1,10 @@
 #ifndef AUTO_PYRAMID_ALIGN_H_
 #define AUTO_PYRAMID_ALIGN_H_
 
+#include <math.h>
+
+#include "../Config/Configurable.h"
+#include "../Config/ConfigManager.h"
 #include "../Sensors/DriveEncoders.h"
 #include "../ComponentData/ComponentData.h"
 #include "../ComponentData/DrivetrainData.h"

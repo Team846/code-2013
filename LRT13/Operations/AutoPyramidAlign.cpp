@@ -1,7 +1,6 @@
 #include "AutoPyramidAlign.h"
 
 AutoPyramidAlign::AutoPyramidAlign()
-	: AsyncProcess("")
 {
 	m_currentState = APA_State::DISABLED;
 	m_startRobotDist = 0.0;
