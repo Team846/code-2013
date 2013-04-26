@@ -43,6 +43,8 @@ void ComponentManager::Update()
 		if(comp == NULL)
 			continue;
 		
+		Profiler::BeginActivity(comp->GetName());
+		
 		if (RobotData::GetCurrentState() != RobotData::DISABLED || !comp->EnableRequired())
 		{
 			if (comp->GetDIO() == -1 || DriverStation::GetInstance()->GetDigitalIn(comp->GetDIO()))
@@ -76,6 +78,8 @@ void ComponentManager::Update()
 				comp->Disable();
 			}
 		}
+		
+		Profiler::End(comp->GetName());
 		
 //		if(comp->IsEnabled())
 //		{

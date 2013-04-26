@@ -42,8 +42,10 @@ SmarterDashboard::SmarterDashboard()
 	m_telemetryTypeNames[3] = "Winch Pawl Status";
 	
 	m_server = new NetServer(1140);
+#ifdef FANCY_STUFF
 	m_server->Open();
 	AsyncPrinter::Println("The SmarterDashboard service is running on port 1140.");
+#endif
 }
 
 SmarterDashboard::~SmarterDashboard()
@@ -56,6 +58,10 @@ SmarterDashboard::~SmarterDashboard()
 
 void SmarterDashboard::Tick()
 {
+#ifndef FANCY_STUFF
+	return;
+#endif
+	
 	static int counter = 0;
 	
 	if(counter++ % 150 == 0)

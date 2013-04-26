@@ -122,5 +122,5 @@ void WinchPawl::Configure()
 {
 	m_timeout = m_config->Get<double>(m_configSection, "timeout", 5.0);
 	m_overCurrentThreshold = m_config->Get<double>(m_configSection, "abortCurrentThreshold", 80.0);
-	m_maxOverCurrentCounter = m_config->Get<int>(m_configSection, "maxOverCurrentCounter", 50);
+	m_maxOverCurrentCounter = m_config->Get<int>(m_configSection, "maxOverCurrentCounter", 150);
 }

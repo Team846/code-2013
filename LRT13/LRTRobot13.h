@@ -33,6 +33,11 @@
 #include "Operations/AutoActions.h"
 
 #include "Components/LEDIndicators.h"
+
+#include "Utils/Profiler.h"
+
+
+
 class LRTRobot13 : public LRTRobotBase
 {
 	public:

@@ -27,8 +27,8 @@ namespace JoystickButtons
 const uint32_t COLLECTOR_SLIDE = 1;
 const uint32_t FIRE = 2;
 const uint32_t CHANGE_ANGLE = 3;
+const uint32_t CONTINUE_CLIMB_DRIVER = 4;
 const uint32_t FIRE_SINGLE = 12;
-const uint32_t CONTINUE_CLIMB = 11;
 
 //const uint32_t FORCE_CLIMB_ADVANCE= 4;
 
@@ -54,6 +54,7 @@ const uint32_t DISENGAGE_PTO = 7;//debug
 const uint32_t SHOOTER_FASTER = 7;
 const uint32_t PAWL_UP = 8;
 const uint32_t RUN_BACKWORDS = 8;
+const uint32_t CONTINUE_CLIMB_OPERATOR = 11;
 const uint32_t PAWL_DOWN = 9;
 const uint32_t COLLECTOR_DOWN_OPERATOR = 10;
 const uint32_t CLIMB_STEP_BACKWARD = 11;

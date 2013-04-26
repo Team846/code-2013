@@ -125,11 +125,20 @@ void Shooter::enabledPeriodic()
 			
 		
 	//	AsyncPrinter::Printf("Period %.5f\n", m_encs[INNER]->GetPeriod());
+		Profiler::BeginActivity("ManageShooterWheel(OUTER)");
 		ManageShooterWheel(OUTER);
+		Profiler::End("ManageShooterWheel(OUTER)");
+		Profiler::BeginActivity("ManageShooterWheel(INNER)");
 		ManageShooterWheel(INNER);
+		Profiler::End("ManageShooterWheel(INNER)");
 		
 		static int e = 0;
 		e++;
+		
+		static bool lastVal = m_proximity->Get();
+		if (lastVal != m_proximity->Get())
+			AsyncPrinter::Printf("shooter loading sensor %d\n", m_proximity->Get());
+		lastVal = m_proximity->Get();
 	//	AsyncPrinter::Printf("%d: inner Speed %.2f, inner error %.2f, inner out %.2f\n", ++e, m_PIDs[INNER].getInput(), m_PIDs[INNER].getError(), m_PIDs[INNER].getOutput()/ m_max_speed[INNER] );
 	//	AsyncPrinter::Printf("%d: inner Speed %.2f, inner error %.2f, inner out %.2f\n", ++e, m_PIDs[OUTER].getInput(), m_PIDs[OUTER].getError(), m_PIDs[OUTER].getOutput()/ m_max_speed[OUTER] );
 		static bool lastFiring = false;
@@ -190,7 +199,7 @@ void Shooter::enabledPeriodic()
 						m_pneumatics->setStorageExit(RETRACTED);
 						m_cyclesToContinueRetracting--;
 					}
-					else
+					else/* if(atSpeed[INNER] && atSpeed[OUTER])*/
 					{
 					
 						m_pneumatics->setStorageExit(EXTENDED);
@@ -205,7 +214,7 @@ void Shooter::enabledPeriodic()
 #if RELIABLE_SHOOTING
 						if (m_errors[INNER] > frisbeeDetectionThreshold || m_timer < 0)
 #else
-						if (fabs(m_errorsNormalized[INNER]) > frisbeeDetectionThreshold)
+						if (fabs(m_errorsNormalized[INNER]) > frisbeeDetectionThreshold || m_timer < 0)
 #endif
 							
 						{
@@ -214,8 +223,8 @@ void Shooter::enabledPeriodic()
 //							AsyncPrinter::Printf("Fired with newSpeed = %.0f, lastSpeed = %.0f taking %d cycles\n", m_speedsRPM[INNER], lastSpeed, e - startShotTime);
 							m_fireState = RETRACT_LOADER_WAIT_FOR_LIFT;
 							m_cyclesToContinueRetracting = requiredCyclesDown ;
-							m_pneumatics->setStorageExit(RETRACTED);
-							
+//							m_pneumatics->setStorageExit(RETRACTED);
+//							
 							if (m_timer >= 0)
 								m_componentData->shooterData->DecrementFrisbeeCounter();
 							
@@ -377,6 +386,8 @@ void Shooter::ManageShooterWheel(int roller)
 	double gain = m_PIDs[roller].getProportionalGain();
 	
 	double out = openLoopInput - normalizedError * gain;
+	
+//	AsyncPrinter::Printf("out: %f, openloopinput: %f, normalizederror: %f, gain: %f\n", out, openLoopInput, normalizedError, gain);
 	
 //	double out = m_PIDs[roller].update( loopPeriod );
 //	out /= m_max_speed[roller] ; //out is a normalized voltage

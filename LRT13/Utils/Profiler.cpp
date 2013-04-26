@@ -1,6 +1,7 @@
 #include "Profiler.h"
 
 map<string, double> Profiler::m_activities;
+map<string, double> Profiler::m_lastTimes;
 map<string, pair<double, int> > Profiler::m_averageTime;
 
 void Profiler::BeginActivity(string name)
@@ -33,5 +34,20 @@ double Profiler::End(string name)
 	m_averageTime[name].first = (m_averageTime[name].first + timeTook) / m_averageTime[name].second;
 	++m_averageTime[name].second;
 	
+	m_lastTimes[name] = timeTook;
+	
 	return timeTook;
+}
+
+double Profiler::GetLastTime(string name)
+{
+	if(m_lastTimes.find(name) == m_lastTimes.end())
+		return 0.0;
+	
+	return m_lastTimes[name];
+}
+
+map<string, double>* Profiler::GetLastTimes()
+{
+	return &m_lastTimes;
 }

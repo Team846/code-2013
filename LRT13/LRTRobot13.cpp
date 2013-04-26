@@ -38,14 +38,12 @@ LRTRobot13::~LRTRobot13()
 	IMU::Finalize();
 }
 
+
 void LRTRobot13::RobotInit()
 {
 	AsyncPrinter::Println("Creating Components...");
 	m_componentManager = new ComponentManager();
 	m_componentManager->CreateComponents();
-	
-	m_autoaim = new AutoAim();
-	m_autoaim->Start();
 	
 	AsyncPrinter::Println("Starting TeleopInputs Task...");
 	m_teleop = new TeleopInputs("TeleopInputs");
@@ -70,6 +68,11 @@ void LRTRobot13::RobotInit()
 	
 	AsyncPrinter::Println("Starting SmarterDashboard service...");
 	SmarterDashboard::Start();
+#ifdef EXTRA_STUFF
+	AsyncPrinter::Println("Starting AutoAim...");
+	m_autoaim = new AutoAim();
+	m_autoaim->Start();
+#endif
 	
 	//AsyncPrinter::Println("Creating the IMU...");
 	//IMU::Instance()->Start();
@@ -79,17 +82,33 @@ void LRTRobot13::RobotInit()
 	AsyncPrinter::Println("Reticulating splines...");
 }
 
+int looptime;
 static int TimeoutCallback(...)
 {
-	printf("Main loop execution time > 20ms\r\n");
+	printf("Main loop execution time > 20ms took %f\r\n", ((GetFPGATime() - looptime) / 1E3));
+	
+	AsyncPrinter::Printf("======================================\n");
+	AsyncPrinter::Printf("PROFILED TIMES (over 20ms): \n");
+	AsyncPrinter::Printf("\n");
+	map<string, double>* times = Profiler::GetLastTimes();
+	
+	for(map<string, double>::iterator it = times->begin(); it != times->end(); ++it)
+	{
+		string name = it->first;
+		double time = it->second;
+		
+		AsyncPrinter::Printf("%s: %f ms\n", name.c_str(), time * 1000.0);
+	}
+	AsyncPrinter::Printf("======================================\n");
+	
 	return 0;
 }
 
 void LRTRobot13::Tick()
 {
+	looptime = GetFPGATime();
 	wdStart(_watchdog, sysClkRateGet() / RobotConfig::LOOP_RATE,
 			TimeoutCallback, 0);
-	
 	// Update current game state
 	UpdateGameState();
 
@@ -132,7 +151,7 @@ void LRTRobot13::Tick()
 		if (!(*it)->StatusOK())
 		{
 			AsyncPrinter::Printf("[Error] Jaguar %d (%s): ", (*it)->GetChannel(), (*it)->GetName());
-			for (int i = 16; i < 0; i++)
+			for (int i = 16; i < 0; i--)
 			{
 				AsyncPrinter::Printf("%d", ((*it)->GetFaults() & ( 1 << i )) >> i);
 			}
@@ -159,6 +178,25 @@ void LRTRobot13::Tick()
 	
 	// Update SmarterDashboard -- this should be the last thing!
 	SmarterDashboard::Instance()->Tick();
+	
+//	static int tick = 0;
+//	
+//	if(tick++ % 50 == 0)
+//	{
+//		AsyncPrinter::Printf("======================================\n");
+//		AsyncPrinter::Printf("PROFILED TIMES: \n");
+//		AsyncPrinter::Printf("\n");
+//		map<string, double>* times = Profiler::GetLastTimes();
+//		
+//		for(map<string, double>::iterator it = times->begin(); it != times->end(); ++it)
+//		{
+//			string name = it->first;
+//			double time = it->second;
+//			
+//			AsyncPrinter::Printf("%s: %f\n", name.c_str(), time);
+//		}
+//		AsyncPrinter::Printf("======================================\n");
+//	}
 	
 	wdCancel(_watchdog);
 }

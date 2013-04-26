@@ -141,17 +141,6 @@ void TeleopInputs::Update()
 		}
 		/************************Climber Functions************************/
 		
-		if (m_operator_stick->IsButtonDown(DriverStationConfig::JoystickButtons::CLIMB_STEP_BACKWARD))
-		{
-			if (m_componentData->climberData->getWaitingState() < RESET_FOR_CLIMBED)
-				m_componentData->climberData->setDesiredState((climber::state)(m_componentData->climberData->getWaitingState() + 1));
-		}
-		else if (m_operator_stick->IsButtonDown(DriverStationConfig::JoystickButtons::CLIMB_STEP_FORWARD))
-		{
-			if (m_componentData->climberData->getWaitingState() > RESET_FOR_INACTIVE)
-				m_componentData->climberData->setDesiredState((climber::state)(m_componentData->climberData->getWaitingState() - 1));
-		}
-		
 		if (m_operator_stick->IsButtonDown(DriverStationConfig::JoystickButtons::DEBUG_CLIMBER))
 		{
 			m_componentData->climberData->enableDebug();
@@ -186,14 +175,7 @@ void TeleopInputs::Update()
 			else
 				m_componentData->climberData->winchPawlInactive();
 			
-			if (m_operator_stick->IsButtonDown(DriverStationConfig::JoystickButtons::CONDITIONAL_ABORT))
-			{
-				m_componentData->climberData->setShouldPotentiallyAbort(true);
-			}
-			else
-			{
-				m_componentData->climberData->setShouldPotentiallyAbort(false);
-			}
+			
 		}
 		else
 		{
@@ -209,32 +191,49 @@ void TeleopInputs::Update()
 						else
 							m_componentData->shooterData->SetLauncherAngleHigh();
 			}
-			
-			if (m_operator_stick->IsButtonJustPressed(DriverStationConfig::JoystickButtons::SHOOTER_ON))
+
+			if (m_componentData->climberData->getCurrentState() == NOTHING)
 			{
-				m_componentData->shooterData->SetEnabled(true);
+				if (m_operator_stick->IsButtonJustPressed(DriverStationConfig::JoystickButtons::SHOOTER_ON))
+				{
+					m_componentData->shooterData->SetEnabled(true);
+				}
+			}
+			else
+			{
+				if (m_operator_stick->IsButtonDown(DriverStationConfig::JoystickButtons::CONDITIONAL_ABORT))
+				{
+					m_componentData->climberData->setShouldPotentiallyAbort(true);
+				}
+				else
+				{
+					m_componentData->climberData->setShouldPotentiallyAbort(false);
+				}
 			}
 		}
 		
-		if (m_driver_stick->IsButtonJustPressed(
-				DriverStationConfig::JoystickButtons::START_CLIMB))
-		{
-			switch (m_componentData->climberData->getDesiredClimbingStep())
-			{
-			case INTENDED_IDLE:
-				m_componentData->climberData->setDesiredClimbingStep(
-						INTENDED_ARM_UP);
-				break;
-			case INTENDED_ARM_UP:
-				m_componentData->climberData->setDesiredClimbingStep(
-						INTENDED_CLIMBING);
-				break;
-			case INTENDED_CLIMBING:
-				break;
-			}
-		}
+//		if (m_driver_stick->IsButtonJustPressed(
+//				DriverStationConfig::JoystickButtons::START_CLIMB))
+//		{
+//			switch (m_componentData->climberData->getDesiredClimbingStep())
+//			{
+//			case INTENDED_IDLE:
+//				m_componentData->climberData->setDesiredClimbingStep(
+//						INTENDED_ARM_UP);
+//				break;
+//			case INTENDED_ARM_UP:
+//				m_componentData->climberData->setDesiredClimbingStep(
+//						INTENDED_CLIMBING);
+//				break;
+//			case INTENDED_CLIMBING:
+//				break;
+//			}
+//		}
+		
 		m_componentData->climberData->setShouldContinueClimbing(
-				m_operator_stick->IsButtonJustPressed(DriverStationConfig::JoystickButtons::CONTINUE_CLIMB));
+				m_driver_stick->IsButtonJustPressed(DriverStationConfig::JoystickButtons::CONTINUE_CLIMB_DRIVER) ||
+				(!m_operator_stick->IsButtonDown(DriverStationConfig::JoystickButtons::DEBUG_CLIMBER) &&
+						m_operator_stick->IsButtonJustPressed(DriverStationConfig::JoystickButtons::CONTINUE_CLIMB_OPERATOR)));
 		
 	//	m_componentData->climberData->setShouldContinueClimbing(
 	//			m_driver_stick->IsButtonJustPressed(DriverStationConfig::JoystickButtons::FORCE_CLIMB_ADVANCE));
@@ -273,11 +272,11 @@ void TeleopInputs::Update()
 		{
 			m_autoActions->EnableAutoAimBackboard();
 		}
-		else if (m_driver_stick->IsButtonDown(
-				DriverStationConfig::JoystickButtons::START_CLIMB))
-		{
-			m_autoActions->EnableAutoAimPyramid();
-		}
+//		else if (m_driver_stick->IsButtonDown(
+//				DriverStationConfig::JoystickButtons::START_CLIMB))
+//		{
+//			m_autoActions->EnableAutoAimPyramid();
+//		}
 	//	else if (m_driver_stick->IsButtonDown(
 	//			DriverStationConfig::JoystickButtons::FEEDER_STATION_APPROACH))
 	//	{

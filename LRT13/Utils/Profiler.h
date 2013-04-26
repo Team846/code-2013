@@ -26,8 +26,16 @@ public:
 	 */
 	static double End(string name);
 	
+	/*!
+	 * 
+	 */
+	static double GetLastTime(string name);
+	
+	static map<string, double>* GetLastTimes();
+	
 private:
 	static map<string, double> m_activities;
+	static map<string, double> m_lastTimes;
 	static map<string, pair<double, int> > m_averageTime;
 };
 

@@ -19,6 +19,7 @@
 #include "../Utils/SmarterDashboard.h"
 #include "../Network/MessageType.h"
 #include "../Network/NetChannel.h"
+#include "../Utils/Profiler.h"
 
 #include "Component.h"
 
