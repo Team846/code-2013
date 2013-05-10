@@ -541,13 +541,15 @@ void AutonomousRoutines::ServiceAutoAimBackBoard()
 	{
 		// we're too far
 		m_componentData->drivetrainData->setControlMode(FORWARD, VELOCITY_CONTROL);
-		m_componentData->drivetrainData->setVelocitySetpoint(FORWARD, (m_componentData->autoAimData->getDesiredY() - m_componentData->autoAimData->getCurrentY() - m_componentData->autoAimData->getErrorThreshold()) / 100.0);
+//		m_componentData->drivetrainData->setVelocitySetpoint(FORWARD, (m_componentData->autoAimData->getDesiredY() - m_componentData->autoAimData->getCurrentY() - m_componentData->autoAimData->getErrorThreshold()) / 100.0);
+		m_componentData->drivetrainData->setVelocitySetpoint(FORWARD, -0.2);
 	}
 	else if(m_componentData->autoAimData->getDesiredY() - m_componentData->autoAimData->getCurrentY() > m_componentData->autoAimData->getErrorThreshold())
 	{
 		// we're too close
 		m_componentData->drivetrainData->setControlMode(FORWARD, VELOCITY_CONTROL);
-		m_componentData->drivetrainData->setVelocitySetpoint(FORWARD, (m_componentData->autoAimData->getDesiredY() - m_componentData->autoAimData->getCurrentY() + m_componentData->autoAimData->getErrorThreshold()) / 100.0);
+//		m_componentData->drivetrainData->setVelocitySetpoint(FORWARD, (m_componentData->autoAimData->getDesiredY() - m_componentData->autoAimData->getCurrentY() + m_componentData->autoAimData->getErrorThreshold()) / 100.0);
+		m_componentData->drivetrainData->setVelocitySetpoint(FORWARD, 0.2);
 	}
 	else
 	{

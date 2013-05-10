@@ -15,8 +15,8 @@
 #include "DigitalInput.h"
 #include "../Network/MessageType.h"
 #include "../Utils/SmarterDashboard.h"
-#include "Relay.h"
-
+//#include "Relay.h"
+#include "DigitalOutput.h"
 using namespace data;
 
 /*!
@@ -47,6 +47,7 @@ public:
 	};
 	
 private:
+	void fubarDoDisabledPeriodic();
 	
 	void ManageShooterWheel(int roller);
 	void ConfigurePIDObject(PID *pid, std::string objName, bool feedForward); //TODO make this a util
@@ -86,7 +87,7 @@ private:
 	
 	Notifier m_sensorProcessingNotifier;
 	
-	Relay* m_flashlight;
+	DigitalOutput* m_flashlight; // Flashlight change
 	
 	static void DeNoiseSensorEntry(void *param);
 	

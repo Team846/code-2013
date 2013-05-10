@@ -72,7 +72,7 @@ Shooter::Shooter() :
 	
 	m_ticks = 0;
 	
-	m_flashlight = new Relay(RobotConfig::Relay::FLASHLIGHT, Relay::kReverseOnly);
+	m_flashlight = new DigitalOutput(RobotConfig::Digital::FLASHLIGHT); // Flashlight change
 	
 	Configure();
 	
@@ -95,6 +95,8 @@ void Shooter::onEnable()
 
 void Shooter::onDisable()
 {
+	m_outer_file.flush();
+	m_inner_file.flush();
 	if (m_outer_file.is_open())
 		m_outer_file.close();
 	if (m_inner_file.is_open())
@@ -111,7 +113,7 @@ void Shooter::enabledPeriodic()
 {	
 	if (m_componentData->shooterData->IsEnabled())
 	{
-		m_flashlight->Set(Relay::kOn);
+		m_flashlight->Set(1); // Flashlight change
 		if (m_componentData->shooterData->ShouldLauncherBeHigh())
 		{
 			m_pneumatics->setShooterAngler(EXTENDED);
@@ -321,12 +323,12 @@ void Shooter::enabledPeriodic()
 		m_ticks++;
 		m_outer_file << (double)(m_ticks / 50.0) << "," << m_speedsRPM[OUTER] << "," << m_periods[OUTER] << "\n";
 		m_inner_file << (double)(m_ticks / 50.0) << "," << m_speedsRPM[INNER] << "," << m_periods[INNER] << "\n";
-		m_outer_file.flush();
-		m_inner_file.flush();
 	}
 	else
 	{
-		disabledPeriodic();
+		m_flashlight->Set(0);
+		fubarDoDisabledPeriodic();
+//		disabledPeriodic();
 	}
 }
 #define PATCH_BAD_SPEED_DATA
@@ -562,9 +564,8 @@ void Shooter::ManageShooterWheel(int roller)
 }
 */
 
-void Shooter::disabledPeriodic()
+void Shooter::fubarDoDisabledPeriodic()
 {
-	m_flashlight->Set(Relay::kOff);
 	SmarterDashboard::Instance()->EnqueueShooterMessage(MessageType::FRONT_SHOOTER_DATA_SPEED, 0.0f, 0.0f);
 	SmarterDashboard::Instance()->EnqueueShooterMessage(MessageType::BACK_SHOOTER_DATA_SPEED, 0.0f, 0.0f);
 	SmarterDashboard::Instance()->EnqueueShooterMessage(MessageType::FRONT_SHOOTER_DATA_CURRENT, 0.0f, 0.0f);
@@ -583,6 +584,21 @@ void Shooter::disabledPeriodic()
 	
 	m_jaguars[OUTER]->SetDutyCycle(0.0F);
 	m_jaguars[INNER]->SetDutyCycle(0.0F);
+//	AsyncPrinter::Printf("Flashlight: %d\n", m_flashlight->Get());
+}
+
+void Shooter::disabledPeriodic()
+{
+//	static int e = 0;
+//	static bool sw = false;
+//	if (++e % 50 == 0)
+//	{
+//		sw = !sw; 
+//	}	
+//	AsyncPrinter::Printf("fl %d\n", sw);
+//	m_flashlight->Set(sw); // Flashlight change
+	m_flashlight->Set(1); // Flashlight on when setting up the robot
+	fubarDoDisabledPeriodic();
 }
 
 void Shooter::Configure()

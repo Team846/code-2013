@@ -42,11 +42,13 @@ void CollectorData::Slide(CollectorState::Enum position)
 
 void CollectorData::SlideDown()
 {
+	shouldStupidMoveDown = false;
 	Slide(CollectorState::DOWN);
 }
 
 void CollectorData::SlideUp()
 {
+	shouldStupidMoveDown = false;
 	Slide(CollectorState::UP);
 }
 

@@ -77,7 +77,7 @@ void LRTRobot13::RobotInit()
 	//AsyncPrinter::Println("Creating the IMU...");
 	//IMU::Instance()->Start();
 	
-	leds.Start();
+	//leds.Start();
 	
 	AsyncPrinter::Println("Reticulating splines...");
 }
@@ -106,6 +106,9 @@ static int TimeoutCallback(...)
 
 void LRTRobot13::Tick()
 {
+	Profiler::BeginActivity("Tick");
+	
+	
 	looptime = GetFPGATime();
 	wdStart(_watchdog, sysClkRateGet() / RobotConfig::LOOP_RATE,
 			TimeoutCallback, 0);
@@ -149,7 +152,7 @@ void LRTRobot13::Tick()
 	{
 		(*it)->RunOneCycle();
 		if (!(*it)->StatusOK())
-		{
+		{	
 			AsyncPrinter::Printf("[Error] Jaguar %d (%s): ", (*it)->GetChannel(), (*it)->GetName());
 			for (int i = 16; i < 0; i--)
 			{
@@ -179,26 +182,27 @@ void LRTRobot13::Tick()
 	// Update SmarterDashboard -- this should be the last thing!
 	SmarterDashboard::Instance()->Tick();
 	
-//	static int tick = 0;
-//	
-//	if(tick++ % 50 == 0)
-//	{
-//		AsyncPrinter::Printf("======================================\n");
-//		AsyncPrinter::Printf("PROFILED TIMES: \n");
-//		AsyncPrinter::Printf("\n");
-//		map<string, double>* times = Profiler::GetLastTimes();
-//		
-//		for(map<string, double>::iterator it = times->begin(); it != times->end(); ++it)
-//		{
-//			string name = it->first;
-//			double time = it->second;
-//			
-//			AsyncPrinter::Printf("%s: %f\n", name.c_str(), time);
-//		}
-//		AsyncPrinter::Printf("======================================\n");
-//	}
+	static int tick = 0;
+	
+	if(tick++ % 50 == 0)
+	{
+		AsyncPrinter::Printf("======================================\n");
+		AsyncPrinter::Printf("PROFILED TIMES: \n");
+		AsyncPrinter::Printf("\n");
+		map<string, double>* times = Profiler::GetLastTimes();
+		
+		for(map<string, double>::iterator it = times->begin(); it != times->end(); ++it)
+		{
+			string name = it->first;
+			double time = it->second;
+			
+			AsyncPrinter::Printf("%s: %f\n", name.c_str(), time);
+		}
+		AsyncPrinter::Printf("======================================\n");
+	}
 	
 	wdCancel(_watchdog);
+	Profiler::End("Tick");
 }
 
 void LRTRobot13::UpdateGameState()

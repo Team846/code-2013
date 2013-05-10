@@ -350,4 +350,15 @@ void TeleopInputs::Update()
 	if (m_driver_stick->IsButtonJustPressed(
 			DriverStationConfig::JoystickButtons::APPLY_CONFIG))
 		m_componentData->configLoaderData->RequestApply();
+	
+	
+	/* climber failure stuff needs to be at end of files */
+	if (m_operator_stick->IsButtonDown(DriverStationConfig::JoystickButtons::DEBUG_CLIMBER))
+	{
+		if (m_operator_stick->IsButtonDown(DriverStationConfig::JoystickButtons::COLLECTOR_DOWN_OPERATOR ))
+		{
+			m_componentData->collectorData->StopRollers();
+			m_componentData->collectorData->shouldStupidMoveDown = true;
+		}
+	}
 }

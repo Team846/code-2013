@@ -27,7 +27,7 @@ ComponentManager::~ComponentManager()
 void ComponentManager::CreateComponents()
 {
 	AddComponent(new Climber()); //climber must be before drivetrain
-	AddComponent(new Collector());//must be before the shooter
+	AddComponent(new Collector());//must be before the shooter and after climber 
 	AddComponent(new WinchPawl());
 	AddComponent(new Shooter()); //must be after climber
 	AddComponent(new Drivetrain());
@@ -61,15 +61,6 @@ void ComponentManager::Update()
 					comp->Disable();
 				}
 			}
-			
-			if(comp->IsEnabled())
-			{
-				comp->enabledPeriodic();
-			}
-			else
-			{
-				comp->disabledPeriodic();
-			}
 		} 
 		else
 		{
@@ -79,16 +70,17 @@ void ComponentManager::Update()
 			}
 		}
 		
+		if(comp->IsEnabled())
+		{
+			comp->enabledPeriodic();
+		}
+		else
+		{
+			comp->disabledPeriodic();
+		}
+		
 		Profiler::End(comp->GetName());
 		
-//		if(comp->IsEnabled())
-//		{
-//			comp->enabledPeriodic();
-//		}
-//		else
-//		{
-//			comp->disabledPeriodic();
-//		}
 	}
 }
 

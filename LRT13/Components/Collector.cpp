@@ -42,6 +42,12 @@ void Collector::onDisable()
 
 void Collector::enabledPeriodic()
 {
+	if (m_componentData->collectorData->shouldStupidMoveDown)
+	{
+		m_pneumatics->setCollector(true);
+		m_jaguar->SetDutyCycle(0.0);
+		return;
+	}
 //	if (m_componentData->climberData->getCurrentState() != climber::NOTHING)
 //		return;
 	if (m_componentData->collectorData->ShouldRunRollers())

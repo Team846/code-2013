@@ -43,6 +43,8 @@ namespace collector
 		void SlideDown();
 		void SlideUp();
 	
+		bool shouldStupidMoveDown;
+		
 		CollectorState::Enum GetCollectorPosition();
 		
 		bool IsDown();

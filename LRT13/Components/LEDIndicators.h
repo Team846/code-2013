@@ -22,8 +22,8 @@ public:
 	void writezeros(uint16_t n);
 	
 private:
-	DigitalOutput m_clockOut;
-	DigitalOutput m_dataOut;
+//	DigitalOutput m_clockOut;
+//	DigitalOutput m_dataOut;
 };
 
 #endif
