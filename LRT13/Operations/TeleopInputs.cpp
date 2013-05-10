@@ -80,7 +80,8 @@ void TeleopInputs::Update()
 		}
 		else
 		{
-#define DUAL_STICK
+//#define DUAL_STICK
+#ifdef DUAL_STICK
 			double turnComposite = 0.0;
 			double forward = 0.0;
 
@@ -90,8 +91,6 @@ void TeleopInputs::Update()
 					RobotConfig::Drive::THROTTLE_EXPONENT);
 			forward = (left + right) / 2;
 			turnComposite = (right - left) / 2;
-			
-#ifdef DUAL_STICK
 #else
 			double turn = 0.0;
 			turn = -m_driver_wheel->GetAxis(Joystick::kXAxis);
