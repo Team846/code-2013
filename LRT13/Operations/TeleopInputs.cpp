@@ -80,13 +80,26 @@ void TeleopInputs::Update()
 		}
 		else
 		{
+#define DUAL_STICK
+			double turnComposite = 0.0;
+			double forward = 0.0;
+
+			double left = pow(-m_driver_stick->GetAxis(Joystick::kYAxis),
+					RobotConfig::Drive::THROTTLE_EXPONENT);
+			double right = pow(-m_operator_stick->GetAxis(Joystick::kYAxis),
+					RobotConfig::Drive::THROTTLE_EXPONENT);
+			forward = (left + right) / 2;
+			turnComposite = (right - left) / 2;
+			
+#ifdef DUAL_STICK
+#else
 			double turn = 0.0;
 			turn = -m_driver_wheel->GetAxis(Joystick::kXAxis);
-			turn *= 2;
+//			turn *= 2;
 			
 			int sign = turn > 0 ? 1 : -1;
 			
-			turn *= turn * sign;
+//			turn *= turn * sign;
 			//turn = -m_driver_stick->GetAxis(Joystick::kZAxis);
 
 			double forward = pow(-m_driver_stick->GetAxis(Joystick::kYAxis),
@@ -110,6 +123,7 @@ void TeleopInputs::Update()
 				turnComposite = 0.0;
 				turn = 0.0;
 			}
+#endif
 			
 //			AsyncPrinter::Printf("turnComposite: %lf forward: %lf\n", turnComposite, forward);
 			
