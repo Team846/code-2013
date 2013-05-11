@@ -19,10 +19,11 @@ const double MAX_VOLTAGE = 13;
 
 namespace Drive
 {
-	const uint32_t THROTTLE_COEFFICIENT = 1; // TODO: anurag, change this
-	const uint32_t THROTTLE_EXPONENT = 1; // TODO: anurag, change this
-	const uint32_t BLEND_COEFFICIENT = 1; // TODO: anurag, change this
-	const uint32_t BLEND_EXPONENT = 1; // TODO: anurag, change this
+	const uint32_t THROTTLE_COEFFICIENT = 1;
+	const uint32_t THROTTLE_EXPONENT = 1; // must be odd
+	const uint32_t BLEND_COEFFICIENT = 1;
+	const uint32_t BLEND_EXPONENT = 1;
+	const double DEADBAND = 0.02;
 }
 
 namespace AutoActions

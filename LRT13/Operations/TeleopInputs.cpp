@@ -82,7 +82,7 @@ void TeleopInputs::Update()
 		{
 //#define DUAL_STICK
 #ifdef DUAL_STICK
-			double turnComposite = 0.0;
+			double turn = 0.0;
 			double forward = 0.0;
 
 			double left = pow(-m_driver_stick->GetAxis(Joystick::kYAxis),
@@ -90,13 +90,33 @@ void TeleopInputs::Update()
 			double right = pow(-m_operator_stick->GetAxis(Joystick::kYAxis),
 					RobotConfig::Drive::THROTTLE_EXPONENT);
 			forward = (left + right) / 2;
-			turnComposite = (right - left) / 2;
+			turn = (right - left) / 2;
+			int sign = turn > 0 ? 1 : -1;
+			
+			if (fabs(turn) < RobotConfig::Drive::DEADBAND)
+				turn = 0.0;
+			else
+			{
+				turn -= sign * RobotConfig::Drive::DEADBAND;
+				turn /= 1.0 - RobotConfig::Drive::DEADBAND;
+			}
+			double turnComposite = sign * turn * turn;
+			// TODO try blended turning
+			
 #else
 			double turn = 0.0;
 			turn = -m_driver_wheel->GetAxis(Joystick::kXAxis);
 //			turn *= 2;
 			
 			int sign = turn > 0 ? 1 : -1;
+			
+			if (fabs(turn) < RobotConfig::Drive::DEADBAND)
+				turn = 0.0;
+			else
+			{
+				turn -= sign * RobotConfig::Drive::DEADBAND;
+				turn /= 1.0 - RobotConfig::Drive::DEADBAND;
+			}
 			
 //			turn *= turn * sign;
 			//turn = -m_driver_stick->GetAxis(Joystick::kZAxis);
