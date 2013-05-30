@@ -94,6 +94,9 @@ private:
 	void DeNoiseSensor();
 	
 	int m_sensorDeNoisingCycle;
+	int firingWaitTicks;
+	int retractWait;
+	int extendWait;
 #define NUM_SENSOR_VALS 5
 	int m_sensorVals[NUM_SENSOR_VALS];//400/50/2 + 1
 	bool m_sensorWindow;

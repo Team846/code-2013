@@ -14,6 +14,7 @@ using namespace data::shooter;
 #define FILTERED_SENSOR 0
 #define TWOSPEED 1
 #define SENSOR_DENOISE_RATE 400.0
+#define SET_INTERVAL
 //#define OPEN_LOOP
 
 //Front of the pyramid is 3400, 4040
@@ -77,6 +78,7 @@ Shooter::Shooter() :
 	Configure();
 	
 	m_sensorProcessingNotifier.StartPeriodic(1.0 / SENSOR_DENOISE_RATE);
+	firingWaitTicks = 0;
 } 
 
 Shooter::~Shooter()
@@ -147,6 +149,7 @@ void Shooter::enabledPeriodic()
 		switch (m_componentData->shooterData->GetShooterSetting())
 		{
 		case CONTINOUS:
+#ifndef SET_INTERVAL
 				m_pneumatics->setStorageExit(EXTENDED);
 				AsyncPrinter::Printf("FireState: %d\n", m_fireState);
 				switch(m_fireState)
@@ -237,6 +240,48 @@ void Shooter::enabledPeriodic()
 					break;
 				}
 	//			AsyncPrinter::Printf("Out\n");
+#else
+				switch(m_fireState)
+				{
+				case FIRING_OFF:
+					firingWaitTicks = 0;
+					m_pneumatics->setStorageExit(RETRACTED);
+					m_fireState = RETRACT_LOADER_WAIT_FOR_LIFT;
+					break;
+				case RETRACT_LOADER_WAIT_FOR_LIFT:
+					m_pneumatics->setStorageExit(RETRACTED);
+					firingWaitTicks++;
+					if (m_proximity->Get())
+					{
+						m_fireState = RETRACT_LOADER_WAIT_FOR_FALL;
+					}
+					if (firingWaitTicks >= retractWait && atSpeed[OUTER] && atSpeed[INNER])
+					{
+						m_pneumatics->setStorageExit(EXTENDED);
+						m_fireState = EXTEND_LOADER;
+						firingWaitTicks = 0;
+					}
+					break;
+				case RETRACT_LOADER_WAIT_FOR_FALL:
+					firingWaitTicks++;
+					if ((firingWaitTicks >= retractWait || !m_proximity->Get()) && atSpeed[OUTER] && atSpeed[INNER])
+					{
+						m_pneumatics->setStorageExit(EXTENDED);
+						m_fireState = EXTEND_LOADER;
+						firingWaitTicks = 0;
+					}
+					break;
+				case EXTEND_LOADER:
+					m_pneumatics->setStorageExit(EXTENDED);
+					firingWaitTicks++;
+					if (firingWaitTicks >= extendWait)
+					{
+						m_pneumatics->setStorageExit(RETRACTED);
+						m_fireState = FIRING_OFF;
+					}
+					break;
+				}
+#endif
 			break;
 		case ONCE:
 			if(atSpeed[OUTER] && atSpeed[INNER])
@@ -251,6 +296,7 @@ void Shooter::enabledPeriodic()
 			lastFiring = false;
 			AsyncPrinter::Printf("\t---Outer wheel speed when shooting: %f\n", m_speedsRPM[OUTER]);
 			AsyncPrinter::Printf("\t---Inner wheel speed when shooting: %f\n", m_speedsRPM[INNER]);
+			AsyncPrinter::Printf("Firing Wait Ticks: %d\n", firingWaitTicks);
 		}
 //				AsyncPrinter::Printf("off\n");
 	//			AsyncPrinter::Printf("IN\n");
@@ -620,6 +666,8 @@ void Shooter::Configure()
 
 	m_speed_setpoints[OUTER][HIGH] = c->Get<double>(m_configSection, "outer_lowSpeedSetpoint", 3100);
 	m_speed_setpoints[INNER][HIGH] = c->Get<double>(m_configSection, "inner_lowSpeedSetpoint", 2800);
+	retractWait = c->Get<double>(m_configSection, "retractWaitCycles", 15);
+	extendWait = c->Get<double>(m_configSection, "extendWaitCycles", 10);
 
 	//TODO: Change default values.
 	requiredCyclesAtSpeed = c->Get<int> (m_configSection, "requiredCycles", 3);

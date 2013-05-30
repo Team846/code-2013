@@ -100,7 +100,7 @@ void TeleopInputs::Update()
 				turn -= sign * RobotConfig::Drive::DEADBAND;
 				turn /= 1.0 - RobotConfig::Drive::DEADBAND;
 			}
-			double turnComposite = sign * turn * turn;
+			double turnComposite = turn;//sign * turn * turn;
 			// TODO try blended turning
 			
 #else
@@ -110,19 +110,22 @@ void TeleopInputs::Update()
 			
 			int sign = turn > 0 ? 1 : -1;
 			
-			if (fabs(turn) < RobotConfig::Drive::DEADBAND)
-				turn = 0.0;
-			else
-			{
-				turn -= sign * RobotConfig::Drive::DEADBAND;
-				turn /= 1.0 - RobotConfig::Drive::DEADBAND;
-			}
 			
 //			turn *= turn * sign;
 			//turn = -m_driver_stick->GetAxis(Joystick::kZAxis);
 
 			double forward = pow(-m_driver_stick->GetAxis(Joystick::kYAxis),
 					RobotConfig::Drive::THROTTLE_EXPONENT);
+
+			int signForward = forward > 0 ? 1 : -1;
+			
+			if (fabs(forward) < RobotConfig::Drive::DEADBAND)
+				forward = 0.0;
+			else
+			{
+				forward -= signForward * RobotConfig::Drive::DEADBAND;
+				forward /= 1.0 - RobotConfig::Drive::DEADBAND;
+			}
 			
 			//blending routine
 			double absForward = fabs(forward); //to ensure correct arc when switching direction
