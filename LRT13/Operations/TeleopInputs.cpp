@@ -62,14 +62,23 @@ void TeleopInputs::Update()
 	/************************Drivetrain************************/
 
 	//#define USEOPENLOOP
-	// Use velocity control in teleoperated mode
+	// Use velocity control in teleoperated modeif (!m_driver_stick->IsButtonDown(
+	if (!m_driver_stick->IsButtonDown(
+		DriverStationConfig::JoystickButtons::VECTOR_DRIVE))
+	{
 #ifdef USEOPENLOOP
 	
-	m_componentData->drivetrainData->setControlMode(FORWARD, OPEN_LOOP);
-	m_componentData->drivetrainData->setControlMode(TURN, OPEN_LOOP);
+		m_componentData->drivetrainData->setControlMode(FORWARD, OPEN_LOOP);
+		m_componentData->drivetrainData->setControlMode(TURN, OPEN_LOOP);
 #else
-	m_componentData->drivetrainData->setControlMode(FORWARD, VELOCITY_CONTROL);
-	m_componentData->drivetrainData->setControlMode(TURN, VELOCITY_CONTROL);
+		m_componentData->drivetrainData->setControlMode(FORWARD, VELOCITY_CONTROL);
+		m_componentData->drivetrainData->setControlMode(TURN, VELOCITY_CONTROL);
+	}
+	else
+	{
+		m_componentData->drivetrainData->setControlMode(FORWARD, VELOCITY_CONTROL);
+		m_componentData->drivetrainData->setControlMode(TURN, POSITION_CONTROL);
+	}
 #endif
 	if (current_state == RobotData::TELEOP)
 	{
@@ -77,94 +86,106 @@ void TeleopInputs::Update()
 				DriverStationConfig::JoystickButtons::RESET_ZERO))
 		{
 			m_componentData->drivetrainData->setOpenLoopOutput(FORWARD, 0.0);
+			m_componentData->drivetrainData->setZeroHeading();
 		}
 		else
 		{
+			if (!m_driver_stick->IsButtonDown(
+					DriverStationConfig::JoystickButtons::VECTOR_DRIVE))
+			{
 //#define DUAL_STICK
 #ifdef DUAL_STICK
-			double turn = 0.0;
-			double forward = 0.0;
+				double turn = 0.0;
+				double forward = 0.0;
+	
+				double left = pow(-m_driver_stick->GetAxis(Joystick::kYAxis),
+						RobotConfig::Drive::THROTTLE_EXPONENT);
+				double right = pow(-m_operator_stick->GetAxis(Joystick::kYAxis),
+						RobotConfig::Drive::THROTTLE_EXPONENT);
+				forward = (left + right) / 2;
+				turn = (right - left) / 2;
+				int sign = turn > 0 ? 1 : -1;
 
-			double left = pow(-m_driver_stick->GetAxis(Joystick::kYAxis),
-					RobotConfig::Drive::THROTTLE_EXPONENT);
-			double right = pow(-m_operator_stick->GetAxis(Joystick::kYAxis),
-					RobotConfig::Drive::THROTTLE_EXPONENT);
-			forward = (left + right) / 2;
-			turn = (right - left) / 2;
-			int sign = turn > 0 ? 1 : -1;
-			
-			if (fabs(turn) < RobotConfig::Drive::DEADBAND)
-				turn = 0.0;
-			else
-			{
-				turn -= sign * RobotConfig::Drive::DEADBAND;
-				turn /= 1.0 - RobotConfig::Drive::DEADBAND;
-			}
-			double turnComposite = turn;//sign * turn * turn;
-			// TODO try blended turning
-			
+				if (fabs(turn) < RobotConfig::Drive::DEADBAND)
+					turn = 0.0;
+				else
+				{
+					turn -= sign * RobotConfig::Drive::DEADBAND;
+					turn /= 1.0 - RobotConfig::Drive::DEADBAND;
+				}
+				double turnComposite = turn;//sign * turn * turn;
+				// TODO try blended turning
 #else
-			double turn = 0.0;
-			turn = -m_driver_wheel->GetAxis(Joystick::kXAxis);
-//			turn *= 2;
-			
-			int sign = turn > 0 ? 1 : -1;
-			
-			
-//			turn *= turn * sign;
-			//turn = -m_driver_stick->GetAxis(Joystick::kZAxis);
-
-			double forward = pow(-m_driver_stick->GetAxis(Joystick::kYAxis),
-					RobotConfig::Drive::THROTTLE_EXPONENT);
-
-			int signForward = forward > 0 ? 1 : -1;
-			
-			if (fabs(forward) < RobotConfig::Drive::DEADBAND)
-				forward = 0.0;
-			else
-			{
-				forward -= signForward * RobotConfig::Drive::DEADBAND;
-				forward /= 1.0 - RobotConfig::Drive::DEADBAND;
-			}
-			
-			//blending routine
-			double absForward = fabs(forward); //to ensure correct arc when switching direction
-
-			double blend = pow((1 - absForward),
-					RobotConfig::Drive::BLEND_EXPONENT); //always between 0 and 1, raised to an exponent to adjust transition between in place and arc.
-
-			const double turnInPlace = turn; //normal turn
-			const double constRadiusTurn = turn * absForward; //arc turn
-
-			double turnComposite = turnInPlace * (blend) + constRadiusTurn
-					* (1 - blend); //blended function
-			
-			if (m_driver_wheel->IsButtonDown(DriverStationConfig::JoystickButtons::STOP_ROBOT ))
-			{
-				forward = 0.0;
-				turnComposite = 0.0;
-				turn = 0.0;
-			}
+				double turn = 0.0;
+				turn = -m_driver_wheel->GetAxis(Joystick::kXAxis);
+	//			turn *= 2;
+				
+				int sign = turn > 0 ? 1 : -1;
+				
+				
+	//			turn *= turn * sign;
+				//turn = -m_driver_stick->GetAxis(Joystick::kZAxis);
+	
+				double forward = pow(-m_driver_stick->GetAxis(Joystick::kYAxis),
+						RobotConfig::Drive::THROTTLE_EXPONENT);
+	
+				int signForward = forward > 0 ? 1 : -1;
+				
+				if (fabs(forward) < RobotConfig::Drive::DEADBAND)
+					forward = 0.0;
+				else
+				{
+					forward -= signForward * RobotConfig::Drive::DEADBAND;
+					forward /= 1.0 - RobotConfig::Drive::DEADBAND;
+				}
+				
+				//blending routine
+				double absForward = fabs(forward); //to ensure correct arc when switching direction
+	
+				double blend = pow((1 - absForward),
+						RobotConfig::Drive::BLEND_EXPONENT); //always between 0 and 1, raised to an exponent to adjust transition between in place and arc.
+	
+				const double turnInPlace = turn; //normal turn
+				const double constRadiusTurn = turn * absForward; //arc turn
+	
+				double turnComposite = turnInPlace * (blend) + constRadiusTurn
+						* (1 - blend); //blended function
+				
+				if (m_driver_wheel->IsButtonDown(DriverStationConfig::JoystickButtons::STOP_ROBOT ))
+				{
+					forward = 0.0;
+					turnComposite = 0.0;
+					turn = 0.0;
+				}
 #endif
 			
-//			AsyncPrinter::Printf("turnComposite: %lf forward: %lf\n", turnComposite, forward);
+//				AsyncPrinter::Printf("turnComposite: %lf forward: %lf\n", turnComposite, forward);
 			
 #ifdef USEOPENLOOP
-			m_componentData->drivetrainData->setOpenLoopOutput(FORWARD, forward);
-			m_componentData->drivetrainData->setOpenLoopOutput(TURN, turnComposite);
+				m_componentData->drivetrainData->setOpenLoopOutput(FORWARD, forward);
+				m_componentData->drivetrainData->setOpenLoopOutput(TURN, turnComposite);
 #else
-//			static int oops = 0;
-//			if (++oops % 5 == 0)
-//				AsyncPrinter::Printf("fwd: %.2f\n", forward);
-			m_componentData->drivetrainData->setOpenLoopOutput(FORWARD, forward);
-			m_componentData->drivetrainData->setOpenLoopOutput(TURN, turnComposite);
-			//for when the climber is being used
-			
-			m_componentData->drivetrainData->setVelocitySetpoint(FORWARD,
-					forward);
-			m_componentData->drivetrainData->setVelocitySetpoint(TURN, turnComposite);
-			//m_componentData->drivetrainData->setVelocitySetpoint(TURN, turn);
+	//			static int oops = 0;
+	//			if (++oops % 5 == 0)
+	//				AsyncPrinter::Printf("fwd: %.2f\n", forward);
+				m_componentData->drivetrainData->setOpenLoopOutput(FORWARD, forward);
+				m_componentData->drivetrainData->setOpenLoopOutput(TURN, turnComposite);
+				//for when the climber is being used
+				
+				m_componentData->drivetrainData->setVelocitySetpoint(FORWARD,
+						forward);
+				m_componentData->drivetrainData->setVelocitySetpoint(TURN, turnComposite);
+				//m_componentData->drivetrainData->setVelocitySetpoint(TURN, turn);
 #endif
+			}
+			else
+			{
+				float desiredHeading = atan2(-m_driver_stick->GetAxis(Joystick::kXAxis), -m_driver_stick->GetAxis(Joystick::kYAxis)) * 180 / acos(-1); // radians to degrees
+				float magnitude = sqrt(m_driver_stick->GetAxis(Joystick::kXAxis) * m_driver_stick->GetAxis(Joystick::kXAxis) +
+						m_driver_stick->GetAxis(Joystick::kYAxis) * m_driver_stick->GetAxis(Joystick::kYAxis));
+				m_componentData->drivetrainData->setVelocitySetpoint(FORWARD, magnitude);
+				m_componentData->drivetrainData->setRelativePositionSetpoint(TURN, desiredHeading - m_componentData->drivetrainData->getCurrentHeading(), 1.0);
+			}
 		}
 	
 	//	AsyncPrinter::Printf("Inputs\n");

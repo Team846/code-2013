@@ -66,6 +66,13 @@ void DrivetrainData::setControlMode(ForwardOrTurn axis, ControlMode control)
 	m_controlModes[axis] = control;
 }
 
+void DrivetrainData::setZeroHeading()
+{
+	m_zeroHeading = fmod(m_driveEncoders->getTurnAngle(), 360);
+	if (m_zeroHeading < 0)
+		m_zeroHeading += 360;
+}
+
 SEM_ID DrivetrainData::createPositionOperationSemaphore(ForwardOrTurn axis,
 		double errorThreshold)
 {
@@ -135,3 +142,10 @@ double DrivetrainData::getPositionControlMaxSpeed(ForwardOrTurn axis)
 	return m_maxSpeeds[axis];
 }
 
+float DrivetrainData::getCurrentHeading()
+{
+	float m_currentHeading = fmod(m_driveEncoders->getTurnAngle(), 360);
+	if (m_currentHeading < 0)
+		m_currentHeading += 360;
+	return m_currentHeading - m_zeroHeading;
+}

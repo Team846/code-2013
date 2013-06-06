@@ -47,7 +47,8 @@ namespace drivetrain
 		
 		void setControlMode(ForwardOrTurn axis, ControlMode control);
 	
-
+		void setZeroHeading();
+		
 		SEM_ID createPositionOperationSemaphore(ForwardOrTurn axis, double errorThreshold);
 		
 		bool isDesiredPositionOperationComplete(ForwardOrTurn axis,
@@ -57,6 +58,8 @@ namespace drivetrain
 		double getVelocitySetpoint(ForwardOrTurn axis);
 		double getRelativePositionSetpoint(ForwardOrTurn axis);
 		double getPositionControlMaxSpeed(ForwardOrTurn axis);
+		
+		float getCurrentHeading();
 		
 		void serviceOperationSemaphores();
 		void cleanWaitForSem(SEM_ID sem);
@@ -73,6 +76,7 @@ namespace drivetrain
 		double m_desiredRates[2];
 		double m_positionSetpoints[2];
 		double m_maxSpeeds[2];
+		float m_zeroHeading;
 		
 		typedef struct drivetrainOpSem
 		{

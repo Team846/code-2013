@@ -32,6 +32,7 @@ const uint32_t FIRE_SINGLE = 12;
 
 //const uint32_t FORCE_CLIMB_ADVANCE= 4;
 
+const uint32_t VECTOR_DRIVE = 8;
 const uint32_t AUTO_AIM_BACKBOARD = 9;
 const uint32_t START_CLIMB = 4;
 //const uint32_t FEEDER_STATION_APPROACH = 3;
