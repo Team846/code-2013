@@ -8,6 +8,7 @@
 #include "LEDIndicatorData.h"
 #include "AutoAimData.h"
 #include "WinchPawlData.h"
+#include "RoutineRecorderData.h"
 
 using namespace data;
 using namespace drivetrain;
@@ -17,6 +18,7 @@ using namespace climber;
 using namespace configloader;
 using namespace indicators;
 using namespace autoaim;
+using namespace routinerecorder;
 
 ComponentData* ComponentData::m_instance = NULL;
 
@@ -41,7 +43,8 @@ ComponentData::ComponentData()
   configLoaderData(new ConfigLoaderData()),
   ledIndicatorData(new LEDIndicatorData()),
   autoAimData(new AutoAimData()),
-  winchPawlData(new WinchPawlData())
+  winchPawlData(new WinchPawlData()),
+  routineRecorderData(new RoutineRecorderData())
 {
 	
 }
@@ -56,4 +59,5 @@ ComponentData::~ComponentData()
 	delete ledIndicatorData;
 	delete autoAimData;
 	delete winchPawlData;
+	delete routineRecorderData;
 }

@@ -10,6 +10,7 @@
 #include "../ComponentData/LEDIndicatorData.h"
 #include "../ComponentData/AutoAimData.h"
 #include "../ComponentData/LEDIndicatorData.h"
+#include "../ComponentData/RoutineRecorderData.h"
 #include "../Config/ConfigManager.h"
 
 using namespace data;

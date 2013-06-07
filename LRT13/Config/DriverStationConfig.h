@@ -57,6 +57,7 @@ const uint32_t PAWL_UP = 8;
 const uint32_t RUN_BACKWORDS = 8;
 const uint32_t CONTINUE_CLIMB_OPERATOR = 11;
 const uint32_t PAWL_DOWN = 9;
+const uint32_t RECORD = 9;
 const uint32_t COLLECTOR_DOWN_OPERATOR = 10;
 const uint32_t CLIMB_STEP_BACKWARD = 11;
 const uint32_t CLIMB_STEP_FORWARD = 12;

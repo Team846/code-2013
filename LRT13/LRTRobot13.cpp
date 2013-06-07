@@ -120,6 +120,7 @@ void LRTRobot13::Tick()
 	{
 		if (RobotData::GetLastState() != RobotData::GetCurrentState())
 			m_auton->Start();
+		semGive(m_auton->loopSem);
 	}
 	else if (RobotData::GetCurrentState() == RobotData::TELEOP)
 	{

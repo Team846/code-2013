@@ -27,7 +27,7 @@ namespace data
 		{
 			OFF = 0,
 			ONCE = 1,
-			CONTINOUS = 2
+			CONTINUOUS = 2
 		};
 		
 		enum PneumaticsState

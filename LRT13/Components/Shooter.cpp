@@ -148,7 +148,7 @@ void Shooter::enabledPeriodic()
 		static bool lastFiring = false;
 		switch (m_componentData->shooterData->GetShooterSetting())
 		{
-		case CONTINOUS:
+		case CONTINUOUS:
 #ifndef SET_INTERVAL
 				m_pneumatics->setStorageExit(EXTENDED);
 				AsyncPrinter::Printf("FireState: %d\n", m_fireState);

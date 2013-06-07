@@ -29,6 +29,7 @@ public:
 	
 	
 	void TeleopTick(); //called every cycle to manage semi-autonomous functions
+	SEM_ID loopSem;
 protected:
 	virtual INT32 Tick();
 private:
@@ -62,6 +63,14 @@ private:
 	{
 		return standardWaitTicks;
 	}
+	typedef struct Cycle
+	{
+		double forward;
+		double turn;
+		bool collecting;
+		bool shooting;
+		bool angleHigh;
+	};
 };
 
 #endif

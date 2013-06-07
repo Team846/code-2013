@@ -5,6 +5,7 @@
 #include "AutoActions.h"
 #include "../Config/DriverStationConfig.h"
 #include "../Utils/AsyncPrinter.h"
+#include <fstream>
 
 using namespace data;
 using namespace data::drivetrain;
@@ -24,6 +25,8 @@ AutonomousRoutines::AutonomousRoutines()
 	m_isRunning = false;
 	
 	m_autonomousStartTime = 0.0;
+	
+	loopSem = semBCreate(SEM_Q_PRIORITY, SEM_EMPTY);
 }
 
 AutonomousRoutines::~AutonomousRoutines()
@@ -285,21 +288,7 @@ void AutonomousRoutines::Autonomous()
 		
 		
 		break;
-	case 4://test routine
-		m_componentData->drivetrainData->setControlMode(FORWARD, POSITION_CONTROL);
-		m_componentData->drivetrainData->setRelativePositionSetpoint(FORWARD, 12 * 7, 0.90);
-		m_componentData->drivetrainData->setControlMode(TURN, POSITION_CONTROL);
-		m_componentData->drivetrainData->setRelativePositionSetpoint(TURN, 0, 0.8);
-		m_componentData->drivetrainData->cleanWaitForSem(m_componentData->drivetrainData->createPositionOperationSemaphore(FORWARD, 0.25));
-
-		
-//		m_componentData->drivetrainData->setVelocitySetpoint(FORWARD, 0.0);
-//		m_componentData->drivetrainData->cleanWaitForSem(m_componentData->drivetrainData->createPositionOperationSemaphore(TURN, 8));
-		
-		//		StopDrive();
-		SafeWait(10.0, 10);
-		break;
-	case 5://start in back and do the fancy driving back routine
+	case 4://start in back and do the fancy driving back routine
 			m_componentData->shooterData->SetNumFrisbeesInStorage(4);
 			FireAllFrisbees(7.0);
 	//		FireAllFrisbees(6.0);
@@ -499,10 +488,65 @@ void AutonomousRoutines::Autonomous()
 			
 			
 			break;
-			
+	// recorded routine
+	case 5:
+		ifstream fin("/RecordedRoutine.txt");
 		
+		if (!fin.is_open())
+		{
+			AsyncPrinter::Printf("[ERROR] Could not open recorded autonomous routine file\n");
+			break;
+		}
+		queue<Cycle> routine;
+		while (!fin.eof())
+		{
+			Cycle current;
+			fin >> current.forward;
+			fin >> current.turn;
+			fin >> current.collecting;
+			fin >> current.shooting;
+			fin >> current.angleHigh;
+			routine.push(current);
+		}
+		m_componentData->drivetrainData->setControlMode(FORWARD, VELOCITY_CONTROL);
+		m_componentData->drivetrainData->setControlMode(TURN, VELOCITY_CONTROL);
+		while (!routine.empty())
+		{
+			semTake(loopSem, WAIT_FOREVER);
+			Cycle current = routine.front();
+			m_componentData->drivetrainData->setVelocitySetpoint(FORWARD, current.forward);
+			m_componentData->drivetrainData->setVelocitySetpoint(TURN, current.turn);
+			if (current.collecting)
+			{
+				m_componentData->collectorData->RunRollers();
+				m_componentData->collectorData->SlideDown();
+			}
+			else
+			{
+				m_componentData->collectorData->StopRollers();
+				m_componentData->collectorData->SlideUp();
+			}
+			if (current.shooting)
+			{
+				m_componentData->shooterData->SetShooterSetting(CONTINUOUS);
+			}
+			else
+			{
+				m_componentData->shooterData->SetShooterSetting(OFF);
+			}
+			if (current.angleHigh)
+			{
+				m_componentData->shooterData->SetLauncherAngleHigh();
+			}
+			else
+			{
+				m_componentData->shooterData->SetLauncherAngleLow();
+			}
+		}
+		fin.close();
+		break;
 	}
-	//initial wait
+		
 	AsyncPrinter::Printf("Auton done.\n");
 	m_isRunning = false;
 }
@@ -606,7 +650,7 @@ void AutonomousRoutines::FireAllFrisbees(double timeoutSeconds)
 		else
 		{
 //			AsyncPrinter::Printf("Firing frisbees\n");
-			m_componentData->shooterData->SetShooterSetting(CONTINOUS);
+			m_componentData->shooterData->SetShooterSetting(CONTINUOUS);
 			
 		}
 		AutonomousFreeCPUPause();

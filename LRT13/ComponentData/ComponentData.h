@@ -39,6 +39,10 @@ namespace data
 	{
 		class AutoAimData;
 	}
+	namespace routinerecorder
+	{
+		class RoutineRecorderData;
+	}
 	
 	/*!
 	 * @brief Provides a central hub for data access.
@@ -60,6 +64,7 @@ namespace data
 		configloader::ConfigLoaderData* const configLoaderData;
 		indicators::LEDIndicatorData* const ledIndicatorData;
 		autoaim::AutoAimData* const autoAimData;
+		routinerecorder::RoutineRecorderData* const routineRecorderData;
 	
 	protected:
 		ComponentData();

@@ -296,11 +296,11 @@ void TeleopInputs::Update()
 	//			m_driver_stick->IsButtonJustPressed(DriverStationConfig::JoystickButtons::FORCE_CLIMB_ADVANCE));
 		
 	
-		/************************Shooter Functions************************/
+		/************************Shooter************************/
 		if (m_driver_stick->IsButtonDown(DriverStationConfig::JoystickButtons::FIRE))
 		{
 	//		AsyncPrinter::Printf("firing\n");
-			m_componentData->shooterData->SetShooterSetting(CONTINOUS);
+			m_componentData->shooterData->SetShooterSetting(CONTINUOUS);
 		}
 		else if (m_driver_stick->IsButtonDown(DriverStationConfig::JoystickButtons::FIRE_SINGLE))
 		{
@@ -417,5 +417,16 @@ void TeleopInputs::Update()
 			m_componentData->collectorData->StopRollers();
 			m_componentData->collectorData->shouldStupidMoveDown = true;
 		}
+	}
+	
+	/************************Routine Recorder************************/
+	if (m_operator_stick->IsButtonDown(DriverStationConfig::JoystickButtons::RECORD) &&
+					!m_operator_stick->IsButtonDown(DriverStationConfig::JoystickButtons::DEBUG_CLIMBER))
+	{
+		m_componentData->routineRecorderData->ShouldRecord(true);
+	}
+	else
+	{
+		m_componentData->routineRecorderData->ShouldRecord(false);
 	}
 }
