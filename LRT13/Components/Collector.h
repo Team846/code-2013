@@ -57,6 +57,13 @@ private:
 	string m_configSection;
 	
 	bool m_lastStateWasUp;
+	
+	int m_slowDownTicks;
+	int m_slowDownTime;
+	bool m_slowDown;
+	
+	float m_slowDownAmount;
+	int m_currentCount;
 };
 
 #endif

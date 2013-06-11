@@ -6,7 +6,7 @@ using namespace data::collector;
 using namespace data::shooter;
 
 RoutineRecorder::RoutineRecorder()
-: Component("Drivetrain", -1, true),
+: Component("RoutineRecorder", -1, true),
   m_driveEncoders(DriveEncoders::GetInstance()),
   m_file("/RecordedRoutine.txt")
 {

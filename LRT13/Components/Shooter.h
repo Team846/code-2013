@@ -102,6 +102,9 @@ private:
 	bool m_sensorWindow;
 	
 	bool m_isSensorTrue;
+	
+	bool m_sensorOK;
+	int m_sensorStableTime;
 };
 
 #endif

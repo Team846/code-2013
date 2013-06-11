@@ -14,7 +14,6 @@ using namespace data::shooter;
 #define FILTERED_SENSOR 0
 #define TWOSPEED 1
 #define SENSOR_DENOISE_RATE 400.0
-#define SET_INTERVAL
 //#define OPEN_LOOP
 
 //Front of the pyramid is 3400, 4040
@@ -36,10 +35,10 @@ Shooter::Shooter() :
 	
 	m_encs[OUTER] = new Counter((UINT32) RobotConfig::Digital::HALL_EFFECT_A);
 	m_encs[OUTER]->Start();
-	m_encs[OUTER]->SetMaxPeriod(100 / 60.0); // Period of 100 RPM; minimum speed we can read -Raphael Chang 4/12/13
+	m_encs[OUTER]->SetMaxPeriod(60 / 100.0); // Period of 100 RPM; minimum speed we can read -Raphael Chang 4/12/13
 	m_encs[INNER] = new Counter((UINT32) RobotConfig::Digital::HALL_EFFECT_B);
 	m_encs[INNER]->Start();
-	m_encs[INNER]->SetMaxPeriod(100 / 60.0); // Period of 100 RPM; minimum speed we can read -Raphael Chang 4/12/13
+	m_encs[INNER]->SetMaxPeriod(60 / 100.0); // Period of 100 RPM; minimum speed we can read -Raphael Chang 4/12/13
 	m_pneumatics = Pneumatics::Instance();
 
 	atSpeedCounter[OUTER] = 0;
@@ -79,7 +78,9 @@ Shooter::Shooter() :
 	
 	m_sensorProcessingNotifier.StartPeriodic(1.0 / SENSOR_DENOISE_RATE);
 	firingWaitTicks = 0;
-} 
+	m_sensorStableTime = 0;
+	m_sensorOK = false;
+}
 
 Shooter::~Shooter()
 {
@@ -149,98 +150,97 @@ void Shooter::enabledPeriodic()
 		switch (m_componentData->shooterData->GetShooterSetting())
 		{
 		case CONTINUOUS:
-#ifndef SET_INTERVAL
-				m_pneumatics->setStorageExit(EXTENDED);
-				AsyncPrinter::Printf("FireState: %d\n", m_fireState);
-				switch(m_fireState)
-				{
-				case FIRING_OFF:
-					if (atSpeed[OUTER] && atSpeed[INNER])
-					{
-						m_fireState = RETRACT_LOADER_WAIT_FOR_LIFT;
-						m_cyclesToContinueRetracting = requiredCyclesDown ;
-						m_pneumatics->setStorageExit(RETRACTED);
-						startShotTime = e;
-						
-						m_timer = 50 * 1.3;
-					}
-					else if (e % 20 == 0)
-						AsyncPrinter::Printf("Not at speed %.0f, %.0f\n", m_speedsRPM[INNER], m_speedsRPM[OUTER]);
-					break;
-				case RETRACT_LOADER_WAIT_FOR_LIFT:
-					m_timer--;
-	//				if (m_cyclesToContinueRetracting > 0)
-#if RELIABLE_SHOOTING
-					if (!m_proximity->Get() && m_timer > 0)//keep waiting
-#else 
-	#if FILTERED_SENSOR
-					if (!m_isSensorTrue)//keep waiting
-	#else
-					if (!m_proximity->Get())//keep waiting
-	#endif
-#endif
-					{
-						m_pneumatics->setStorageExit(RETRACTED);
-						m_cyclesToContinueRetracting--;
-					}
-					else
-					{
-						m_pneumatics->setStorageExit(RETRACTED);
-	//					m_pneumatics->setStorageExit(EXTENDED);
-						m_fireState = RETRACT_LOADER_WAIT_FOR_FALL;
-					}
-					break;
-				case RETRACT_LOADER_WAIT_FOR_FALL:
-#if RELIABLE_SHOOTING
-					if (m_proximity->Get() && m_timer > 0)//keep waiting
-#else
-	#if FILTERED_SENSOR
-					if (m_isSensorTrue)//keep waiting
-	#else
-					if (m_proximity->Get())//keep waiting
-	#endif
-#endif
-					{
-						m_pneumatics->setStorageExit(RETRACTED);
-						m_cyclesToContinueRetracting--;
-					}
-					else/* if(atSpeed[INNER] && atSpeed[OUTER])*/
-					{
-					
-						m_pneumatics->setStorageExit(EXTENDED);
-						m_fireState = EXTEND_LOADER;
-						m_timer = 50;
-					}
-					break;
-				case EXTEND_LOADER:
-						m_pneumatics->setStorageExit(EXTENDED);
-						m_timer--;
-						AsyncPrinter::Printf("normalized error: %f, threshold: %f\n", m_errorsNormalized[INNER], frisbeeDetectionThreshold);
-#if RELIABLE_SHOOTING
-						if (m_errors[INNER] > frisbeeDetectionThreshold || m_timer < 0)
-#else
-						if (fabs(m_errorsNormalized[INNER]) > frisbeeDetectionThreshold || m_timer < 0)
-#endif
-							
-						{
-							AsyncPrinter::Printf("Outer wheel speed when shooting: %f\n", m_speedsRPM[OUTER]);
-							AsyncPrinter::Printf("Inner wheel speed when shooting: %f\n", m_speedsRPM[INNER]);
-//							AsyncPrinter::Printf("Fired with newSpeed = %.0f, lastSpeed = %.0f taking %d cycles\n", m_speedsRPM[INNER], lastSpeed, e - startShotTime);
-							m_fireState = RETRACT_LOADER_WAIT_FOR_LIFT;
-							m_cyclesToContinueRetracting = requiredCyclesDown ;
-//							m_pneumatics->setStorageExit(RETRACTED);
+//				m_pneumatics->setStorageExit(EXTENDED);
+//				AsyncPrinter::Printf("FireState: %d\n", m_fireState);
+//				switch(m_fireState)
+//				{
+//				case FIRING_OFF:
+//					if (atSpeed[OUTER] && atSpeed[INNER])
+//					{
+//						m_fireState = RETRACT_LOADER_WAIT_FOR_LIFT;
+//						m_cyclesToContinueRetracting = requiredCyclesDown ;
+//						m_pneumatics->setStorageExit(RETRACTED);
+//						startShotTime = e;
+//						
+//						m_timer = 50 * 1.3;
+//					}
+//					else if (e % 20 == 0)
+//						AsyncPrinter::Printf("Not at speed %.0f, %.0f\n", m_speedsRPM[INNER], m_speedsRPM[OUTER]);
+//					break;
+//				case RETRACT_LOADER_WAIT_FOR_LIFT:
+//					m_timer--;
+//	//				if (m_cyclesToContinueRetracting > 0)
+//#if RELIABLE_SHOOTING
+//					if (!m_proximity->Get() && m_timer > 0)//keep waiting
+//#else 
+//	#if FILTERED_SENSOR
+//					if (!m_isSensorTrue)//keep waiting
+//	#else
+//					if (!m_proximity->Get())//keep waiting
+//	#endif
+//#endif
+//					{
+//						m_pneumatics->setStorageExit(RETRACTED);
+//						m_cyclesToContinueRetracting--;
+//					}
+//					else
+//					{
+//						m_pneumatics->setStorageExit(RETRACTED);
+//	//					m_pneumatics->setStorageExit(EXTENDED);
+//						m_fireState = RETRACT_LOADER_WAIT_FOR_FALL;
+//					}
+//					break;
+//				case RETRACT_LOADER_WAIT_FOR_FALL:
+//#if RELIABLE_SHOOTING
+//					if (m_proximity->Get() && m_timer > 0)//keep waiting
+//#else
+//	#if FILTERED_SENSOR
+//					if (m_isSensorTrue)//keep waiting
+//	#else
+//					if (m_proximity->Get())//keep waiting
+//	#endif
+//#endif
+//					{
+//						m_pneumatics->setStorageExit(RETRACTED);
+//						m_cyclesToContinueRetracting--;
+//					}
+//					else/* if(atSpeed[INNER] && atSpeed[OUTER])*/
+//					{
+//					
+//						m_pneumatics->setStorageExit(EXTENDED);
+//						m_fireState = EXTEND_LOADER;
+//						m_timer = 50;
+//					}
+//					break;
+//				case EXTEND_LOADER:
+//						m_pneumatics->setStorageExit(EXTENDED);
+//						m_timer--;
+//						AsyncPrinter::Printf("normalized error: %f, threshold: %f\n", m_errorsNormalized[INNER], frisbeeDetectionThreshold);
+//#if RELIABLE_SHOOTING
+//						if (m_errors[INNER] > frisbeeDetectionThreshold || m_timer < 0)
+//#else
+//						if (fabs(m_errorsNormalized[INNER]) > frisbeeDetectionThreshold || m_timer < 0)
+//#endif
 //							
-							if (m_timer >= 0)
-								m_componentData->shooterData->DecrementFrisbeeCounter();
-							
-							startShotTime = e;
-						}
-	//					else
-	//						AsyncPrinter::Printf("Speed drop %.3f\n", lastSpeed - m_speeds[INNER]);
-					break;
-				}
-	//			AsyncPrinter::Printf("Out\n");
-#else
+//						{
+//							AsyncPrinter::Printf("Outer wheel speed when shooting: %f\n", m_speedsRPM[OUTER]);
+//							AsyncPrinter::Printf("Inner wheel speed when shooting: %f\n", m_speedsRPM[INNER]);
+////							AsyncPrinter::Printf("Fired with newSpeed = %.0f, lastSpeed = %.0f taking %d cycles\n", m_speedsRPM[INNER], lastSpeed, e - startShotTime);
+//							m_fireState = RETRACT_LOADER_WAIT_FOR_LIFT;
+//							m_cyclesToContinueRetracting = requiredCyclesDown ;
+////							m_pneumatics->setStorageExit(RETRACTED);
+////							
+//							if (m_timer >= 0)
+//								m_componentData->shooterData->DecrementFrisbeeCounter();
+//							
+//							startShotTime = e;
+//						}
+//	//					else
+//	//						AsyncPrinter::Printf("Speed drop %.3f\n", lastSpeed - m_speeds[INNER]);
+//					break;
+//				}
+//	//			AsyncPrinter::Printf("Out\n");
+			
 				switch(m_fireState)
 				{
 				case FIRING_OFF:
@@ -251,7 +251,7 @@ void Shooter::enabledPeriodic()
 				case RETRACT_LOADER_WAIT_FOR_LIFT:
 					m_pneumatics->setStorageExit(RETRACTED);
 					firingWaitTicks++;
-					if (m_proximity->Get())
+					if (m_proximity->Get() && m_sensorOK)
 					{
 						m_fireState = RETRACT_LOADER_WAIT_FOR_FALL;
 					}
@@ -264,7 +264,7 @@ void Shooter::enabledPeriodic()
 					break;
 				case RETRACT_LOADER_WAIT_FOR_FALL:
 					firingWaitTicks++;
-					if ((firingWaitTicks >= retractWait || !m_proximity->Get()) && atSpeed[OUTER] && atSpeed[INNER])
+					if ((firingWaitTicks >= retractWait || (!m_proximity->Get() && m_sensorOK)) && atSpeed[OUTER] && atSpeed[INNER])
 					{
 						m_pneumatics->setStorageExit(EXTENDED);
 						m_fireState = EXTEND_LOADER;
@@ -281,7 +281,6 @@ void Shooter::enabledPeriodic()
 					}
 					break;
 				}
-#endif
 			break;
 		case ONCE:
 			if(atSpeed[OUTER] && atSpeed[INNER])
@@ -291,17 +290,31 @@ void Shooter::enabledPeriodic()
 			}
 			break;
 		case OFF:
-		if(lastFiring)
-		{
-			lastFiring = false;
-			AsyncPrinter::Printf("\t---Outer wheel speed when shooting: %f\n", m_speedsRPM[OUTER]);
-			AsyncPrinter::Printf("\t---Inner wheel speed when shooting: %f\n", m_speedsRPM[INNER]);
-			AsyncPrinter::Printf("Firing Wait Ticks: %d\n", firingWaitTicks);
-		}
+			if(lastFiring)
+			{
+				lastFiring = false;
+				AsyncPrinter::Printf("\t---Outer wheel speed when shooting: %f\n", m_speedsRPM[OUTER]);
+				AsyncPrinter::Printf("\t---Inner wheel speed when shooting: %f\n", m_speedsRPM[INNER]);
+				AsyncPrinter::Printf("Firing Wait Ticks: %d\n", firingWaitTicks);
+			}
+			static bool lastSensor = m_proximity->Get();
+			if (lastSensor != m_proximity->Get())
+			{
+				m_sensorStableTime = 0;
+				m_sensorOK = false;
+			} else
+			{
+				m_sensorStableTime++;
+			}
+			if (m_sensorStableTime > 4)
+			{
+				m_sensorOK = true;
+			}
+			lastSensor = m_proximity->Get();
 //				AsyncPrinter::Printf("off\n");
-	//			AsyncPrinter::Printf("IN\n");
-				m_pneumatics->setStorageExit(EXTENDED);
-				m_fireState = FIRING_OFF;
+//			AsyncPrinter::Printf("IN\n");
+			m_pneumatics->setStorageExit(EXTENDED);
+			m_fireState = FIRING_OFF;
 			break;
 		}
 		

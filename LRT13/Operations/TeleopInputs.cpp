@@ -33,6 +33,7 @@ TeleopInputs::TeleopInputs(char * taskName, INT32 priority)
 			DriverStationConfig::JoystickConfig::NUM_WHEEL_AXES);
 
 	m_autoActions = AutoActions::Instance();
+	m_componentData->drivetrainData->setZeroHeading();
 	r = 0, g = 64, b = 127;
 }
 
@@ -183,8 +184,14 @@ void TeleopInputs::Update()
 				float desiredHeading = atan2(-m_driver_stick->GetAxis(Joystick::kXAxis), -m_driver_stick->GetAxis(Joystick::kYAxis)) * 180 / acos(-1); // radians to degrees
 				float magnitude = sqrt(m_driver_stick->GetAxis(Joystick::kXAxis) * m_driver_stick->GetAxis(Joystick::kXAxis) +
 						m_driver_stick->GetAxis(Joystick::kYAxis) * m_driver_stick->GetAxis(Joystick::kYAxis));
+				if (fabs (desiredHeading - m_componentData->drivetrainData->getCurrentHeading()) > fabs (desiredHeading - m_componentData->drivetrainData->getCurrentHeading() + 360))
+					desiredHeading += 360;
+				else if (fabs (desiredHeading - m_componentData->drivetrainData->getCurrentHeading()) > fabs (desiredHeading - m_componentData->drivetrainData->getCurrentHeading() - 360))
+					desiredHeading -= 360;
+				AsyncPrinter::Printf("Vector drive: %f degrees, %f\n", desiredHeading, magnitude);
+				AsyncPrinter::Printf("Current heading: %f\n", m_componentData->drivetrainData->getCurrentHeading());
 				m_componentData->drivetrainData->setVelocitySetpoint(FORWARD, magnitude);
-				m_componentData->drivetrainData->setRelativePositionSetpoint(TURN, desiredHeading - m_componentData->drivetrainData->getCurrentHeading(), 1.0);
+				m_componentData->drivetrainData->setRelativePositionSetpoint(TURN, magnitude == 0 ? 0.0 : desiredHeading - m_componentData->drivetrainData->getCurrentHeading(), magnitude + 0.5);
 			}
 		}
 	

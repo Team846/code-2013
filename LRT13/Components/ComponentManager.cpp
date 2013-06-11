@@ -5,6 +5,7 @@
 #include "Collector.h"
 #include "Shooter.h"
 #include "WinchPawl.h"
+#include "RoutineRecorder.h"
 #include "../ComponentData/RobotData.h"
 #include "../Utils/AsyncPrinter.h"
 #include "../Pneumatics/Pneumatics.h"
@@ -32,6 +33,10 @@ void ComponentManager::CreateComponents()
 	AddComponent(new Shooter()); //must be after climber
 	AddComponent(new Drivetrain());
 	AddComponent(new ConfigLoader());
+#define MANOJ
+#ifdef MANOJ
+	AddComponent(new RoutineRecorder());
+#endif
 }
 
 void ComponentManager::Update()

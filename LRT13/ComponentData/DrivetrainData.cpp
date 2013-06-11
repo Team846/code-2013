@@ -144,7 +144,7 @@ double DrivetrainData::getPositionControlMaxSpeed(ForwardOrTurn axis)
 
 float DrivetrainData::getCurrentHeading()
 {
-	float m_currentHeading = fmod(m_driveEncoders->getTurnAngle(), 360);
+	float m_currentHeading = fmod(m_driveEncoders->getTurnAngle(), 720);
 	if (m_currentHeading < 0)
 		m_currentHeading += 360;
 	return m_currentHeading - m_zeroHeading;

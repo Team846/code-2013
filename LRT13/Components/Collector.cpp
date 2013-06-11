@@ -6,6 +6,8 @@
 #include "../ComponentData/ShooterData.h"
 #include "../ComponentData/ClimberData.h"
 
+#define SLOW_DOWN
+
 Collector::Collector()
 : Component("Collector", DriverStationConfig::DigitalIns::COLLECTOR, true),
   m_configSection("collector")
@@ -21,6 +23,10 @@ Collector::Collector()
 	m_lastReverseState = false;
 	m_timer = 0;
 	m_lastStateWasUp = true;
+	m_jaguar->setCollectionFlags(AsyncCANJaguar::OUTCURR);
+	m_slowDownTicks = 0;
+	m_slowDown = false;
+	m_currentCount = 0;
 	Configure();
 }
 
@@ -52,7 +58,35 @@ void Collector::enabledPeriodic()
 //		return;
 	if (m_componentData->collectorData->ShouldRunRollers())
 	{
+#ifdef SLOW_DOWN
+		double current = m_jaguar->GetOutputCurrent();
+		if (current > 14.0 && current < 20.0)
+		{
+			m_currentCount++;
+		}
+		else
+		{
+			m_currentCount = 0;
+		}
+		if (m_currentCount > 5)
+			m_slowDown = true;
+		if (m_slowDown)
+		{
+			m_jaguar->SetDutyCycle(m_slowDownAmount * m_componentData->collectorData->RollerDirection());
+			m_slowDownTicks++;
+		}
+		else
+		{
+			m_jaguar->SetDutyCycle(m_dutyCycle * m_componentData->collectorData->RollerDirection());
+		}
+		if (m_slowDownTicks > m_slowDownTime)
+		{
+			m_slowDownTicks = 0;
+			m_slowDown = false;
+		}
+#else
 		m_jaguar->SetDutyCycle(m_dutyCycle * m_componentData->collectorData->RollerDirection());
+#endif
 //		if ((unsigned int)RobotData::GetFrisbeeCounter() < RobotConfig::MAX_GAME_PIECES)
 //		{
 //			m_jaguar->SetDutyCycle(m_dutyCycle);
@@ -171,6 +205,8 @@ void Collector::Configure()
 	m_overflowWaitThreshold = ConfigManager::Instance()->Get<int> (m_configSection, "overflowWaitCycles", 50);
 	m_time_before_retract = ConfigManager::Instance()->Get<int>(m_configSection, "cyclesBeforeRetract", 15);
 	m_time_before_extend = ConfigManager::Instance()->Get<int>(m_configSection, "cyclesBeforeExtend", 15);
+	m_slowDownTime = ConfigManager::Instance()->Get<int>(m_configSection, "slowDownTicks", 50);
+	m_slowDownAmount = ConfigManager::Instance()->Get<float>(m_configSection, "slowDownDutyCycle", 0.5);
 }
 
 void Collector::Log()

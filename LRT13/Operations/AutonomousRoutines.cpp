@@ -490,7 +490,7 @@ void AutonomousRoutines::Autonomous()
 			break;
 	// recorded routine
 	case 5:
-		ifstream fin("/RecordedRoutine.txt");
+		fstream fin("/RecordedRoutine.txt");
 		
 		if (!fin.is_open())
 		{
@@ -501,17 +501,23 @@ void AutonomousRoutines::Autonomous()
 		while (!fin.eof())
 		{
 			Cycle current;
-			fin >> current.forward;
+			double forward;
+			fin >> forward;
+			current.forward = forward;
+			double turn;
 			fin >> current.turn;
+			current.turn = turn;
 			fin >> current.collecting;
 			fin >> current.shooting;
 			fin >> current.angleHigh;
+			AsyncPrinter::Printf("next step file %lf\n", current.forward);
 			routine.push(current);
 		}
 		m_componentData->drivetrainData->setControlMode(FORWARD, VELOCITY_CONTROL);
 		m_componentData->drivetrainData->setControlMode(TURN, VELOCITY_CONTROL);
 		while (!routine.empty())
 		{
+			AsyncPrinter::Printf("next step\n");
 			semTake(loopSem, WAIT_FOREVER);
 			Cycle current = routine.front();
 			m_componentData->drivetrainData->setVelocitySetpoint(FORWARD, current.forward);

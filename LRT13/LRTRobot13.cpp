@@ -87,19 +87,19 @@ static int TimeoutCallback(...)
 {
 	printf("Main loop execution time > 20ms took %f\r\n", ((GetFPGATime() - looptime) / 1E3));
 	
-//	AsyncPrinter::Printf("======================================\n");
-//	AsyncPrinter::Printf("PROFILED TIMES (over 20ms): \n");
-//	AsyncPrinter::Printf("\n");
-//	map<string, double>* times = Profiler::GetLastTimes();
-//	
-//	for(map<string, double>::iterator it = times->begin(); it != times->end(); ++it)
-//	{
-//		string name = it->first;
-//		double time = it->second;
-//		
-//		AsyncPrinter::Printf("%s: %f ms\n", name.c_str(), time * 1000.0);
-//	}
-//	AsyncPrinter::Printf("======================================\n");
+	AsyncPrinter::Printf("======================================\n");
+	AsyncPrinter::Printf("PROFILED TIMES (over 20ms): \n");
+	AsyncPrinter::Printf("\n");
+	map<string, double>* times = Profiler::GetLastTimes();
+	
+	for(map<string, double>::iterator it = times->begin(); it != times->end(); ++it)
+	{
+		string name = it->first;
+		double time = it->second;
+		
+		AsyncPrinter::Printf("%s: %f ms\n", name.c_str(), time * 1000.0);
+	}
+	AsyncPrinter::Printf("======================================\n");
 	
 	return 0;
 }
