@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include "sysLib.h"
 #include "../LRTRobotBase.h"
-#include "../Jaguar/AsyncCANJaguar.h"
+#include "AsyncCANJaguar.h"
 #include "../Utils/AsyncPrinter.h"
 
 #define DISABLE_SETPOINT_CACHING 0

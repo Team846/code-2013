@@ -6,17 +6,40 @@
 #include <string>
 
 #include "AsyncCANJaguar.h"
+#include "LRTTalon.h"
 #include "..\Config\ConfigManager.h"
 #include "..\Config\Configurable.h"
 #include "..\Utils\AsyncPrinter.h"
 #include "..\Sensors\DriveEncoders.h"
 #include "..\Utils\RunningSum.h"
 
+#define TALON 0
+
 using namespace std;
 
-class ESC: public Configurable
+class ESC : public Configurable
 {
 public:
+#if TALON
+	/*!
+	 * @brief Constructs a new LRT specific ESC object. 
+	 * @param channel Port of the Talon
+	 * @param brakeChannel Port of the Talon jumper
+	 * @param encoder 
+	 * @param name
+	 */
+	ESC(int channel, int brakeChannel, LRTEncoder* encoder, string name);
+	/*!
+	 * @brief Constructs a new LRT specific ESC object. 
+	 * @param channelA Port of the first Talon
+	 * @param channelB Port of the second Talon 
+	 * @param brakeChannelA Port of the first Talon jumper
+	 * @param brakeChannelB Port of the second Talon jumper
+	 * @param encoder
+	 * @param name
+	 */
+	ESC(int channelA, int channelB, int brakeChannelA, int brakeChannelB, LRTEncoder* encoder, string name);
+#else
 	/*!
 	 * @brief Constructs a new LRT specific ESC object. 
 	 * @param channel CANID of the Jaguar 
@@ -32,7 +55,7 @@ public:
 	 * @param name
 	 */
 	ESC(int channelA, int channelB, LRTEncoder* encoder, string name);
-
+#endif
 	/*!
 	 * @brief Cleans up the speed controller including cleanup of the jaguar resources.
 	 */
@@ -61,7 +84,11 @@ public:
 	void Disable();
 	LRTEncoder* m_encoder;
 private:
+#if TALON
+	LRTTalon *m_talon1, *m_talon2;
+#else
 	AsyncCANJaguar *m_jag1, *m_jag2;
+#endif
 	std::string namea, nameb;
 	
 	float maxVDiff;

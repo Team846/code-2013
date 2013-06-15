@@ -3,7 +3,7 @@
 #include "../Config/RobotConfig.h"
 #include "../Sensors/DriveEncoders.h"
 #include "../Utils/Util.h"
-#include "../Jaguar/ESC.h"
+#include "../SpeedController/ESC.h"
 #include "../Config/DriverStationConfig.h"
 
 using namespace data;

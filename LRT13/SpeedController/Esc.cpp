@@ -4,7 +4,36 @@
 #include "Esc.h"
 #include "../Config/RobotConfig.h"
 
-#warning Overloaded constructors should chain to one master constructor/function
+#if TALON
+ESC::ESC(int channel, int brakeChannel, LRTEncoder* encoder, string name) :
+	m_name(name)
+{
+	m_encoder = encoder;
+	m_talon1 = new LRTTalon(channel, name.c_str(), brakeChannel);
+	m_talon2 = NULL;
+	m_cycle_count = 0;
+	m_delta_voltage_limit = 13.0;
+	maxVDiff = 2.0;
+}
+
+ESC::ESC(int channelA, int channelB, int brakeChannelA, int brakeChannelB, LRTEncoder* encoder, string name) :
+	m_name(name)
+{
+	m_encoder = encoder;
+	namea = name + "A";
+	nameb = name + "B";
+	
+	m_talon1 = new LRTTalon(channelA, namea.c_str(), brakeChannelA);
+	m_talon2 = new LRTTalon(channelB, nameb.c_str(), brakeChannelB);
+
+	m_talon1->SetNeutralMode(LRTTalon::kNeutralMode_Coast);
+	m_talon2->SetNeutralMode(LRTTalon::kNeutralMode_Coast);
+
+	m_cycle_count = 0;
+	m_delta_voltage_limit = 13.0;
+	printf("Constructed ESC: %s\n", name.c_str());
+}
+#else
 /************************** Esc Class ********************/
 ESC::ESC(int channel, LRTEncoder *encoder, string name) :
 	m_name(name)
@@ -34,11 +63,17 @@ ESC::ESC(int channelA, int channelB, LRTEncoder* encoder, string name) :
 	m_delta_voltage_limit = 13.0;
 	printf("Constructed ESC: %s\n", name.c_str());
 }
+#endif
 
 ESC::~ESC()
 {
+#if TALON
+	DELETE(m_talon1);
+	DELETE(m_talon2);
+#else
 	DELETE(m_jag1);
 	DELETE(m_jag2);
+#endif
 }
 
 void ESC::DecrementMaxVDiff()
@@ -151,15 +186,26 @@ void ESC::SetDutyCycle(float dutyCycle)
 		bool shouldBrakeThisCycle = ditherPattern[brake_level] & (1
 				<< m_cycle_count);
 
+		
 		if (shouldBrakeThisCycle)
 		{
+#if TALON
+			m_talon1->SetNeutralMode(LRTTalon::kNeutralMode_Brake);
+			m_talon2->SetNeutralMode(LRTTalon::kNeutralMode_Brake);
+#else
 			m_jag1->ConfigNeutralMode(AsyncCANJaguar::kNeutralMode_Brake);
 			m_jag2->ConfigNeutralMode(AsyncCANJaguar::kNeutralMode_Brake);
+#endif
 		}
 		else
 		{
+#if TALON
+			m_talon1->SetNeutralMode(LRTTalon::kNeutralMode_Coast);
+			m_talon2->SetNeutralMode(LRTTalon::kNeutralMode_Coast);
+#else
 			m_jag1->ConfigNeutralMode(AsyncCANJaguar::kNeutralMode_Coast);
 			m_jag2->ConfigNeutralMode(AsyncCANJaguar::kNeutralMode_Coast);
+#endif
 		}
 		//		AsyncPrinter::Printf("Braking\n");
 	}
@@ -185,31 +231,56 @@ void ESC::SetDutyCycle(float dutyCycle)
 	{
 		if (command.dutyCycle > 0)
 		{
+#if TALON
+			m_talon1->Set(min(command.dutyCycle, dutyCycleLimitSameDir));
+			m_talon2->Set(min(command.dutyCycle, dutyCycleLimitSameDir));
+#else
 			m_jag1->SetDutyCycle(min(command.dutyCycle, dutyCycleLimitSameDir));
 			m_jag2->SetDutyCycle(min(command.dutyCycle, dutyCycleLimitSameDir));
+#endif
 		}
 		else
 		{
+#if TALON
+			m_talon1->Set(max(command.dutyCycle, -dutyCycleLimitReverse));
+			m_talon2->Set(max(command.dutyCycle, -dutyCycleLimitReverse));
+#else
 			m_jag1->SetDutyCycle(max(command.dutyCycle, -dutyCycleLimitReverse));
 			m_jag2->SetDutyCycle(max(command.dutyCycle, -dutyCycleLimitReverse));
+#endif
 		}
 	}
 	else
 	{
 		if (command.dutyCycle < 0)
 		{
+#if TALON
+			m_talon1->Set(max(command.dutyCycle, -dutyCycleLimitSameDir));
+			m_talon2->Set(max(command.dutyCycle, -dutyCycleLimitSameDir));
+#else
 			m_jag1->SetDutyCycle(max(command.dutyCycle, -dutyCycleLimitSameDir));
 			m_jag2->SetDutyCycle(max(command.dutyCycle, -dutyCycleLimitSameDir));
+#endif
 		}
 		else
 		{
+#if TALON
+			m_talon1->Set(min(command.dutyCycle, dutyCycleLimitReverse));
+			m_talon2->Set(min(command.dutyCycle, dutyCycleLimitReverse));
+#else
 			m_jag1->SetDutyCycle(min(command.dutyCycle, dutyCycleLimitReverse));
 			m_jag2->SetDutyCycle(min(command.dutyCycle, dutyCycleLimitReverse));
+#endif
 		}
 	}
 #else
+#if TALON
+	m_talon1->Set(command.dutyCycle);
+	m_talon2->Set(command.dutyCycle);
+#else
 	m_jag1->SetDutyCycle(command.dutyCycle);
 	m_jag2->SetDutyCycle(command.dutyCycle);
+#endif
 #endif
 #endif
 //	AsyncPrinter::Printf("Speed %.2f out: %.2f, braking %.2f\n", speed, command.dutyCycle, command.braking);
@@ -217,14 +288,21 @@ void ESC::SetDutyCycle(float dutyCycle)
 	
 void ESC::Disable()
 {
+#if TALON
+	m_talon1->Set(0.0);
+	m_talon2->Set(0.0);
+#else
 	m_jag1->SetDutyCycle(0.0);
 	m_jag2->SetDutyCycle(0.0);
+#endif
 }
 
 void ESC::ResetCache()
 {
+#if not TALON
 	m_jag1->ResetCache();
 	if (m_jag2)
 		m_jag2->ResetCache();
+#endif
 }
 

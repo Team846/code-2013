@@ -162,6 +162,12 @@ void LRTRobot13::Tick()
 			AsyncPrinter::Printf("\n");
 		}
 	}
+	
+	// Update all talons
+	for (vector<LRTTalon*>::iterator it = LRTTalon::talon_vector.begin(); it < LRTTalon::talon_vector.end(); it++)
+	{
+		(*it)->Update();
+	}
 
 	// Update pneumatics
 	if (DriverStation::GetInstance()->GetDigitalIn(DriverStationConfig::DigitalIns::PNEUMATICS))

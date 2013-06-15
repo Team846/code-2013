@@ -8,7 +8,7 @@
 #include "../Log/Loggable.h"
 #include "../Utils/PID.h"
 #include "../ComponentData/CollectorData.h"
-#include "../Jaguar/AsyncCANJaguar.h"
+#include "../SpeedController/AsyncCANJaguar.h"
 #include "../Components/Component.h"
 #include "DigitalInput.h"
 #include "../Pneumatics/Pneumatics.h"

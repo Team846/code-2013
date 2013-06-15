@@ -11,7 +11,7 @@
 #include "../Log/Loggable.h"
 #include "../Utils/PID.h"
 #include "../ComponentData/DrivetrainData.h"
-#include "../Jaguar/AsyncCANJaguar.h"
+#include "../SpeedController/AsyncCANJaguar.h"
 #include "../Pneumatics/Pneumatics.h"
 #include "../ComponentData/ClimberData.h"
 #include "../Sensors/DriveEncoders.h"

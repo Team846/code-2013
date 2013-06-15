@@ -9,7 +9,7 @@
 #include "../Log/Loggable.h"
 #include "../Utils/PID.h"
 #include "../ComponentData/DrivetrainData.h"
-#include "../Jaguar/AsyncCANJaguar.h"
+#include "../SpeedController/AsyncCANJaguar.h"
 #include "../ComponentData/ShooterData.h"
 #include "../Pneumatics/Pneumatics.h"
 #include "DigitalInput.h"

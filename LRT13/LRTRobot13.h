@@ -21,7 +21,8 @@
 
 #include "Operations/AutonomousRoutines.h"
 #include "Operations/TeleopInputs.h"
-#include "Jaguar/AsyncCANJaguar.h"
+#include "SpeedController/AsyncCANJaguar.h"
+#include "SpeedController/LRTTalon.h"
 
 #include "Pneumatics/Pneumatics.h"
 
