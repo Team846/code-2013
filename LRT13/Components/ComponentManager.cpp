@@ -33,10 +33,7 @@ void ComponentManager::CreateComponents()
 	AddComponent(new Shooter()); //must be after climber
 	AddComponent(new Drivetrain());
 	AddComponent(new ConfigLoader());
-#define MANOJ
-#ifdef MANOJ
 	AddComponent(new RoutineRecorder());
-#endif
 }
 
 void ComponentManager::Update()

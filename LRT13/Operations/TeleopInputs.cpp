@@ -179,7 +179,7 @@ void TeleopInputs::Update()
 				//m_componentData->drivetrainData->setVelocitySetpoint(TURN, turn);
 #endif
 			}
-			else
+			else 
 			{
 				float desiredHeading = atan2(-m_driver_stick->GetAxis(Joystick::kXAxis), -m_driver_stick->GetAxis(Joystick::kYAxis)) * 180 / acos(-1); // radians to degrees
 				float magnitude = sqrt(m_driver_stick->GetAxis(Joystick::kXAxis) * m_driver_stick->GetAxis(Joystick::kXAxis) +

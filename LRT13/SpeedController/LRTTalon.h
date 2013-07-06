@@ -7,7 +7,7 @@
 
 using namespace std;
 
-class LRTTalon: public Talon
+class LRTTalon : public Talon
 {
 public:
 	typedef enum {kNeutralMode_Coast = 0, kNeutralMode_Brake = 1} NeutralMode;

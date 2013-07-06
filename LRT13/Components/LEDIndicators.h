@@ -1,29 +1,23 @@
-#ifndef LED_INDICATOR_H_
-#define LED_INDICATOR_H_
+#ifndef LED_INDICATORS_H_
+#define LED_INDICATORS_H_
 
-#include <DigitalOutput.h>
 #include <SPI.h>
+#include "../Process/SynchronizedProcess.h"
+#include "../Config/RobotConfig.h"
 
-#include "../ComponentData/ComponentData.h"
-#include "../ComponentData/LEDIndicatorData.h"
-#include "../Process/AsyncProcess.h"
-
-using namespace data;
-using namespace data::indicators;
-
-class LEDIndicators : public AsyncProcess
+class LEDIndicators : public SynchronizedProcess
 {
 public:
 	LEDIndicators();
 	~LEDIndicators();
+	void SetPixelColor(int numPixel, int r, int g, int b);
+	void SetPixelRange(int startPixel, int endPixel, int r, int g, int b); //start and end values are inclusive of the range -MV
 	
 	INT32 Tick();
-	void write8(uint8_t d);
-	void writezeros(uint16_t n);
-	
 private:
-//	DigitalOutput m_clockOut;
-//	DigitalOutput m_dataOut;
+	UINT8* m_pixelBuffer;
+	DigitalOutput* m_clockOut;
+	DigitalOutput* m_dataOut;
+	SPI* m_spi;
 };
-
 #endif

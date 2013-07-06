@@ -8,6 +8,7 @@ LRTTalon::LRTTalon(UINT32 channel, const char* name, UINT32 jumperChannel) :
 	m_brake_jumper(jumperChannel != 0 ? new DigitalOutput(jumperChannel) : NULL)
 {
 	m_pwm = 0.0;
+	m_neutral = kNeutralMode_Coast;
 	talon_vector.push_back(this);
 }
 
@@ -17,6 +18,7 @@ LRTTalon::LRTTalon(UINT8 moduleNumber, UINT32 channel, const char* name, UINT32 
 	m_brake_jumper(jumperChannel != 0 ? new DigitalOutput(jumperChannel) : NULL)
 {
 	m_pwm = 0.0;
+	m_neutral = kNeutralMode_Coast;
 	talon_vector.push_back(this);
 }
 

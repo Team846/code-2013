@@ -10,6 +10,7 @@
 #include "../Utils/PID.h"
 #include "../ComponentData/DrivetrainData.h"
 #include "../SpeedController/AsyncCANJaguar.h"
+#include "../SpeedController/LRTTalon.h"
 #include "../ComponentData/ShooterData.h"
 #include "../Pneumatics/Pneumatics.h"
 #include "DigitalInput.h"
@@ -57,6 +58,7 @@ private:
 	
 	AsyncCANJaguar* m_jaguars[2];
 	Counter* m_encs[2];
+	LRTTalon* m_talon;
 
 	Pneumatics* m_pneumatics;
 	DigitalInput* m_proximity;
@@ -64,6 +66,7 @@ private:
 	
 	PID m_PIDs[2];
 	double m_errorsNormalized[2];
+	double m_errorIntegrals[2];
 	
 	int atSpeedCounter[2];
 	

@@ -69,7 +69,8 @@ ESC::~ESC()
 {
 #if TALON
 	DELETE(m_talon1);
-	DELETE(m_talon2);
+	if (m_talon2 != NULL)
+		DELETE(m_talon2);
 #else
 	DELETE(m_jag1);
 	DELETE(m_jag2);
@@ -191,7 +192,8 @@ void ESC::SetDutyCycle(float dutyCycle)
 		{
 #if TALON
 			m_talon1->SetNeutralMode(LRTTalon::kNeutralMode_Brake);
-			m_talon2->SetNeutralMode(LRTTalon::kNeutralMode_Brake);
+			if (m_talon2 != NULL)
+				m_talon2->SetNeutralMode(LRTTalon::kNeutralMode_Brake);
 #else
 			m_jag1->ConfigNeutralMode(AsyncCANJaguar::kNeutralMode_Brake);
 			m_jag2->ConfigNeutralMode(AsyncCANJaguar::kNeutralMode_Brake);
@@ -201,7 +203,8 @@ void ESC::SetDutyCycle(float dutyCycle)
 		{
 #if TALON
 			m_talon1->SetNeutralMode(LRTTalon::kNeutralMode_Coast);
-			m_talon2->SetNeutralMode(LRTTalon::kNeutralMode_Coast);
+			if (m_talon2 != NULL)
+				m_talon2->SetNeutralMode(LRTTalon::kNeutralMode_Coast);
 #else
 			m_jag1->ConfigNeutralMode(AsyncCANJaguar::kNeutralMode_Coast);
 			m_jag2->ConfigNeutralMode(AsyncCANJaguar::kNeutralMode_Coast);
@@ -233,7 +236,8 @@ void ESC::SetDutyCycle(float dutyCycle)
 		{
 #if TALON
 			m_talon1->Set(min(command.dutyCycle, dutyCycleLimitSameDir));
-			m_talon2->Set(min(command.dutyCycle, dutyCycleLimitSameDir));
+			if (m_talon2 != NULL)
+				m_talon2->Set(min(command.dutyCycle, dutyCycleLimitSameDir));
 #else
 			m_jag1->SetDutyCycle(min(command.dutyCycle, dutyCycleLimitSameDir));
 			m_jag2->SetDutyCycle(min(command.dutyCycle, dutyCycleLimitSameDir));
@@ -243,7 +247,8 @@ void ESC::SetDutyCycle(float dutyCycle)
 		{
 #if TALON
 			m_talon1->Set(max(command.dutyCycle, -dutyCycleLimitReverse));
-			m_talon2->Set(max(command.dutyCycle, -dutyCycleLimitReverse));
+			if (m_talon2 != NULL)
+				m_talon2->Set(max(command.dutyCycle, -dutyCycleLimitReverse));
 #else
 			m_jag1->SetDutyCycle(max(command.dutyCycle, -dutyCycleLimitReverse));
 			m_jag2->SetDutyCycle(max(command.dutyCycle, -dutyCycleLimitReverse));
@@ -256,7 +261,8 @@ void ESC::SetDutyCycle(float dutyCycle)
 		{
 #if TALON
 			m_talon1->Set(max(command.dutyCycle, -dutyCycleLimitSameDir));
-			m_talon2->Set(max(command.dutyCycle, -dutyCycleLimitSameDir));
+			if (m_talon2 != NULL)
+				m_talon2->Set(max(command.dutyCycle, -dutyCycleLimitSameDir));
 #else
 			m_jag1->SetDutyCycle(max(command.dutyCycle, -dutyCycleLimitSameDir));
 			m_jag2->SetDutyCycle(max(command.dutyCycle, -dutyCycleLimitSameDir));
@@ -266,7 +272,8 @@ void ESC::SetDutyCycle(float dutyCycle)
 		{
 #if TALON
 			m_talon1->Set(min(command.dutyCycle, dutyCycleLimitReverse));
-			m_talon2->Set(min(command.dutyCycle, dutyCycleLimitReverse));
+			if (m_talon2 != NULL)
+				m_talon2->Set(min(command.dutyCycle, dutyCycleLimitReverse));
 #else
 			m_jag1->SetDutyCycle(min(command.dutyCycle, dutyCycleLimitReverse));
 			m_jag2->SetDutyCycle(min(command.dutyCycle, dutyCycleLimitReverse));
@@ -276,7 +283,8 @@ void ESC::SetDutyCycle(float dutyCycle)
 #else
 #if TALON
 	m_talon1->Set(command.dutyCycle);
-	m_talon2->Set(command.dutyCycle);
+	if (m_talon2 != NULL)
+		m_talon2->Set(command.dutyCycle);
 #else
 	m_jag1->SetDutyCycle(command.dutyCycle);
 	m_jag2->SetDutyCycle(command.dutyCycle);
@@ -290,7 +298,8 @@ void ESC::Disable()
 {
 #if TALON
 	m_talon1->Set(0.0);
-	m_talon2->Set(0.0);
+	if (m_talon2 != NULL)
+		m_talon2->Set(0.0);
 #else
 	m_jag1->SetDutyCycle(0.0);
 	m_jag2->SetDutyCycle(0.0);

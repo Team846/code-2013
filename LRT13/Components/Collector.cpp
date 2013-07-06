@@ -60,7 +60,7 @@ void Collector::enabledPeriodic()
 	{
 #ifdef SLOW_DOWN
 		double current = m_jaguar->GetOutputCurrent();
-		if (current > 14.0 && current < 20.0)
+		if (current > 15.0 && current < 17.0)
 		{
 			m_currentCount++;
 		}
