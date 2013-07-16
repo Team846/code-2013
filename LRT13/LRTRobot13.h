@@ -24,6 +24,8 @@
 #include "SpeedController/AsyncCANJaguar.h"
 #include "SpeedController/LRTTalon.h"
 
+#include "Utils/LCD.h"
+
 #include "Pneumatics/Pneumatics.h"
 
 #include "Sensors/DriveEncoders.h"

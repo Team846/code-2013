@@ -32,6 +32,7 @@ LRTRobot13::~LRTRobot13()
 	AsyncPrinter::Finalize();
 	ConfigManager::Finalize();
 	LogManager::Finalize();
+	LCD::Finalize();
 	Pneumatics::Finalize();
 	DriveEncoders::Finalize();
 	AutoActions::Finalize();
@@ -62,6 +63,9 @@ void LRTRobot13::RobotInit()
 	
 	AsyncPrinter::Println("Starting LogManager Task...");
 	LogManager::Instance()->Start();
+
+	AsyncPrinter::Println("Starting LCD Task...");
+	LCD::Instance()->Start();
 	
 	AsyncPrinter::Println("Configuring...");
 	ConfigManager::Instance()->ConfigureAll();
