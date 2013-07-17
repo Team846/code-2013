@@ -12,6 +12,7 @@
 #include "../ComponentData/LEDIndicatorData.h"
 #include "../ComponentData/RoutineRecorderData.h"
 #include "../Config/ConfigManager.h"
+#include "../Utils/LCD.h"
 
 using namespace data;
 using namespace data::drivetrain;

@@ -20,6 +20,7 @@
 #include "../Network/MessageType.h"
 #include "../Network/NetChannel.h"
 #include "../Utils/Profiler.h"
+#include "../Utils/LCD.h"
 
 #include "Component.h"
 
