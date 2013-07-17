@@ -20,16 +20,19 @@ namespace data
 		public:
 			LEDIndicatorData();
 			
-			void setColorRGB(INT8 red, INT8 green, INT8 blue, Indicator arrow);
+			bool IsIndicatorChangeRequested(Indicator arrow);
+			void IsIndicatorChangeRequested(Indicator arrow, bool value);
 			
-			INT8 getColorR(Indicator arrow);
-			INT8 getColorG(Indicator arrow);
-			INT8 getColorB(Indicator arrow);
+			void SetIndicatorColor(unsigned char red, unsigned char green, unsigned char blue, Indicator arrow);
 			
-		private:
-			INT8 r[4];
-			INT8 g[4];
-			INT8 b[4];
+			char GetColorR(Indicator arrow);
+			char GetColorG(Indicator arrow);
+			char GetColorB(Indicator arrow);
+			UINT32 GetCombinedColor(Indicator arrow);
+			
+	private:
+			UINT32 m_indicatorColor[4];
+			bool m_changeRequested[4];
 		};
 	};
 };

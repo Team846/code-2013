@@ -24,7 +24,7 @@ LRTRobot13::~LRTRobot13()
 	LogManager::Instance()->Abort();
 	
 	DELETE(m_componentManager);
-	
+	DELETE(m_leds);
 	SmarterDashboard::Close();
 	
 	// Finalize all singletons
@@ -81,7 +81,9 @@ void LRTRobot13::RobotInit()
 	//AsyncPrinter::Println("Creating the IMU...");
 	//IMU::Instance()->Start();
 	
-	//leds.Start();
+	AsyncPrinter::Println("Starting LED Task");
+	m_leds = new LEDIndicators();
+
 	
 	AsyncPrinter::Println("Reticulating splines...");
 }
@@ -191,6 +193,9 @@ void LRTRobot13::Tick()
 		AsyncPrinter::Printf("[WARNING] Battery voltage: %f\n", DriverStation::GetInstance()->GetBatteryVoltage());
 
 	LCD::Instance()->RunOneCycle();
+	
+	//Update LEDs
+	m_leds->RunOneCycle();
 	
 	// Update SmarterDashboard -- this should be the last thing!
 	SmarterDashboard::Instance()->Tick();

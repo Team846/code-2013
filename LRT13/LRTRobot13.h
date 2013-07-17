@@ -60,7 +60,7 @@ class LRTRobot13 : public LRTRobotBase
 		AutonomousRoutines* m_auton;
 		AutoAim* m_autoaim;
 		
-		//LEDIndicators leds;
+		LEDIndicators* m_leds;
 		
 		WDOG_ID _watchdog;
 

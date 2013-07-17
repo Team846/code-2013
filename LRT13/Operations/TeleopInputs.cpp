@@ -381,30 +381,30 @@ void TeleopInputs::Update()
 	if(m_componentData->autoAimData->getDesiredX() - m_componentData->autoAimData->getCurrentX() < -m_componentData->autoAimData->getErrorThreshold())
 	{
 		// we're to the right
-		m_componentData->ledIndicatorData->setColorRGB(0, 0, 127, data::indicators::LEFT_ARROW);
-		m_componentData->ledIndicatorData->setColorRGB(0, 0, 0, data::indicators::RIGHT_ARROW);
-		m_componentData->ledIndicatorData->setColorRGB(0, 0, 0, data::indicators::DOWN_ARROW);
-		m_componentData->ledIndicatorData->setColorRGB(0, 0, 0, data::indicators::UP_ARROW);
+		//m_componentData->ledIndicatorData->setColorRGB(0, 0, 127, data::indicators::LEFT_ARROW);
+		//m_componentData->ledIndicatorData->setColorRGB(0, 0, 0, data::indicators::RIGHT_ARROW);
+		//m_componentData->ledIndicatorData->setColorRGB(0, 0, 0, data::indicators::DOWN_ARROW);
+		//m_componentData->ledIndicatorData->setColorRGB(0, 0, 0, data::indicators::UP_ARROW);
 		LCD::Instance()->Print(2, 0, "<");
 		LCD::Instance()->Print(2, 2, " ");
 	}
 	else if(m_componentData->autoAimData->getDesiredX() - m_componentData->autoAimData->getCurrentX() > m_componentData->autoAimData->getErrorThreshold())
 	{
 		// we're to the left
-		m_componentData->ledIndicatorData->setColorRGB(127, 0, 0, data::indicators::RIGHT_ARROW);
-		m_componentData->ledIndicatorData->setColorRGB(0, 0, 0, data::indicators::LEFT_ARROW);
-		m_componentData->ledIndicatorData->setColorRGB(0, 0, 0, data::indicators::DOWN_ARROW);
-		m_componentData->ledIndicatorData->setColorRGB(0, 0, 0, data::indicators::UP_ARROW);
+		//m_componentData->ledIndicatorData->setColorRGB(127, 0, 0, data::indicators::RIGHT_ARROW);
+		//m_componentData->ledIndicatorData->setColorRGB(0, 0, 0, data::indicators::LEFT_ARROW);
+		//m_componentData->ledIndicatorData->setColorRGB(0, 0, 0, data::indicators::DOWN_ARROW);
+		//m_componentData->ledIndicatorData->setColorRGB(0, 0, 0, data::indicators::UP_ARROW);
 		LCD::Instance()->Print(2, 0, " ");
 		LCD::Instance()->Print(2, 2, ">");
 	}
 	else
 	{
 		// we're lined up!
-		m_componentData->ledIndicatorData->setColorRGB(0, 127, 0, data::indicators::LEFT_ARROW);
-		m_componentData->ledIndicatorData->setColorRGB(0, 127, 0, data::indicators::RIGHT_ARROW);
-		m_componentData->ledIndicatorData->setColorRGB(0, 0, 0, data::indicators::DOWN_ARROW);
-		m_componentData->ledIndicatorData->setColorRGB(0, 0, 0, data::indicators::UP_ARROW);
+		//m_componentData->ledIndicatorData->setColorRGB(0, 127, 0, data::indicators::LEFT_ARROW);
+		//m_componentData->ledIndicatorData->setColorRGB(0, 127, 0, data::indicators::RIGHT_ARROW);
+		//m_componentData->ledIndicatorData->setColorRGB(0, 0, 0, data::indicators::DOWN_ARROW);
+		//m_componentData->ledIndicatorData->setColorRGB(0, 0, 0, data::indicators::UP_ARROW);
 		LCD::Instance()->Print(2, 0, "<");
 		LCD::Instance()->Print(2, 2, ">");
 	}

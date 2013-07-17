@@ -52,6 +52,10 @@ namespace Digital // Ports 1-14
 	const uint32_t FLASHLIGHT = 13; // Flashlight change
 	const uint32_t COMPRESSOR_PRESSURE_SENSOR_PIN = 14;
 	const uint32_t TWOCAN_MOSFET = CHANGEME;
+	const uint32_t SPI_MOSI = CHANGEME;
+	const uint32_t SPI_MISO = CHANGEME;
+	const uint32_t SPI_SCLK = CHANGEME;
+	const uint32_t SPI_SS = CHANGEME;
 }
 
 namespace Solenoid // Ports 1-8

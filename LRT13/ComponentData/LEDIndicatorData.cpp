@@ -5,29 +5,46 @@ using namespace data::indicators;
 
 LEDIndicatorData::LEDIndicatorData()
 {
-	memset(r, 0, sizeof(r));
-	memset(g, 0, sizeof(g));
-	memset(b, 0, sizeof(b));
+	memset(m_indicatorColor, 0, sizeof(m_indicatorColor));
+	memset(m_changeRequested, false, sizeof(m_changeRequested));
 }
 
-void LEDIndicatorData::setColorRGB(INT8 red, INT8 green, INT8 blue, Indicator arrow)
+bool LEDIndicatorData::IsIndicatorChangeRequested(Indicator arrow)
 {
-	r[arrow] = red;
-	g[arrow] = green;
-	b[arrow] = blue;
+	return m_changeRequested[arrow];
 }
 
-INT8 LEDIndicatorData::getColorR(Indicator arrow)
+void LEDIndicatorData::IsIndicatorChangeRequested(Indicator arrow, bool value)
 {
-	return r[arrow];
+	m_changeRequested[arrow] = value;
 }
 
-INT8 LEDIndicatorData::getColorG(Indicator arrow)
+void LEDIndicatorData::SetIndicatorColor(unsigned char red, unsigned char green, unsigned char blue, Indicator arrow)
 {
-	return g[arrow];
+	UINT32 combinedColor = ((UINT32) (green | 0x08) << 16) | //grb is actually the correct format for colors, don't change
+						   ((UINT32) (red | 0x08) << 8)  |   
+							         (blue | 0x08);	
+	m_indicatorColor[arrow] = combinedColor;
+	m_changeRequested[arrow] = true;
 }
 
-INT8 LEDIndicatorData::getColorB(Indicator arrow)
+char LEDIndicatorData::GetColorR(Indicator arrow)
 {
-	return b[arrow];
+	return (UINT8) (m_indicatorColor[arrow] >> 8) & (UINT32) 255;
 }
+
+char LEDIndicatorData::GetColorG(Indicator arrow)
+{
+	return (char) m_indicatorColor[arrow] >> 16;
+}
+
+char LEDIndicatorData::GetColorB(Indicator arrow)
+{
+	return (char) m_indicatorColor[arrow] & (UINT32) 255;
+}
+
+UINT32 LEDIndicatorData::GetCombinedColor(Indicator arrow)
+{
+	return m_indicatorColor[arrow];
+}
+
