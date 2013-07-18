@@ -105,10 +105,10 @@ INT32 LCD::Tick()
 {
 	static int loops = 0;
 
-	if (loops % 12 == 0)
+	if (loops % 5 == 0)
 		LCDUpdate();
 
-	char heartbeat = loadArray[(loops / 12) % 4];
+	char heartbeat = loadArray[(loops / 10) % 4];
 	Print(kHeartbeatLine, 0, "%c  %s  %.2f", heartbeat, "Ultimate Funky Object", gameTime);
 
 	loops++;
