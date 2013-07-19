@@ -13,6 +13,7 @@
 #include "../ComponentData/RoutineRecorderData.h"
 #include "../Config/ConfigManager.h"
 #include "../Utils/LCD.h"
+#include "../Utils/Util.h"
 
 using namespace data;
 using namespace data::drivetrain;

@@ -42,6 +42,7 @@ LRTRobot13::~LRTRobot13()
 
 void LRTRobot13::RobotInit()
 {
+	timer.Start();
 	AsyncPrinter::Println("Creating Components...");
 	m_componentManager = new ComponentManager();
 	m_componentManager->CreateComponents();
@@ -118,6 +119,8 @@ void LRTRobot13::Tick()
 	looptime = GetFPGATime();
 	wdStart(_watchdog, sysClkRateGet() / RobotConfig::LOOP_RATE,
 			TimeoutCallback, 0);
+	
+	LCD::Instance()->UpdateGameTime(timer.Get());
 	// Update current game state
 	UpdateGameState();
 

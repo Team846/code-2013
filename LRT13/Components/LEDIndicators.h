@@ -12,7 +12,7 @@
 #include "../Process/SynchronizedProcess.h"
 #include "../Config/RobotConfig.h"
 
-#define NUMLEDS CHANGEME
+#define NUMLEDS 16
 using namespace data;
 using namespace data::indicators;
 
@@ -26,8 +26,6 @@ public:
 private:
 	void setPixelColor(int numpixel, UINT32 grb);
 	void setPixelRangeColor(int startpixel, int endpixel, UINT32 grb);
-	
-	UINT32 convertColor(char red, char blue, char red);
 	
 	UINT8* m_pixelBuffer;
 	

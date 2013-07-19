@@ -13,8 +13,8 @@ namespace data
 	{
 		enum Roller
 		{
-			OUTER = 0,
-			INNER = 1
+			OUTER = 1,
+			INNER = 0
 		};
 
 		enum Speed
@@ -49,6 +49,9 @@ namespace data
 				void SetAcceptableSpeedError(double error, int roller);
 				double GetAcceptableSpeedError(int roller);
 				
+				void SetSpeedOffset(double offset);
+				double GetSpeedOffset();
+				
 				void SetLauncherAngleHigh();
 				void SetLauncherAngleLow();
 				bool ShouldLauncherBeHigh();
@@ -78,6 +81,7 @@ namespace data
 				ShooterSetting shooter_setting;
 				int frisbeeCounter;
 				bool m_enabled;
+				double speedOffset;
 		};
 	}
 	

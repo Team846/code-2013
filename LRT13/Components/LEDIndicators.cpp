@@ -20,9 +20,10 @@ LEDIndicators::LEDIndicators():
 	m_spi->SetClockRate(20000); //still needs tweaking for best results
 	m_spi->ApplyConfig(); //NECESSARY or else SPI will wont work
 	
+	m_spi->Write(0); //inital zeros to prime strip to known state
 	for(int i =((NUMLEDS+31)/32)-1; i; i--)
 	{
-			 m_spi->Write(0); //inital zeros to prime strip to known state
+		m_spi->Write(0); //inital zeros to prime strip to known state
 	}
 }
 
@@ -31,6 +32,7 @@ LEDIndicators::~LEDIndicators()
 	DELETE(m_spi);
 	DELETE(m_clockOut);
 	DELETE(m_dataOut);
+	DELETE_ARR(m_pixelBuffer);
 }
 
 INT32 LEDIndicators::Tick()

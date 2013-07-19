@@ -31,7 +31,7 @@ public:
 	static void Finalize();
 
 	void LCDUpdate();
-	void Print(UINT8 line, UINT8 index, const char* format, ...);
+	void Print(UINT8 line, UINT8 index, bool clear, const char* format, ...);
 
 	void ScrollLCD(int x, int y);
 

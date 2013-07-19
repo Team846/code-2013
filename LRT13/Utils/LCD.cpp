@@ -40,7 +40,7 @@ void LCD::Finalize()
 	DELETE(instance);
 }
 
-void LCD::Print(UINT8 line, UINT8 index, const char* format, ...)
+void LCD::Print(UINT8 line, UINT8 index, bool clear, const char* format, ...)
 {
 	if (line > kNumBufferLines)
 	{
@@ -60,7 +60,8 @@ void LCD::Print(UINT8 line, UINT8 index, const char* format, ...)
 
 	va_end(args);
 
-//	memset(textBuffer + line * kNumBufferColumns + index, ' ', kNumBufferColumns);
+	if (clear)
+		memset(textBuffer + line * kNumBufferColumns + index, ' ', kNumBufferColumns);
 
 	// limit the maximum length to write to the line
 	if (len > kNumBufferColumns - index)
@@ -105,12 +106,13 @@ INT32 LCD::Tick()
 {
 	static int loops = 0;
 
-	if (loops % 5 == 0)
+	if (loops % 2 == 0)
 		LCDUpdate();
 
 	char heartbeat = loadArray[(loops / 10) % 4];
-	Print(kHeartbeatLine, 0, "%c  %s  %.2f", heartbeat, "Ultimate Funky Object", gameTime);
-
+	Print(kHeartbeatLine, 0, true, "%c  %s  %f", heartbeat, "LRT13", gameTime);
+//	Print(5, 0, true, "");
+//	Print(5, loops % 42 >= 21 ? loops % 21 : 20 - loops % 21, true, "%c", '_');
 	loops++;
 	
 	return 0;

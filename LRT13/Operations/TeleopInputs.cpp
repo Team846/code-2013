@@ -328,6 +328,14 @@ void TeleopInputs::Update()
 				m_componentData->shooterData->SetLauncherAngleHigh();
 		}
 		
+		if (fabs(m_driver_stick->GetRawAxis(4)) < 0.1)
+		{
+			m_componentData->shooterData->SetSpeedOffset(1.0);
+		} else
+		{
+			m_componentData->shooterData->SetSpeedOffset(1 - 0.5 * (m_driver_stick->GetRawAxis(4) - Util::Sign(m_driver_stick->GetRawAxis(4)) * 0.1) / 0.9);
+		}
+		
 	
 		/************************Automatic Functions************************/
 	
@@ -377,36 +385,55 @@ void TeleopInputs::Update()
 			m_componentData->collectorData->RunRollersBackwards();
 		}
 	}
-	LCD::Instance()->Print(2, 1, "o");
+	LCD::Instance()->Print(2, 0, false, "Auto Aim");
+	LCD::Instance()->Print(2, 12, false, "o");
 	if(m_componentData->autoAimData->getDesiredX() - m_componentData->autoAimData->getCurrentX() < -m_componentData->autoAimData->getErrorThreshold())
 	{
 		// we're to the right
 		//m_componentData->ledIndicatorData->setColorRGB(0, 0, 127, data::indicators::LEFT_ARROW);
 		//m_componentData->ledIndicatorData->setColorRGB(0, 0, 0, data::indicators::RIGHT_ARROW);
-		//m_componentData->ledIndicatorData->setColorRGB(0, 0, 0, data::indicators::DOWN_ARROW);
-		//m_componentData->ledIndicatorData->setColorRGB(0, 0, 0, data::indicators::UP_ARROW);
-		LCD::Instance()->Print(2, 0, "<");
-		LCD::Instance()->Print(2, 2, " ");
+		LCD::Instance()->Print(2, 10, false, "<");
+		LCD::Instance()->Print(2, 14, false, " ");
 	}
 	else if(m_componentData->autoAimData->getDesiredX() - m_componentData->autoAimData->getCurrentX() > m_componentData->autoAimData->getErrorThreshold())
 	{
 		// we're to the left
 		//m_componentData->ledIndicatorData->setColorRGB(127, 0, 0, data::indicators::RIGHT_ARROW);
 		//m_componentData->ledIndicatorData->setColorRGB(0, 0, 0, data::indicators::LEFT_ARROW);
-		//m_componentData->ledIndicatorData->setColorRGB(0, 0, 0, data::indicators::DOWN_ARROW);
-		//m_componentData->ledIndicatorData->setColorRGB(0, 0, 0, data::indicators::UP_ARROW);
-		LCD::Instance()->Print(2, 0, " ");
-		LCD::Instance()->Print(2, 2, ">");
+		LCD::Instance()->Print(2, 10, false, " ");
+		LCD::Instance()->Print(2, 14, false, ">");
 	}
 	else
 	{
 		// we're lined up!
 		//m_componentData->ledIndicatorData->setColorRGB(0, 127, 0, data::indicators::LEFT_ARROW);
 		//m_componentData->ledIndicatorData->setColorRGB(0, 127, 0, data::indicators::RIGHT_ARROW);
-		//m_componentData->ledIndicatorData->setColorRGB(0, 0, 0, data::indicators::DOWN_ARROW);
-		//m_componentData->ledIndicatorData->setColorRGB(0, 0, 0, data::indicators::UP_ARROW);
-		LCD::Instance()->Print(2, 0, "<");
-		LCD::Instance()->Print(2, 2, ">");
+		LCD::Instance()->Print(2, 10, false, "<");
+		LCD::Instance()->Print(2, 14, false, ">");
+	}
+	if(m_componentData->autoAimData->getDesiredY() - m_componentData->autoAimData->getCurrentY() < -m_componentData->autoAimData->getErrorThreshold())
+	{
+		// we're back
+//		m_componentData->ledIndicatorData->setColorRGB(0, 0, 0, data::indicators::DOWN_ARROW);
+//		m_componentData->ledIndicatorData->setColorRGB(0, 0, 127, data::indicators::UP_ARROW);
+		LCD::Instance()->Print(3, 20, false, "^");
+		LCD::Instance()->Print(1, 20, false, " ");
+	}
+	else if(m_componentData->autoAimData->getDesiredX() - m_componentData->autoAimData->getCurrentX() > m_componentData->autoAimData->getErrorThreshold())
+	{
+		// we're forward
+//		m_componentData->ledIndicatorData->setColorRGB(127, 0, 0, data::indicators::DOWN_ARROW);
+//		m_componentData->ledIndicatorData->setColorRGB(0, 0, 0, data::indicators::UP_ARROW);
+		LCD::Instance()->Print(3, 20, false, " ");
+		LCD::Instance()->Print(1, 20, false, "v");
+	}
+	else
+	{
+		// we're lined up!
+//		m_componentData->ledIndicatorData->setColorRGB(0, 127, 0, data::indicators::DOWN_ARROW);
+//		m_componentData->ledIndicatorData->setColorRGB(0, 127, 0, data::indicators::UP_ARROW);
+		LCD::Instance()->Print(3, 20, false, "v");
+		LCD::Instance()->Print(1, 20, false, "^");
 	}
 	
 	/************************Config************************/

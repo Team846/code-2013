@@ -62,6 +62,8 @@ class LRTRobot13 : public LRTRobotBase
 		
 		LEDIndicators* m_leds;
 		
+		Timer timer;
+		
 		WDOG_ID _watchdog;
 
 };

@@ -710,7 +710,7 @@ void Climber::enabledPeriodic()
 	
 	if(printCounter++ % 20 == 0 || m_state != m_previous_state)
 		AsyncPrinter::Printf("Climb state: %s\n", m_stateString.c_str());
-	LCD::Instance()->Print(4, 0, "Climb: %s", m_stateString.c_str());
+	LCD::Instance()->Print(4, 0, true, "Climb: %s", m_stateString.c_str());
 	
 	SmarterDashboard::Instance()->SetTelemetryData<string>(TelemetryType::CLIMBER_STATE, m_stateString);
 	
@@ -1132,6 +1132,7 @@ void Climber::disabledPeriodic()
 //		AsyncPrinter::Printf("Hook Change to %d\n", !m_pneumatics->GetHookState()	);
 //		m_pneumatics->setHookPosition(!m_pneumatics->GetHookState());
 //	}
+	LCD::Instance()->Print(4, 0, true, "Climb: DISABLED");
 }
 
 void Climber::Configure()

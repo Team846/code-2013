@@ -135,3 +135,13 @@ bool ShooterData::shouldDecreaseSpeedOnce()
 		return false;
 	
 }
+
+void ShooterData::SetSpeedOffset(double offset)
+{
+	speedOffset = offset;
+}
+
+double ShooterData::GetSpeedOffset()
+{
+	return speedOffset;
+}

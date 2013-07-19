@@ -254,78 +254,78 @@ void Shooter::enabledPeriodic()
 //				}
 //	//			AsyncPrinter::Printf("Out\n");
 				
-				switch(m_fireState)
-				{
-				case FIRING_OFF:
-					firingWaitTicks=0;
-					m_pneumatics->setStorageExit(RETRACTED); // move pusher back
-					m_fireState=RETRACT_LOADER_WAIT_FOR_LIFT; 
-					break;
-					
-				case RETRACT_LOADER_WAIT_FOR_LIFT:
-					firingWaitTicks++;
-					if(m_proximity->Get()){ // frisbee lifted
-					m_fireState=	RETRACT_LOADER_WAIT_FOR_FALL;
-					
-					}
-					break;
-				case RETRACT_LOADER_WAIT_FOR_FALL:
-					if(!m_proximity->Get()){ // frisbee fallen
-						m_fireState=EXTEND_LOADER;
-						firingWaitTicks=0;
-					}
-					break;
-					
-				case EXTEND_LOADER:
-					m_pneumatics->setStorageExit(EXTENDED); // fire frisbee
-					firingWaitTicks++;
-					if(firingWaitTicks==10){
-						m_fireState=FIRING_OFF;
-					
-					}
-					break;
-				}
-				
 //				switch(m_fireState)
 //				{
 //				case FIRING_OFF:
-//					firingWaitTicks = 0;
-//					m_pneumatics->setStorageExit(RETRACTED);
-//					m_fireState = RETRACT_LOADER_WAIT_FOR_LIFT;
+//					firingWaitTicks=0;
+//					m_pneumatics->setStorageExit(RETRACTED); // move pusher back
+//					m_fireState=RETRACT_LOADER_WAIT_FOR_LIFT; 
 //					break;
+//					
 //				case RETRACT_LOADER_WAIT_FOR_LIFT:
-//					m_pneumatics->setStorageExit(RETRACTED);
 //					firingWaitTicks++;
-//					if (m_proximity->Get() && m_sensorOK)
-//					{
-//						m_fireState = RETRACT_LOADER_WAIT_FOR_FALL;
-//					}
-//					if (firingWaitTicks >= retractWait && atSpeed[OUTER] && atSpeed[INNER])
-//					{
-//						m_pneumatics->setStorageExit(EXTENDED);
-//						m_fireState = EXTEND_LOADER;
-//						firingWaitTicks = 0;
+//					if(m_proximity->Get()){ // frisbee lifted
+//					m_fireState=	RETRACT_LOADER_WAIT_FOR_FALL;
+//					
 //					}
 //					break;
 //				case RETRACT_LOADER_WAIT_FOR_FALL:
-//					firingWaitTicks++;
-//					if ((firingWaitTicks >= retractWait || (!m_proximity->Get() && m_sensorOK)) && atSpeed[OUTER] && atSpeed[INNER])
-//					{
-//						m_pneumatics->setStorageExit(EXTENDED);
-//						m_fireState = EXTEND_LOADER;
-//						firingWaitTicks = 0;
+//					if(!m_proximity->Get()){ // frisbee fallen
+//						m_fireState=EXTEND_LOADER;
+//						firingWaitTicks=0;
 //					}
 //					break;
+//					
 //				case EXTEND_LOADER:
-//					m_pneumatics->setStorageExit(EXTENDED);
+//					m_pneumatics->setStorageExit(EXTENDED); // fire frisbee
 //					firingWaitTicks++;
-//					if (firingWaitTicks >= extendWait)
-//					{
-//						m_pneumatics->setStorageExit(RETRACTED);
-//						m_fireState = FIRING_OFF;
+//					if(firingWaitTicks==10){
+//						m_fireState=FIRING_OFF;
+//					
 //					}
 //					break;
 //				}
+				
+				switch(m_fireState)
+				{
+				case FIRING_OFF:
+					firingWaitTicks = 0;
+					m_pneumatics->setStorageExit(RETRACTED);
+					m_fireState = RETRACT_LOADER_WAIT_FOR_LIFT;
+					break;
+				case RETRACT_LOADER_WAIT_FOR_LIFT:
+					m_pneumatics->setStorageExit(RETRACTED);
+					firingWaitTicks++;
+					if (m_proximity->Get() && m_sensorOK)
+					{
+						m_fireState = RETRACT_LOADER_WAIT_FOR_FALL;
+					}
+					if (firingWaitTicks >= retractWait && atSpeed[OUTER] && atSpeed[INNER])
+					{
+						m_pneumatics->setStorageExit(EXTENDED);
+						m_fireState = EXTEND_LOADER;
+						firingWaitTicks = 0;
+					}
+					break;
+				case RETRACT_LOADER_WAIT_FOR_FALL:
+					firingWaitTicks++;
+					if ((firingWaitTicks >= retractWait || (!m_proximity->Get() && m_sensorOK)) && atSpeed[OUTER] && atSpeed[INNER])
+					{
+						m_pneumatics->setStorageExit(EXTENDED);
+						m_fireState = EXTEND_LOADER;
+						firingWaitTicks = 0;
+					}
+					break;
+				case EXTEND_LOADER:
+					m_pneumatics->setStorageExit(EXTENDED);
+					firingWaitTicks++;
+					if (firingWaitTicks >= extendWait)
+					{
+						m_pneumatics->setStorageExit(RETRACTED);
+						m_fireState = FIRING_OFF;
+					}
+					break;
+				}
 			break;
 		case ONCE:
 			if(atSpeed[OUTER] && atSpeed[INNER])
@@ -432,10 +432,13 @@ void Shooter::enabledPeriodic()
 	}
 	else
 	{
+		LCD::Instance()->Print(5, 19, false, "%c", ' ');
+		LCD::Instance()->Print(5, 20, false, "%c", ' ');
 		m_flashlight->Set(0);
 		fubarDoDisabledPeriodic();
 //		disabledPeriodic();
 	}
+	LCD::Instance()->Print(5, 0, false, "Shooter: %.2f%%", 100 * m_componentData->shooterData->GetSpeedOffset());
 }
 #define PATCH_BAD_SPEED_DATA
 
@@ -458,10 +461,10 @@ void Shooter::ManageShooterWheel(int roller)
 //	m_PIDs[roller].setSetpoint(100000);
 	
 #if TWOSPEED
-	double speedSetpoint = m_speed_setpoints[roller][LOW];
+	double speedSetpoint = m_speed_setpoints[roller][LOW] * m_componentData->shooterData->GetSpeedOffset();
 	
 	if (m_componentData->shooterData->ShouldLauncherBeHigh()) //low speed. meantime
-		speedSetpoint = m_speed_setpoints[roller][HIGH];
+		speedSetpoint = m_speed_setpoints[roller][HIGH] * m_componentData->shooterData->GetSpeedOffset();
 	
 //	m_PIDs[roller].setSetpoint(speedSetpoint);
 	//		AsyncPrinter::Printf("Setpoint: %.0f\n", m_PIDs[roller].getSetpoint());
@@ -603,11 +606,16 @@ void Shooter::ManageShooterWheel(int roller)
 	{
 		atSpeedCounter[roller]++;
 		atSpeed[roller] = atSpeedCounter[roller] >= requiredCyclesAtSpeed;
+		LCD::Instance()->Print(5, 19 + roller, false, "%c", '*');
 	}
 	else
 	{
 		atSpeedCounter[roller] = 0;
 		atSpeed[roller] = false;
+		if (normalizedError > acceptableSpeedErrorNormalized[roller])
+			LCD::Instance()->Print(5, 19 + roller, false, "%c", 'v');
+		if (normalizedError < -acceptableSpeedErrorNormalized[roller])
+			LCD::Instance()->Print(5, 19 + roller, false, "%c", '^');
 	}
 	
 	m_periods[roller] = measuredPeriod;
