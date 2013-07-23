@@ -8,7 +8,7 @@ Pneumatics* Pneumatics::m_instance = NULL;
 	(x).pulsed = true;
 
 Pneumatics::Pneumatics() :
-	SynchronizedProcess("Pneumatics"), Configurable(), Loggable(),
+	SynchronizedProcess("Pneumatics", Task::kDefaultPriority - 1), Configurable(), Loggable(),
 			m_configSection("Pneumatics")
 {
 	INIT_PULSED_SOLENOID(m_collector, new DoubleSolenoid(

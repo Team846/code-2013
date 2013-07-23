@@ -73,17 +73,16 @@ void LRTRobot13::RobotInit()
 	
 	AsyncPrinter::Println("Starting SmarterDashboard service...");
 	SmarterDashboard::Start();
-#ifdef EXTRA_STUFF
 	AsyncPrinter::Println("Starting AutoAim...");
 	m_autoaim = new AutoAim();
 	m_autoaim->Start();
-#endif
 	
 	//AsyncPrinter::Println("Creating the IMU...");
 	//IMU::Instance()->Start();
 	
 	AsyncPrinter::Println("Starting LED Task");
 	m_leds = new LEDIndicators();
+	m_leds->Start();
 
 	
 	AsyncPrinter::Println("Reticulating splines...");
@@ -199,6 +198,9 @@ void LRTRobot13::Tick()
 	
 	//Update LEDs
 	m_leds->RunOneCycle();
+	
+	//Update AutoAim
+	m_autoaim->RunOneCycle();
 	
 	// Update SmarterDashboard -- this should be the last thing!
 	SmarterDashboard::Instance()->Tick();

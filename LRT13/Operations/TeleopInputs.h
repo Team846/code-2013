@@ -49,6 +49,13 @@ private:
 	
 	AutoActions* m_autoActions;
 	int r, g, b;
+	
+	double stoppedForward;
+	double stoppedTurn;
+	
+	bool lastPressed;
+	bool continuous;
+	int doubleTimeout;
 };
 
 #endif

@@ -1,7 +1,7 @@
 #include "LEDIndicators.h"
 
 LEDIndicators::LEDIndicators():
- SynchronizedProcess("LEDIndicators"),
+ SynchronizedProcess("LEDIndicators", Task::kDefaultPriority + 2),
  m_clockOut(new DigitalOutput(RobotConfig::Digital::SPI_SCLK)),
  m_dataOut(new DigitalOutput(RobotConfig::Digital::SPI_MOSI)),
  m_spi(new SPI(m_clockOut, m_dataOut))

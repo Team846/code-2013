@@ -19,7 +19,7 @@ void AsyncPrinter::Finalize()
 }
 
 AsyncPrinter::AsyncPrinter()
-	: AsyncProcess("AsyncProcess")
+	: AsyncProcess("AsyncPrinter", Task::kDefaultPriority + 1)
 {
 	m_queueSem = semBCreate(SEM_Q_PRIORITY, SEM_FULL);
 }

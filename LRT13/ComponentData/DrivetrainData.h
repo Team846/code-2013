@@ -66,9 +66,9 @@ namespace drivetrain
 		bool cleanWaitForSem(SEM_ID sem, double timeout);
 		
 		void DebugPrintPosition(ForwardOrTurn axis);
+		double getCurrentPos(ForwardOrTurn axis);
 	
 	private:
-		double getCurrentPos(ForwardOrTurn axis);
 		
 		DriveEncoders *m_driveEncoders;
 		ControlMode m_controlModes[2];

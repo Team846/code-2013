@@ -18,8 +18,8 @@ public:
     void SetEnabled(bool enabled);
     bool IsEnabled();
 
-    virtual void Set(float value);
-    virtual void SetAngle(float angle);
+    void Set(float value);
+    void SetAngle(float angle);
     void SetMicroseconds(int ms);
 };
 

@@ -17,7 +17,7 @@ void AsyncCANJaguar::println(const char * str)
 
 AsyncCANJaguar::AsyncCANJaguar(UINT8 channel, const char* name) :
 			SynchronizedProcess(
-					(std::string("JAG#") + Util::ToString<int>(channel)).c_str()),
+					(std::string("JAG#") + Util::ToString<int>(channel)).c_str(), Task::kDefaultPriority - 2),
 			CANJaguar(channel),
 			Loggable(),
 			m_print_ctor_dtor(m_task_name.c_str(), (m_task_name + "\n").c_str())

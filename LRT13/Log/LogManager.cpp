@@ -16,7 +16,7 @@ void LogManager::Finalize()
 }
 
 LogManager::LogManager() :
-	SynchronizedProcess("LogManager")
+	SynchronizedProcess("LogManager", Task::kDefaultPriority + 3)
 {
 	
 }

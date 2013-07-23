@@ -4,7 +4,7 @@ using namespace data;
 using namespace drivetrain;
 
 AutoAim::AutoAim()
-: AsyncProcess("AutoAim")
+: SynchronizedProcess("AutoAim", Task::kDefaultPriority + 2)
 {
 	m_server = new NetServer(8000);
 	m_server->Open();

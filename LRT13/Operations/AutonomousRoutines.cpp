@@ -16,7 +16,7 @@ using namespace data::shooter;
 #define USE_COLLECTOR 1
 
 AutonomousRoutines::AutonomousRoutines()
-:  AsyncProcess("AutonTask")
+:  AsyncProcess("AutonTask", Task::kDefaultPriority - 1)
 {
 	m_componentData = ComponentData::GetInstance();
 	

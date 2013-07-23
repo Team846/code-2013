@@ -1,7 +1,5 @@
 #include "Component.h"
 
-#warning needs implementation
-
 Component::Component(std::string name, int dio, bool requiresEnabledState)
 : m_componentData(data::ComponentData::GetInstance()),
   m_name(name)

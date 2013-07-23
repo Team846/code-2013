@@ -26,8 +26,9 @@ namespace data
 		enum ShooterSetting
 		{
 			OFF = 0,
-			ONCE = 1,
-			CONTINUOUS = 2
+			MANUAL = 1,
+			ONCE = 2,
+			CONTINUOUS = 3
 		};
 		
 		enum PneumaticsState

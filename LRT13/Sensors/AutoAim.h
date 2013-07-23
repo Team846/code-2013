@@ -10,14 +10,14 @@
 #include "../Network/MessageType.h"
 #include "../Utils/Util.h"
 #include "../Utils/SmarterDashboard.h"
-#include "../Process/AsyncProcess.h"
+#include "../Process/SynchronizedProcess.h"
 
 /*!
  * @brief Interfaces with the auto-aim sensor on the offboard processor
  * 
  * @author Raphael Chang, Tony Peng
  */
-class AutoAim : public Configurable, public AsyncProcess
+class AutoAim : public Configurable, public SynchronizedProcess
 {
 public:
 	AutoAim();
