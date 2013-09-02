@@ -6,14 +6,13 @@
  * @brief Contains all constants for robot configuration
  */
 
-#warning Update robot config
-
 #define CHANGEME 99
 
 namespace RobotConfig
 {
 const uint32_t LOOP_RATE = 50; //hertz
 const std::string CONFIG_FILE_PATH = "/LRT13.conf";
+const std::string ROUTINE_FILE_PATH = "/Autonomous.routine";
 const uint32_t MAX_GAME_PIECES = 4;
 const double MAX_VOLTAGE = 13;
 

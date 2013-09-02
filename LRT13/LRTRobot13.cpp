@@ -15,7 +15,6 @@ LRTRobot13::~LRTRobot13()
 	printf("LRTRobot13 Destructing\n");
 	
 	// Stop all tasks
-	m_auton->Abort(0, 1.0);
 	for (vector<AsyncCANJaguar*>::iterator it = AsyncCANJaguar::jaguar_vector.begin(); it < AsyncCANJaguar::jaguar_vector.end(); it++)
 	{
 		(*it)->Abort();
@@ -126,19 +125,12 @@ void LRTRobot13::Tick()
 	// Update appropriate operation controllers
 	if (RobotData::GetCurrentState() == RobotData::AUTONOMOUS )
 	{
-		if (RobotData::GetLastState() != RobotData::GetCurrentState())
-			m_auton->Start();
-		semGive(m_auton->loopSem);
+		m_auton->Update();
 	}
 	else if (RobotData::GetCurrentState() == RobotData::TELEOP)
 	{
 		m_teleop->Tick();
 		m_auton->TeleopTick(); // Handles the automation involving vision
-		if (m_auton->IsRunning())
-		{
-			m_auton->Abort(0, 1.0);
-			AsyncPrinter::Printf("Killing auton\n");
-		}
 //		m_teleop->RunOneCycle();
 //		AsyncPrinter::Printf("TELEOP!\n");
 	}
@@ -147,10 +139,6 @@ void LRTRobot13::Tick()
 //		AsyncPrinter::Printf("Disabled!\n");
 		m_teleop->Tick();
 //		m_teleop->RunOneCycle();
-		if (m_auton->IsRunning())
-		{
-			m_auton->Abort(1.0, 1.0);
-		}
 	}
 	
 	// Update all components

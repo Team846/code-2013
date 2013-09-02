@@ -2,14 +2,15 @@
 #define AUTONOMOUS_ROUTINES_H_
 
 #include "../Process/SynchronizedProcess.h"
-#include "Actions/IRobotAction.h"
-#include "Actions/PauseAction.h"
 #include "../ComponentData/RobotData.h"
 #include "../ComponentData/DrivetrainData.h"
 #include "../ComponentData/AutoAimData.h"
 #include "../ComponentData/ConfigLoaderData.h"
+#include "Routines/Routine.h"
 
 #include <queue>
+#include <fstream>
+#include <string>
 
 namespace data
 {
@@ -21,56 +22,45 @@ class AutoActions;
  * @brief Performs autonomous routine and contains autonomous functions. It has two parts, the Tick function which is meant to run every cycle to operate semi-automated processes
  * @author Raphael Chang, Tony Peng, Brian Axelrod
  */
-class AutonomousRoutines : public AsyncProcess
+class AutonomousRoutines
 {
 public:
 	AutonomousRoutines();
 	~AutonomousRoutines();
 	
-	
 	void TeleopTick(); //called every cycle to manage semi-autonomous functions
-	SEM_ID loopSem;
-protected:
-	virtual INT32 Tick();
-private:
-	void StopDrive();
-	/*
-	 * @brief Runs autonomous routine
-	 */
-	void Autonomous();
 	
+	void Update();
+	
+private:
+    void LoadRoutine(std::string path);
+    
 	void ServiceAutoAimBackBoard();
 	void ServiceAutoAimPyramid();
 	void ServiceFeederStationApproach();
-	
-	/********* One function per auto routine ************/
-	void FireAllFrisbees(double timeoutSeconds);
-	void FrontCenter(int numFrisbeesToPickUp);
-	void RearCorner(int numFrisbeesToPickUp);
-	
-	void AutonomousFreeCPUPause();
-	void SafeGrabSem(SEM_ID sem);
-	void SafeWait(double seconds, int safeCheckFrequency);
-	
+		
 	double m_autonomousStartTime;
 	
-	data::ComponentData* m_componentData;
-	
 	AutoActions* m_autoActions;
+
+	data::ComponentData *m_componentData;
 	
-	static const unsigned int standardWaitTicks = 1000/200;//sysClkRateGet() = 1000
-	unsigned int GetStandardWaitTicks()
-	{
-		return standardWaitTicks;
-	}
-	typedef struct Cycle
-	{
-		double forward;
-		double turn;
-		bool collecting;
-		bool shooting;
-		bool angleHigh;
-	};
+    ifstream input;
+    queue<Routine*> routines;
+    bool beginNext;
+    
+    data::RobotData::RobotState m_currentState;
+    data::RobotData::RobotState m_lastState;
+    
+    
+//	typedef struct Cycle
+//	{
+//		double forward;
+//		double turn;
+//		bool collecting;
+//		bool shooting;
+//		bool angleHigh;
+//	};
 };
 
 #endif
