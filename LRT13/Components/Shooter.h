@@ -18,6 +18,8 @@
 #include "../Utils/SmarterDashboard.h"
 //#include "Relay.h"
 #include "DigitalOutput.h"
+#include "NetworkTables/NetworkTable.h"
+
 using namespace data;
 
 /*!
@@ -92,6 +94,8 @@ private:
 	
 	DigitalOutput* m_flashlight; // Flashlight change
 	
+	NetworkTable *table;
+	
 	static void DeNoiseSensorEntry(void *param);
 	
 	void DeNoiseSensor();
@@ -101,6 +105,7 @@ private:
 	int retractWait;
 	int extendWait;
 #define NUM_SENSOR_VALS 5
+	DigitalInput* m_outerSensor;
 	int m_sensorVals[NUM_SENSOR_VALS];//400/50/2 + 1
 	bool m_sensorWindow;
 	

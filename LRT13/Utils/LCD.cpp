@@ -9,7 +9,7 @@ LCD* LCD::instance = NULL;
 double LCD::gameTime = -1.0;
 
 LCD::LCD() :
-	SynchronizedProcess("LCD", Task::kDefaultPriority + 3),
+	SynchronizedProcess("LCD", Task::kDefaultPriority + 2),
 	loadArray("\\|/-")
 {
 	textBuffer = new char[kNumBufferLines * kNumBufferColumns];

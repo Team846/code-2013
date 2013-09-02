@@ -21,9 +21,6 @@ AutonomousRoutines::AutonomousRoutines()
 	m_autonomousStartTime = 0.0;
 
 	beginNext = false;
-	
-	m_currentState = RobotData::DISABLED;
-	m_lastState = RobotData::DISABLED;
 }
 
 AutonomousRoutines::~AutonomousRoutines()
@@ -51,12 +48,11 @@ void AutonomousRoutines::TeleopTick()
 
 void AutonomousRoutines::Update()
 {
-	m_currentState = RobotData::GetCurrentState();
-	
-	if (m_currentState == RobotData::AUTONOMOUS)
+	if (RobotData::GetCurrentState() == RobotData::AUTONOMOUS)
 	{
-		if (m_lastState != m_currentState)
+		if (RobotData::GetLastState() != RobotData::GetCurrentState())
 		{
+			AsyncPrinter::Printf("Starting autonomous\n");
 			m_autonomousStartTime = Timer::GetFPGATimestamp();
 			
 			while (!routines.empty())
@@ -68,20 +64,25 @@ void AutonomousRoutines::Update()
 		}
 		if (!routines.empty())
 		{
+			printf("Next routine\n");
 			if (beginNext)
 			{
+				printf("Next routine run\n");
 				routines.front()->Run();
+				printf("Next routine started\n");
 				beginNext = false;
 			}
 			if (routines.front()->Completed())
 			{
+				printf("Routine finished\n");
 				delete routines.front();
+				printf("Routine deleted\n");
 				routines.pop();
 				beginNext = true;
 			}
 		}
+		printf("done\n");
 	}
-	m_lastState = m_currentState;
 
 	//	fstream fin("/RecordedRoutine.txt");
 	//	
@@ -147,16 +148,16 @@ void AutonomousRoutines::Update()
 
 void AutonomousRoutines::LoadRoutine(std::string path)
 {
-	input.open(path.c_str());
-	if (!input.is_open())
+	ifstream fin(path.c_str());
+	if (!fin.is_open())
 	{
 		AsyncPrinter::Printf("Cannot open autonomous routine file: %s\n", path.c_str());
 		return;
 	}
-	while (!input.eof())
+	while (!fin.eof())
 	{
 		string line;
-		getline(input, line);
+		getline(fin, line);
 		stringstream sstream(line);
 		string command;
 		getline(sstream, command, '(');
@@ -164,13 +165,15 @@ void AutonomousRoutines::LoadRoutine(std::string path)
 		stringstream pstream(param);
 		double arg;
 		pstream >> arg;
-		getline(sstream, command, ')');
 		
+		printf("command %s\n", command.c_str());
 		if (command == "drive")
 			routines.push(new Drive(arg));
 		else if (command == "turn")
 			routines.push(new Turn(arg));
+		AsyncPrinter::Printf("Done loading autonomous routine file: %s\n", path.c_str());
 	}
+	fin.close();
 }
 
 void AutonomousRoutines::ServiceAutoAimBackBoard()

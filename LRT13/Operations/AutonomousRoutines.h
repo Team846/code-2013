@@ -45,7 +45,6 @@ private:
 
 	data::ComponentData *m_componentData;
 	
-    ifstream input;
     queue<Routine*> routines;
     bool beginNext;
     

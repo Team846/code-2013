@@ -20,7 +20,7 @@ using namespace data;
  * @brief Provides control over the collector component.
  * @author Raphael Chang, Tony Peng, Manoj Vasishta
  */
-class Collector : public Component, public Configurable, public Loggable//,public Pneumatic
+class Collector : public Component, public Configurable, public Loggable
 {
 public:
 	Collector();
@@ -64,6 +64,9 @@ private:
 	
 	float m_slowDownAmount;
 	int m_currentCount;
+	
+	float m_lowerCurrent;
+	float m_upperCurrent;
 };
 
 #endif

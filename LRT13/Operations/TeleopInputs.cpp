@@ -86,6 +86,7 @@ void TeleopInputs::Update()
 		m_componentData->drivetrainData->setControlMode(TURN, POSITION_CONTROL);
 	}
 #endif
+	static bool lastStop = false;
 	if (current_state == RobotData::TELEOP)
 	{
 		if (m_driver_stick->IsButtonDown(
@@ -163,7 +164,21 @@ void TeleopInputs::Update()
 					forward = 0.0;
 					turnComposite = 0.0;
 					turn = 0.0;
-				}
+					if (!lastStop)
+					{
+						stoppedForward = m_componentData->drivetrainData->getCurrentPos(FORWARD);
+						stoppedTurn
+								= m_componentData->drivetrainData->getCurrentPos(
+										TURN);
+					}
+					m_componentData->drivetrainData->setControlMode(FORWARD, POSITION_CONTROL);
+					m_componentData->drivetrainData->setRelativePositionSetpoint(FORWARD, stoppedForward - m_componentData->drivetrainData->getCurrentPos(FORWARD), 1.0);
+	
+					m_componentData->drivetrainData->setControlMode(TURN, POSITION_CONTROL);
+					m_componentData->drivetrainData->setRelativePositionSetpoint(TURN, stoppedTurn - m_componentData->drivetrainData->getCurrentPos(TURN), 1.0);
+					lastStop = true;
+				} else
+					lastStop = false;
 #endif
 
 				//				AsyncPrinter::Printf("turnComposite: %lf forward: %lf\n", turnComposite, forward);
@@ -176,26 +191,26 @@ void TeleopInputs::Update()
 				//			if (++oops % 5 == 0)
 				//				AsyncPrinter::Printf("fwd: %.2f\n", forward);
 
-				static double lastForward;
-				static double lastTurn;
-				if (forward == 0.0)
-				{
-					if (forward != lastForward)
-						stoppedForward = m_componentData->drivetrainData->getCurrentPos(FORWARD);
-					m_componentData->drivetrainData->setControlMode(FORWARD, POSITION_CONTROL);
-					m_componentData->drivetrainData->setRelativePositionSetpoint(FORWARD, stoppedForward - m_componentData->drivetrainData->getCurrentPos(FORWARD), 1.0);
-				}
-				if (turnComposite == 0.0)
-				{
-					if (turnComposite != lastTurn)
-						stoppedTurn
-								= m_componentData->drivetrainData->getCurrentPos(
-										TURN);
-					m_componentData->drivetrainData->setControlMode(TURN, POSITION_CONTROL);
-					m_componentData->drivetrainData->setRelativePositionSetpoint(TURN, stoppedTurn - m_componentData->drivetrainData->getCurrentPos(TURN), 1.0);
-				}
-				lastForward = forward;
-				lastTurn = turn;
+//				static double lastForward;
+//				static double lastTurn;
+//				if (forward == 0.0)
+//				{
+//					if (forward != lastForward)
+//						stoppedForward = m_componentData->drivetrainData->getCurrentPos(FORWARD);
+//					m_componentData->drivetrainData->setControlMode(FORWARD, POSITION_CONTROL);
+//					m_componentData->drivetrainData->setRelativePositionSetpoint(FORWARD, stoppedForward - m_componentData->drivetrainData->getCurrentPos(FORWARD), 1.0);
+//				}
+//				if (turnComposite == 0.0)
+//				{
+//					if (turnComposite != lastTurn)
+//						stoppedTurn
+//								= m_componentData->drivetrainData->getCurrentPos(
+//										TURN);
+//					m_componentData->drivetrainData->setControlMode(TURN, POSITION_CONTROL);
+//					m_componentData->drivetrainData->setRelativePositionSetpoint(TURN, stoppedTurn - m_componentData->drivetrainData->getCurrentPos(TURN), 1.0);
+//				}
+//				lastForward = forward;
+//				lastTurn = turn;
 
 				m_componentData->drivetrainData->setOpenLoopOutput(FORWARD,
 						forward);
@@ -476,7 +491,8 @@ void TeleopInputs::Update()
 		{
 			m_componentData->collectorData->RunRollersBackwards();
 		}
-	}
+	} else
+		lastStop = false;
 	LCD::Instance()->Print(2, 0, false, "Auto Aim");
 	LCD::Instance()->Print(2, 12, false, "o");
 	if (m_componentData->autoAimData->getDesiredX()

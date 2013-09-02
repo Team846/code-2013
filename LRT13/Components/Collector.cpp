@@ -60,7 +60,7 @@ void Collector::enabledPeriodic()
 	{
 #ifdef SLOW_DOWN
 		double current = m_jaguar->GetOutputCurrent();
-		if (current > 15.0 && current < 17.0)
+		if (current > m_lowerCurrent && current < m_upperCurrent)
 		{
 			m_currentCount++;
 		}
@@ -207,6 +207,8 @@ void Collector::Configure()
 	m_time_before_extend = ConfigManager::Instance()->Get<int>(m_configSection, "cyclesBeforeExtend", 15);
 	m_slowDownTime = ConfigManager::Instance()->Get<int>(m_configSection, "slowDownTicks", 50);
 	m_slowDownAmount = ConfigManager::Instance()->Get<float>(m_configSection, "slowDownDutyCycle", 0.5);
+	m_lowerCurrent = ConfigManager::Instance()->Get<float>(m_configSection, "lowerCurrent", 15.0);
+	m_upperCurrent = ConfigManager::Instance()->Get<float>(m_configSection, "upperCurrent", 20.0);
 }
 
 void Collector::Log()

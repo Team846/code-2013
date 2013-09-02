@@ -17,6 +17,8 @@ Drivetrain::Drivetrain()
 		m_driveEncoders->getEncoder(data::drivetrain::LEFT), "left");
 	m_escs[RIGHT] = new ESC(RobotConfig::CAN::RIGHT_DRIVE_A, RobotConfig::CAN::RIGHT_DRIVE_B ,
 		m_driveEncoders->getEncoder(data::drivetrain::RIGHT), "right");
+	
+	m_scale = 1.0;
 }
 
 Drivetrain::~Drivetrain()
@@ -98,8 +100,8 @@ void Drivetrain::enabledPeriodic()
 		m_escs[LEFT]->IncrementMaxVDiff();
 		m_escs[RIGHT]->IncrementMaxVDiff();
 	}
-	m_escs[LEFT]->SetDutyCycle(leftOutput);
-	m_escs[RIGHT]->SetDutyCycle(rightOutput);
+	m_escs[LEFT]->SetDutyCycle(leftOutput * m_scale);
+	m_escs[RIGHT]->SetDutyCycle(rightOutput * m_scale);
 	
 	m_componentData->drivetrainData->serviceOperationSemaphores();
 }
@@ -129,6 +131,8 @@ void Drivetrain::Configure()
 
 	ConfigurePIDObject(&m_PIDs[POSITION][TURN], "position_turn", false);
 	ConfigurePIDObject(&m_PIDs[POSITION][FORWARD], "position_fwd", false);
+
+	m_scale = m_config->Get<double>(Component::GetName(), "speed_scale", 1.0);
 }
 
 void Drivetrain::Log()

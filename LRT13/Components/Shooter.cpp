@@ -41,14 +41,15 @@ Shooter::Shooter() :
 #endif
 	m_jaguars[INNER]->setCollectionFlags(AsyncCANJaguar::OUTCURR);
 
-	m_encs[OUTER] = new Counter((UINT32) RobotConfig::Digital::HALL_EFFECT_B);
+	m_outerSensor = new DigitalInput((UINT32) RobotConfig::Digital::HALL_EFFECT_B);
+	m_encs[OUTER] = new Counter(m_outerSensor);
 	m_encs[OUTER]->Start();
-	m_encs[OUTER]->SetMaxPeriod(60 / 100.0); // Period of 100 RPM; minimum speed we can read -Raphael Chang 4/12/13
+	m_encs[OUTER]->SetMaxPeriod(60 / 100.0); // Period of 100 RPM; minimum speed we can read -RC 4/12/13
 	m_encs[INNER] = new Counter((UINT32) RobotConfig::Digital::HALL_EFFECT_A);
 	m_encs[INNER]->Start();
-	m_encs[INNER]->SetMaxPeriod(60 / 100.0); // Period of 100 RPM; minimum speed we can read -Raphael Chang 4/12/13
+	m_encs[INNER]->SetMaxPeriod(60 / 100.0); // Period of 100 RPM; minimum speed we can read -RC 4/12/13
 	m_pneumatics = Pneumatics::Instance();
-
+	
 	atSpeedCounter[OUTER] = 0;
 	atSpeedCounter[INNER] = 0;
 
@@ -90,6 +91,7 @@ Shooter::Shooter() :
 	firingWaitTicks = 0;
 	m_sensorStableTime = 0;
 	m_sensorOK = false;
+	table = NetworkTable::GetTable("RobotData");
 }
 
 Shooter::~Shooter()
@@ -490,8 +492,11 @@ void Shooter::enabledPeriodic()
 		fubarDoDisabledPeriodic();
 		//		disabledPeriodic();
 	}
+	table->PutNumber("ShooterInner", m_speedsRPM[INNER] / m_max_speed[INNER]);
+	table->PutNumber("ShooterOuter", m_speedsRPM[OUTER] / m_max_speed[OUTER]);
 	LCD::Instance()->Print(5, 0, false, "Shooter: %.2f%%",
 			100 * m_componentData->shooterData->GetSpeedOffset());
+	
 }
 #define PATCH_BAD_SPEED_DATA
 
@@ -559,6 +564,23 @@ void Shooter::ManageShooterWheel(int roller)
 
 	double out = openLoopInput - normalizedError * p_gain
 			- m_errorIntegrals[roller] * i_gain;
+	static int counter = 0;
+	if (out != 0 && currentSpeedRPM == 0.0)
+	{
+		counter++;
+		if(counter >= 100 )
+		{
+			out = 0;
+			AsyncPrinter::Printf("[ERROR] Shooter Stalling!!!!!!!111\n");
+		}
+	}
+	else
+	{
+		counter = 0;
+	}
+	
+//	AsyncPrinter::Printf("roller %d Integral: %f\n", roller, m_errorIntegrals[roller]);
+	
 
 	//	AsyncPrinter::Printf("out: %f, openloopinput: %f, normalizederror: %f, gain: %f\n", out, openLoopInput, normalizedError, gain);
 
@@ -638,11 +660,11 @@ void Shooter::ManageShooterWheel(int roller)
 #else
 	if (roller == OUTER)
 	{
-		m_outer_file << out << ",";
+		m_outer_file << out * m_max_speed[roller] << ",";
 	}
 	if (roller == INNER)
 	{
-		m_inner_file << out << ",";
+		m_inner_file << out * m_max_speed[roller] << ",";
 	}
 #ifndef TALON
 	m_jaguars[roller]->SetDutyCycle(out);
@@ -659,11 +681,15 @@ void Shooter::ManageShooterWheel(int roller)
 	if (roller == INNER)
 		m_jaguars[roller]->SetVoltageRampRate(0.0);
 #endif
-
 	//	static int e = 0;
 	//	if (++e % 5 == 0)
 	//		AsyncPrinter::Printf("Error %.0f\n", m_PIDs[roller].getError());
 
+	if (roller == INNER)
+		table->PutNumber("ShooterInnerOutput", out);
+	else
+		table->PutNumber("ShooterOuterOutput", out);
+	
 	if (fabs(normalizedError) < acceptableSpeedErrorNormalized[roller])
 	{
 		atSpeedCounter[roller]++;
@@ -745,7 +771,7 @@ void Shooter::ManageShooterWheel(int roller)
  out = Util::Min<double>(out, maxOut);
  
  if (out < 0.0)
- out = 0.0;// Don't do reverse power
+ out = 0.0;// Don't do rerse power
  
  //	AsyncPrinter::Printf("%d: %.2f\n", out);
  out /= (DriverStation::GetInstance()->GetBatteryVoltage() / RobotConfig::MAX_VOLTAGE);
@@ -830,6 +856,14 @@ void Shooter::disabledPeriodic()
 	//	AsyncPrinter::Printf("fl %d\n", sw);
 	//	m_flashlight->Set(sw); // Flashlight change
 	m_flashlight->Set(1); // Flashlight on when setting up the robot
+	m_errorIntegrals[OUTER] = 0;
+	m_errorIntegrals[INNER] = 0;
+	if (m_outerSensor->Get())
+		m_flashlight->Set(1);
+	else
+		m_flashlight->Set(0);
+	
+	
 	fubarDoDisabledPeriodic();
 }
 

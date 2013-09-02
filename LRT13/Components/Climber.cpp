@@ -377,7 +377,7 @@ void Climber::enabledPeriodic()
 #ifdef STEP
 		if(m_climberData->shouldContinueClimbing())
 #endif
-		m_state = ARM_DOWN;
+		m_state = CLIMB_PREPARE; // ARM_DOWN;
 		break;
 	case ARM_DOWN:
 		m_stateString = "ARM_DOWN";
