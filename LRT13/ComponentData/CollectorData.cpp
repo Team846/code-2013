@@ -6,6 +6,7 @@ using namespace data::collector;
 CollectorData::CollectorData()
 {
 	m_collectorState = CollectorState::UP;
+	m_running = false;
 }
 
 void CollectorData::RunRollers()

@@ -213,6 +213,15 @@ public:
 			return -result;
 	}
 	
+	template<typename T>
+	static inline T lexical_cast(string value)
+	{
+	    T temp;
+	    stringstream sstream(value);
+	    sstream >> std::boolalpha >> temp;
+	    return temp;
+	}
+	
 	/*!
 	 * @brief Frees the resources pointed to in a map<pointer, object>
 	 */

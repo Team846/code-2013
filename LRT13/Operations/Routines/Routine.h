@@ -19,6 +19,8 @@ public:
 	
 	virtual void Run() = 0;
 	
+	virtual void Stop() { };
+	
 	virtual bool Completed() = 0;
 	
 protected:

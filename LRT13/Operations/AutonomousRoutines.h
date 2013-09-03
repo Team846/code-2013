@@ -20,7 +20,7 @@ class AutoActions;
 
 /*!
  * @brief Performs autonomous routine and contains autonomous functions. It has two parts, the Tick function which is meant to run every cycle to operate semi-automated processes
- * @author Raphael Chang, Tony Peng, Brian Axelrod
+ * @author Raphael Chang, Tony Peng, Brian Axelrod, Manoj Vasishta
  */
 class AutonomousRoutines
 {
@@ -47,10 +47,6 @@ private:
 	
     queue<Routine*> routines;
     bool beginNext;
-    
-    data::RobotData::RobotState m_currentState;
-    data::RobotData::RobotState m_lastState;
-    
     
 //	typedef struct Cycle
 //	{

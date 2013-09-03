@@ -5,9 +5,14 @@
 #include "AutoActions.h"
 #include "../Config/RobotConfig.h"
 #include "../Utils/AsyncPrinter.h"
+#include "../Utils/Util.h"
+#include <algorithm>
 
 #include "Routines/Drive.h"
 #include "Routines/Turn.h"
+#include "Routines/Collect.h"
+#include "Routines/Shoot.h"
+#include "Routines/RoutineGroup.h"
 
 using namespace data;
 using namespace data::drivetrain;
@@ -74,6 +79,7 @@ void AutonomousRoutines::Update()
 			}
 			if (routines.front()->Completed())
 			{
+				routines.front()->Stop();
 				printf("Routine finished\n");
 				delete routines.front();
 				printf("Routine deleted\n");
@@ -151,28 +157,126 @@ void AutonomousRoutines::LoadRoutine(std::string path)
 	ifstream fin(path.c_str());
 	if (!fin.is_open())
 	{
-		AsyncPrinter::Printf("Cannot open autonomous routine file: %s\n", path.c_str());
+		AsyncPrinter::Printf("Cannot open autonomous routine file: %s\n",
+				path.c_str());
 		return;
 	}
+
+	int lineNumber = 1;
 	while (!fin.eof())
 	{
+		// Going through the file line by line for each command
 		string line;
-		getline(fin, line);
-		stringstream sstream(line);
-		string command;
-		getline(sstream, command, '(');
-		string param;
-		stringstream pstream(param);
-		double arg;
-		pstream >> arg;
-		
-		printf("command %s\n", command.c_str());
-		if (command == "drive")
-			routines.push(new Drive(arg));
-		else if (command == "turn")
-			routines.push(new Turn(arg));
-		AsyncPrinter::Printf("Done loading autonomous routine file: %s\n", path.c_str());
+		getline(fin, line, '#'); // Up to hash comment
+		line.erase(remove_if(line.begin(), line.end(), isspace), line.end()); // Remove spaces
+		if (line.length() == 0)
+			continue;
+		vector<string> routineList;
+		unsigned int pos;
+		while ((pos = line.find("),")) != std::string::npos) // Look for parallel commands
+		{
+			routineList.push_back(line.substr(0, pos + 1));
+			line.erase(0, pos + 2);
+		}
+		routineList.push_back(line);
+		vector<Routine*> parallelRoutines;
+		for (vector<string>::iterator it = routineList.begin(); it
+				< routineList.end(); it++)
+		{
+			Routine *current;
+			stringstream sstream(*it);
+			string command, args;
+			getline(sstream, command, '('); // Get command name
+
+			getline(sstream, args, ')');
+
+			stringstream argstream(args);
+			string temp;
+			vector<string> arglist;
+
+			// Checking for commas delimiting args
+			while (getline(argstream, temp, ','))
+			{
+				arglist.push_back(temp);
+			}
+
+			// Print out the current command that the program is on
+			AsyncPrinter::Printf("command %s\n", command.c_str());
+			bool failed = false;
+
+			if (command == "drive")
+			{
+				if (arglist.size() == 1)
+					current = new Drive(
+							Util::lexical_cast<double>(arglist[0]));
+				else if (arglist.size() == 2)
+					current = new Drive(
+							Util::lexical_cast<double>(arglist[0]),
+							Util::lexical_cast<double>(arglist[1]));
+				else if (arglist.size() == 3)
+					current = new Drive(
+							Util::lexical_cast<double>(arglist[0]),
+							Util::lexical_cast<double>(arglist[1]),
+							Util::lexical_cast<double>(arglist[2]));
+				else
+					failed = true;
+			}
+
+			else if (command == "turn")
+			{
+				if (arglist.size() == 1)
+					current = new Turn(
+							Util::lexical_cast<double>(arglist[0]));
+				else if (arglist.size() == 2)
+					current = new Turn(
+							Util::lexical_cast<double>(arglist[0]),
+							Util::lexical_cast<double>(arglist[1]));
+				else if (arglist.size() == 3)
+					current = new Turn(
+							Util::lexical_cast<double>(arglist[0]),
+							Util::lexical_cast<double>(arglist[1]),
+							Util::lexical_cast<double>(arglist[2]));
+				else
+					failed = true;
+			}
+
+			else if (command == "shoot")
+			{
+				if (arglist.size() == 1)
+					current = new Shoot(
+							Util::lexical_cast<int>(arglist[0]));
+				else if (arglist.size() == 2)
+					current = new Shoot(
+							Util::lexical_cast<int>(arglist[0]),
+							Util::lexical_cast<double>(arglist[1]));
+				else
+					failed = true;
+			}
+			// Collect command
+			else if (command == "collect")
+			{
+				if (arglist.size() == 1)
+					current = new Collect(
+							Util::lexical_cast<bool>(arglist[0]));
+			}
+			if (failed)
+				AsyncPrinter::Printf(
+						"[WARNING] Incorrect number of arguments for routine: %s on line %d\n",
+						command.c_str(), lineNumber);
+			parallelRoutines.push_back(current);
+		}
+		if (parallelRoutines.size() > 1)
+		{
+			routines.push(new RoutineGroup(parallelRoutines));
+		}
+		else
+		{
+			routines.push(parallelRoutines[0]);
+		}
+		lineNumber++;
 	}
+	AsyncPrinter::Printf("Done loading autonomous routine file: %s\n",
+			path.c_str());
 	fin.close();
 }
 
