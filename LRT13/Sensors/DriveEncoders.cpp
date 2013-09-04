@@ -122,7 +122,7 @@ double DriveEncoders::getTurnAngle()
 double DriveEncoders::getWheelDist(Side side)
 {
 	// pulses / ( pulses / revolution ) * distance / revolution = inch distance
-	LRTEncoder * e = (side == LEFT ? m_encoders[LEFT] : m_encoders[RIGHT]);
+	LRTEncoder * e = m_encoders[side];
 	double dist = (double) ((e->Get() * 1.0) / PULSES_PER_REVOLUTION
 			* WHEEL_DIAMETER * PI);
 	return dist;

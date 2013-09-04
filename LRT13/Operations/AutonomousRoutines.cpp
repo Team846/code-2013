@@ -167,7 +167,9 @@ void AutonomousRoutines::LoadRoutine(std::string path)
 	{
 		// Going through the file line by line for each command
 		string line;
-		getline(fin, line, '#'); // Up to hash comment
+		getline(fin, line);
+		stringstream nocomments(line);
+		getline(nocomments, line, '#');
 		line.erase(remove_if(line.begin(), line.end(), isspace), line.end()); // Remove spaces
 		if (line.length() == 0)
 			continue;
@@ -258,11 +260,21 @@ void AutonomousRoutines::LoadRoutine(std::string path)
 				if (arglist.size() == 1)
 					current = new Collect(
 							Util::lexical_cast<bool>(arglist[0]));
+				else
+					failed = true;
+			}
+			else
+			{
+				AsyncPrinter::Printf("[WARNING] Unknown routine: %s on line %d, ignoring.\n", command.c_str(), lineNumber);
+				continue;
 			}
 			if (failed)
+			{
 				AsyncPrinter::Printf(
-						"[WARNING] Incorrect number of arguments for routine: %s on line %d\n",
+						"[WARNING] Incorrect number of arguments for routine: %s on line %d, ignoring.\n",
 						command.c_str(), lineNumber);
+				continue;
+			}
 			parallelRoutines.push_back(current);
 		}
 		if (parallelRoutines.size() > 1)
