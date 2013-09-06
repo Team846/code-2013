@@ -61,7 +61,6 @@ Shooter::Shooter() :
 	requiredCyclesAtSpeed = 0;
 	acceptableSpeedErrorNormalized[OUTER] = 0;
 	acceptableSpeedErrorNormalized[INNER] = 0;
-	lastSpeed = 0;
 	m_speedsRPM[OUTER] = 0;
 	m_speedsRPM[INNER] = 0;
 	m_periods[OUTER] = 0;
@@ -91,6 +90,8 @@ Shooter::Shooter() :
 	firingWaitTicks = 0;
 	m_sensorStableTime = 0;
 	m_sensorOK = false;
+	frisbeeExited = false;
+	frisbeeExitedLastCycle = false;
 	table = NetworkTable::GetTable("RobotData");
 }
 
@@ -409,8 +410,14 @@ void Shooter::enabledPeriodic()
 			m_fireState = FIRING_OFF;
 			break;
 		}
-
-		lastSpeed = m_speedsRPM[INNER];
+		
+		frisbeeExited = !atSpeed[OUTER]; // Speed drop
+		if (frisbeeExited && frisbeeExited != frisbeeExitedLastCycle)
+		{
+			m_componentData->shooterData->IncrementFrisbeeCounter();
+		}
+		frisbeeExitedLastCycle = frisbeeExited;
+		
 		//		AsyncPrinter::Printf("Speed %.3f\n", m_speedsRPM[OUTER]);
 
 		//	double frisbee_detected = 1;//m_proximity->Get() == 0;
@@ -836,6 +843,8 @@ void Shooter::fubarDoDisabledPeriodic()
 		m_pneumatics->setShooterAngler(RETRACTED);
 	}
 
+	frisbeeExitedLastCycle = frisbeeExited = true;
+	
 #ifndef TALON
 	m_jaguars[OUTER]->SetDutyCycle(0.0F);
 #else

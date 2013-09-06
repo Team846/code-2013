@@ -82,7 +82,7 @@ private:
 	int requiredCyclesDown;
 	double acceptableSpeedErrorNormalized[2], m_speedsRPM[2], m_periods[2];
 	double m_maxNormalizedCurrent;
-	double frisbeeDetectionThreshold, lastSpeed;
+	double frisbeeDetectionThreshold;
 	int startShotTime;
 	
 	int m_timer;
@@ -113,6 +113,9 @@ private:
 	
 	bool m_sensorOK;
 	int m_sensorStableTime;
+	
+	bool frisbeeExited;
+	bool frisbeeExitedLastCycle;
 };
 
 #endif

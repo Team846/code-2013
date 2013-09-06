@@ -64,12 +64,12 @@ bool ShooterData::ShouldLauncherBeHigh()
 	return extendLauncher;
 }
 
-int ShooterData::GetNumFrisbeesInStorage()
+int ShooterData::GetFrisbeeCounter()
 {
 	return frisbeeCounter;
 }
 
-void ShooterData::SetNumFrisbeesInStorage(int numFrisbees)
+void ShooterData::SetFrisbeeCounter(int numFrisbees)
 {
 	frisbeeCounter = numFrisbees;
 }

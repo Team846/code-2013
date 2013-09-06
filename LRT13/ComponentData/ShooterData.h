@@ -66,8 +66,8 @@ namespace data
 				void SetShooterSetting(ShooterSetting s);
 				int GetShooterSetting();
 				
-				int GetNumFrisbeesInStorage();
-				void SetNumFrisbeesInStorage(int numFrisbees);
+				int GetFrisbeeCounter();
+				void SetFrisbeeCounter(int numFrisbees);
 				void IncrementFrisbeeCounter();
 				void DecrementFrisbeeCounter();
 				void SetEnabled(bool enabled);

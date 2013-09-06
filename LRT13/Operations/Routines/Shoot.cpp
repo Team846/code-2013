@@ -9,13 +9,14 @@ Shoot::Shoot(int count, double timeout)
 
 void Shoot::Run()
 {
+	m_timer.Start();
+	m_startingCount = m_componentData->shooterData->GetFrisbeeCounter();
 	m_componentData->shooterData->SetShooterSetting(data::shooter::CONTINUOUS);
 }
 
 bool Shoot::Completed()
 {
-	// TODO: Fire count
-	return true;
+	return m_timer.Get() > m_timeout || m_componentData->shooterData->GetFrisbeeCounter() >= m_startingCount + m_count;
 }
 
 void Shoot::Stop()

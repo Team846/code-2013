@@ -12,6 +12,7 @@
 #include "Routines/Turn.h"
 #include "Routines/Collect.h"
 #include "Routines/Shoot.h"
+#include "Routines/Angle.h"
 #include "Routines/RoutineGroup.h"
 
 using namespace data;
@@ -59,22 +60,22 @@ void AutonomousRoutines::Update()
 		{
 			AsyncPrinter::Printf("Starting autonomous\n");
 			m_autonomousStartTime = Timer::GetFPGATimestamp();
-			
+
 			while (!routines.empty())
 				routines.pop();
-	
+
 			LoadRoutine(RobotConfig::ROUTINE_FILE_PATH);
-			
+
 			beginNext = true;
+			
+			m_componentData->shooterData->SetEnabled(true);
 		}
 		if (!routines.empty())
 		{
-			printf("Next routine\n");
 			if (beginNext)
 			{
-				printf("Next routine run\n");
+				printf("Next routine\n");
 				routines.front()->Run();
-				printf("Next routine started\n");
 				beginNext = false;
 			}
 			if (routines.front()->Completed())
@@ -87,7 +88,6 @@ void AutonomousRoutines::Update()
 				beginNext = true;
 			}
 		}
-		printf("done\n");
 	}
 
 	//	fstream fin("/RecordedRoutine.txt");
@@ -196,76 +196,72 @@ void AutonomousRoutines::LoadRoutine(std::string path)
 			string temp;
 			vector<string> arglist;
 
-			// Checking for commas delimiting args
+			// Check for commas delimiting args
 			while (getline(argstream, temp, ','))
 			{
 				arglist.push_back(temp);
 			}
 
-			// Print out the current command that the program is on
-			AsyncPrinter::Printf("command %s\n", command.c_str());
+			AsyncPrinter::Printf("Command %s\n", command.c_str());
 			bool failed = false;
 
 			if (command == "drive")
 			{
 				if (arglist.size() == 1)
-					current = new Drive(
-							Util::lexical_cast<double>(arglist[0]));
+					current = new Drive(Util::lexical_cast<double>(arglist[0]));
 				else if (arglist.size() == 2)
-					current = new Drive(
-							Util::lexical_cast<double>(arglist[0]),
+					current = new Drive(Util::lexical_cast<double>(arglist[0]),
 							Util::lexical_cast<double>(arglist[1]));
 				else if (arglist.size() == 3)
-					current = new Drive(
-							Util::lexical_cast<double>(arglist[0]),
+					current = new Drive(Util::lexical_cast<double>(arglist[0]),
 							Util::lexical_cast<double>(arglist[1]),
 							Util::lexical_cast<double>(arglist[2]));
 				else
 					failed = true;
 			}
-
 			else if (command == "turn")
 			{
 				if (arglist.size() == 1)
-					current = new Turn(
-							Util::lexical_cast<double>(arglist[0]));
+					current = new Turn(Util::lexical_cast<double>(arglist[0]));
 				else if (arglist.size() == 2)
-					current = new Turn(
-							Util::lexical_cast<double>(arglist[0]),
+					current = new Turn(Util::lexical_cast<double>(arglist[0]),
 							Util::lexical_cast<double>(arglist[1]));
 				else if (arglist.size() == 3)
-					current = new Turn(
-							Util::lexical_cast<double>(arglist[0]),
+					current = new Turn(Util::lexical_cast<double>(arglist[0]),
 							Util::lexical_cast<double>(arglist[1]),
 							Util::lexical_cast<double>(arglist[2]));
 				else
 					failed = true;
 			}
-
 			else if (command == "shoot")
 			{
 				if (arglist.size() == 1)
-					current = new Shoot(
-							Util::lexical_cast<int>(arglist[0]));
+					current = new Shoot(Util::lexical_cast<int>(arglist[0]));
 				else if (arglist.size() == 2)
-					current = new Shoot(
-							Util::lexical_cast<int>(arglist[0]),
+					current = new Shoot(Util::lexical_cast<int>(arglist[0]),
 							Util::lexical_cast<double>(arglist[1]));
 				else
 					failed = true;
 			}
-			// Collect command
 			else if (command == "collect")
 			{
 				if (arglist.size() == 1)
-					current = new Collect(
-							Util::lexical_cast<bool>(arglist[0]));
+					current = new Collect(Util::lexical_cast<bool>(arglist[0]));
+				else
+					failed = true;
+			}
+			else if (command == "angle")
+			{
+				if (arglist.size() == 1)
+					current = new Angle(Util::lexical_cast<bool>(arglist[0]));
 				else
 					failed = true;
 			}
 			else
 			{
-				AsyncPrinter::Printf("[WARNING] Unknown routine: %s on line %d, ignoring.\n", command.c_str(), lineNumber);
+				AsyncPrinter::Printf(
+						"[WARNING] Unknown routine: %s on line %d, ignoring.\n",
+						command.c_str(), lineNumber);
 				continue;
 			}
 			if (failed)
