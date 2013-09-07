@@ -16,7 +16,7 @@ void Shoot::Run()
 
 bool Shoot::Completed()
 {
-	return m_timer.Get() > m_timeout || m_componentData->shooterData->GetFrisbeeCounter() >= m_startingCount + m_count;
+	return (m_timeout && m_timer.Get() > m_timeout) || m_componentData->shooterData->GetFrisbeeCounter() >= m_startingCount + m_count;
 }
 
 void Shoot::Stop()

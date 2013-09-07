@@ -116,6 +116,8 @@ private:
 	
 	bool frisbeeExited;
 	bool frisbeeExitedLastCycle;
+	
+	int m_timeoutCounter;
 };
 
 #endif

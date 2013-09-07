@@ -1,19 +1,21 @@
-#ifndef ANGLE_H_
-#define ANGLE_H_
+#ifndef PAUSE_H_
+#define PAUSE_H_
 
 #include "Routine.h"
 #include "Timer.h"
 
-class Angle : public Routine
+class Pause : public Routine
 {
 public:
-	Angle(bool high);
+	Pause(double time);
 	
 	virtual void Run();
 	
 	virtual bool Completed();
 private:
-	bool m_high;
+	double m_time;
+	
+	Timer m_timer;
 };
 
 #endif

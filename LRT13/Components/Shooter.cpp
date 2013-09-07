@@ -93,6 +93,7 @@ Shooter::Shooter() :
 	frisbeeExited = false;
 	frisbeeExitedLastCycle = false;
 	table = NetworkTable::GetTable("RobotData");
+	m_timeoutCounter = 0;
 }
 
 Shooter::~Shooter()
@@ -571,11 +572,10 @@ void Shooter::ManageShooterWheel(int roller)
 
 	double out = openLoopInput - normalizedError * p_gain
 			- m_errorIntegrals[roller] * i_gain;
-	static int counter = 0;
 	if (out != 0 && currentSpeedRPM == 0.0)
 	{
-		counter++;
-		if(counter >= 100 )
+		m_timeoutCounter++;
+		if(m_timeoutCounter >= 100 )
 		{
 			out = 0;
 			AsyncPrinter::Printf("[ERROR] Shooter Stalling!!!!!!!111\n");
@@ -583,7 +583,7 @@ void Shooter::ManageShooterWheel(int roller)
 	}
 	else
 	{
-		counter = 0;
+		m_timeoutCounter = 0;
 	}
 	
 //	AsyncPrinter::Printf("roller %d Integral: %f\n", roller, m_errorIntegrals[roller]);
@@ -845,6 +845,8 @@ void Shooter::fubarDoDisabledPeriodic()
 
 	frisbeeExitedLastCycle = frisbeeExited = true;
 	
+	m_timeoutCounter = 0;
+	
 #ifndef TALON
 	m_jaguars[OUTER]->SetDutyCycle(0.0F);
 #else
@@ -867,6 +869,8 @@ void Shooter::disabledPeriodic()
 	m_flashlight->Set(1); // Flashlight on when setting up the robot
 	m_errorIntegrals[OUTER] = 0;
 	m_errorIntegrals[INNER] = 0;
+	atSpeed[OUTER] = false;
+	atSpeed[INNER] = false;
 	if (m_outerSensor->Get())
 		m_flashlight->Set(1);
 	else

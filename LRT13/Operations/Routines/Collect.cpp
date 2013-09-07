@@ -8,8 +8,16 @@ Collect::Collect(bool collect)
 
 void Collect::Run()
 {
-	m_componentData->collectorData->SlideDown();
-	m_componentData->collectorData->RunRollers();
+	if (m_collect)
+	{
+		m_componentData->collectorData->SlideDown();
+		m_componentData->collectorData->RunRollers();
+	}
+	else
+	{
+		m_componentData->collectorData->SlideUp();
+		m_componentData->collectorData->StopRollers();
+	}
 }
 
 bool Collect::Completed()
