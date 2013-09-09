@@ -60,10 +60,10 @@ void DriveEncoders::Configure()
 			"max_encoder_rate", 2214.762);
 	MAX_TURNING_RATE = m_config->Get<double> (m_configsection,
 			"max_turning_rate", 3782);
-	TICKS_PER_FULL_TURN = m_config->Get<double> (m_configsection,
-			"ticks_per_full_turn", 2288.3 * 180.0 / 165.0 * 2.0);
 	WHEEL_DIAMETER = m_config->Get<double> (m_configsection, "wheel_diameter",
 			6.0); // inches
+	TICKS_PER_FULL_TURN = m_config->Get<double> (m_configsection,
+			"ticks_per_full_turn", 2.0 * 26.1 * PI / (WHEEL_DIAMETER * PI) * PULSES_PER_REVOLUTION); //2288.3 * 180.0 / 165.0 * 2.0
 }
 
 void DriveEncoders::Log()

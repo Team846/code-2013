@@ -43,7 +43,7 @@ const uint32_t RESET_ZERO = 10;
 
 
 //Operator stick 
-const uint32_t DEBUG_CLIMBER = 1;
+const uint32_t DEBUG_CLIMBER = 1; // SHOOTER_OFF
 const uint32_t SHOOTER_ON = 2;
 const uint32_t CONDITIONAL_ABORT = 2;
 const uint32_t CLIMBER_ARM = 3;
