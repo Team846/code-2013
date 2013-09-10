@@ -5,8 +5,6 @@
  * @brief Contains all constants for driver station configuration
  */
 
-#warning Update driver station config
-
 namespace DriverStationConfig
 {
 namespace JoystickConfig
@@ -24,43 +22,35 @@ const uint32_t DRIVER_WHEEL_PORT = 3;
 namespace JoystickButtons
 {
 //Driver stick
-const uint32_t COLLECTOR_SLIDE = 1;
-const uint32_t FIRE = 2;
-const uint32_t CHANGE_ANGLE = 3;
-const uint32_t CONTINUE_CLIMB_DRIVER = 4;
-const uint32_t FIRE_SINGLE = 12;
+const uint32_t FIRE = 1;
+const uint32_t COLLECTOR_SLIDE = 2;
+const uint32_t MANUAL_FIRE = 3;
+const uint32_t START_CLIMB = 4;
 
 //const uint32_t FORCE_CLIMB_ADVANCE= 4;
 
 const uint32_t VECTOR_DRIVE = 8;
 const uint32_t AUTO_AIM_BACKBOARD = 9;
-const uint32_t START_CLIMB = 4;
 //const uint32_t FEEDER_STATION_APPROACH = 3;
 const uint32_t APPLY_CONFIG = 5;
 const uint32_t LOAD_CONFIG = 6;
 const uint32_t SAVE_CONFIG = 7;
 const uint32_t RESET_ZERO = 10;
 
-
-//Operator stick 
-const uint32_t DEBUG_CLIMBER = 1; // SHOOTER_OFF
+//Operator stick
+const uint32_t SHOOTER_OFF = 1;
 const uint32_t SHOOTER_ON = 2;
 const uint32_t CONDITIONAL_ABORT = 2;
-const uint32_t CLIMBER_ARM = 3;
-const uint32_t ARM_ANGLE = 4;
+const uint32_t CONTINUE_CLIMB = 3;
+const uint32_t CHANGE_ANGLE = 4;
 const uint32_t COLLECTOR_DOWN_NO_MOTOR = 5;
-const uint32_t ENGAGE_PTO = 6;//debug
-const uint32_t SHOOTER_SLOWER = 6;
-const uint32_t DISENGAGE_PTO = 7;//debug
-const uint32_t SHOOTER_FASTER = 7;
+const uint32_t ENGAGE_PTO = 6;
+const uint32_t DISENGAGE_PTO = 7;
 const uint32_t PAWL_UP = 8;
-const uint32_t RUN_BACKWORDS = 8;
-const uint32_t CONTINUE_CLIMB_OPERATOR = 11;
 const uint32_t PAWL_DOWN = 9;
-const uint32_t RECORD = 9;
-const uint32_t COLLECTOR_DOWN_OPERATOR = 10;
-const uint32_t CLIMB_STEP_BACKWARD = 11;
-const uint32_t CLIMB_STEP_FORWARD = 12;
+//const uint32_t RECORD = 9;
+const uint32_t PURGE = 10;
+const uint32_t CLIMBER_ARM = 11;
 
 const uint32_t STOP_ROBOT = 5;
 }

@@ -43,6 +43,8 @@ private:
 	double m_errorThreshold;
 	
 	double m_scale;
+
+	NetworkTable *table;
 	
 	void ConfigurePIDObject(PID *pid, std::string objName, bool feedForward);
 	double ComputeOutput(data::drivetrain::ForwardOrTurn axis);

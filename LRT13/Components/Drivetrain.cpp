@@ -19,6 +19,7 @@ Drivetrain::Drivetrain()
 		m_driveEncoders->getEncoder(data::drivetrain::RIGHT), "right");
 	
 	m_scale = 1.0;
+	table = NetworkTable::GetTable("RobotData");
 }
 
 Drivetrain::~Drivetrain()
@@ -87,8 +88,9 @@ void Drivetrain::enabledPeriodic()
 	{
 //		AsyncPrinter::Printf("turnPos:%.4f\n",m_driveEncoders->getTurnAngle());
 	}
-//	AsyncPrinter::Printf("Encoders left: %.3f, %.2f\n", m_driveEncoders->getNormalizedSpeed(drivetrain::LEFT), DriverStation::GetInstance()->GetBatteryVoltage());
-//	AsyncPrinter::Printf("Encoders right: %.3f\n", m_driveEncoders->getNormalizedSpeed(drivetrain::RIGHT));
+	table->PutNumber("LeftEncoder", m_driveEncoders->getNormalizedSpeed(drivetrain::LEFT));
+	table->PutNumber("RightEncoder", m_driveEncoders->getNormalizedSpeed(drivetrain::RIGHT));
+	table->PutNumber("TurnTicks", m_driveEncoders->getTurnTicks());
 	if (DriverStation::GetInstance()->GetBatteryVoltage() < 7.0)
 	{
 		AsyncPrinter::Printf("Decreasing current\n");
