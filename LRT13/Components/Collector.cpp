@@ -14,7 +14,7 @@ Collector::Collector()
 {
 	m_jaguar = new AsyncCANJaguar(RobotConfig::CAN::COLLECTOR, "Collector");
 	m_proximity = new DigitalInput(RobotConfig::Digital::PROXIMITY_COLLECTOR);
-	m_pneumatics = Pneumatics::Instance();
+	m_pneumatics = new Pneumatics(RobotConfig::Solenoid::COLLECTOR_A, RobotConfig::Solenoid::COLLECTOR_B, "Collector");
 	m_dutyCycle = 0.0;
 	m_count = 0;
 	m_samplesThreshold = 0;
@@ -50,7 +50,7 @@ void Collector::enabledPeriodic()
 {
 	if (m_componentData->collectorData->shouldStupidMoveDown)
 	{
-		m_pneumatics->setCollector(true);
+		m_pneumatics->Set(true);
 		m_jaguar->SetDutyCycle(0.0);
 		return;
 	}
@@ -115,7 +115,7 @@ void Collector::enabledPeriodic()
 		if (m_componentData->collectorData->IsDown())
 		{
 			//going down is easy for now
-			m_pneumatics->setCollector(true);
+			m_pneumatics->Set(true);
 			m_componentData->shooterData->SetLauncherAngleLow();
 			m_timer = m_time_before_extend;
 		}
@@ -124,7 +124,7 @@ void Collector::enabledPeriodic()
 			AsyncPrinter::Printf("Started going up\n");
 			m_componentData->shooterData->SetLauncherAngleLow();
 			m_timer = m_time_before_retract;
-//			m_pneumatics->setCollector(false);
+//			m_pneumatics->Set(false);
 		}
 		
 	}
@@ -138,7 +138,7 @@ void Collector::enabledPeriodic()
 		{
 			m_componentData->shooterData->SetLauncherAngleHigh();
 		}
-		m_pneumatics->setCollector(true);
+		m_pneumatics->Set(true);
 	}
 	else
 	{
@@ -148,7 +148,7 @@ void Collector::enabledPeriodic()
 		}
 		else
 		{
-			m_pneumatics->setCollector(false);
+			m_pneumatics->Set(false);
 		}
 	}
 	m_lastStateWasUp = m_componentData->collectorData->IsUp();

@@ -62,7 +62,8 @@ private:
 	Counter* m_encs[2];
 	LRTTalon* m_talon;
 
-	Pneumatics* m_pneumatics;
+	Pneumatics* m_angler;
+	Pneumatics* m_pusher;
 	DigitalInput* m_proximity;
 	continuousFireState m_fireState;
 	

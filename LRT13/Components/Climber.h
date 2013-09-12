@@ -56,7 +56,8 @@ private:
 	
 	string m_configSection;
 	
-	Pneumatics* m_pneumatics;
+	Pneumatics* m_climberArms;
+	Pneumatics* m_hooks;
 
 	double m_winch_current_threshold;
 	double m_winch_engage_duty_cycle;

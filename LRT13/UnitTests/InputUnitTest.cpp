@@ -24,7 +24,7 @@ InputUnitTest::~InputUnitTest()
 void InputUnitTest::Run()
 {
 	GetWatchdog().SetEnabled(false);
-	Pneumatics::Instance()->Start();
+	//Pneumatics::Instance()->Start();
 	
 	while(true)
 	{
@@ -32,27 +32,27 @@ void InputUnitTest::Run()
 		{
 			m_stick->Update();
 
-			Pneumatics::Instance()->setCompressor(true);
+			//Pneumatics::Instance()->setCompressor(true);
 
 			if(m_stick->IsButtonJustPressed(1))
 			{
-				Pneumatics::Instance()->setClimberArm(!Pneumatics::Instance()->GetClimberState());
+				//Pneumatics::Instance()->setClimberArm(!//Pneumatics::Instance()->GetClimberState());
 			}
 			
 			if(m_stick->IsButtonDown(2))
 			{
 				printf("auto aim is down.\n");
-				Pneumatics::Instance()->setCollector(true);
+				//Pneumatics::Instance()->setCollector(true);
 			}
 			else
 			{
-				Pneumatics::Instance()->setCollector(false);
+				//Pneumatics::Instance()->setCollector(false);
 			}
 			
 			if(m_stick->IsButtonJustPressed(3))
 			{
 				printf("disc track is down.\n");
-				Pneumatics::Instance()->setHookPosition(!Pneumatics::Instance()->GetHookState());
+				//Pneumatics::Instance()->setHookPosition(!//Pneumatics::Instance()->GetHookState());
 			}
 			
 			
@@ -60,24 +60,24 @@ void InputUnitTest::Run()
 			if(m_stick->IsButtonJustPressed(4))
 			{
 				printf("load config is down.\n");
-				Pneumatics::Instance()->setShooterAngler(!Pneumatics::Instance()->GetShooterAngleState());
+				//Pneumatics::Instance()->setShooterAngler(!//Pneumatics::Instance()->GetShooterAngleState());
 			}
 			
-			Pneumatics::Instance()->RunOneCycle();
+			//Pneumatics::Instance()->RunOneCycle();
 			
 			if(m_stick->IsButtonDown(5))
 			{
 				printf("reset zero is down.\n");
-				Pneumatics::Instance()->setStorageExit(true);
+				//Pneumatics::Instance()->setStorageExit(true);
 			}
 			else
 			{
-				Pneumatics::Instance()->setStorageExit(false);
+				//Pneumatics::Instance()->setStorageExit(false);
 			}
 			
 			if(m_stick->IsButtonJustPressed(6))
 			{
-				Pneumatics::Instance()->setClimberArm(!Pneumatics::Instance()->GetClimberState());
+				//Pneumatics::Instance()->setClimberArm(!//Pneumatics::Instance()->GetClimberState());
 			}
 			
 			float rawZAxis = m_stick->GetAxis(Joystick::kZAxis);
@@ -91,7 +91,7 @@ void InputUnitTest::Run()
 		}
 		else
 		{
-			Pneumatics::Instance()->setCompressor(false);
+			//Pneumatics::Instance()->setCompressor(false);
 		}
 		taskDelay(sysClkRateGet() / 10);
 	}

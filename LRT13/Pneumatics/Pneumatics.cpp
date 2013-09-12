@@ -1,135 +1,86 @@
 #include "Pneumatics.h"
 
-Pneumatics* Pneumatics::m_instance = NULL;
+#include <sstream>
 
-#define INIT_PULSED_SOLENOID(x, y) (x).solenoid = (y);\
-	(x).counter = (m_pulse_length); \
-	(x).state = false; \
-	(x).pulsed = true;
+vector<Pneumatics*> Pneumatics::pneumatic_vector;
+Compressor *Pneumatics::m_compressor;
 
-Pneumatics::Pneumatics() :
-	SynchronizedProcess("Pneumatics", Task::kDefaultPriority - 1), Configurable(), Loggable(),
-			m_configSection("Pneumatics")
+Pneumatics::Pneumatics(uint32_t forward, uint32_t reverse, const char *name) :
+	SynchronizedProcess((std::string("Pneumatics") + std::string(name)).c_str(), Task::kDefaultPriority - 1),
+	Configurable(),
+	m_configSection("Pneumatics")
 {
-	INIT_PULSED_SOLENOID(m_collector, new DoubleSolenoid(
-					RobotConfig::Solenoid::COLLECTOR_A,
-					RobotConfig::Solenoid::COLLECTOR_B));
-
-	INIT_PULSED_SOLENOID(m_climber, new DoubleSolenoid(
-					RobotConfig::Solenoid::CLIMBER_A,
-					RobotConfig::Solenoid::CLIMBER_B));
+	solenoid = new DoubleSolenoid(forward, reverse);
+	counter = 0;
+	pulsed = true;
+	m_name = name;
+	state = OFF;
 	
-	INIT_PULSED_SOLENOID(m_hook, new DoubleSolenoid(
-					RobotConfig::Solenoid::HOOKS_A,
-					RobotConfig::Solenoid::HOOKS_B));
+	pneumatic_vector.push_back(this);
+}
 
-	INIT_PULSED_SOLENOID(m_storageExit, new DoubleSolenoid(
-					2,
-					RobotConfig::Solenoid::STORAGE_EXIT_A,
-					RobotConfig::Solenoid::STORAGE_EXIT_B));
-	
-	INIT_PULSED_SOLENOID(m_shooterAngler, new DoubleSolenoid(
-					RobotConfig::Solenoid::SHOOTER_ANGLER_A,
-					RobotConfig::Solenoid::SHOOTER_ANGLER_B));
+Pneumatics::Pneumatics(uint32_t forward, uint32_t reverse, uint8_t module, const char *name) :
+	SynchronizedProcess("Pneumatics", Task::kDefaultPriority - 1),
+	Configurable(),
+	m_configSection("Pneumatics")
+{
+	solenoid = new DoubleSolenoid(module, forward, reverse);
+	counter = 0;
+	pulsed = true;
+	m_name = name;
+	state = OFF;
 
+	pneumatic_vector.push_back(this);
+}
+
+Pneumatics::Pneumatics(uint32_t forward, const char *name) :
+	SynchronizedProcess((std::string("Pneumatics") + std::string(name)).c_str(), Task::kDefaultPriority - 1),
+	Configurable(),
+	m_configSection("Pneumatics")
+{
+	solenoid = new Solenoid(forward);
+	counter = 0;
+	pulsed = false;
+	m_name = name;
+	state = OFF;
+
+	pneumatic_vector.push_back(this);
+}
+
+Pneumatics::Pneumatics(uint32_t forward, uint8_t module, const char *name) :
+	SynchronizedProcess("Pneumatics", Task::kDefaultPriority - 1),
+	Configurable(),
+	m_configSection("Pneumatics")
+{
+	solenoid = new Solenoid(module, forward);
+	counter = 0;
+	pulsed = false;
+	m_name = name;
+	state = OFF;
+
+	pneumatic_vector.push_back(this);
+}
+
+Pneumatics::~Pneumatics()
+{
+	delete solenoid;
+}
+
+void Pneumatics::CreateCompressor()
+{
 	m_compressor = new Compressor(
 			RobotConfig::Digital::COMPRESSOR_PRESSURE_SENSOR_PIN,
 			RobotConfig::Relay::COMPRESSOR_RELAY);
 	m_compressor->Start();
 }
 
-#undef INIT_PULSED_SOLENOID
-
-Pneumatics* Pneumatics::Instance()
+void Pneumatics::DestroyCompressor()
 {
-	if (m_instance == NULL)
-	{
-		m_instance = new Pneumatics();
-	}
-	return m_instance;
+	m_compressor->Stop();
+	delete m_compressor;
 }
 
-void Pneumatics::setClimberArm(bool on, bool force)
-{
-	if (on != m_climber.state || force)
-	{
-		m_climber.state = on;
-		m_climber.counter = m_pulse_length;
-	}
-}
-
-void Pneumatics::setShooterAngler(bool on, bool force)
-{
-	if(on != m_shooterAngler.state || force)
-	{
-		m_shooterAngler.state = on;
-		m_shooterAngler.counter = m_pulse_length;
-	}
-}
-
-void Pneumatics::setCollector(bool on, bool force)
-{
-	if (on != m_collector.state || force)
-	{
-		m_collector.state = on;
-		m_collector.counter = m_pulse_length;
-	}
-}
-
-void Pneumatics::setHookPosition(bool on, bool force)
-{
-	if (on != m_hook.state || force)
-	{
-		m_hook.state = on;
-		m_hook.counter = m_pulse_length;
-	}
-}
-
-void Pneumatics::setStorageExit(bool on, bool force)
-{
-	if (on != m_storageExit.state || force)
-	{
-		m_storageExit.state = on;
-		m_storageExit.counter = m_pulse_length;
-	}
-}
-
-void Pneumatics::pulse(PulsedSolenoid * ptr)
-{
-	if (ptr->pulsed)
-	{
-		if (ptr->counter > 0)
-		{
-			ptr->counter = ptr->counter - 1;
-			if (ptr->state)
-			{
-				ptr->solenoid->Set(DoubleSolenoid::kForward);
-			}
-			else
-			{
-				ptr->solenoid->Set(DoubleSolenoid::kReverse);
-			}
-		}
-		else
-		{
-			ptr->counter = 0;
-			ptr->solenoid->Set(DoubleSolenoid::kOff);
-		}
-	}
-	else
-	{
-		if (ptr->state)
-		{
-			ptr->solenoid->Set(DoubleSolenoid::kForward);
-		}
-		else
-		{
-			ptr->solenoid->Set(DoubleSolenoid::kReverse);
-		}
-	}
-}
-
-void Pneumatics::setCompressor(bool on)
+void Pneumatics::SetCompressor(bool on)
 {
 	if (on)
 	{
@@ -141,63 +92,92 @@ void Pneumatics::setCompressor(bool on)
 	}
 }
 
-Pneumatics::~Pneumatics()
+void Pneumatics::Set(bool on, bool force)
 {
-	DELETE(m_collector.solenoid);
-	DELETE(m_hook.solenoid);
-	DELETE(m_climber.solenoid);
-	DELETE(m_shooterAngler.solenoid);
-	DELETE(m_compressor);
-	m_compressor->Stop();
+	if (on != state || force)
+	{
+		if (dynamic_cast<DoubleSolenoid*>(solenoid))
+		{
+			if (on)
+				state = FORWARD;
+			else
+				state = REVERSE;
+		}
+		else if (dynamic_cast<Solenoid*>(solenoid))
+		{
+			if (on)
+				state = FORWARD;
+			else
+				state = OFF;
+		}
+		counter = m_pulse_length;
+	}
+}
+
+bool Pneumatics::Get()
+{
+	return state;
 }
 
 INT32 Pneumatics::Tick()
 {
-	pulse(&m_collector);
-	pulse(&m_hook);
-	//
-	pulse(&m_storageExit);
-	pulse(&m_shooterAngler);
-	pulse(&m_climber);
-//	AsyncPrinter::Printf("Arm %d, %d\n", m_climber.state, m_climber.counter);
-//	AsyncPrinter::Printf("Compressor: %s\n", (m_compressor->Enabled() ? "on" : "off"));
-//	AsyncPrinter::Printf("Pressure switch: %d\n", m_compressor->GetPressureSwitchValue());
+	if (pulsed && dynamic_cast<DoubleSolenoid*>(solenoid))
+	{
+		if (counter > 0)
+		{
+			counter--;
+			if (state == FORWARD)
+			{
+				dynamic_cast<DoubleSolenoid*>(solenoid)->Set(DoubleSolenoid::kForward);
+			}
+			else if (state == REVERSE)
+			{
+				dynamic_cast<DoubleSolenoid*>(solenoid)->Set(DoubleSolenoid::kReverse);
+			}
+			else if (state == OFF)
+			{
+				dynamic_cast<DoubleSolenoid*>(solenoid)->Set(DoubleSolenoid::kOff);
+			}
+		}
+		else
+		{
+			counter = 0;
+			dynamic_cast<DoubleSolenoid*>(solenoid)->Set(DoubleSolenoid::kOff);
+		}
+	}
+	else
+	{
+		if (state == FORWARD)
+		{
+			if (dynamic_cast<Solenoid*>(solenoid))
+				dynamic_cast<Solenoid*>(solenoid)->Set(true);
+			else if (dynamic_cast<DoubleSolenoid*>(solenoid))
+				dynamic_cast<DoubleSolenoid*>(solenoid)->Set(DoubleSolenoid::kForward);
+		}
+		else if (state == REVERSE)
+		{
+			if (dynamic_cast<DoubleSolenoid*>(solenoid))
+				dynamic_cast<DoubleSolenoid*>(solenoid)->Set(DoubleSolenoid::kReverse);
+		}
+		else if (state == OFF)
+		{
+			if (dynamic_cast<Solenoid*>(solenoid))
+				dynamic_cast<Solenoid*>(solenoid)->Set(false);
+			else if (dynamic_cast<DoubleSolenoid*>(solenoid))
+				dynamic_cast<DoubleSolenoid*>(solenoid)->Set(DoubleSolenoid::kOff);
+		}
+	}
 	
 	return 0;
 }
 
-void Pneumatics::Finalize()
-{
-	DELETE(m_instance);
-}
-
 void Pneumatics::Configure()
 {
-	ConfigManager* c = ConfigManager::Instance();
+	ConfigManager *c = ConfigManager::Instance();
 	m_pulse_length = c->Get<int> (m_configSection, "pulseLength", 25);
 }
 
-void Pneumatics::Log()
+const char* Pneumatics::GetName()
 {
-	
-}
-
-bool Pneumatics::GetStorageExitState()
-{
-	return m_storageExit.state;
-}
-
-bool Pneumatics::GetClimberState()
-{
-	return m_climber.state;
-}
-
-bool Pneumatics::GetShooterAngleState()
-{
-	return m_shooterAngler.state;
-}
-
-bool Pneumatics::GetHookState()
-{
-	return m_hook.state;
+	return m_name;
 }

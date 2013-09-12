@@ -19,7 +19,10 @@ LRTRobot13::~LRTRobot13()
 	{
 		(*it)->Abort();
 	}
-	Pneumatics::Instance()->Abort();
+	for (vector<Pneumatics*>::iterator it = Pneumatics::pneumatic_vector.begin(); it < Pneumatics::pneumatic_vector.end(); it++)
+	{
+		(*it)->Abort();
+	}
 	LogManager::Instance()->Abort();
 	
 	DELETE(m_componentManager);
@@ -32,10 +35,10 @@ LRTRobot13::~LRTRobot13()
 	ConfigManager::Finalize();
 	LogManager::Finalize();
 	LCD::Finalize();
-	Pneumatics::Finalize();
 	DriveEncoders::Finalize();
 	AutoActions::Finalize();
 	IMU::Finalize();
+	Pneumatics::DestroyCompressor();
 }
 
 
@@ -57,9 +60,13 @@ void LRTRobot13::RobotInit()
 	{
 		(*it)->Start();
 	}
-	
-	AsyncPrinter::Println("Starting Pneumatics Task...");
-	Pneumatics::Instance()->Start();
+	AsyncPrinter::Println("Starting Pneumatics Tasks...");
+	for (vector<Pneumatics*>::iterator it = Pneumatics::pneumatic_vector.begin(); it < Pneumatics::pneumatic_vector.end(); it++)
+	{
+		(*it)->Start();
+	}
+		
+	Pneumatics::CreateCompressor();
 	
 	AsyncPrinter::Println("Starting LogManager Task...");
 	LogManager::Instance()->Start();
@@ -158,7 +165,12 @@ void LRTRobot13::Tick()
 			AsyncPrinter::Printf("\n");
 		}
 	}
-	
+	// Update all pneumatics
+	for (vector<Pneumatics*>::iterator it = Pneumatics::pneumatic_vector.begin(); it < Pneumatics::pneumatic_vector.end(); it++)
+	{
+		(*it)->RunOneCycle();
+	}
+		
 	// Update all talons
 	for (vector<LRTTalon*>::iterator it = LRTTalon::talon_vector.begin(); it < LRTTalon::talon_vector.end(); it++)
 	{
@@ -168,13 +180,12 @@ void LRTRobot13::Tick()
 	// Update pneumatics
 	if (DriverStation::GetInstance()->GetDigitalIn(DriverStationConfig::DigitalIns::PNEUMATICS))
 	{
-		Pneumatics::Instance()->setCompressor(true);
+		Pneumatics::SetCompressor(true);
 	}
 	else
 	{
-		Pneumatics::Instance()->setCompressor(false);
+		Pneumatics::SetCompressor(false);
 	}
-	Pneumatics::Instance()->RunOneCycle();
 	
 	// Update LogManager
 	LogManager::Instance()->RunOneCycle();

@@ -48,7 +48,8 @@ Shooter::Shooter() :
 	m_encs[INNER] = new Counter((UINT32) RobotConfig::Digital::HALL_EFFECT_A);
 	m_encs[INNER]->Start();
 	m_encs[INNER]->SetMaxPeriod(60 / 100.0); // Period of 100 RPM; minimum speed we can read -RC 4/12/13
-	m_pneumatics = Pneumatics::Instance();
+	m_angler = new Pneumatics(RobotConfig::Solenoid::SHOOTER_ANGLER_A, RobotConfig::Solenoid::SHOOTER_ANGLER_B, "ShooterAngler");
+	m_pusher = new Pneumatics(RobotConfig::Solenoid::STORAGE_EXIT_A, RobotConfig::Solenoid::STORAGE_EXIT_B, "StorageExit");
 	
 	atSpeedCounter[OUTER] = 0;
 	atSpeedCounter[INNER] = 0;
@@ -137,13 +138,13 @@ void Shooter::enabledPeriodic()
 		m_flashlight->Set(1); // Flashlight change
 		if (m_componentData->shooterData->ShouldLauncherBeHigh())
 		{
-			m_pneumatics->setShooterAngler(EXTENDED);
+			m_angler->Set(EXTENDED);
 			//		AsyncPrinter::Printf("High\n");
 		}
 		else
 		{
 			//		AsyncPrinter::Printf("Low\n");
-			m_pneumatics->setShooterAngler(RETRACTED);
+			m_angler->Set(RETRACTED);
 		}
 
 		//	AsyncPrinter::Printf("Period %.5f\n", m_encs[INNER]->GetPeriod());
@@ -295,11 +296,11 @@ void Shooter::enabledPeriodic()
 			{
 			case FIRING_OFF:
 				firingWaitTicks = 0;
-				m_pneumatics->setStorageExit(RETRACTED);
+				m_pusher->Set(RETRACTED);
 				m_fireState = RETRACT_LOADER_WAIT_FOR_LIFT;
 				break;
 			case RETRACT_LOADER_WAIT_FOR_LIFT:
-				m_pneumatics->setStorageExit(RETRACTED);
+				m_pusher->Set(RETRACTED);
 				firingWaitTicks++;
 				if (m_proximity->Get() && m_sensorOK)
 				{
@@ -308,7 +309,7 @@ void Shooter::enabledPeriodic()
 				if (firingWaitTicks >= retractWait && atSpeed[OUTER]
 						&& atSpeed[INNER])
 				{
-					m_pneumatics->setStorageExit(EXTENDED);
+					m_pusher->Set(EXTENDED);
 					m_fireState = EXTEND_LOADER;
 					firingWaitTicks = 0;
 				}
@@ -318,17 +319,17 @@ void Shooter::enabledPeriodic()
 				if ((firingWaitTicks >= retractWait || (!m_proximity->Get()
 						&& m_sensorOK)) && atSpeed[OUTER] && atSpeed[INNER])
 				{
-					m_pneumatics->setStorageExit(EXTENDED);
+					m_pusher->Set(EXTENDED);
 					m_fireState = EXTEND_LOADER;
 					firingWaitTicks = 0;
 				}
 				break;
 			case EXTEND_LOADER:
-				m_pneumatics->setStorageExit(EXTENDED);
+				m_pusher->Set(EXTENDED);
 				firingWaitTicks++;
 				if (firingWaitTicks >= extendWait)
 				{
-					m_pneumatics->setStorageExit(RETRACTED);
+					m_pusher->Set(RETRACTED);
 					m_fireState = FIRING_OFF;
 				}
 				break;
@@ -339,11 +340,11 @@ void Shooter::enabledPeriodic()
 			{
 			case FIRING_OFF:
 				firingWaitTicks = 0;
-				m_pneumatics->setStorageExit(RETRACTED);
+				m_pusher->Set(RETRACTED);
 				m_fireState = RETRACT_LOADER_WAIT_FOR_LIFT;
 				break;
 			case RETRACT_LOADER_WAIT_FOR_LIFT:
-				m_pneumatics->setStorageExit(RETRACTED);
+				m_pusher->Set(RETRACTED);
 				firingWaitTicks++;
 				if (m_proximity->Get() && m_sensorOK)
 				{
@@ -352,7 +353,7 @@ void Shooter::enabledPeriodic()
 				if (firingWaitTicks >= retractWait && atSpeed[OUTER]
 						&& atSpeed[INNER])
 				{
-					m_pneumatics->setStorageExit(EXTENDED);
+					m_pusher->Set(EXTENDED);
 					m_fireState = EXTEND_LOADER;
 					firingWaitTicks = 0;
 				}
@@ -362,12 +363,12 @@ void Shooter::enabledPeriodic()
 				if ((firingWaitTicks >= retractWait || (!m_proximity->Get()
 						&& m_sensorOK)) && atSpeed[OUTER] && atSpeed[INNER])
 				{
-					m_pneumatics->setStorageExit(EXTENDED);
+					m_pusher->Set(EXTENDED);
 					m_fireState = EXTEND_LOADER;
 				}
 				break;
 			case EXTEND_LOADER:
-				m_pneumatics->setStorageExit(EXTENDED);
+				m_pusher->Set(EXTENDED);
 				break;
 			}
 			break;
@@ -375,7 +376,7 @@ void Shooter::enabledPeriodic()
 			if (atSpeed[OUTER] && atSpeed[INNER])
 			{
 				lastFiring = true;
-				m_pneumatics->setStorageExit(RETRACTED);
+				m_pusher->Set(RETRACTED);
 			}
 			break;
 		case OFF:
@@ -407,7 +408,7 @@ void Shooter::enabledPeriodic()
 			lastSensor = m_proximity->Get();
 			//				AsyncPrinter::Printf("off\n");
 			//			AsyncPrinter::Printf("IN\n");
-			m_pneumatics->setStorageExit(EXTENDED);
+			m_pusher->Set(EXTENDED);
 			m_fireState = FIRING_OFF;
 			break;
 		}
@@ -834,13 +835,13 @@ void Shooter::fubarDoDisabledPeriodic()
 
 	if (m_componentData->shooterData->ShouldLauncherBeHigh())
 	{
-		m_pneumatics->setShooterAngler(EXTENDED);
+		m_angler->Set(EXTENDED);
 		//		AsyncPrinter::Printf("High\n");
 	}
 	else
 	{
 		//		AsyncPrinter::Printf("Low\n");
-		m_pneumatics->setShooterAngler(RETRACTED);
+		m_angler->Set(RETRACTED);
 	}
 
 	frisbeeExitedLastCycle = frisbeeExited = true;

@@ -21,7 +21,8 @@ Climber::Climber() :
 			m_logFile()
 {
 	m_climbing_level = 0;
-	m_pneumatics = Pneumatics::Instance();
+	m_climberArms = new Pneumatics(RobotConfig::Solenoid::CLIMBER_A, RobotConfig::Solenoid::CLIMBER_B, "ClimberArms");
+	m_hooks = new Pneumatics(RobotConfig::Solenoid::HOOKS_A, RobotConfig::Solenoid::HOOKS_B, "Hooks");
 	m_state = NOTHING;
 	m_driving_encoders = DriveEncoders::GetInstance();
 	m_climbing_level = 0;
@@ -143,12 +144,12 @@ void Climber::enabledPeriodic()
 		
 		if(m_climberData->shouldChangeHooks())
 		{
-			m_pneumatics->setHookPosition(!m_pneumatics->GetHookState());
+			m_hooks->Set(!m_hooks->Get());
 		}
 		
 		if(m_climberData->shouldChangeArm())
 		{
-			m_pneumatics->setClimberArm(!m_pneumatics->GetClimberState(), true);
+			m_climberArms->Set(!m_climberArms->Get(), true);
 		}
 //		m_pneumatics->setHookPosition(m_componentData->climberData->shouldExtendHooks());
 //		m_pneumatics->setClimberArm(m_componentData->climberData->shouldExtendArm());
@@ -270,8 +271,8 @@ void Climber::enabledPeriodic()
 		
 		winchPawlOff();
 		
-		m_pneumatics->setHookPosition(RETRACTED, true);
-		m_pneumatics->setClimberArm(RETRACTED, true);
+		m_hooks->Set(RETRACTED, true);
+		m_climberArms->Set(RETRACTED, true);
 
 		m_driveSpeed = 0.0;
 		
@@ -294,7 +295,7 @@ void Climber::enabledPeriodic()
 	case BEGIN:
 		m_stateString = "BEGIN";
 		
-		m_pneumatics->setClimberArm(EXTENDED, true);
+		m_climberArms->Set(EXTENDED, true);
 		
 		m_shooterData->SetLauncherAngleLow();
 		m_shooterData->SetEnabled(false);
@@ -348,7 +349,7 @@ void Climber::enabledPeriodic()
 		if(m_climbing_level > GROUND)
 		{
 			m_shooterData->SetLauncherAngleHigh();
-			m_pneumatics->setHookPosition(RETRACTED, true);
+			m_hooks->Set(RETRACTED, true);
 		}
 		else
 		{
@@ -404,7 +405,7 @@ void Climber::enabledPeriodic()
 	case CLIMB_PREPARE:
 		m_stateString = "CLIMB_PREPARE";
 		
-		m_pneumatics->setHookPosition(RETRACTED, true);
+		m_hooks->Set(RETRACTED, true);
 		m_shooterData->SetLauncherAngleLow();
 
 		m_componentData->collectorData->SlideUp();
@@ -468,7 +469,7 @@ void Climber::enabledPeriodic()
 	case EXTEND_HOOKS:
 		m_stateString = "EXTEND_HOOKS";
 		
-		m_pneumatics->setHookPosition(EXTENDED, true);
+		m_hooks->Set(EXTENDED, true);
 #ifdef STEP
 		if(m_climberData->shouldContinueClimbing())
 #endif
@@ -508,8 +509,8 @@ void Climber::enabledPeriodic()
 				
 		if(m_climbing_level == GROUND)
 		{
-			m_pneumatics->setHookPosition(RETRACTED, true);
-			m_pneumatics->setClimberArm(RETRACTED, true);
+			m_hooks->Set(RETRACTED, true);
+			m_climberArms->Set(RETRACTED, true);
 		}
 		
 		m_winchPawl->setDutyCyle(0.0F);
@@ -528,9 +529,9 @@ void Climber::enabledPeriodic()
 		
 		if(m_climbing_level == GROUND)
 		{
-			m_pneumatics->setHookPosition(RETRACTED, true);
+			m_hooks->Set(RETRACTED, true);
 		}
-		m_pneumatics->setClimberArm(EXTENDED, true);
+		m_climberArms->Set(EXTENDED, true);
 
 		if(m_climbing_level > GROUND)
 			m_shooterData->SetLauncherAngleHigh();
@@ -553,9 +554,9 @@ void Climber::enabledPeriodic()
 				
 		if(m_climbing_level == GROUND)
 		{
-			m_pneumatics->setHookPosition(RETRACTED, true);
+			m_hooks->Set(RETRACTED, true);
 		}
-		m_pneumatics->setClimberArm(EXTENDED, true);
+		m_climberArms->Set(EXTENDED, true);
 
 		if(m_climbing_level > GROUND)
 			m_shooterData->SetLauncherAngleHigh();
@@ -578,9 +579,9 @@ void Climber::enabledPeriodic()
 						
 		if(m_climbing_level == GROUND)
 		{
-			m_pneumatics->setHookPosition(RETRACTED, true);
+			m_hooks->Set(RETRACTED, true);
 		}
-		m_pneumatics->setClimberArm(EXTENDED, true);
+		m_climberArms->Set(EXTENDED, true);
 
 		if(m_climbing_level > GROUND)
 			m_shooterData->SetLauncherAngleHigh();
@@ -604,9 +605,9 @@ void Climber::enabledPeriodic()
 								
 		if(m_climbing_level == GROUND)
 		{
-			m_pneumatics->setHookPosition(RETRACTED, true);
+			m_hooks->Set(RETRACTED, true);
 		}
-		m_pneumatics->setClimberArm(EXTENDED, true);
+		m_climberArms->Set(EXTENDED, true);
 
 		if(m_climbing_level > GROUND)
 			m_shooterData->SetLauncherAngleHigh();
@@ -628,8 +629,8 @@ void Climber::enabledPeriodic()
 	case RESET_FOR_CLIMB:
 		m_stateString = "RESET_CLIMB";
 		
-		m_pneumatics->setClimberArm(EXTENDED);
-		m_pneumatics->setHookPosition(RETRACTED);
+		m_climberArms->Set(EXTENDED);
+		m_hooks->Set(RETRACTED);
 		m_shooterData->SetLauncherAngleLow();
 		
 		engagePTO();
@@ -653,8 +654,8 @@ void Climber::enabledPeriodic()
 	case RESET_FOR_TURN_WINCH_PAWL_OFF:
 		m_stateString = "RESET_TURN_WINCH_PAWL_OFF";
 		
-		m_pneumatics->setClimberArm(EXTENDED);
-		m_pneumatics->setHookPosition(RETRACTED);
+		m_climberArms->Set(EXTENDED);
+		m_hooks->Set(RETRACTED);
 		m_shooterData->SetLauncherAngleLow();
 		
 		engagePTO();
@@ -671,8 +672,8 @@ void Climber::enabledPeriodic()
 	case RESET_FOR_EXTEND_HOOKS:
 		m_stateString = "RESET_EXTEND_HOOKS";
 		
-		m_pneumatics->setClimberArm(EXTENDED);
-		m_pneumatics->setHookPosition(RETRACTED);
+		m_climberArms->Set(EXTENDED);
+		m_hooks->Set(RETRACTED);
 		m_shooterData->SetLauncherAngleLow();
 		
 		engagePTO();
@@ -689,8 +690,8 @@ void Climber::enabledPeriodic()
 	case RESET_FOR_CLIMBED:
 		m_stateString = "RESET_CLIMBED";
 
-		m_pneumatics->setClimberArm(EXTENDED);
-		m_pneumatics->setHookPosition(EXTENDED);
+		m_climberArms->Set(EXTENDED);
+		m_hooks->Set(EXTENDED);
 		m_shooterData->SetLauncherAngleLow();
 		
 		engagePTO();
@@ -1125,8 +1126,7 @@ void Climber::disabledPeriodic()
 //	if (e % 10 == 0)
 //		AsyncPrinter::Printf("Climber Disabled\n");
 	
-	
-	m_pneumatics->setHookPosition(false);
+	m_hooks->Set(false);
 //	if (e % 50 == 0)
 //	{
 //		AsyncPrinter::Printf("Hook Change to %d\n", !m_pneumatics->GetHookState()	);

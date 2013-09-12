@@ -2,101 +2,67 @@
 #define PNEUMATICS_H_
 
 #include <WPILib.h>
+#include <SolenoidBase.h>
 #include <DoubleSolenoid.h>
+#include <Solenoid.h>
 #include <Compressor.h>
 
 #include "../Config/RobotConfig.h"
 #include "../Config/Configurable.h"
-#include "../Log/Loggable.h"
 #include "../Process/SynchronizedProcess.h"
 #include "../Config/ConfigManager.h"
 #include "../Utils/AsyncPrinter.h"
 
-typedef struct
-{
-	DoubleSolenoid * solenoid;
-	int counter;
-	bool state;
-	bool pulsed;
-} PulsedSolenoid;
-
-class Pneumatics : public SynchronizedProcess, public Configurable, public Loggable
+class Pneumatics : public SynchronizedProcess, public Configurable
 {
 public:
-	/*!
-	 * Destructor
-	 */
+	enum State
+	{
+		OFF = false,
+		FORWARD = true,
+		REVERSE = false
+	};
+	
+	// Double solenoid
+	Pneumatics(uint32_t forward, uint32_t reverse, uint8_t module, const char *name);
+	Pneumatics(uint32_t forward, uint32_t reverse, const char *name);
+	// Single solenoid
+	Pneumatics(uint32_t forward, uint8_t module, const char *name);
+	Pneumatics(uint32_t forward, const char *name);
 	virtual ~Pneumatics();
-
-	/*!
-	 * Gets an instance of Pneumatics
-	 * @return pointer to instance
-	 */
-	static Pneumatics* Instance();
-
-	/*!
-	 * Deletes instance
-	 */
-	static void Finalize();
 	
-	void setCollector(bool on, bool force = false);
+	static void CreateCompressor();
+	static void DestroyCompressor();
+	static void SetCompressor(bool on);
 	
-	void setShooterAngler(bool on, bool force = false);
+	void Set(bool on, bool force = false);
+	bool Get();
 
-	void setClimberArm(bool on, bool force = false);
-
-	void setStorageExit(bool on, bool force = false);
-	
-	void setHookPosition(bool on, bool force = false);
-	
-	/*!
-	 * Sets the state of the compressor
-	 * @param on
-	 */
-	void setCompressor(bool on);
-
-	/*!
-	 * Configures values
-	 */
 	virtual void Configure();
-
-	/*!
-	 * Logs value
-	 */
-	virtual void Log();
 	
-	//returns state
-	bool GetStorageExitState();
-	bool GetClimberState();
-	bool GetHookState();
-	bool GetShooterAngleState();
-
+	const char* GetName();
+	
+	static vector<Pneumatics*> pneumatic_vector;
+	
 protected:
 	INT32 Tick();
 
 private:
-	/*!
-	 * Constructor
-	 */
-	Pneumatics();
-
-	/*!
-	 * Pulses a solenoid
-	 * @param ptr the pulsed solenoid
-	 */
-	void pulse(PulsedSolenoid * ptr);
-
-	PulsedSolenoid m_collector, m_climber, m_storageExit, m_hook, m_shooterAngler;
-
-	static Pneumatics* m_instance;
-
+	void InternalUpdate();
+	
 	std::string m_configSection;
 
 	int m_pulse_length;
-	bool m_mutex;
 
-	Compressor* m_compressor;
+	static Compressor *m_compressor;
 
+	SolenoidBase *solenoid;
+	int counter;
+	bool pulsed;
+	State state;
+	
+	const char *m_name;
+	
 	DISALLOW_COPY_AND_ASSIGN(Pneumatics);
 
 };
