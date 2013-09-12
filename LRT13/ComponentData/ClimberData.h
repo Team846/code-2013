@@ -128,7 +128,6 @@ typedef enum humanState
 		bool m_shouldContinueClimbing, m_shouldForceContinueClimbing;
 		
 		bool m_shouldPotentiallyAbort;
-		bool m_shouldChangeAngleState;
 		
 		bool m_shouldWinchPawlGoUp;
 		bool m_shouldWinchPawlGoDown;
@@ -137,8 +136,6 @@ typedef enum humanState
 		bool m_shouldPTODisEngage;
 		
 		bool m_shoulddebug;
-		
-		bool m_shouldChangeHooks;
 		
 		bool m_shouldChangeArm;
 		

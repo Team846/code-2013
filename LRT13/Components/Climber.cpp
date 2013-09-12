@@ -100,20 +100,12 @@ void Climber::enabledPeriodic()
 		m_paused = false;
 	}
 	
-	static bool wasDebugging = false;
 	if (m_componentData->climberData->shouldDebug())
 	{
 		m_componentData->climberData->disableDebug();
 		
 		m_climberData->setCurrentState(DEBUG_MODE);
 		AsyncPrinter::Printf("Debug\n");
-		if (m_componentData->climberData->shouldChangeAngleState())
-		{
-			if (m_componentData->shooterData->ShouldLauncherBeHigh())
-				m_componentData->shooterData->SetLauncherAngleLow();
-			else
-				m_componentData->shooterData->SetLauncherAngleHigh();
-		}
 		
 		if (m_componentData->climberData->shouldWinchPawlGoUp())
 		{
@@ -123,11 +115,10 @@ void Climber::enabledPeriodic()
 		else if (m_componentData->climberData->shouldWinchPawlGoDown())
 		{
 			AsyncPrinter::Printf("winch pawl down %d\n", m_winch_gear_tooth.Get());
-			winchPawlDown(true);//note the asymettry 
+			winchPawlDown(true);
 		}
 		else
 		{
-//			AsyncPrinter::Printf("You failed a tlife!\n");
 			winchPawlOff();
 		}
 		
@@ -142,18 +133,10 @@ void Climber::enabledPeriodic()
 			engagePTO(true);
 		}
 		
-		if(m_climberData->shouldChangeHooks())
-		{
-			m_hooks->Set(!m_hooks->Get());
-		}
-		
 		if(m_climberData->shouldChangeArm())
 		{
 			m_climberArms->Set(!m_climberArms->Get(), true);
 		}
-//		m_pneumatics->setHookPosition(m_componentData->climberData->shouldExtendHooks());
-//		m_pneumatics->setClimberArm(m_componentData->climberData->shouldExtendArm());
-//		AsyncPrinter::Printf("Still alive %d\n", GetFPGATime());
 		return;
 	}
 

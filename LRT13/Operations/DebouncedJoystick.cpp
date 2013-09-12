@@ -79,7 +79,7 @@ double DebouncedJoystick::GetRawAxisDelta(int axis)
 	return axisPrevValue[axis] - axisValue[axis];
 }
 
-bool DebouncedJoystick::IsButtonJustPressed(int button)
+bool DebouncedJoystick::IsButtonClicked(int button)
 {
 	if (!ButtonInBounds(button))
 		return false;

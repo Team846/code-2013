@@ -50,7 +50,7 @@ const uint32_t PAWL_UP = 8;
 const uint32_t PAWL_DOWN = 9;
 //const uint32_t RECORD = 9;
 const uint32_t PURGE = 10;
-const uint32_t CLIMBER_ARM = 11;
+const uint32_t CLIMBER_ARMS = 11;
 
 const uint32_t STOP_ROBOT = 5;
 }

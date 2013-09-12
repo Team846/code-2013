@@ -166,18 +166,31 @@ void TeleopInputs::Update()
 					turn = 0.0;
 					if (!lastStop)
 					{
-						stoppedForward = m_componentData->drivetrainData->getCurrentPos(FORWARD);
+						stoppedForward
+								= m_componentData->drivetrainData->getCurrentPos(
+										FORWARD);
 						stoppedTurn
 								= m_componentData->drivetrainData->getCurrentPos(
 										TURN);
 					}
-					m_componentData->drivetrainData->setControlMode(FORWARD, POSITION_CONTROL);
-					m_componentData->drivetrainData->setRelativePositionSetpoint(FORWARD, stoppedForward - m_componentData->drivetrainData->getCurrentPos(FORWARD), 1.0);
-	
-					m_componentData->drivetrainData->setControlMode(TURN, POSITION_CONTROL);
-					m_componentData->drivetrainData->setRelativePositionSetpoint(TURN, stoppedTurn - m_componentData->drivetrainData->getCurrentPos(TURN), 1.0);
+					m_componentData->drivetrainData->setControlMode(FORWARD,
+							POSITION_CONTROL);
+					m_componentData->drivetrainData->setRelativePositionSetpoint(
+							FORWARD,
+							stoppedForward
+									- m_componentData->drivetrainData->getCurrentPos(
+											FORWARD), 1.0);
+
+					m_componentData->drivetrainData->setControlMode(TURN,
+							POSITION_CONTROL);
+					m_componentData->drivetrainData->setRelativePositionSetpoint(
+							TURN,
+							stoppedTurn
+									- m_componentData->drivetrainData->getCurrentPos(
+											TURN), 1.0);
 					lastStop = true;
-				} else
+				}
+				else
 					lastStop = false;
 #endif
 
@@ -191,26 +204,26 @@ void TeleopInputs::Update()
 				//			if (++oops % 5 == 0)
 				//				AsyncPrinter::Printf("fwd: %.2f\n", forward);
 
-//				static double lastForward;
-//				static double lastTurn;
-//				if (forward == 0.0)
-//				{
-//					if (forward != lastForward)
-//						stoppedForward = m_componentData->drivetrainData->getCurrentPos(FORWARD);
-//					m_componentData->drivetrainData->setControlMode(FORWARD, POSITION_CONTROL);
-//					m_componentData->drivetrainData->setRelativePositionSetpoint(FORWARD, stoppedForward - m_componentData->drivetrainData->getCurrentPos(FORWARD), 1.0);
-//				}
-//				if (turnComposite == 0.0)
-//				{
-//					if (turnComposite != lastTurn)
-//						stoppedTurn
-//								= m_componentData->drivetrainData->getCurrentPos(
-//										TURN);
-//					m_componentData->drivetrainData->setControlMode(TURN, POSITION_CONTROL);
-//					m_componentData->drivetrainData->setRelativePositionSetpoint(TURN, stoppedTurn - m_componentData->drivetrainData->getCurrentPos(TURN), 1.0);
-//				}
-//				lastForward = forward;
-//				lastTurn = turn;
+				//				static double lastForward;
+				//				static double lastTurn;
+				//				if (forward == 0.0)
+				//				{
+				//					if (forward != lastForward)
+				//						stoppedForward = m_componentData->drivetrainData->getCurrentPos(FORWARD);
+				//					m_componentData->drivetrainData->setControlMode(FORWARD, POSITION_CONTROL);
+				//					m_componentData->drivetrainData->setRelativePositionSetpoint(FORWARD, stoppedForward - m_componentData->drivetrainData->getCurrentPos(FORWARD), 1.0);
+				//				}
+				//				if (turnComposite == 0.0)
+				//				{
+				//					if (turnComposite != lastTurn)
+				//						stoppedTurn
+				//								= m_componentData->drivetrainData->getCurrentPos(
+				//										TURN);
+				//					m_componentData->drivetrainData->setControlMode(TURN, POSITION_CONTROL);
+				//					m_componentData->drivetrainData->setRelativePositionSetpoint(TURN, stoppedTurn - m_componentData->drivetrainData->getCurrentPos(TURN), 1.0);
+				//				}
+				//				lastForward = forward;
+				//				lastTurn = turn;
 
 				m_componentData->drivetrainData->setOpenLoopOutput(FORWARD,
 						forward);
@@ -270,81 +283,63 @@ void TeleopInputs::Update()
 
 		//	AsyncPrinter::Printf("Inputs\n");
 
-		if (m_operator_stick->IsButtonJustPressed(
-				DriverStationConfig::JoystickButtons::CLIMBER_ARM))
-		{
-			m_componentData->climberData->changeArmState();
-			AsyncPrinter::Printf("Arm\n");
-			//change arm position
-		}
+
 		/************************Climber Functions************************/
 
-		if (m_operator_stick->IsButtonDown(
-				DriverStationConfig::JoystickButtons::SHOOTER_OFF))
+		// PTO
+		if (m_operator_stick->IsButtonClicked(
+				DriverStationConfig::JoystickButtons::ENGAGE_PTO))
 		{
 			m_componentData->climberData->enableDebug();
+			//			m_componentData->shooterData->SetEnabled(false);
+			m_componentData->climberData->EngagePTO();
+		}
+		else if (m_operator_stick->IsButtonClicked(
+				DriverStationConfig::JoystickButtons::DISENGAGE_PTO))
+		{
+			m_componentData->climberData->enableDebug();
+			//			m_componentData->shooterData->SetEnabled(false);
+			m_componentData->climberData->DisengagePTO();
+		}
+		else
+		{
+			m_componentData->climberData->disableDebug();
+		}
+		// Winch Pawl
+		if (m_operator_stick->IsButtonDown(
+				DriverStationConfig::JoystickButtons::PAWL_UP))
+		{
+			m_componentData->climberData->enableDebug();
+			//			m_componentData->shooterData->SetEnabled(false);
+			m_componentData->climberData->winchPawlUp();
 
-			m_componentData->shooterData->SetEnabled(false);
-
-			if (m_operator_stick->IsButtonJustPressed(
-					DriverStationConfig::JoystickButtons::ENGAGE_PTO))
-			{
-				m_componentData->climberData->EngagePTO();
-				//change PTO state
-			}
-			else if (m_operator_stick->IsButtonJustPressed(
-					DriverStationConfig::JoystickButtons::DISENGAGE_PTO))
-			{
-				m_componentData->climberData->DisengagePTO();
-			}
-
-			if (m_operator_stick->IsButtonJustPressed(
-					DriverStationConfig::JoystickButtons::CHANGE_ANGLE))
-			{
-				m_componentData->climberData->changeHooks();
-			}
-
-			if (m_operator_stick->IsButtonDown(
-					DriverStationConfig::JoystickButtons::PAWL_UP))
-			{
-				m_componentData->climberData->winchPawlUp();
-
-			}
-			else if (m_operator_stick->IsButtonDown(
-					DriverStationConfig::JoystickButtons::PAWL_DOWN))
-			{
-				m_componentData->climberData->winchPawlDown();
-
-			}
-			else
-				m_componentData->climberData->winchPawlInactive();
-
+		}
+		else if (m_operator_stick->IsButtonDown(
+				DriverStationConfig::JoystickButtons::PAWL_DOWN))
+		{
+			m_componentData->climberData->enableDebug();
+			//			m_componentData->shooterData->SetEnabled(false);
+			m_componentData->climberData->winchPawlDown();
 		}
 		else
 		{
 			m_componentData->climberData->winchPawlInactive();
 			m_componentData->climberData->disableDebug();
-
-			if (m_operator_stick->IsButtonJustPressed(
-					DriverStationConfig::JoystickButtons::CHANGE_ANGLE))
-			{
-				//		m_componentData->climberData->changeAngleState();
-				//change angle
-				if (m_componentData->shooterData->ShouldLauncherBeHigh())
-					m_componentData->shooterData->SetLauncherAngleLow();
-				else
-					m_componentData->shooterData->SetLauncherAngleHigh();
-			}
-
-			if (m_componentData->climberData->getCurrentState() == NOTHING)
-			{
-				if (m_operator_stick->IsButtonJustPressed(
-						DriverStationConfig::JoystickButtons::SHOOTER_ON))
-				{
-					m_componentData->shooterData->SetEnabled(true);
-				}
-			}
-			else
+		}
+		// Climber Arms
+		if (m_operator_stick->IsButtonClicked(
+				DriverStationConfig::JoystickButtons::CLIMBER_ARMS))
+		{
+			m_componentData->climberData->enableDebug();
+			m_componentData->climberData->changeArmState();
+		}
+		if (m_componentData->climberData->getCurrentState() != NOTHING)
+		{
+			m_componentData->climberData->setShouldContinueClimbing(
+					m_operator_stick->IsButtonClicked(
+							DriverStationConfig::JoystickButtons::CONTINUE_CLIMB));
+			if (m_operator_stick->IsButtonClicked(
+					DriverStationConfig::JoystickButtons::SHOOTER_ON))
 			{
 				if (m_operator_stick->IsButtonDown(
 						DriverStationConfig::JoystickButtons::CONDITIONAL_ABORT))
@@ -359,36 +354,12 @@ void TeleopInputs::Update()
 				}
 			}
 		}
-
-		//		if (m_driver_stick->IsButtonJustPressed(
-		//				DriverStationConfig::JoystickButtons::START_CLIMB))
-		//		{
-		//			switch (m_componentData->climberData->getDesiredClimbingStep())
-		//			{
-		//			case INTENDED_IDLE:
-		//				m_componentData->climberData->setDesiredClimbingStep(
-		//						INTENDED_ARM_UP);
-		//				break;
-		//			case INTENDED_ARM_UP:
-		//				m_componentData->climberData->setDesiredClimbingStep(
-		//						INTENDED_CLIMBING);
-		//				break;
-		//			case INTENDED_CLIMBING:
-		//				break;
-		//			}
-		//		}
-
-		m_componentData->climberData->setShouldContinueClimbing(
-				m_driver_stick->IsButtonJustPressed(
-						DriverStationConfig::JoystickButtons::START_CLIMB)
-						|| (!m_operator_stick->IsButtonDown(
-								DriverStationConfig::JoystickButtons::SHOOTER_OFF)
-								&& m_operator_stick->IsButtonJustPressed(
-										DriverStationConfig::JoystickButtons::CONTINUE_CLIMB)));
-
-		//	m_componentData->climberData->setShouldContinueClimbing(
-		//			m_driver_stick->IsButtonJustPressed(DriverStationConfig::JoystickButtons::FORCE_CLIMB_ADVANCE));
-
+		else
+		{
+			m_componentData->climberData->setShouldContinueClimbing(
+					m_driver_stick->IsButtonClicked(
+							DriverStationConfig::JoystickButtons::START_CLIMB));
+		}
 
 		/************************Shooter************************/
 		if (m_driver_stick->IsButtonDown(
@@ -422,16 +393,25 @@ void TeleopInputs::Update()
 			}
 		}
 
-		if (fabs(m_driver_stick->GetRawAxis(4)) < 0.1)
+		if (m_componentData->climberData->getCurrentState() == NOTHING)
 		{
-			m_componentData->shooterData->SetSpeedOffset(1.0);
+			if (m_operator_stick->IsButtonClicked(
+					DriverStationConfig::JoystickButtons::SHOOTER_ON))
+			{
+				m_componentData->shooterData->SetEnabled(true);
+			}
 		}
-		else
-		{
-			m_componentData->shooterData->SetSpeedOffset(
-					1 - 0.5 * (m_driver_stick->GetRawAxis(4) - Util::Sign(
-							m_driver_stick->GetRawAxis(4)) * 0.1) / 0.9);
-		}
+
+		//		if (fabs(m_driver_stick->GetRawAxis(4)) < 0.1)
+		//		{
+		//			m_componentData->shooterData->SetSpeedOffset(1.0);
+		//		}
+		//		else
+		//		{
+		//			m_componentData->shooterData->SetSpeedOffset(
+		//					1 - 0.5 * (m_driver_stick->GetRawAxis(4) - Util::Sign(
+		//							m_driver_stick->GetRawAxis(4)) * 0.1) / 0.9);
+		//		}
 
 		/************************Automatic Functions************************/
 
@@ -480,7 +460,8 @@ void TeleopInputs::Update()
 		{
 			m_componentData->collectorData->RunRollersBackwards();
 		}
-	} else
+	}
+	else
 		lastStop = false;
 	LCD::Instance()->Print(2, 0, false, "Auto Aim");
 	LCD::Instance()->Print(2, 12, false, "o");
@@ -543,13 +524,13 @@ void TeleopInputs::Update()
 
 	/************************Config************************/
 
-	if (m_driver_stick->IsButtonJustPressed(
+	if (m_driver_stick->IsButtonClicked(
 			DriverStationConfig::JoystickButtons::SAVE_CONFIG))
 		m_componentData->configLoaderData->RequestSave();
-	if (m_driver_stick->IsButtonJustPressed(
+	if (m_driver_stick->IsButtonClicked(
 			DriverStationConfig::JoystickButtons::LOAD_CONFIG))
 		m_componentData->configLoaderData->RequestLoad();
-	if (m_driver_stick->IsButtonJustPressed(
+	if (m_driver_stick->IsButtonClicked(
 			DriverStationConfig::JoystickButtons::APPLY_CONFIG))
 		m_componentData->configLoaderData->RequestApply();
 
@@ -557,24 +538,24 @@ void TeleopInputs::Update()
 	if (m_operator_stick->IsButtonDown(
 			DriverStationConfig::JoystickButtons::SHOOTER_OFF))
 	{
-//		if (m_operator_stick->IsButtonDown(
-//				DriverStationConfig::JoystickButtons::COLLECTOR_DOWN_OPERATOR))
-//		{
-//			m_componentData->collectorData->StopRollers();
-//			m_componentData->collectorData->shouldStupidMoveDown = true;
-//		}
+		//		if (m_operator_stick->IsButtonDown(
+		//				DriverStationConfig::JoystickButtons::COLLECTOR_DOWN_OPERATOR))
+		//		{
+		//			m_componentData->collectorData->StopRollers();
+		//			m_componentData->collectorData->shouldStupidMoveDown = true;
+		//		}
 	}
 
 	/************************Routine Recorder************************/
-//	if (m_operator_stick->IsButtonDown(
-//			DriverStationConfig::JoystickButtons::RECORD)
-//			&& !m_operator_stick->IsButtonDown(
-//					DriverStationConfig::JoystickButtons::SHOOTER_OFF))
-//	{
-//		m_componentData->routineRecorderData->ShouldRecord(true);
-//	}
-//	else
-//	{
-//		m_componentData->routineRecorderData->ShouldRecord(false);
-//	}
+	//	if (m_operator_stick->IsButtonDown(
+	//			DriverStationConfig::JoystickButtons::RECORD)
+	//			&& !m_operator_stick->IsButtonDown(
+	//					DriverStationConfig::JoystickButtons::SHOOTER_OFF))
+	//	{
+	//		m_componentData->routineRecorderData->ShouldRecord(true);
+	//	}
+	//	else
+	//	{
+	//		m_componentData->routineRecorderData->ShouldRecord(false);
+	//	}
 }

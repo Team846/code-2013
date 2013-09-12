@@ -34,7 +34,7 @@ void InputUnitTest::Run()
 
 			//Pneumatics::Instance()->setCompressor(true);
 
-			if(m_stick->IsButtonJustPressed(1))
+			if(m_stick->IsButtonClicked(1))
 			{
 				//Pneumatics::Instance()->setClimberArm(!//Pneumatics::Instance()->GetClimberState());
 			}
@@ -49,7 +49,7 @@ void InputUnitTest::Run()
 				//Pneumatics::Instance()->setCollector(false);
 			}
 			
-			if(m_stick->IsButtonJustPressed(3))
+			if(m_stick->IsButtonClicked(3))
 			{
 				printf("disc track is down.\n");
 				//Pneumatics::Instance()->setHookPosition(!//Pneumatics::Instance()->GetHookState());
@@ -57,7 +57,7 @@ void InputUnitTest::Run()
 			
 			
 			
-			if(m_stick->IsButtonJustPressed(4))
+			if(m_stick->IsButtonClicked(4))
 			{
 				printf("load config is down.\n");
 				//Pneumatics::Instance()->setShooterAngler(!//Pneumatics::Instance()->GetShooterAngleState());
@@ -75,7 +75,7 @@ void InputUnitTest::Run()
 				//Pneumatics::Instance()->setStorageExit(false);
 			}
 			
-			if(m_stick->IsButtonJustPressed(6))
+			if(m_stick->IsButtonClicked(6))
 			{
 				//Pneumatics::Instance()->setClimberArm(!//Pneumatics::Instance()->GetClimberState());
 			}

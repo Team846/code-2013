@@ -19,19 +19,19 @@ void ServoTest::Run()
 	while(true)
 	{
 		m_stick->Update();
-		if(m_stick->IsButtonJustPressed(DriverStationConfig::JoystickButtons::APPLY_CONFIG))
+		if(m_stick->IsButtonClicked(DriverStationConfig::JoystickButtons::APPLY_CONFIG))
 		{
 			leftServoValue -= 10;
 		}
-		if(m_stick->IsButtonJustPressed(DriverStationConfig::JoystickButtons::LOAD_CONFIG))
+		if(m_stick->IsButtonClicked(DriverStationConfig::JoystickButtons::LOAD_CONFIG))
 		{
 			leftServoValue += 10;
 		}
-		if(m_stick->IsButtonJustPressed(12))
+		if(m_stick->IsButtonClicked(12))
 		{
 			rightServoValue -= 10;
 		}
-		if(m_stick->IsButtonJustPressed(11))
+		if(m_stick->IsButtonClicked(11))
 		{
 			rightServoValue += 10;
 		}
