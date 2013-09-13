@@ -4,6 +4,7 @@
 #include "../ComponentData/ShooterData.h"
 #include "AutoActions.h"
 #include "../Config/RobotConfig.h"
+#include "../Config/DriverStationConfig.h"
 #include "../Utils/AsyncPrinter.h"
 #include "../Utils/Util.h"
 #include <algorithm>
@@ -59,13 +60,14 @@ void AutonomousRoutines::Update()
 	{
 		if (RobotData::GetLastState() != RobotData::GetCurrentState())
 		{
-			AsyncPrinter::Printf("Starting autonomous\n");
+			int autonRoutine = (int)(DriverStation::GetInstance()->GetDigitalIn(DriverStationConfig::AnalogIns::AUTONOMOUS_SELECT)+ 0.5) + 1;
+			AsyncPrinter::Printf("Starting autonomous routine %d\n", autonRoutine);
 			m_autonomousStartTime = Timer::GetFPGATimestamp();
 
 			while (!routines.empty())
 				routines.pop();
-
-			LoadRoutine(RobotConfig::ROUTINE_FILE_PATH);
+			
+			LoadRoutine(RobotConfig::ROUTINE_FILE_PATH + Util::lexical_cast(autonRoutine));
 
 			beginNext = true;
 			

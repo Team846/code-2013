@@ -212,7 +212,7 @@ public:
 		else
 			return -result;
 	}
-	
+
 	template<typename T>
 	static inline T lexical_cast(string value)
 	{
@@ -220,6 +220,12 @@ public:
 	    stringstream sstream(value);
 	    sstream >> std::boolalpha >> temp;
 	    return temp;
+	}
+	
+	template<typename T>
+	static inline string lexical_cast(T value)
+	{
+		return std::string(static_cast<ostringstream*>(&(ostringstream() << value))->str());
 	}
 	
 	/*!
