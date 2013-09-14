@@ -16,8 +16,10 @@ ShooterData::ShooterData()
 	shooter_setting = OFF;
 	extendLauncher = true;
 	
+	speedOffset = 1.0;
+	
 	m_enabled = true;
-} 
+}
 
 void ShooterData::SetDesiredSpeed(double desiredSpeed, Roller roller)
 {

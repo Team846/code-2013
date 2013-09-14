@@ -401,6 +401,21 @@ void TeleopInputs::Update()
 				m_componentData->shooterData->SetEnabled(true);
 			}
 		}
+		
+		if (m_operator_stick->IsButtonClicked(
+			DriverStationConfig::JoystickButtons::CHANGE_ANGLE))
+		{
+				if (m_componentData->shooterData->ShouldLauncherBeHigh())
+						m_componentData->shooterData->SetLauncherAngleLow();
+				else
+						m_componentData->shooterData->SetLauncherAngleHigh();
+		}
+		
+		if (m_operator_stick->IsButtonClicked(
+			DriverStationConfig::JoystickButtons::SHOOTER_OFF))
+		{
+			m_componentData->shooterData->SetEnabled(false);
+		}
 
 		//		if (fabs(m_driver_stick->GetRawAxis(4)) < 0.1)
 		//		{
@@ -452,11 +467,8 @@ void TeleopInputs::Update()
 			m_componentData->collectorData->SlideUp();
 			m_componentData->collectorData->StopRollers();
 		}
-
 		if (m_operator_stick->IsButtonDown(
-				DriverStationConfig::JoystickButtons::PURGE)
-				&& !m_operator_stick->IsButtonDown(
-						DriverStationConfig::JoystickButtons::SHOOTER_OFF))
+				DriverStationConfig::JoystickButtons::PURGE))
 		{
 			m_componentData->collectorData->RunRollersBackwards();
 		}
@@ -533,18 +545,6 @@ void TeleopInputs::Update()
 	if (m_driver_stick->IsButtonClicked(
 			DriverStationConfig::JoystickButtons::APPLY_CONFIG))
 		m_componentData->configLoaderData->RequestApply();
-
-	/* climber failure stuff needs to be at end of files */
-	if (m_operator_stick->IsButtonDown(
-			DriverStationConfig::JoystickButtons::SHOOTER_OFF))
-	{
-		//		if (m_operator_stick->IsButtonDown(
-		//				DriverStationConfig::JoystickButtons::COLLECTOR_DOWN_OPERATOR))
-		//		{
-		//			m_componentData->collectorData->StopRollers();
-		//			m_componentData->collectorData->shouldStupidMoveDown = true;
-		//		}
-	}
 
 	/************************Routine Recorder************************/
 	//	if (m_operator_stick->IsButtonDown(

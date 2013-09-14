@@ -60,7 +60,7 @@ void AutonomousRoutines::Update()
 	{
 		if (RobotData::GetLastState() != RobotData::GetCurrentState())
 		{
-			int autonRoutine = (int)(DriverStation::GetInstance()->GetDigitalIn(DriverStationConfig::AnalogIns::AUTONOMOUS_SELECT)+ 0.5) + 1;
+			int autonRoutine = (int)(DriverStation::GetInstance()->GetAnalogIn(DriverStationConfig::AnalogIns::AUTONOMOUS_SELECT) + 0.5) + 1;
 			AsyncPrinter::Printf("Starting autonomous routine %d\n", autonRoutine);
 			m_autonomousStartTime = Timer::GetFPGATimestamp();
 

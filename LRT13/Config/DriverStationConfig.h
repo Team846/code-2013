@@ -22,8 +22,8 @@ const uint32_t DRIVER_WHEEL_PORT = 3;
 namespace JoystickButtons
 {
 //Driver stick
-const uint32_t FIRE = 1;
-const uint32_t COLLECTOR_SLIDE = 2;
+const uint32_t COLLECTOR_SLIDE = 1;
+const uint32_t FIRE = 2;
 const uint32_t MANUAL_FIRE = 3;
 const uint32_t START_CLIMB = 4;
 

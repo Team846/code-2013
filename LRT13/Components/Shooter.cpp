@@ -49,7 +49,7 @@ Shooter::Shooter() :
 	m_encs[INNER]->Start();
 	m_encs[INNER]->SetMaxPeriod(60 / 100.0); // Period of 100 RPM; minimum speed we can read -RC 4/12/13
 	m_angler = new Pneumatics(RobotConfig::Solenoid::SHOOTER_ANGLER_A, RobotConfig::Solenoid::SHOOTER_ANGLER_B, "ShooterAngler");
-	m_pusher = new Pneumatics(RobotConfig::Solenoid::STORAGE_EXIT_A, RobotConfig::Solenoid::STORAGE_EXIT_B, "StorageExit");
+	m_pusher = new Pneumatics(RobotConfig::Solenoid::STORAGE_EXIT_A, RobotConfig::Solenoid::STORAGE_EXIT_B, 2, "StorageExit");
 	
 	atSpeedCounter[OUTER] = 0;
 	atSpeedCounter[INNER] = 0;
@@ -64,6 +64,10 @@ Shooter::Shooter() :
 	acceptableSpeedErrorNormalized[INNER] = 0;
 	m_speedsRPM[OUTER] = 0;
 	m_speedsRPM[INNER] = 0;
+	m_speed_setpoints[OUTER][LOW] = 0;
+	m_speed_setpoints[OUTER][HIGH] = 0;
+	m_speed_setpoints[INNER][LOW] = 0;
+	m_speed_setpoints[INNER][HIGH] = 0;
 	m_periods[OUTER] = 0;
 	m_errorIntegrals[INNER] = 0;
 	m_errorIntegrals[OUTER] = 0;
@@ -573,18 +577,18 @@ void Shooter::ManageShooterWheel(int roller)
 
 	double out = openLoopInput - normalizedError * p_gain
 			- m_errorIntegrals[roller] * i_gain;
-	if (out != 0 && currentSpeedRPM == 0.0)
+	if ((int)out != 0 && currentSpeedRPM == 0.0)
 	{
 		m_timeoutCounter++;
-		if(m_timeoutCounter >= 100 )
+		if(m_timeoutCounter >= 100)
 		{
+			AsyncPrinter::Printf("[ERROR] Shooter Stalling!");
 			out = 0;
-			AsyncPrinter::Printf("[ERROR] Shooter Stalling!!!!!!!111\n");
 		}
 	}
 	else
 	{
-		m_timeoutCounter = 0;
+		m_timeoutCounter = 0; //swagphael
 	}
 	
 //	AsyncPrinter::Printf("roller %d Integral: %f\n", roller, m_errorIntegrals[roller]);
