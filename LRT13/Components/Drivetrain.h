@@ -45,6 +45,9 @@ private:
 	double m_scale;
 
 	NetworkTable *table;
+	ofstream m_log_file;
+	
+	double lastSpeed[4];
 	
 	void ConfigurePIDObject(PID *pid, std::string objName, bool feedForward);
 	double ComputeOutput(data::drivetrain::ForwardOrTurn axis);

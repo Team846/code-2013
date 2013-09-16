@@ -178,7 +178,7 @@ void LRTRobot13::Tick()
 	}
 
 	// Update pneumatics
-	if (DriverStation::GetInstance()->GetDigitalIn(DriverStationConfig::DigitalIns::PNEUMATICS))
+	if (DriverStation::GetInstance()->GetDigitalIn(DriverStationConfig::DigitalIns::COMPRESSOR))
 	{
 		Pneumatics::SetCompressor(true);
 	}

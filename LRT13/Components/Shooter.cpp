@@ -577,7 +577,7 @@ void Shooter::ManageShooterWheel(int roller)
 
 	double out = openLoopInput - normalizedError * p_gain
 			- m_errorIntegrals[roller] * i_gain;
-	if ((int)out != 0 && currentSpeedRPM == 0.0)
+	if (fabs(out) < 0.01 && currentSpeedRPM == 0.0)
 	{
 		m_timeoutCounter++;
 		if(m_timeoutCounter >= 100)
