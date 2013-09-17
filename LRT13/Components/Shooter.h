@@ -60,7 +60,7 @@ private:
 	
 	AsyncCANJaguar* m_jaguars[2];
 	Counter* m_encs[2];
-	LRTTalon* m_talon;
+	LRTTalon* m_talons[2];
 
 	Pneumatics* m_angler;
 	Pneumatics* m_pusher;

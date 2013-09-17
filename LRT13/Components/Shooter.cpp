@@ -30,16 +30,17 @@ Shooter::Shooter() :
 #ifndef TALON
 	m_jaguars[OUTER] = new AsyncCANJaguar(RobotConfig::CAN::SHOOTER_B,
 			"ShooterFront");
-#else
-	m_talon = new LRTTalon(8, "ShooterFront", 9);
-#endif
 	m_jaguars[INNER] = new AsyncCANJaguar(RobotConfig::CAN::SHOOTER_A,
 			"ShooterBack");
+#else
+	m_talons[OUTER] = new LRTTalon(8, "ShooterFront", 9);
+	m_talons[INNER] = new LRTTalon(7, "ShooterBack", 10);
+#endif
 
 #ifndef TALON
 	m_jaguars[OUTER]->setCollectionFlags(AsyncCANJaguar::OUTCURR);
-#endif
 	m_jaguars[INNER]->setCollectionFlags(AsyncCANJaguar::OUTCURR);
+#endif
 
 	m_outerSensor = new DigitalInput((UINT32) RobotConfig::Digital::HALL_EFFECT_B);
 	m_encs[OUTER] = new Counter(m_outerSensor);
@@ -105,8 +106,8 @@ Shooter::~Shooter()
 {
 #ifndef TALON
 	DELETE(m_jaguars[OUTER]);
-#endif
 	DELETE(m_jaguars[INNER]);
+#endif
 }
 
 void Shooter::onEnable()
@@ -128,8 +129,8 @@ void Shooter::onDisable()
 	m_ticks = 0;
 #ifndef TALON
 	m_jaguars[OUTER]->SetDutyCycle(0.0F);
-#endif
 	m_jaguars[INNER]->SetDutyCycle(0.0F);
+#endif
 }
 
 //inner_speedSetpoint=4400
@@ -486,10 +487,10 @@ void Shooter::enabledPeriodic()
 				m_speedsRPM[INNER] / m_max_speed[INNER]);
 #ifndef TALON
 		SmarterDashboard::Instance()->EnqueueShooterMessage(MessageType::FRONT_SHOOTER_DATA_CURRENT, timenow, m_jaguars[OUTER]->GetOutputCurrent());
-#endif
 		SmarterDashboard::Instance()->EnqueueShooterMessage(
 				MessageType::BACK_SHOOTER_DATA_CURRENT, timenow,
 				m_jaguars[INNER]->GetOutputCurrent());
+#endif
 
 		m_ticks++;
 		m_outer_file << (double) (m_ticks / 50.0) << "," << m_speedsRPM[OUTER]
@@ -588,7 +589,7 @@ void Shooter::ManageShooterWheel(int roller)
 	}
 	else
 	{
-		m_timeoutCounter = 0; //swagphael
+		m_timeoutCounter = 0;
 	}
 	
 //	AsyncPrinter::Printf("roller %d Integral: %f\n", roller, m_errorIntegrals[roller]);
@@ -628,20 +629,10 @@ void Shooter::ManageShooterWheel(int roller)
 	else
 	m_jaguars[roller]->ConfigNeutralMode(CANJaguar::kNeutralMode_Coast);
 #else
-	if (roller == OUTER)
-	{
-		if (normalizedError > 0.1)
-			m_talon->SetNeutralMode(LRTTalon::kNeutralMode_Brake);
-		else
-			m_talon->SetNeutralMode(LRTTalon::kNeutralMode_Coast);
-	}
+	if (normalizedError > 0.1)
+		m_talons[roller]->SetNeutralMode(LRTTalon::kNeutralMode_Brake);
 	else
-	{
-		if (normalizedError > 0.1)
-			m_jaguars[roller]->ConfigNeutralMode(CANJaguar::kNeutralMode_Brake);
-		else
-			m_jaguars[roller]->ConfigNeutralMode(CANJaguar::kNeutralMode_Coast);
-	}
+		m_talons[roller]->SetNeutralMode(LRTTalon::kNeutralMode_Coast);
 #endif
 
 #ifdef OPEN_LOOP
@@ -652,7 +643,7 @@ void Shooter::ManageShooterWheel(int roller)
 #else
 		if (roller == OUTER)
 		{
-			m_talon->Set(m_speed_setpoints[roller][HIGH] / m_max_speed[roller]);
+			m_talons[OUTER]->Set(m_speed_setpoints[roller][HIGH] / m_max_speed[roller]);
 		}
 		else
 		m_jaguars[roller]->SetDutyCycle(m_speed_setpoints[roller][HIGH] / m_max_speed[roller]);
@@ -664,7 +655,7 @@ void Shooter::ManageShooterWheel(int roller)
 		m_jaguars[roller]->SetDutyCycle(m_speed_setpoints[roller][LOW] / m_max_speed[roller]);
 #else
 		if (roller == OUTER)
-		m_talon->Set(m_speed_setpoints[roller][LOW] / m_max_speed[roller]);
+		m_talons[OUTER]->Set(m_speed_setpoints[roller][LOW] / m_max_speed[roller]);
 		else
 		m_jaguars[roller]->SetDutyCycle(m_speed_setpoints[roller][LOW] / m_max_speed[roller]);
 #endif
@@ -681,17 +672,12 @@ void Shooter::ManageShooterWheel(int roller)
 #ifndef TALON
 	m_jaguars[roller]->SetDutyCycle(out);
 #else
-	if (roller == OUTER)
-		m_talon->Set(out);
-	else
-		m_jaguars[roller]->SetDutyCycle(out);
+	m_talons[roller]->Set((float)out);
 #endif
 #endif
 #ifndef TALON
 	m_jaguars[roller]->SetVoltageRampRate(0.0);
 #else
-	if (roller == INNER)
-		m_jaguars[roller]->SetVoltageRampRate(0.0);
 #endif
 	//	static int e = 0;
 	//	if (++e % 5 == 0)
@@ -720,7 +706,6 @@ void Shooter::ManageShooterWheel(int roller)
 
 	m_periods[roller] = measuredPeriod;
 	m_speedsRPM[roller] = currentSpeedRPM;
-
 }
 
 /*
@@ -854,10 +839,11 @@ void Shooter::fubarDoDisabledPeriodic()
 	
 #ifndef TALON
 	m_jaguars[OUTER]->SetDutyCycle(0.0F);
-#else
-	m_talon->Set(0.0F);
-#endif
 	m_jaguars[INNER]->SetDutyCycle(0.0F);
+#else
+	m_talons[OUTER]->Set(0.0F);
+	m_talons[INNER]->Set(0.0F);
+#endif
 	//	AsyncPrinter::Printf("Flashlight: %d\n", m_flashlight->Get());
 }
 

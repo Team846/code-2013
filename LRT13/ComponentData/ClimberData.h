@@ -123,6 +123,8 @@ typedef enum humanState
 		state getCurrentState();
 		void setWaitingState(state newState);
 		state getWaitingState();
+		void setShouldHooksDown(bool hooksDown);
+		bool shouldHooksDown();
 	private:
 		humanState m_desiredClimbingStep;
 		bool m_shouldContinueClimbing, m_shouldForceContinueClimbing;
@@ -138,6 +140,10 @@ typedef enum humanState
 		bool m_shoulddebug;
 		
 		bool m_shouldChangeArm;
+		
+		//MCCC
+		bool m_shouldHooksDown;
+		//End MCCC
 		
 		double m_winchPawlCurrent;
 		

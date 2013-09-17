@@ -43,12 +43,6 @@ void AutonomousRoutines::TeleopTick()
 	case AutoActions::AUTO_AIM_BACKBOARD:
 		ServiceAutoAimBackBoard();
 		break;
-	case AutoActions::AUTO_AIM_PYRAMID:
-		ServiceAutoAimPyramid();
-		break;
-	case AutoActions::FEEDER_STATION_APPROACH:
-		ServiceFeederStationApproach();
-		break;
 	case AutoActions::NO_ADV_AUTOMATION:
 		break;
 	}
@@ -347,12 +341,3 @@ void AutonomousRoutines::ServiceAutoAimBackBoard()
 	}
 }
 
-void AutonomousRoutines::ServiceAutoAimPyramid()
-{
-	//TODO writeme
-}
-
-void AutonomousRoutines::ServiceFeederStationApproach()
-{
-	//TODO writeme
-}

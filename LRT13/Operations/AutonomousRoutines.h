@@ -20,7 +20,7 @@ class AutoActions;
 
 /*!
  * @brief Performs autonomous routine and contains autonomous functions. It has two parts, the Tick function which is meant to run every cycle to operate semi-automated processes
- * @author Raphael Chang, Tony Peng, Brian Axelrod, Manoj Vasishta
+ * @author Raphael Chang, Tony Penguin, Brian Axelrod, Manoj Vasishta, MCC
  */
 class AutonomousRoutines
 {
@@ -36,8 +36,6 @@ private:
     void LoadRoutine(std::string path);
     
 	void ServiceAutoAimBackBoard();
-	void ServiceAutoAimPyramid();
-	void ServiceFeederStationApproach();
 		
 	double m_autonomousStartTime;
 	

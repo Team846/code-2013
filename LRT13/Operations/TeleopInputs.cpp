@@ -38,6 +38,7 @@ TeleopInputs::TeleopInputs(char * taskName, INT32 priority)
 	lastPressed = false;
 	continuous = false;
 	doubleTimeout = 0;
+	holdTicks = 0;
 }
 
 TeleopInputs::~TeleopInputs()
@@ -356,9 +357,20 @@ void TeleopInputs::Update()
 		}
 		else
 		{
-			m_componentData->climberData->setShouldContinueClimbing(
+			m_componentData->climberData->setShouldHooksDown(
 					m_driver_stick->IsButtonClicked(
 							DriverStationConfig::JoystickButtons::START_CLIMB));
+			//MCCC
+			if (m_driver_stick->IsButtonDown(DriverStationConfig::JoystickButtons::START_CLIMB)) {
+				holdTicks++;
+			} else {
+				holdTicks = 0;
+			}
+			if (holdTicks >= 50) {
+				m_componentData->climberData->setShouldContinueClimbing(true);
+				m_componentData->climberData->setShouldHooksDown(false);
+			}
+			//end MCCC
 		}
 
 		/************************Shooter************************/

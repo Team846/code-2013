@@ -17,6 +17,8 @@ ClimberData::ClimberData()
 	m_shouldPotentiallyAbort = false;
 	
 	m_shouldChangeArm = false;
+	
+	m_shouldHooksDown = false;
 
 	m_winchPawlCurrent = 0.0;
 	
@@ -199,3 +201,14 @@ state ClimberData::getWaitingState()
 {
 	return m_waitingState;
 }
+
+void ClimberData::setShouldHooksDown(bool hooksDown)
+{
+	m_shouldHooksDown = hooksDown;
+}
+
+bool ClimberData::shouldHooksDown()
+{
+	return m_shouldHooksDown;
+}
+
