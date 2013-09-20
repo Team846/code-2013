@@ -6,6 +6,8 @@
 #include "../SpeedController/ESC.h"
 #include "../Config/DriverStationConfig.h"
 
+#define MOTION_PROFILE
+
 using namespace data;
 using namespace drivetrain;
 
@@ -24,6 +26,9 @@ Drivetrain::Drivetrain() :
 	lastSpeed[LEFT] = 0.0;
 	lastSpeed[RIGHT] = 0.0;
 
+	m_profile = new TrapezoidProfile(1.0, .5);
+	m_profiled[FORWARD] = new ProfiledPID(m_profile);
+	m_profiled[TURN] = new ProfiledPID(m_profile);
 	m_scale = 1.0;
 	table = NetworkTable::GetTable("RobotData");
 }
@@ -35,10 +40,12 @@ Drivetrain::~Drivetrain()
 
 double Drivetrain::ComputeOutput(data::drivetrain::ForwardOrTurn axis)
 {
+#ifndef MOTION_PROFILE
 	double positionSetpoint =
 			m_componentData->drivetrainData->getRelativePositionSetpoint(axis); // this will tell you how much further to go. i.e. if you have to go 5 units further forward it will return 5
-
-	//	AsyncPrinter::Printf("relative position setpoin: %lf\n", positionSetpoint);
+#else
+	double positionSetpoint = m_componentData->drivetrainData->getAbsolutePositionSetpoint(axis);
+#endif
 
 	double velocitySetpoint =
 			m_componentData->drivetrainData->getVelocitySetpoint(axis);
@@ -47,6 +54,7 @@ double Drivetrain::ComputeOutput(data::drivetrain::ForwardOrTurn axis)
 	switch (m_componentData->drivetrainData->getControlMode(axis))
 	{
 	case data::drivetrain::POSITION_CONTROL:
+#ifndef MOTION_PROFILE
 		m_PIDs[POSITION][axis].setInput(0.0);//we're always at our current position! :D -BA
 		m_PIDs[POSITION][axis].setSetpoint(positionSetpoint);
 		velocitySetpoint = m_PIDs[POSITION][axis].update(
@@ -58,6 +66,19 @@ double Drivetrain::ComputeOutput(data::drivetrain::ForwardOrTurn axis)
 					= Util::Sign(velocitySetpoint)
 							* m_componentData->drivetrainData->getPositionControlMaxSpeed(
 									axis);
+#else
+		m_profiled[axis]->setInput(m_componentData->drivetrainData->getCurrentPos(axis));
+		m_profiled[axis]->setSetpoint(positionSetpoint);
+		velocitySetpoint = m_profiled[axis]->update(
+				1.0 / RobotConfig::LOOP_RATE);
+		if (fabs(velocitySetpoint)
+				> m_componentData->drivetrainData->getPositionControlMaxSpeed(
+						axis))
+			velocitySetpoint
+					= Util::Sign(velocitySetpoint)
+							* m_componentData->drivetrainData->getPositionControlMaxSpeed(
+									axis);
+#endif
 		//fall through the switch
 	case data::drivetrain::VELOCITY_CONTROL:
 		//1.0e-2

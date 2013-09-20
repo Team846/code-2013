@@ -38,8 +38,7 @@ public:
 	 * @param i_decay integral decay (defaults to 0.5)
 	 * @param feedforward whether or not feedforward is used
 	 */
-	void
-			setParameters(double p_gain, double i_gain, double d_gain,
+	void setParameters(double p_gain, double i_gain, double d_gain,
 					double ff_gain = 1.0, double i_decay = 0.87,
 					bool feedforward = true);
 
@@ -48,7 +47,7 @@ public:
 	 * @param dt time differential
 	 * @return pid output
 	 */
-	double update(double dt);
+	virtual double update(double dt);
 
 	/*!
 	 * @brief sets the feedback input
@@ -60,7 +59,7 @@ public:
 	 * @brief sets the setpoint
 	 * @param setpoint
 	 */
-	void setSetpoint(double setpoint);
+	virtual void setSetpoint(double setpoint);
 
 	/*!
 	 * @brief gets the PID output
@@ -159,7 +158,6 @@ public:
 	 */
 	void setIIRDecay(double decay);
 	
-
 private:
 	double m_proportional_gain;
 	double m_integral_gain;

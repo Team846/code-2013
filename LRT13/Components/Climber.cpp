@@ -128,8 +128,6 @@ void Climber::enabledPeriodic()
 		}
 		else if (m_componentData->climberData->shouldPTOChangeEngage())
 		{
-			
-			
 			engagePTO(true);
 		}
 		

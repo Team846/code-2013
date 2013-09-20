@@ -18,9 +18,7 @@ public:
 	enum actions
 	{
 		AUTO_AIM_BACKBOARD = 1,
-		AUTO_AIM_PYRAMID = 2,
-		FEEDER_STATION_APPROACH = 3,
-		NO_ADV_AUTOMATION = 4
+		NO_ADV_AUTOMATION = 2
 	};
 	
 	enum routines
@@ -36,8 +34,6 @@ public:
 	~AutoActions();
 	
 	void EnableAutoAimBackboard();
-	void EnableAutoAimPyramid();
-	void EnableFeederStationTrack();
 	void Reset();
 	
 	actions GetCurrentAutonomousAction();

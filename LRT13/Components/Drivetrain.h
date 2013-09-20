@@ -6,6 +6,8 @@
 #include "../Log/Loggable.h"
 #include "Component.h"
 #include "../Utils/PID.h"
+#include "../Utils/ProfiledPID.h"
+#include "../Utils/TrapezoidProfile.h"
 #include "../ComponentData/DrivetrainData.h"
 
 using namespace data;
@@ -36,6 +38,8 @@ private:
 	const static int POSITION = 0;
 	const static int VELOCITY = 1;
 	PID m_PIDs[2][2];
+	TrapezoidProfile *m_profile;
+	ProfiledPID* m_profiled[2];
 	
 	DriveEncoders* m_driveEncoders;
 	ESC *m_escs[4];

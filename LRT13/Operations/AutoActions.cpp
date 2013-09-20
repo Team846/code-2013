@@ -32,16 +32,6 @@ void AutoActions::EnableAutoAimBackboard()
 	m_currentAction = AUTO_AIM_BACKBOARD;
 }
 
-void AutoActions::EnableAutoAimPyramid()
-{
-	m_currentAction = AUTO_AIM_PYRAMID;
-}
-
-void AutoActions::EnableFeederStationTrack()
-{
-	m_currentAction = FEEDER_STATION_APPROACH;
-}
-
 void AutoActions::Reset()
 {
 	m_counter = 0;

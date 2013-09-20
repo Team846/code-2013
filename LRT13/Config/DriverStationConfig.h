@@ -53,6 +53,7 @@ const uint32_t PURGE = 10;
 const uint32_t CLIMBER_ARMS = 11;
 
 const uint32_t STOP_ROBOT = 5;
+const uint32_t REVERSE_DRIVE = 6;
 }
 namespace DigitalIns
 {

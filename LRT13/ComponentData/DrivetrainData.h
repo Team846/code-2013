@@ -57,7 +57,10 @@ namespace drivetrain
 		double getOpenLoopOutput(ForwardOrTurn axis);
 		double getVelocitySetpoint(ForwardOrTurn axis);
 		double getRelativePositionSetpoint(ForwardOrTurn axis);
+		double getAbsolutePositionSetpoint(ForwardOrTurn axis);
 		double getPositionControlMaxSpeed(ForwardOrTurn axis);
+		bool isPositionSetpointChanged(ForwardOrTurn axis);
+		void setPositionSetpointChanged(ForwardOrTurn axis, bool changed);
 		
 		float getCurrentHeading();
 		
@@ -77,6 +80,7 @@ namespace drivetrain
 		double m_positionSetpoints[2];
 		double m_maxSpeeds[2];
 		float m_zeroHeading;
+		bool m_positionSetpointChanged[2];
 		
 		typedef struct drivetrainOpSem
 		{

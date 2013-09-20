@@ -52,13 +52,12 @@ private:
 	
 	double stoppedForward;
 	double stoppedTurn;
+	int driveSign;
 	
 	bool lastPressed;
 	bool continuous;
 	int doubleTimeout;
-	//Master Coder Crew Code (MCCC)
 	int holdTicks;
-	//end MCCC
 };
 
 #endif

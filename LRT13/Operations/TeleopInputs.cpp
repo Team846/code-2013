@@ -39,6 +39,7 @@ TeleopInputs::TeleopInputs(char * taskName, INT32 priority)
 	continuous = false;
 	doubleTimeout = 0;
 	holdTicks = 0;
+	driveSign = -1;
 }
 
 TeleopInputs::~TeleopInputs()
@@ -134,7 +135,7 @@ void TeleopInputs::Update()
 				//turn = -m_driver_stick->GetAxis(Joystick::kZAxis);
 
 				double forward = pow(
-						-m_driver_stick->GetAxis(Joystick::kYAxis),
+						driveSign * m_driver_stick->GetAxis(Joystick::kYAxis),
 						RobotConfig::Drive::THROTTLE_EXPONENT);
 
 				int signForward = forward > 0 ? 1 : -1;
@@ -193,6 +194,11 @@ void TeleopInputs::Update()
 				}
 				else
 					lastStop = false;
+				if (m_driver_wheel->IsButtonClicked(
+					DriverStationConfig::JoystickButtons::REVERSE_DRIVE))
+				{
+					driveSign = -driveSign;
+				}
 #endif
 
 				//				AsyncPrinter::Printf("turnComposite: %lf forward: %lf\n", turnComposite, forward);
@@ -360,7 +366,6 @@ void TeleopInputs::Update()
 			m_componentData->climberData->setShouldHooksDown(
 					m_driver_stick->IsButtonClicked(
 							DriverStationConfig::JoystickButtons::START_CLIMB));
-			//MCCC
 			if (m_driver_stick->IsButtonDown(DriverStationConfig::JoystickButtons::START_CLIMB)) {
 				holdTicks++;
 			} else {
@@ -370,7 +375,6 @@ void TeleopInputs::Update()
 				m_componentData->climberData->setShouldContinueClimbing(true);
 				m_componentData->climberData->setShouldHooksDown(false);
 			}
-			//end MCCC
 		}
 
 		/************************Shooter************************/
