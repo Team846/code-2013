@@ -26,9 +26,10 @@ Drivetrain::Drivetrain() :
 	lastSpeed[LEFT] = 0.0;
 	lastSpeed[RIGHT] = 0.0;
 
-	m_profile = new TrapezoidProfile(1.0, .5);
-	m_profiled[FORWARD] = new ProfiledPID(m_profile);
-	m_profiled[TURN] = new ProfiledPID(m_profile);
+	m_profiles[FORWARD] = new TrapezoidProfile(1.0, 1.0);
+	m_profiles[TURN] = new TrapezoidProfile(1.0, 1.0);
+	m_profiled[FORWARD] = new ProfiledPID(m_profiles[FORWARD]);
+	m_profiled[TURN] = new ProfiledPID(m_profiles[TURN]);
 	m_scale = 1.0;
 	table = NetworkTable::GetTable("RobotData");
 }
@@ -68,7 +69,13 @@ double Drivetrain::ComputeOutput(data::drivetrain::ForwardOrTurn axis)
 									axis);
 #else
 		m_profiled[axis]->setInput(m_componentData->drivetrainData->getCurrentPos(axis));
-		m_profiled[axis]->setSetpoint(positionSetpoint);
+		if (m_componentData->drivetrainData->isPositionSetpointChanged(axis))
+		{
+			m_profiles[axis]->updateValues(m_componentData->drivetrainData->getPositionControlMaxSpeed(
+						axis) * (axis == FORWARD ? m_driveEncoders->getMaxSpeed() : m_driveEncoders->getMaxTurnRate()), m_timeToMax[axis]);
+			m_profiled[axis]->setSetpoint(positionSetpoint);
+			m_componentData->drivetrainData->setPositionSetpointChanged(axis, false);
+		}
 		velocitySetpoint = m_profiled[axis]->update(
 				1.0 / RobotConfig::LOOP_RATE);
 		if (fabs(velocitySetpoint)
@@ -182,6 +189,8 @@ void Drivetrain::Configure()
 	ConfigurePIDObject(&m_PIDs[POSITION][FORWARD], "position_fwd", false);
 
 	m_scale = m_config->Get<double> (Component::GetName(), "speed_scale", 1.0);
+	m_timeToMax[FORWARD] = m_config->Get<double> (Component::GetName(), "time_to_max_forward", 1.0);
+	m_timeToMax[TURN] = m_config->Get<double> (Component::GetName(), "time_to_max_turn", 1.0);
 }
 
 void Drivetrain::Log()

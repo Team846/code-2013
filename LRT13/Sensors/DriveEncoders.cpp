@@ -143,3 +143,14 @@ double DriveEncoders::getMaxEncoderRate()
 {
 	return MAX_ENCODER_RATE;
 }
+
+double DriveEncoders::getMaxSpeed()
+{
+	return MAX_ENCODER_RATE / PULSES_PER_REVOLUTION
+			* WHEEL_DIAMETER * PI;
+}
+
+double DriveEncoders::getMaxTurnRate()
+{
+	return MAX_TURNING_RATE / TICKS_PER_FULL_TURN * 360;
+}

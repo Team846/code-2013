@@ -59,7 +59,18 @@ public:
 	 * @return maxEncoderRate
 	 */
 	double getMaxEncoderRate();
-
+	
+	/*!
+	 * @brief Gets the fastest attainable encoder rate
+	 * @return maxEncoderRate
+	 */
+	double getMaxSpeed();
+	
+	/*!
+	 * @brief Gets the fastest attainable encoder rate
+	 * @return maxEncoderRate
+	 */
+	double getMaxTurnRate();
 
 	/*!
 	 * @brief Get non-normalized average forward speed

@@ -7,6 +7,7 @@
 #include "../ComponentData/AutoAimData.h"
 #include "../ComponentData/ConfigLoaderData.h"
 #include "Routines/Routine.h"
+#include "DebouncedJoystick.h"
 
 #include <queue>
 #include <fstream>
@@ -45,6 +46,8 @@ private:
 	
     queue<Routine*> routines;
     bool beginNext;
+    
+    DebouncedJoystick *m_joystick;
     
 //	typedef struct Cycle
 //	{

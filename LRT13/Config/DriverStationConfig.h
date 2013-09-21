@@ -36,6 +36,7 @@ const uint32_t APPLY_CONFIG = 5;
 const uint32_t LOAD_CONFIG = 6;
 const uint32_t SAVE_CONFIG = 7;
 const uint32_t RESET_ZERO = 10;
+const uint32_t PAUSE_AUTON = 11;
 
 //Operator stick
 const uint32_t SHOOTER_OFF = 1;

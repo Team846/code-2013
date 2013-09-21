@@ -38,8 +38,9 @@ private:
 	const static int POSITION = 0;
 	const static int VELOCITY = 1;
 	PID m_PIDs[2][2];
-	TrapezoidProfile *m_profile;
+	TrapezoidProfile *m_profiles[2];
 	ProfiledPID* m_profiled[2];
+	double m_timeToMax[2];
 	
 	DriveEncoders* m_driveEncoders;
 	ESC *m_escs[4];

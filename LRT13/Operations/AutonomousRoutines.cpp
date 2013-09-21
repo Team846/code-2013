@@ -28,6 +28,11 @@ AutonomousRoutines::AutonomousRoutines()
 
 	m_autonomousStartTime = 0.0;
 
+	m_joystick = new DebouncedJoystick(
+			DriverStationConfig::JoystickConfig::DRIVER_STICK_PORT,
+			DriverStationConfig::JoystickConfig::NUM_JOYSTICK_BUTTONS,
+			DriverStationConfig::JoystickConfig::NUM_JOYSTICK_AXES);
+	
 	beginNext = false;
 }
 
@@ -61,7 +66,7 @@ void AutonomousRoutines::Update()
 			while (!routines.empty())
 				routines.pop();
 			
-			LoadRoutine(RobotConfig::ROUTINE_FILE_PATH + Util::lexical_cast(autonRoutine));
+			LoadRoutine(RobotConfig::ROUTINE_FILE_PATH.substr(0, RobotConfig::ROUTINE_FILE_PATH.find('.')) + Util::lexical_cast(autonRoutine) + RobotConfig::ROUTINE_FILE_PATH.substr(RobotConfig::ROUTINE_FILE_PATH.find('.') + 1, RobotConfig::ROUTINE_FILE_PATH.length() - RobotConfig::ROUTINE_FILE_PATH.find('.') - 2));
 
 			beginNext = true;
 			
@@ -75,7 +80,7 @@ void AutonomousRoutines::Update()
 				routines.front()->Run();
 				beginNext = false;
 			}
-			if (routines.front()->Completed())
+			if (routines.front()->Completed() && !m_joystick->IsButtonDown(DriverStationConfig::JoystickButtons::PAUSE_AUTON))
 			{
 				routines.front()->Stop();
 				printf("Routine finished\n");

@@ -11,6 +11,8 @@ public:
 	virtual double update(double currentTime);
 	virtual void setSetpoint(double setpoint, double time);
 	void updateValues(double maxV, double timeToMaxV);
+	double getVelocity();
+	double getOutput();
 	
 private:
 	double m_maxV;
@@ -23,6 +25,7 @@ private:
 	double m_timeFromMax;
 	double m_timeTotal;
 	double m_lastTime;
+	double m_velocity;
 };
 
 #endif
