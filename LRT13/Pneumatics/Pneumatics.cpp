@@ -10,6 +10,7 @@ Pneumatics::Pneumatics(uint32_t forward, uint32_t reverse, const char *name) :
 	Configurable(),
 	m_configSection("Pneumatics")
 {
+	printf("Created DoubleSolenoid %s\n", name);
 	solenoid = new DoubleSolenoid(forward, reverse);
 	counter = 0;
 	pulsed = true;
@@ -24,6 +25,7 @@ Pneumatics::Pneumatics(uint32_t forward, uint32_t reverse, uint8_t module, const
 	Configurable(),
 	m_configSection("Pneumatics")
 {
+	printf("Created DoubleSolenoid %s\n", name);
 	solenoid = new DoubleSolenoid(module, forward, reverse);
 	counter = 0;
 	pulsed = true;
@@ -38,6 +40,7 @@ Pneumatics::Pneumatics(uint32_t forward, const char *name) :
 	Configurable(),
 	m_configSection("Pneumatics")
 {
+	printf("Created Solenoid %s\n", name);
 	solenoid = new Solenoid(forward);
 	counter = 0;
 	pulsed = false;
@@ -52,6 +55,7 @@ Pneumatics::Pneumatics(uint32_t forward, uint8_t module, const char *name) :
 	Configurable(),
 	m_configSection("Pneumatics")
 {
+	printf("Created Solenoid %s\n", name);
 	solenoid = new Solenoid(module, forward);
 	counter = 0;
 	pulsed = false;
@@ -154,17 +158,17 @@ INT32 Pneumatics::Tick()
 			else if (dynamic_cast<DoubleSolenoid*>(solenoid))
 				dynamic_cast<DoubleSolenoid*>(solenoid)->Set(DoubleSolenoid::kForward);
 		}
-		else if (state == REVERSE)
-		{
-			if (dynamic_cast<DoubleSolenoid*>(solenoid))
-				dynamic_cast<DoubleSolenoid*>(solenoid)->Set(DoubleSolenoid::kReverse);
-		}
 		else if (state == OFF)
 		{
 			if (dynamic_cast<Solenoid*>(solenoid))
 				dynamic_cast<Solenoid*>(solenoid)->Set(false);
 			else if (dynamic_cast<DoubleSolenoid*>(solenoid))
 				dynamic_cast<DoubleSolenoid*>(solenoid)->Set(DoubleSolenoid::kOff);
+		}
+		else if (state == REVERSE)
+		{
+			if (dynamic_cast<DoubleSolenoid*>(solenoid))
+				dynamic_cast<DoubleSolenoid*>(solenoid)->Set(DoubleSolenoid::kReverse);
 		}
 	}
 	

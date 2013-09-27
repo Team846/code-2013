@@ -6,7 +6,7 @@
 #include "../SpeedController/ESC.h"
 #include "../Config/DriverStationConfig.h"
 
-#define MOTION_PROFILE
+//#define MOTION_PROFILE
 
 using namespace data;
 using namespace drivetrain;
@@ -46,6 +46,7 @@ double Drivetrain::ComputeOutput(data::drivetrain::ForwardOrTurn axis)
 			m_componentData->drivetrainData->getRelativePositionSetpoint(axis); // this will tell you how much further to go. i.e. if you have to go 5 units further forward it will return 5
 #else
 	double positionSetpoint = m_componentData->drivetrainData->getAbsolutePositionSetpoint(axis);
+	AsyncPrinter::Printf("positionSetpoint: %f\n", positionSetpoint);
 #endif
 
 	double velocitySetpoint =
@@ -163,6 +164,8 @@ void Drivetrain::disabledPeriodic()
 {
 	m_escs[LEFT]->SetDutyCycle(0.0);
 	m_escs[RIGHT]->SetDutyCycle(0.0);
+	table->PutNumber("TurnTicks", m_driveEncoders->getTurnTicks());
+//	printf("TurnTIcks: %d\n", m_driveEncoders->getTurnTicks());
 }
 
 void Drivetrain::onDisable()

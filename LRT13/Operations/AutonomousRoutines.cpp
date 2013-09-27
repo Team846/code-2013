@@ -66,7 +66,7 @@ void AutonomousRoutines::Update()
 			while (!routines.empty())
 				routines.pop();
 			
-			LoadRoutine(RobotConfig::ROUTINE_FILE_PATH.substr(0, RobotConfig::ROUTINE_FILE_PATH.find('.')) + Util::lexical_cast(autonRoutine) + RobotConfig::ROUTINE_FILE_PATH.substr(RobotConfig::ROUTINE_FILE_PATH.find('.') + 1, RobotConfig::ROUTINE_FILE_PATH.length() - RobotConfig::ROUTINE_FILE_PATH.find('.') - 2));
+			LoadRoutine(RobotConfig::ROUTINE_FILE_PATH.substr(0, RobotConfig::ROUTINE_FILE_PATH.find('.')) + Util::lexical_cast(autonRoutine) + RobotConfig::ROUTINE_FILE_PATH.substr(RobotConfig::ROUTINE_FILE_PATH.find('.'), RobotConfig::ROUTINE_FILE_PATH.length() - RobotConfig::ROUTINE_FILE_PATH.find('.')));
 
 			beginNext = true;
 			
@@ -83,9 +83,7 @@ void AutonomousRoutines::Update()
 			if (routines.front()->Completed() && !m_joystick->IsButtonDown(DriverStationConfig::JoystickButtons::PAUSE_AUTON))
 			{
 				routines.front()->Stop();
-				printf("Routine finished\n");
 				delete routines.front();
-				printf("Routine deleted\n");
 				routines.pop();
 				beginNext = true;
 			}

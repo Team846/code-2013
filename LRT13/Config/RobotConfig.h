@@ -63,10 +63,11 @@ namespace Solenoid // Ports 1-8
 	const uint32_t COLLECTOR_B = 2;
 	const uint32_t CLIMBER_A = 3;
 	const uint32_t CLIMBER_B = 4;
-	const uint32_t HOOKS_A  = 5;
-	const uint32_t HOOKS_B = 6;
-	const uint32_t STORAGE_EXIT_A = 1; // Module 4
-	const uint32_t STORAGE_EXIT_B = 2; // Module 4
+	const uint32_t HOOKS = 5;
+//	const uint32_t HOOKS_A  = 5;
+//	const uint32_t HOOKS_B = 6;
+	const uint32_t STORAGE_EXIT_A = 1; // Module 2
+	const uint32_t STORAGE_EXIT_B = 2; // Module 2
 	const uint32_t SHOOTER_ANGLER_A = 7;
 	const uint32_t SHOOTER_ANGLER_B = 8;
 }

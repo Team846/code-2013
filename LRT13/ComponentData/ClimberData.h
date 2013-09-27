@@ -14,29 +14,11 @@ namespace climber
 typedef enum state
 	{
 		NOTHING = -1,
-		INACTIVE = 0,
-		BEGIN = 1,
-		ARM_UP = 2,
-		COLLECTOR_DOWN = 3,
-		LINE_UP = 4,
-		ARM_DOWN_PREPARE = 5,
-		ARM_DOWN = 6,
-		CLIMB_PREPARE = 7,
-		CLIMB = 8,
-		TURN_WINCH_PAWL_OFF = 9,
-		EXTEND_HOOKS = 10,
-		CLIMBED = 11,
-		WAIT = 12,
-		RESET_FOR_INACTIVE = 13,
-		RESET_FOR_BEGIN = 14,
-		RESET_FOR_LINE_UP = 15,
-		RESET_FOR_ARM_DOWN_PREPARE = 16,
-		RESET_FOR_ARM_DOWN = 17,
-		RESET_FOR_CLIMB_PREPARE = 18,
-		RESET_FOR_CLIMB = 19,
-		RESET_FOR_TURN_WINCH_PAWL_OFF = 20,
-		RESET_FOR_EXTEND_HOOKS = 21,
-		RESET_FOR_CLIMBED = 22,
+		BEGIN = 0,
+		LINE_UP = 1,
+		CLIMB_PREPARE = 2,
+		CLIMB = 3,
+		CLIMBED = 4,
 		DEBUG_MODE = 100,
 		
 //		IDLE = 1,
@@ -89,7 +71,7 @@ typedef enum humanState
 		void enableDebug();
 		void disableDebug();
 
-		bool changeArmState();
+		void changeArmState();
 		
 		bool shouldChangeAngleState();
 		void changeAngleState();
@@ -123,8 +105,8 @@ typedef enum humanState
 		state getCurrentState();
 		void setWaitingState(state newState);
 		state getWaitingState();
-		void setShouldHooksDown(bool hooksDown);
-		bool shouldHooksDown();
+		void setShouldHooksChange(bool hooksDown);
+		bool shouldHooksChange();
 	private:
 		humanState m_desiredClimbingStep;
 		bool m_shouldContinueClimbing, m_shouldForceContinueClimbing;
@@ -141,9 +123,7 @@ typedef enum humanState
 		
 		bool m_shouldChangeArm;
 		
-		//MCCC
-		bool m_shouldHooksDown;
-		//End MCCC
+		bool m_shouldHooksChange;
 		
 		double m_winchPawlCurrent;
 		

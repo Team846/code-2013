@@ -18,7 +18,7 @@ ClimberData::ClimberData()
 	
 	m_shouldChangeArm = false;
 	
-	m_shouldHooksDown = false;
+	m_shouldHooksChange = false;
 
 	m_winchPawlCurrent = 0.0;
 	
@@ -66,9 +66,9 @@ void ClimberData::setShouldForceContinueClimbing(bool shouldContinue)
 	m_shouldContinueClimbing = shouldContinue;
 }
 
-bool ClimberData::changeArmState()
+void ClimberData::changeArmState()
 {
-	m_shouldChangeArm = !m_shouldChangeArm;
+	m_shouldChangeArm = true;
 }
 
 void ClimberData::extendArm()
@@ -129,9 +129,9 @@ void ClimberData::setWinchPawlCurrent(double value)
 
 bool ClimberData::shouldPTOChangeDisengage()
 {
-	if (m_shouldPTOEngage)
+	if (m_shouldPTODisEngage)
 	{
-		m_shouldPTOEngage = false;
+		m_shouldPTODisEngage = false;
 		return true;
 	}
 	return false;
@@ -139,9 +139,9 @@ bool ClimberData::shouldPTOChangeDisengage()
 
 bool ClimberData::shouldPTOChangeEngage()
 {
-	if (m_shouldPTODisEngage)
+	if (m_shouldPTOEngage)
 	{
-		m_shouldPTODisEngage = false;
+		m_shouldPTOEngage = false;
 		return true;
 	}
 	return false;
@@ -202,13 +202,17 @@ state ClimberData::getWaitingState()
 	return m_waitingState;
 }
 
-void ClimberData::setShouldHooksDown(bool hooksDown)
+void ClimberData::setShouldHooksChange(bool hooksDown)
 {
-	m_shouldHooksDown = hooksDown;
+	m_shouldHooksChange = hooksDown;
 }
 
-bool ClimberData::shouldHooksDown()
+bool ClimberData::shouldHooksChange()
 {
-	return m_shouldHooksDown;
+	if (m_shouldHooksChange)
+	{
+		m_shouldHooksChange = false;
+		return true;
+	}
+	return false;
 }
-

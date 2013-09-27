@@ -45,13 +45,14 @@ const uint32_t CONDITIONAL_ABORT = 2;
 const uint32_t CONTINUE_CLIMB = 3;
 const uint32_t CHANGE_ANGLE = 4;
 const uint32_t COLLECTOR_DOWN_NO_MOTOR = 5;
-const uint32_t ENGAGE_PTO = 6;
-const uint32_t DISENGAGE_PTO = 7;
+const uint32_t COLLECT_OPERATOR = 6;
+const uint32_t CLIMBER_ARMS = 7;
 const uint32_t PAWL_UP = 8;
 const uint32_t PAWL_DOWN = 9;
 //const uint32_t RECORD = 9;
 const uint32_t PURGE = 10;
-const uint32_t CLIMBER_ARMS = 11;
+const uint32_t DISENGAGE_PTO = 11;
+const uint32_t ENGAGE_PTO = 12;
 
 const uint32_t STOP_ROBOT = 5;
 const uint32_t REVERSE_DRIVE = 6;

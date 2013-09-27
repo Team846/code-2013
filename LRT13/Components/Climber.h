@@ -79,8 +79,7 @@ private:
 	int m_disengageTimer_threshold;
 	GearTooth m_winch_gear_tooth;
 	int m_gear_tooth_ticks_position;
-	int m_gear_tooth_threshold;
-	int m_climbing_level;
+	int m_gear_tooth_threshold;			
 	data::climber::state m_previous_state;
 	bool m_paused;
 	double m_driveSpeed;

@@ -127,7 +127,7 @@ void TeleopInputs::Update()
 #else
 				double turn = 0.0;
 				turn = -m_driver_wheel->GetAxis(Joystick::kXAxis);
-				//			turn *= 2;
+//				turn *= 3.0 / 4;
 
 				int sign = turn > 0 ? 1 : -1;
 
@@ -294,29 +294,26 @@ void TeleopInputs::Update()
 		/************************Climber Functions************************/
 
 		// PTO
+		bool debug = false;
 		if (m_operator_stick->IsButtonClicked(
 				DriverStationConfig::JoystickButtons::ENGAGE_PTO))
 		{
-			m_componentData->climberData->enableDebug();
+			debug = true;
 			//			m_componentData->shooterData->SetEnabled(false);
 			m_componentData->climberData->EngagePTO();
 		}
 		else if (m_operator_stick->IsButtonClicked(
 				DriverStationConfig::JoystickButtons::DISENGAGE_PTO))
 		{
-			m_componentData->climberData->enableDebug();
+			debug = true;
 			//			m_componentData->shooterData->SetEnabled(false);
 			m_componentData->climberData->DisengagePTO();
-		}
-		else
-		{
-			m_componentData->climberData->disableDebug();
 		}
 		// Winch Pawl
 		if (m_operator_stick->IsButtonDown(
 				DriverStationConfig::JoystickButtons::PAWL_UP))
 		{
-			m_componentData->climberData->enableDebug();
+			debug = true;
 			//			m_componentData->shooterData->SetEnabled(false);
 			m_componentData->climberData->winchPawlUp();
 
@@ -324,21 +321,26 @@ void TeleopInputs::Update()
 		else if (m_operator_stick->IsButtonDown(
 				DriverStationConfig::JoystickButtons::PAWL_DOWN))
 		{
-			m_componentData->climberData->enableDebug();
+			debug = true;
 			//			m_componentData->shooterData->SetEnabled(false);
 			m_componentData->climberData->winchPawlDown();
 		}
 		else
 		{
 			m_componentData->climberData->winchPawlInactive();
-			m_componentData->climberData->disableDebug();
 		}
 		// Climber Arms
 		if (m_operator_stick->IsButtonClicked(
 				DriverStationConfig::JoystickButtons::CLIMBER_ARMS))
 		{
-			m_componentData->climberData->enableDebug();
+			debug = true;
 			m_componentData->climberData->changeArmState();
+		}
+		if (m_driver_stick->IsButtonClicked(
+						DriverStationConfig::JoystickButtons::START_CLIMB))
+		{
+			debug = true;
+			m_componentData->climberData->setShouldHooksChange(true);
 		}
 		if (m_componentData->climberData->getCurrentState() != NOTHING)
 		{
@@ -363,18 +365,24 @@ void TeleopInputs::Update()
 		}
 		else
 		{
-			m_componentData->climberData->setShouldHooksDown(
-					m_driver_stick->IsButtonClicked(
-							DriverStationConfig::JoystickButtons::START_CLIMB));
 			if (m_driver_stick->IsButtonDown(DriverStationConfig::JoystickButtons::START_CLIMB)) {
 				holdTicks++;
 			} else {
 				holdTicks = 0;
 			}
 			if (holdTicks >= 50) {
+				debug = false;
 				m_componentData->climberData->setShouldContinueClimbing(true);
-				m_componentData->climberData->setShouldHooksDown(false);
+				m_componentData->climberData->setShouldHooksChange(false);
 			}
+		}
+		if (debug)
+		{
+			m_componentData->climberData->enableDebug();
+		}
+		else
+		{
+			m_componentData->climberData->disableDebug();
 		}
 
 		/************************Shooter************************/
@@ -487,6 +495,11 @@ void TeleopInputs::Update()
 				DriverStationConfig::JoystickButtons::PURGE))
 		{
 			m_componentData->collectorData->RunRollersBackwards();
+		}
+		else if (m_operator_stick->IsButtonDown(
+				DriverStationConfig::JoystickButtons::COLLECT_OPERATOR))
+		{
+			m_componentData->collectorData->RunRollers();
 		}
 	}
 	else

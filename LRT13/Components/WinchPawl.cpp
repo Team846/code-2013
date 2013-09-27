@@ -10,7 +10,7 @@ WinchPawl::WinchPawl()
 	m_timedOut = false;
 	
 	m_jaguar.setCollectionFlags(AsyncCANJaguar::OUTCURR);
-	
+	m_jaguar.ConfigNeutralMode(AsyncCANJaguar::kNeutralMode_Brake);
 	m_lastRequestedDutyCycle = 0.0;
 	m_lastEnabled = false;
 	
