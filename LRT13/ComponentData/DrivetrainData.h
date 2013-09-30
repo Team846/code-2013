@@ -61,6 +61,7 @@ namespace drivetrain
 		double getPositionControlMaxSpeed(ForwardOrTurn axis);
 		bool isPositionSetpointChanged(ForwardOrTurn axis);
 		void setPositionSetpointChanged(ForwardOrTurn axis, bool changed);
+		double getPositionControlStartingPosition(ForwardOrTurn axis);
 		
 		float getCurrentHeading();
 		
@@ -79,6 +80,7 @@ namespace drivetrain
 		double m_desiredRates[2];
 		double m_positionSetpoints[2];
 		double m_maxSpeeds[2];
+		double m_positionStart[2];
 		float m_zeroHeading;
 		bool m_positionSetpointChanged[2];
 		

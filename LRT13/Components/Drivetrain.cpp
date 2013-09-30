@@ -6,7 +6,7 @@
 #include "../SpeedController/ESC.h"
 #include "../Config/DriverStationConfig.h"
 
-//#define MOTION_PROFILE
+#define MOTION_PROFILE
 
 using namespace data;
 using namespace drivetrain;
@@ -46,7 +46,6 @@ double Drivetrain::ComputeOutput(data::drivetrain::ForwardOrTurn axis)
 			m_componentData->drivetrainData->getRelativePositionSetpoint(axis); // this will tell you how much further to go. i.e. if you have to go 5 units further forward it will return 5
 #else
 	double positionSetpoint = m_componentData->drivetrainData->getAbsolutePositionSetpoint(axis);
-	AsyncPrinter::Printf("positionSetpoint: %f\n", positionSetpoint);
 #endif
 
 	double velocitySetpoint =
@@ -69,7 +68,7 @@ double Drivetrain::ComputeOutput(data::drivetrain::ForwardOrTurn axis)
 							* m_componentData->drivetrainData->getPositionControlMaxSpeed(
 									axis);
 #else
-		m_profiled[axis]->setInput(m_componentData->drivetrainData->getCurrentPos(axis));
+		m_profiled[axis]->setInput(m_componentData->drivetrainData->getCurrentPos(axis) - m_componentData->drivetrainData->getPositionControlStartingPosition(axis));
 		if (m_componentData->drivetrainData->isPositionSetpointChanged(axis))
 		{
 			m_profiles[axis]->updateValues(m_componentData->drivetrainData->getPositionControlMaxSpeed(

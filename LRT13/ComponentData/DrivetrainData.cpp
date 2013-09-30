@@ -14,6 +14,7 @@ DrivetrainData::DrivetrainData()
 	memset(m_positionSetpoints, 0, sizeof(m_positionSetpoints));
 	memset(m_maxSpeeds, 0, sizeof(m_maxSpeeds));
 	memset(m_positionSetpointChanged, 0, sizeof(m_positionSetpointChanged));
+	memset(m_positionStart, 0, sizeof(m_positionStart));
 }
 
 DrivetrainData::~DrivetrainData()
@@ -41,6 +42,7 @@ void DrivetrainData::setRelativePositionSetpoint(ForwardOrTurn axis,
 	m_positionSetpoints[axis] = setpoint + getCurrentPos(axis);
 	m_maxSpeeds[axis] = maxspeed;
 	m_positionSetpointChanged[axis] = true;
+	m_positionStart[axis] = getCurrentPos(axis);
 }
 
 
@@ -156,6 +158,11 @@ double DrivetrainData::getAbsolutePositionSetpoint(ForwardOrTurn axis)
 double DrivetrainData::getPositionControlMaxSpeed(ForwardOrTurn axis)
 {
 	return m_maxSpeeds[axis];
+}
+
+double DrivetrainData::getPositionControlStartingPosition(ForwardOrTurn axis)
+{
+	return m_positionStart[axis];
 }
 
 float DrivetrainData::getCurrentHeading()
