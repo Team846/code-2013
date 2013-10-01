@@ -97,7 +97,8 @@ typedef enum humanState
 		void extendArm();
 		void retractArm();
 		
-		bool shouldChangeArm();
+		bool shouldArmsUp();
+		bool shouldArmsChange();
 		
 		void setDesiredState(state target);
 		state getDesiredState();
@@ -121,6 +122,7 @@ typedef enum humanState
 		
 		bool m_shoulddebug;
 		
+		bool m_armState;
 		bool m_shouldChangeArm;
 		
 		bool m_shouldHooksChange;

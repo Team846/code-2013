@@ -127,7 +127,7 @@ void TeleopInputs::Update()
 #else
 				double turn = 0.0;
 				turn = -m_driver_wheel->GetAxis(Joystick::kXAxis);
-//				turn *= 3.0 / 4;
+				turn *= 3.0 / 4;
 
 				int sign = turn > 0 ? 1 : -1;
 

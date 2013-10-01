@@ -1,4 +1,5 @@
 #include "ProfiledPID.h"
+#include <cstdio>
 
 ProfiledPID::ProfiledPID(MotionProfile *profile, double p_gain, double i_gain, double d_gain, double ff_gain,
 		double i_decay, bool feedforward) :
@@ -21,6 +22,7 @@ ProfiledPID::~ProfiledPID()
 double ProfiledPID::update(double dt)
 {
 	PID::setSetpoint(m_profile->update(m_timer.Get()));
+	printf("Motion Profile Setpoint: %f\n", m_profile->update(m_timer.Get()));
 	return PID::update(dt);
 }
 

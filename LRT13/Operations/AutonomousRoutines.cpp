@@ -14,6 +14,7 @@
 #include "Routines/Collect.h"
 #include "Routines/Shoot.h"
 #include "Routines/Angle.h"
+#include "Routines/Arms.h"
 #include "Routines/Pause.h"
 #include "Routines/RoutineGroup.h"
 
@@ -254,6 +255,13 @@ void AutonomousRoutines::LoadRoutine(std::string path)
 			{
 				if (arglist.size() == 1)
 					current = new Angle(Util::lexical_cast<bool>(arglist[0]));
+				else
+					failed = true;
+			}
+			else if (command == "arms")
+			{
+				if (arglist.size() == 1)
+					current = new Arms(Util::lexical_cast<bool>(arglist[0]));
 				else
 					failed = true;
 			}

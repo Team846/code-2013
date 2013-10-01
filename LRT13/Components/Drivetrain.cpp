@@ -73,18 +73,18 @@ double Drivetrain::ComputeOutput(data::drivetrain::ForwardOrTurn axis)
 		{
 			m_profiles[axis]->updateValues(m_componentData->drivetrainData->getPositionControlMaxSpeed(
 						axis) * (axis == FORWARD ? m_driveEncoders->getMaxSpeed() : m_driveEncoders->getMaxTurnRate()), m_timeToMax[axis]);
-			m_profiled[axis]->setSetpoint(positionSetpoint);
+			m_profiled[axis]->setSetpoint(positionSetpoint - m_componentData->drivetrainData->getPositionControlStartingPosition(axis));
 			m_componentData->drivetrainData->setPositionSetpointChanged(axis, false);
 		}
 		velocitySetpoint = m_profiled[axis]->update(
 				1.0 / RobotConfig::LOOP_RATE);
-		if (fabs(velocitySetpoint)
-				> m_componentData->drivetrainData->getPositionControlMaxSpeed(
-						axis))
-			velocitySetpoint
-					= Util::Sign(velocitySetpoint)
-							* m_componentData->drivetrainData->getPositionControlMaxSpeed(
-									axis);
+//		if (fabs(velocitySetpoint)
+//				> m_componentData->drivetrainData->getPositionControlMaxSpeed(
+//						axis))
+//			velocitySetpoint
+//					= Util::Sign(velocitySetpoint)
+//							* m_componentData->drivetrainData->getPositionControlMaxSpeed(
+//									axis);
 #endif
 		//fall through the switch
 	case data::drivetrain::VELOCITY_CONTROL:
@@ -187,8 +187,13 @@ void Drivetrain::Configure()
 	ConfigurePIDObject(&m_PIDs[VELOCITY][TURN], "velocity_turn", true);
 	ConfigurePIDObject(&m_PIDs[VELOCITY][FORWARD], "velocity_fwd", true);
 
+#ifdef MOTION_PROFILE
+	ConfigurePIDObject((PID*)m_profiled[TURN], "position_turn", false);
+	ConfigurePIDObject((PID*)m_profiled[FORWARD], "position_fwd", false);
+#else
 	ConfigurePIDObject(&m_PIDs[POSITION][TURN], "position_turn", false);
 	ConfigurePIDObject(&m_PIDs[POSITION][FORWARD], "position_fwd", false);
+#endif
 
 	m_scale = m_config->Get<double> (Component::GetName(), "speed_scale", 1.0);
 	m_timeToMax[FORWARD] = m_config->Get<double> (Component::GetName(), "time_to_max_forward", 1.0);
