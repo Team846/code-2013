@@ -21,8 +21,9 @@ ProfiledPID::~ProfiledPID()
 
 double ProfiledPID::update(double dt)
 {
-	PID::setSetpoint(m_profile->update(m_timer.Get()));
-	printf("Motion Profile Setpoint: %f\n", m_profile->update(m_timer.Get()));
+	double setpoint = m_profile->update(m_timer.Get());
+	PID::setSetpoint(setpoint);
+	printf("Motion Profile Setpoint: %f\n", setpoint);
 	return PID::update(dt);
 }
 

@@ -63,7 +63,14 @@ void AutonomousRoutines::Update()
 			int autonRoutine = (int)(DriverStation::GetInstance()->GetAnalogIn(DriverStationConfig::AnalogIns::AUTONOMOUS_SELECT) + 0.5) + 1;
 			AsyncPrinter::Printf("Starting autonomous routine %d\n", autonRoutine);
 			m_autonomousStartTime = Timer::GetFPGATimestamp();
-
+			
+			double delay = DriverStation::GetInstance()->GetAnalogIn(DriverStationConfig::AnalogIns::AUTONOMOUS_DELAY);
+			
+			if (delay > 0.0)
+			{
+				routines.push(new Pause(delay));
+			}
+			
 			while (!routines.empty())
 				routines.pop();
 			

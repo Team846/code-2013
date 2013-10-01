@@ -4,7 +4,7 @@
 #include "../Config/RobotConfig.h"
 #include "../Config/DriverStationConfig.h"
 #include "../ComponentData/CollectorData.h"
-#define STEP
+//#define STEP
 
 using namespace data::climber;
 using namespace data;
@@ -216,14 +216,10 @@ void Climber::enabledPeriodic()
 		m_stateString = "BEGIN";
 		m_hooks->Set(Pneumatics::FORWARD, true);
 		m_climberArms->Set(Pneumatics::FORWARD, true);
-
-		m_shooterData->SetLauncherAngleHigh();
 		
 		disengagePTO(true);
 		
 //		m_timer = m_componentData->collectorData->GetExtendTime() + 40;
-		
-//		disengagePTO(true);
 		
 		m_componentData->collectorData->SlideUp();
 //		m_pneumatics->setCollector(RETRACTED, true);
@@ -246,7 +242,27 @@ void Climber::enabledPeriodic()
 
 		winchPawlOff();
 		
-		// do all the manual stuff! (hooks down, arms engage)
+		// Line up to the bar (maybe shoot)
+		
+		if(m_climberData->shouldContinueClimbing())
+		{
+			m_state = HANG;
+		}
+		break;
+	case HANG:
+		m_stateString = "HANG";
+
+		m_shooterData->SetLauncherAngleHigh();
+		m_hooks->Set(Pneumatics::OFF, true);
+		
+		m_state = ARMS_DOWN;
+		break;
+	case ARMS_DOWN:
+		m_stateString = "ARMS_DOWN";
+
+		winchPawlOff();
+		
+		// Engage the arm hooks into the second bar
 		
 		if(m_climberData->shouldContinueClimbing())
 		{
@@ -328,16 +344,7 @@ void Climber::enabledPeriodic()
 			m_logFile << "stopping" << endl;
 			
 			winchPawlOff();
-
-#ifdef STEP
-		if(m_climberData->shouldContinueClimbing())
-#endif
-			m_state = CLIMBED;
 		}
-		break;
-	case CLIMBED:
-		m_stateString = "CLIMBED";
-		
 		break;
 	}
 	

@@ -15,7 +15,7 @@ public:
 	bool ButtonInBounds(int button);
 	bool AxisInBounds(int axis);
 
-	bool IsButtonClicked(int button);
+	bool IsButtonJustPressed(int button);
 	bool IsButtonJustReleased(int button);
 	bool IsButtonDown(int button);
 	bool WasButtonDown(int button);

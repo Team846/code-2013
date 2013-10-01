@@ -16,6 +16,8 @@
  * @author Tony Peng
  */
 
+using namespace std;
+
 class Util
 {
 public:

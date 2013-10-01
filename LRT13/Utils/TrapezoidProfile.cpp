@@ -1,5 +1,6 @@
 #include "TrapezoidProfile.h"
 #include "math.h"
+#include "Util.h"
 
 TrapezoidProfile::TrapezoidProfile(double maxV, double timeToMaxV)
 {
@@ -63,11 +64,13 @@ void TrapezoidProfile::setSetpoint(double setpoint, double time)
 	m_velocity = 0.0;
 	m_startingTime = time;
 	m_lastTime = time;
-	m_timeToMax = m_maxV / m_accel; // Time spent accelerating
-	double timeAtMax = (setpoint - 2 * (m_timeToMax * m_maxV - m_accel * m_timeToMax * m_timeToMax / 2)) / m_maxV; // Time spent at max velocity
+	double maxV = Util::Sign(setpoint) * m_maxV;
+	double accel = Util::Sign(setpoint) * m_accel;
+	m_timeToMax = maxV / accel; // Time spent accelerating
+	double timeAtMax = (setpoint - 2 * (m_timeToMax * maxV - accel * m_timeToMax * m_timeToMax / 2)) / maxV; // Time spent at max velocity
 	if (timeAtMax < 0)
 	{
-		m_timeToMax = sqrt(2 * m_accel * m_setpoint / 2) / m_accel; // t = (sqrt(v^2+2ad)-v)/a
+		m_timeToMax = Util::Sign(setpoint) * sqrt(2 * accel * m_setpoint / 2) / accel; // t = (sqrt(v^2+2ad)-v)/a
 		timeAtMax = 0;
 	}
 	m_timeFromMax = m_timeToMax + timeAtMax; // Time to start decelerating

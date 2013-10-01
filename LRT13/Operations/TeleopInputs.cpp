@@ -194,7 +194,7 @@ void TeleopInputs::Update()
 				}
 				else
 					lastStop = false;
-				if (m_driver_wheel->IsButtonClicked(
+				if (m_driver_wheel->IsButtonJustPressed(
 					DriverStationConfig::JoystickButtons::REVERSE_DRIVE))
 				{
 					driveSign = -driveSign;
@@ -295,14 +295,14 @@ void TeleopInputs::Update()
 
 		// PTO
 		bool debug = false;
-		if (m_operator_stick->IsButtonClicked(
+		if (m_operator_stick->IsButtonJustPressed(
 				DriverStationConfig::JoystickButtons::ENGAGE_PTO))
 		{
 			debug = true;
 			//			m_componentData->shooterData->SetEnabled(false);
 			m_componentData->climberData->EngagePTO();
 		}
-		else if (m_operator_stick->IsButtonClicked(
+		else if (m_operator_stick->IsButtonJustPressed(
 				DriverStationConfig::JoystickButtons::DISENGAGE_PTO))
 		{
 			debug = true;
@@ -330,13 +330,13 @@ void TeleopInputs::Update()
 			m_componentData->climberData->winchPawlInactive();
 		}
 		// Climber Arms
-		if (m_operator_stick->IsButtonClicked(
+		if (m_operator_stick->IsButtonJustPressed(
 				DriverStationConfig::JoystickButtons::CLIMBER_ARMS))
 		{
 			debug = true;
 			m_componentData->climberData->changeArmState();
 		}
-		if (m_driver_stick->IsButtonClicked(
+		if (m_driver_stick->IsButtonJustPressed(
 						DriverStationConfig::JoystickButtons::START_CLIMB))
 		{
 			debug = true;
@@ -344,33 +344,43 @@ void TeleopInputs::Update()
 		}
 		if (m_componentData->climberData->getCurrentState() != NOTHING)
 		{
-			m_componentData->climberData->setShouldContinueClimbing(
-					m_operator_stick->IsButtonClicked(
-							DriverStationConfig::JoystickButtons::CONTINUE_CLIMB));
-			if (m_operator_stick->IsButtonClicked(
-					DriverStationConfig::JoystickButtons::SHOOTER_ON))
+			if (m_componentData->climberData->getCurrentState() != LINE_UP)
 			{
-				if (m_operator_stick->IsButtonDown(
-						DriverStationConfig::JoystickButtons::CONDITIONAL_ABORT))
+				m_componentData->climberData->setShouldContinueClimbing(
+						m_operator_stick->IsButtonJustPressed(
+								DriverStationConfig::JoystickButtons::CONTINUE_CLIMB));
+			}
+			else
+			{
+				if (m_driver_stick->IsButtonJustPressed(DriverStationConfig::JoystickButtons::START_CLIMB))
 				{
-					m_componentData->climberData->setShouldPotentiallyAbort(
-							true);
+					debug = false;
+					m_componentData->climberData->setShouldContinueClimbing(true);
+					m_componentData->climberData->setShouldHooksChange(false);
 				}
-				else
-				{
-					m_componentData->climberData->setShouldPotentiallyAbort(
-							false);
-				}
+			}
+			if (m_operator_stick->IsButtonJustPressed(
+					DriverStationConfig::JoystickButtons::CONDITIONAL_ABORT))
+			{
+				m_componentData->climberData->setShouldPotentiallyAbort(true);
+			}
+			else
+			{
+				m_componentData->climberData->setShouldPotentiallyAbort(false);
 			}
 		}
 		else
 		{
-			if (m_driver_stick->IsButtonDown(DriverStationConfig::JoystickButtons::START_CLIMB)) {
+			if (m_driver_stick->IsButtonDown(DriverStationConfig::JoystickButtons::START_CLIMB))
+			{
 				holdTicks++;
-			} else {
+			}
+			else
+			{
 				holdTicks = 0;
 			}
-			if (holdTicks >= 50) {
+			if (holdTicks >= 25)
+			{
 				debug = false;
 				m_componentData->climberData->setShouldContinueClimbing(true);
 				m_componentData->climberData->setShouldHooksChange(false);
@@ -419,14 +429,14 @@ void TeleopInputs::Update()
 
 		if (m_componentData->climberData->getCurrentState() == NOTHING)
 		{
-			if (m_operator_stick->IsButtonClicked(
+			if (m_operator_stick->IsButtonJustPressed(
 					DriverStationConfig::JoystickButtons::SHOOTER_ON))
 			{
 				m_componentData->shooterData->SetEnabled(true);
 			}
 		}
 		
-		if (m_operator_stick->IsButtonClicked(
+		if (m_operator_stick->IsButtonJustPressed(
 			DriverStationConfig::JoystickButtons::CHANGE_ANGLE))
 		{
 				if (m_componentData->shooterData->ShouldLauncherBeHigh())
@@ -435,7 +445,7 @@ void TeleopInputs::Update()
 						m_componentData->shooterData->SetLauncherAngleHigh();
 		}
 		
-		if (m_operator_stick->IsButtonClicked(
+		if (m_operator_stick->IsButtonJustPressed(
 			DriverStationConfig::JoystickButtons::SHOOTER_OFF))
 		{
 			m_componentData->shooterData->SetEnabled(false);
@@ -565,13 +575,13 @@ void TeleopInputs::Update()
 
 	/************************Config************************/
 
-	if (m_driver_stick->IsButtonClicked(
+	if (m_driver_stick->IsButtonJustPressed(
 			DriverStationConfig::JoystickButtons::SAVE_CONFIG))
 		m_componentData->configLoaderData->RequestSave();
-	if (m_driver_stick->IsButtonClicked(
+	if (m_driver_stick->IsButtonJustPressed(
 			DriverStationConfig::JoystickButtons::LOAD_CONFIG))
 		m_componentData->configLoaderData->RequestLoad();
-	if (m_driver_stick->IsButtonClicked(
+	if (m_driver_stick->IsButtonJustPressed(
 			DriverStationConfig::JoystickButtons::APPLY_CONFIG))
 		m_componentData->configLoaderData->RequestApply();
 
