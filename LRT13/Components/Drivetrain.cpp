@@ -137,9 +137,11 @@ void Drivetrain::enabledPeriodic()
 			m_driveEncoders->getNormalizedSpeed(drivetrain::RIGHT));
 	table->PutNumber("TurnTicks", m_driveEncoders->getTurnTicks());
 	static int ticks = 0;
-	m_log_file << (double) (ticks++ / 50.0) << "," << m_driveEncoders->getNormalizedSpeed(drivetrain::LEFT) - lastSpeed[LEFT]
-	<< "," << fabs(leftOutput - m_driveEncoders->getNormalizedSpeed(drivetrain::LEFT)) << "," << m_driveEncoders->getNormalizedSpeed(drivetrain::RIGHT) - lastSpeed[RIGHT]
-	<< "," << fabs(rightOutput - m_driveEncoders->getNormalizedSpeed(drivetrain::RIGHT)) << "\n";
+//	m_log_file << (double) (ticks++ / 50.0) << "," << m_driveEncoders->getNormalizedSpeed(drivetrain::LEFT) - lastSpeed[LEFT]
+//	<< "," << fabs(leftOutput - m_driveEncoders->getNormalizedSpeed(drivetrain::LEFT)) << "," << m_driveEncoders->getNormalizedSpeed(drivetrain::RIGHT) - lastSpeed[RIGHT]
+//	<< "," << fabs(rightOutput - m_driveEncoders->getNormalizedSpeed(drivetrain::RIGHT)) << "\n";
+	if (m_componentData->drivetrainData->getControlMode(FORWARD) == POSITION_CONTROL)
+		m_log_file << (double) (ticks++ / 50.0) << "," << m_driveEncoders->getNormalizedForwardSpeed() * m_driveEncoders->getMaxSpeed() << "," << m_profiles[FORWARD]->getVelocity() << ',' << m_componentData->drivetrainData->getCurrentPos(FORWARD) - m_componentData->drivetrainData->getPositionControlStartingPosition(FORWARD) << ',' << m_profiles[FORWARD]->getOutput() << '\n';
 	lastSpeed[LEFT] = m_driveEncoders->getNormalizedSpeed(drivetrain::LEFT);
 	lastSpeed[RIGHT] = m_driveEncoders->getNormalizedSpeed(drivetrain::RIGHT);
 	if (DriverStation::GetInstance()->GetBatteryVoltage() < 7.0)

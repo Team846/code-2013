@@ -64,15 +64,15 @@ void AutonomousRoutines::Update()
 			AsyncPrinter::Printf("Starting autonomous routine %d\n", autonRoutine);
 			m_autonomousStartTime = Timer::GetFPGATimestamp();
 			
+			while (!routines.empty())
+				routines.pop();
+			
 			double delay = DriverStation::GetInstance()->GetAnalogIn(DriverStationConfig::AnalogIns::AUTONOMOUS_DELAY);
 			
 			if (delay > 0.0)
 			{
 				routines.push(new Pause(delay));
 			}
-			
-			while (!routines.empty())
-				routines.pop();
 			
 			LoadRoutine(RobotConfig::ROUTINE_FILE_PATH.substr(0, RobotConfig::ROUTINE_FILE_PATH.find('.')) + Util::lexical_cast(autonRoutine) + RobotConfig::ROUTINE_FILE_PATH.substr(RobotConfig::ROUTINE_FILE_PATH.find('.'), RobotConfig::ROUTINE_FILE_PATH.length() - RobotConfig::ROUTINE_FILE_PATH.find('.')));
 

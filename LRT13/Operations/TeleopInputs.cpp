@@ -344,21 +344,9 @@ void TeleopInputs::Update()
 		}
 		if (m_componentData->climberData->getCurrentState() != NOTHING)
 		{
-			if (m_componentData->climberData->getCurrentState() != LINE_UP)
-			{
-				m_componentData->climberData->setShouldContinueClimbing(
-						m_operator_stick->IsButtonJustPressed(
-								DriverStationConfig::JoystickButtons::CONTINUE_CLIMB));
-			}
-			else
-			{
-				if (m_driver_stick->IsButtonJustPressed(DriverStationConfig::JoystickButtons::START_CLIMB))
-				{
-					debug = false;
-					m_componentData->climberData->setShouldContinueClimbing(true);
-					m_componentData->climberData->setShouldHooksChange(false);
-				}
-			}
+			m_componentData->climberData->setShouldContinueClimbing(
+					m_operator_stick->IsButtonJustPressed(
+							DriverStationConfig::JoystickButtons::CONTINUE_CLIMB));
 			if (m_operator_stick->IsButtonJustPressed(
 					DriverStationConfig::JoystickButtons::CONDITIONAL_ABORT))
 			{

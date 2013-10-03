@@ -242,27 +242,7 @@ void Climber::enabledPeriodic()
 
 		winchPawlOff();
 		
-		// Line up to the bar (maybe shoot)
-		
-		if(m_climberData->shouldContinueClimbing())
-		{
-			m_state = HANG;
-		}
-		break;
-	case HANG:
-		m_stateString = "HANG";
-
-		m_shooterData->SetLauncherAngleHigh();
-		m_hooks->Set(Pneumatics::OFF, true);
-		
-		m_state = ARMS_DOWN;
-		break;
-	case ARMS_DOWN:
-		m_stateString = "ARMS_DOWN";
-
-		winchPawlOff();
-		
-		// Engage the arm hooks into the second bar
+		// Line up to the first bar and engage arms to second bar
 		
 		if(m_climberData->shouldContinueClimbing())
 		{

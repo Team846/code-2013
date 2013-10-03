@@ -23,19 +23,21 @@ void TrapezoidProfile::updateValues(double maxV, double timeToMaxV)
 double TrapezoidProfile::update(double currentTime)
 {
 	double timeElapsed = currentTime - m_startingTime;
+	double accel = Util::Sign(m_setpoint) * m_accel;
+	double maxV = Util::Sign(m_setpoint) * m_maxV;
 	if (timeElapsed < m_timeToMax)
 	{
-		m_velocity = m_accel * timeElapsed;
+		m_velocity = accel * timeElapsed;
 		m_output += m_velocity * (currentTime - m_lastTime);
 	}
 	else if (timeElapsed < m_timeFromMax)
 	{
-		m_velocity = m_maxV;
+		m_velocity = maxV;
 		m_output += m_velocity * (currentTime - m_lastTime);
 	}
 	else if (timeElapsed < m_timeTotal)
 	{
-		m_velocity = (m_timeToMax * m_accel - m_accel * (timeElapsed - m_timeFromMax));
+		m_velocity = (m_timeToMax * accel - accel * (timeElapsed - m_timeFromMax));
 		m_output += m_velocity * (currentTime - m_lastTime);
 	}
 	else
