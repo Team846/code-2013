@@ -7,6 +7,7 @@
 #include "../Config/DriverStationConfig.h"
 
 #define MOTION_PROFILE
+#define ALTERNATE_VELOCITY
 
 using namespace data;
 using namespace drivetrain;
@@ -86,8 +87,13 @@ double Drivetrain::ComputeOutput(data::drivetrain::ForwardOrTurn axis)
 //							* m_componentData->drivetrainData->getPositionControlMaxSpeed(
 //									axis);
 #endif
+#ifdef ALTERNATE_VELOCITY
+		rawOutput = velocitySetpoint;
+		break;
+#endif
 		//fall through the switch
 	case data::drivetrain::VELOCITY_CONTROL:
+#ifndef ALTERNATE_VELOCITY
 		//1.0e-2
 		if (fabs(velocitySetpoint) < 2.0E-2)
 			m_PIDs[VELOCITY][axis].setIIREnabled(true);
@@ -104,11 +110,41 @@ double Drivetrain::ComputeOutput(data::drivetrain::ForwardOrTurn axis)
 		m_PIDs[VELOCITY][axis].setSetpoint(velocitySetpoint);
 
 		rawOutput = m_PIDs[VELOCITY][axis].update(1.0 / RobotConfig::LOOP_RATE);
+#else
+		rawOutput = velocitySetpoint;
+#endif
 		break;
 	case data::drivetrain::OPEN_LOOP:
 		break;
 	}
 	return rawOutput;
+}
+
+double Drivetrain::ComputeSide(data::drivetrain::Side side, double forward, double turn)
+{
+	double setpoint = 0.0;
+	if (side == LEFT)
+		setpoint = forward - turn;
+	else if (side == RIGHT)
+		setpoint = forward + turn;
+	if (fabs(setpoint) < 2.0E-2)
+		m_PIDs[VELOCITY][side - 2].setIIREnabled(true);
+	else
+		m_PIDs[VELOCITY][side - 2].setIIREnabled(false);
+
+	if (side == LEFT)
+	{
+		m_PIDs[VELOCITY][side - 2].setInput(
+				m_driveEncoders->getNormalizedSpeed(LEFT));
+	}
+	else if (side == RIGHT)
+	{
+		m_PIDs[VELOCITY][side - 2].setInput(
+				m_driveEncoders->getNormalizedSpeed(RIGHT));
+	}
+	m_PIDs[VELOCITY][side - 2].setSetpoint(setpoint);
+
+	return m_PIDs[VELOCITY][side - 2].update(1.0 / RobotConfig::LOOP_RATE);
 }
 
 void Drivetrain::enabledPeriodic()
@@ -120,8 +156,13 @@ void Drivetrain::enabledPeriodic()
 	//	if(++e % 2 == 0)
 	//		AsyncPrinter::Printf("fwd: %.2f, turn %.2f, fwd %.2f, turn %.2f\n", fwdOutput, turnOutput, m_driveEncoders->getNormalizedForwardSpeed(), m_driveEncoders->getNormalizedTurningSpeed());
 
+#ifndef ALTERNATE_VELOCITY
 	double leftOutput = fwdOutput - turnOutput;
 	double rightOutput = fwdOutput + turnOutput;
+#else
+	double leftOutput = ComputeSide(LEFT, fwdOutput, turnOutput);
+	double rightOutput = ComputeSide(RIGHT, fwdOutput, turnOutput);
+#endif
 
 	Util::Clamp<double>(leftOutput, -1.0, 1.0);
 	Util::Clamp<double>(rightOutput, -1.0, 1.0);

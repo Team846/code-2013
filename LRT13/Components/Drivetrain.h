@@ -56,6 +56,7 @@ private:
 	
 	void ConfigurePIDObject(PID *pid, std::string objName, bool feedForward);
 	double ComputeOutput(data::drivetrain::ForwardOrTurn axis);
+	double ComputeSide(data::drivetrain::Side side, double forward, double turn);
 };
 
 #endif
