@@ -42,7 +42,7 @@ namespace drivetrain
 		void setVelocitySetpoint(ForwardOrTurn axis, double setpoint);
 		
 		void setRelativePositionSetpoint(ForwardOrTurn axis, double setpoint,
-				double maxSpeed);
+				double maxSpeed, bool fromLastSetpoint = false);
 		void setMaxPositionControlSpeed(ForwardOrTurn axis, double maxSpeed);
 		
 		void setControlMode(ForwardOrTurn axis, ControlMode control);

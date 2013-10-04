@@ -84,7 +84,6 @@ void AutonomousRoutines::Update()
 		{
 			if (beginNext)
 			{
-				printf("Next routine\n");
 				routines.front()->Run();
 				beginNext = false;
 			}

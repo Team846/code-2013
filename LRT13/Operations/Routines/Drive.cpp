@@ -12,7 +12,7 @@ Drive::Drive(double distance, double maxSpeed, double errorThreshold)
 void Drive::Run()
 {
 	m_componentData->drivetrainData->setControlMode(data::drivetrain::FORWARD, data::drivetrain::POSITION_CONTROL);
-	m_componentData->drivetrainData->setRelativePositionSetpoint(data::drivetrain::FORWARD, m_distance, m_maxSpeed);
+	m_componentData->drivetrainData->setRelativePositionSetpoint(data::drivetrain::FORWARD, m_distance, m_maxSpeed, true);
 }
 
 bool Drive::Completed()

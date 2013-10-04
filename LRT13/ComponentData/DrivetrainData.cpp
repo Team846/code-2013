@@ -37,9 +37,16 @@ void DrivetrainData::setVelocitySetpoint(ForwardOrTurn axis, double setpoint)
 }
 
 void DrivetrainData::setRelativePositionSetpoint(ForwardOrTurn axis,
-		double setpoint, double maxspeed)
+		double setpoint, double maxspeed, bool fromLastSetpoint)
 {
-	m_positionSetpoints[axis] = setpoint + getCurrentPos(axis);
+	if (fromLastSetpoint)
+	{
+		m_positionSetpoints[axis] += setpoint;
+	}
+	else
+	{
+		m_positionSetpoints[axis] = setpoint + getCurrentPos(axis);
+	}
 	m_maxSpeeds[axis] = maxspeed;
 	m_positionSetpointChanged[axis] = true;
 	m_positionStart[axis] = getCurrentPos(axis);

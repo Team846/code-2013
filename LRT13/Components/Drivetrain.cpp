@@ -78,7 +78,7 @@ double Drivetrain::ComputeOutput(data::drivetrain::ForwardOrTurn axis)
 			m_componentData->drivetrainData->setPositionSetpointChanged(axis, false);
 		}
 		velocitySetpoint = m_profiled[axis]->update(
-				1.0 / RobotConfig::LOOP_RATE);// + m_profiles[axis]->getVelocity();
+				1.0 / RobotConfig::LOOP_RATE) + m_profiles[axis]->getVelocity() / (axis == FORWARD ? m_driveEncoders->getMaxSpeed() : m_driveEncoders->getMaxTurnRate());
 //		if (fabs(velocitySetpoint)
 //				> m_componentData->drivetrainData->getPositionControlMaxSpeed(
 //						axis))

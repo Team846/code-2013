@@ -12,7 +12,7 @@ Turn::Turn(double angle, double maxSpeed, double errorThreshold)
 void Turn::Run()
 {
 	m_componentData->drivetrainData->setControlMode(data::drivetrain::TURN, data::drivetrain::POSITION_CONTROL);
-	m_componentData->drivetrainData->setRelativePositionSetpoint(data::drivetrain::TURN, m_angle, m_maxSpeed);
+	m_componentData->drivetrainData->setRelativePositionSetpoint(data::drivetrain::TURN, m_angle, m_maxSpeed, true);
 }
 
 bool Turn::Completed()
