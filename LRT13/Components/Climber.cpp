@@ -22,6 +22,8 @@ Climber::Climber() :
 {
 	m_climberArms = new Pneumatics(RobotConfig::Solenoid::CLIMBER_A, RobotConfig::Solenoid::CLIMBER_B, "ClimberArms");
 	m_hooks = new Pneumatics(RobotConfig::Solenoid::HOOKS, "Hooks");
+	m_pressure_a = new AnalogChannel(RobotConfig::Analog::PRESSURE_A);
+	m_pressure_b = new AnalogChannel(RobotConfig::Analog::PRESSURE_B);
 	m_state = NOTHING;
 	m_driving_encoders = DriveEncoders::GetInstance();
 	m_paused = false;
@@ -35,7 +37,8 @@ Climber::Climber() :
 	m_driveSpeed = 0.0;
 	
 	m_ptoEngaged = false;
-	
+	m_pressure_scale = 1400;
+	table = NetworkTable::GetTable("RobotData");
 }
 
 Climber::~Climber()
@@ -242,7 +245,27 @@ void Climber::enabledPeriodic()
 
 		winchPawlOff();
 		
-		// Line up to the first bar and engage arms to second bar
+		// Line up to the first bar
+		
+		if(m_climberData->shouldContinueClimbing())
+		{
+			m_state = HOOKS_DOWN;
+		}
+		break;
+	case HOOKS_DOWN:
+		m_stateString = "HOOKS_DOWN";
+		m_hooks->Set(Pneumatics::OFF, true);
+		
+		m_shooterData->SetLauncherAngleHigh();
+		
+		m_state = ARMS_DOWN;
+		break;
+	case ARMS_DOWN:
+		m_stateString = "ARMS_DOWN";
+
+		winchPawlOff();
+		
+		// Engage arms to second bar
 		
 		if(m_climberData->shouldContinueClimbing())
 		{
@@ -333,6 +356,8 @@ void Climber::enabledPeriodic()
 	if(printCounter++ % 20 == 0 || m_state != m_previous_state)
 		AsyncPrinter::Printf("Climb state: %s\n", m_stateString.c_str());
 	LCD::Instance()->Print(4, 0, true, "Climb: %s", m_stateString.c_str());
+	LCD::Instance()->Print(4, 0, true, "P: %.4f", (m_pressure_b->GetAverageVoltage() - m_pressure_a->GetAverageVoltage()) * m_pressure_scale);
+	table->PutNumber("Pressure", (m_pressure_b->GetAverageVoltage() - m_pressure_a->GetAverageVoltage()) * m_pressure_scale);
 	
 	SmarterDashboard::Instance()->SetTelemetryData<string>(TelemetryType::CLIMBER_STATE, m_stateString);
 	
@@ -461,7 +486,7 @@ void Climber::Configure()
 	m_servo_right_engaged_position = m_config->Get<int> (m_configSection, "rightServoEngaged", 1514);
 	m_servo_left_disengaged_position = m_config->Get<int> (m_configSection, "leftServoDisengaged", 905);
 	m_servo_right_disengaged_position = m_config->Get<int> (m_configSection, "rightServoDisengaged", 905);
-	
+	m_pressure_scale = m_config->Get<double> (m_configSection, "pressure_scale", 1400);
 	m_climbingLevelGearToothTicks[0] = m_config->Get<int>(m_configSection, "fromGroundLevelGearToothTicks", 40);
 	m_climbingLevelGearToothTicks[1] = m_config->Get<int>(m_configSection, "fromTenPointLevelGearToothTicks", 130);
 	m_climbingLevelGearToothTicks[2] = m_config->Get<int>(m_configSection, "fromTwentyPointLevelGearToothTicks", 130);

@@ -32,6 +32,8 @@ namespace AutoActions
 
 namespace Analog // Ports 1-7
 {
+	const uint32_t PRESSURE_A = 7;
+	const uint32_t PRESSURE_B = 6;
 }
 
 namespace Digital // Ports 1-14

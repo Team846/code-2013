@@ -78,7 +78,7 @@ double Drivetrain::ComputeOutput(data::drivetrain::ForwardOrTurn axis)
 			m_componentData->drivetrainData->setPositionSetpointChanged(axis, false);
 		}
 		velocitySetpoint = m_profiled[axis]->update(
-				1.0 / RobotConfig::LOOP_RATE);
+				1.0 / RobotConfig::LOOP_RATE);// + m_profiles[axis]->getVelocity();
 //		if (fabs(velocitySetpoint)
 //				> m_componentData->drivetrainData->getPositionControlMaxSpeed(
 //						axis))
@@ -132,16 +132,8 @@ double Drivetrain::ComputeSide(data::drivetrain::Side side, double forward, doub
 	else
 		m_PIDs[VELOCITY][side - 2].setIIREnabled(false);
 
-	if (side == LEFT)
-	{
-		m_PIDs[VELOCITY][side - 2].setInput(
-				m_driveEncoders->getNormalizedSpeed(LEFT));
-	}
-	else if (side == RIGHT)
-	{
-		m_PIDs[VELOCITY][side - 2].setInput(
-				m_driveEncoders->getNormalizedSpeed(RIGHT));
-	}
+	m_PIDs[VELOCITY][side - 2].setInput(
+			m_driveEncoders->getNormalizedSpeed(side));
 	m_PIDs[VELOCITY][side - 2].setSetpoint(setpoint);
 
 	return m_PIDs[VELOCITY][side - 2].update(1.0 / RobotConfig::LOOP_RATE);

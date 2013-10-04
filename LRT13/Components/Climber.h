@@ -21,6 +21,7 @@
 #include "../Network/NetChannel.h"
 #include "../Utils/Profiler.h"
 #include "../Utils/LCD.h"
+#include "AnalogChannel.h"
 
 #include "Component.h"
 
@@ -78,12 +79,15 @@ private:
 	int m_servo_right_disengaged_position;
 	int m_disengageTimer_threshold;
 	GearTooth m_winch_gear_tooth;
+	AnalogChannel *m_pressure_a;
+	AnalogChannel *m_pressure_b;
+	NetworkTable *table;
+	double m_pressure_scale;
 	int m_gear_tooth_ticks_position;
 	int m_gear_tooth_threshold;			
 	data::climber::state m_previous_state;
 	bool m_paused;
 	double m_driveSpeed;
-	
 	int m_armUpTicks;
 	int m_climbingLevelGearToothTicks[3];
 	

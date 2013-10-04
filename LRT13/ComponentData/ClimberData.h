@@ -16,8 +16,10 @@ typedef enum state
 		NOTHING = -1,
 		BEGIN = 0,
 		LINE_UP = 1,
-		CLIMB_PREPARE = 2,
-		CLIMB = 3,
+		HOOKS_DOWN = 2,
+		ARMS_DOWN = 3,
+		CLIMB_PREPARE = 4,
+		CLIMB = 5,
 		DEBUG_MODE = 100,
 		
 //		IDLE = 1,
