@@ -306,6 +306,8 @@ void Climber::enabledPeriodic()
 		
 		m_hooks->Set(Pneumatics::OFF, true);
 
+		m_shooterData->SetLauncherAngleLow();
+		
 		engagePTO(true);
 		
 		m_drive_train_position = m_winch_gear_tooth.Get();

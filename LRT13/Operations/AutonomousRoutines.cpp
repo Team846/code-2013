@@ -78,6 +78,8 @@ void AutonomousRoutines::Update()
 
 			beginNext = true;
 			
+			m_componentData->drivetrainData->zeroLastPositionSetpoint(FORWARD);
+			m_componentData->drivetrainData->zeroLastPositionSetpoint(TURN);
 			m_componentData->shooterData->SetEnabled(true);
 		}
 		if (!routines.empty())

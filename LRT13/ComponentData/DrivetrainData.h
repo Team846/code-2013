@@ -48,6 +48,7 @@ namespace drivetrain
 		void setControlMode(ForwardOrTurn axis, ControlMode control);
 	
 		void setZeroHeading();
+		void zeroLastPositionSetpoint(ForwardOrTurn axis);
 		
 		SEM_ID createPositionOperationSemaphore(ForwardOrTurn axis, double errorThreshold);
 		

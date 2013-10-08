@@ -94,6 +94,11 @@ void DrivetrainData::setZeroHeading()
 		m_zeroHeading += 360;
 }
 
+void DrivetrainData::zeroLastPositionSetpoint(ForwardOrTurn axis)
+{
+	m_positionSetpoints[axis] = getCurrentPos(axis);
+}
+
 SEM_ID DrivetrainData::createPositionOperationSemaphore(ForwardOrTurn axis,
 		double errorThreshold)
 {

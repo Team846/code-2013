@@ -6,7 +6,7 @@
 #include "../SpeedController/ESC.h"
 #include "../Config/DriverStationConfig.h"
 
-#define MOTION_PROFILE
+//#define MOTION_PROFILE
 #define ALTERNATE_VELOCITY
 
 using namespace data;
