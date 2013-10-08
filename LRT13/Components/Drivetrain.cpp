@@ -57,17 +57,38 @@ double Drivetrain::ComputeOutput(data::drivetrain::ForwardOrTurn axis)
 	{
 	case data::drivetrain::POSITION_CONTROL:
 #ifndef MOTION_PROFILE
-		m_PIDs[POSITION][axis].setInput(0.0);//we're always at our current position! :D -BA
-		m_PIDs[POSITION][axis].setSetpoint(positionSetpoint);
-		velocitySetpoint = m_PIDs[POSITION][axis].update(
-				1.0 / RobotConfig::LOOP_RATE);
-		if (fabs(velocitySetpoint)
-				> m_componentData->drivetrainData->getPositionControlMaxSpeed(
-						axis))
-			velocitySetpoint
-					= Util::Sign(velocitySetpoint)
-							* m_componentData->drivetrainData->getPositionControlMaxSpeed(
-									axis);
+		if (!m_componentData->drivetrainData->syncingArc() || axis == FORWARD)
+		{
+			m_PIDs[POSITION][axis].setInput(0.0); // We're always at our current position! :D -BA
+			m_PIDs[POSITION][axis].setSetpoint(positionSetpoint);
+			velocitySetpoint = m_PIDs[POSITION][axis].update(
+					1.0 / RobotConfig::LOOP_RATE);
+			if (fabs(velocitySetpoint)
+					> m_componentData->drivetrainData->getPositionControlMaxSpeed(
+							axis))
+				velocitySetpoint
+						= Util::Sign(velocitySetpoint)
+								* m_componentData->drivetrainData->getPositionControlMaxSpeed(
+										axis);
+		}
+		else // Turn control in arc syncing mode
+		{
+			m_PIDs[POSITION][axis].setInput(0.0);
+			m_PIDs[POSITION][axis].setSetpoint(fabs(m_componentData->drivetrainData->getRelativePositionSetpoint(FORWARD)
+					/ (m_componentData->drivetrainData->getAbsolutePositionSetpoint(FORWARD)
+							- m_componentData->drivetrainData->getPositionControlStartingPosition(FORWARD)))
+					- m_componentData->drivetrainData->getRelativePositionSetpoint(TURN)
+					/ (m_componentData->drivetrainData->getAbsolutePositionSetpoint(TURN)
+							- m_componentData->drivetrainData->getPositionControlStartingPosition(TURN))); // Turn vs. forward proportion difference
+			velocitySetpoint = ((m_componentData->drivetrainData->getAbsolutePositionSetpoint(TURN)
+					- m_componentData->drivetrainData->getPositionControlStartingPosition(TURN))
+					/ ((m_componentData->drivetrainData->getAbsolutePositionSetpoint(FORWARD)
+					- m_componentData->drivetrainData->getPositionControlStartingPosition(FORWARD))
+					/ m_componentData->drivetrainData->getVelocitySetpoint(FORWARD) * m_driveEncoders->getMaxSpeed()))
+					/ m_driveEncoders->getMaxTurnRate(); // Match turn rate to forward rate
+			velocitySetpoint += m_PIDs[POSITION][axis].update(
+					1.0 / RobotConfig::LOOP_RATE); // Correction for turn vs. forward proportion difference
+		}
 #else
 		m_profiled[axis]->setInput(m_componentData->drivetrainData->getCurrentPos(axis) - m_componentData->drivetrainData->getPositionControlStartingPosition(axis));
 		if (m_componentData->drivetrainData->isPositionSetpointChanged(axis))
@@ -91,6 +112,7 @@ double Drivetrain::ComputeOutput(data::drivetrain::ForwardOrTurn axis)
 		rawOutput = velocitySetpoint;
 		break;
 #endif
+		m_componentData->drivetrainData->setVelocitySetpoint(axis, velocitySetpoint);
 		//fall through the switch
 	case data::drivetrain::VELOCITY_CONTROL:
 #ifndef ALTERNATE_VELOCITY

@@ -72,6 +72,9 @@ namespace drivetrain
 		
 		void DebugPrintPosition(ForwardOrTurn axis);
 		double getCurrentPos(ForwardOrTurn axis);
+		
+		void syncArc();
+		bool syncingArc();
 	
 	private:
 		
@@ -84,6 +87,7 @@ namespace drivetrain
 		double m_positionStart[2];
 		float m_zeroHeading;
 		bool m_positionSetpointChanged[2];
+		bool m_syncArc;
 		
 		typedef struct drivetrainOpSem
 		{

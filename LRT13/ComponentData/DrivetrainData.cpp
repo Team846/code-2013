@@ -39,6 +39,7 @@ void DrivetrainData::setVelocitySetpoint(ForwardOrTurn axis, double setpoint)
 void DrivetrainData::setRelativePositionSetpoint(ForwardOrTurn axis,
 		double setpoint, double maxspeed, bool fromLastSetpoint)
 {
+	m_syncArc = false;
 	if (fromLastSetpoint)
 	{
 		m_positionSetpoints[axis] += setpoint;
@@ -184,3 +185,14 @@ float DrivetrainData::getCurrentHeading()
 		m_currentHeading += 360;
 	return m_currentHeading - m_zeroHeading;
 }
+
+void DrivetrainData::syncArc()
+{
+	m_syncArc = true;
+}
+
+bool DrivetrainData::syncingArc()
+{
+	return m_syncArc;
+}
+
