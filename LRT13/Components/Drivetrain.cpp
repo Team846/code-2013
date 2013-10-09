@@ -73,13 +73,13 @@ double Drivetrain::ComputeOutput(data::drivetrain::ForwardOrTurn axis)
 		}
 		else // Turn control in arc syncing mode
 		{
-			m_PIDs[POSITION][axis].setInput(0.0);
-			m_PIDs[POSITION][axis].setSetpoint(fabs(m_componentData->drivetrainData->getRelativePositionSetpoint(FORWARD)
+			m_PIDs[POSITION][axis].setInput(fabs(m_componentData->drivetrainData->getRelativePositionSetpoint(FORWARD)
 					/ (m_componentData->drivetrainData->getAbsolutePositionSetpoint(FORWARD)
 							- m_componentData->drivetrainData->getPositionControlStartingPosition(FORWARD)))
 					- m_componentData->drivetrainData->getRelativePositionSetpoint(TURN)
 					/ (m_componentData->drivetrainData->getAbsolutePositionSetpoint(TURN)
 							- m_componentData->drivetrainData->getPositionControlStartingPosition(TURN))); // Turn vs. forward proportion difference
+			m_PIDs[POSITION][axis].setSetpoint(0.0);
 			velocitySetpoint = ((m_componentData->drivetrainData->getAbsolutePositionSetpoint(TURN)
 					- m_componentData->drivetrainData->getPositionControlStartingPosition(TURN))
 					/ ((m_componentData->drivetrainData->getAbsolutePositionSetpoint(FORWARD)
