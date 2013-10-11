@@ -73,9 +73,11 @@ double Drivetrain::ComputeOutput(data::drivetrain::ForwardOrTurn axis)
 		}
 		else // Turn control in arc syncing mode
 		{
-			m_PIDs[POSITION][axis].setInput(fabs(m_componentData->drivetrainData->getRelativePositionSetpoint(FORWARD)
+			int sign = Util::Sign(m_componentData->drivetrainData->getAbsolutePositionSetpoint(TURN)
+							- m_componentData->drivetrainData->getPositionControlStartingPosition(TURN));
+			m_PIDs[POSITION][axis].setInput(m_componentData->drivetrainData->getRelativePositionSetpoint(FORWARD)
 					/ (m_componentData->drivetrainData->getAbsolutePositionSetpoint(FORWARD)
-							- m_componentData->drivetrainData->getPositionControlStartingPosition(FORWARD)))
+							- m_componentData->drivetrainData->getPositionControlStartingPosition(FORWARD))
 					- m_componentData->drivetrainData->getRelativePositionSetpoint(TURN)
 					/ (m_componentData->drivetrainData->getAbsolutePositionSetpoint(TURN)
 							- m_componentData->drivetrainData->getPositionControlStartingPosition(TURN))); // Turn vs. forward proportion difference
@@ -86,7 +88,7 @@ double Drivetrain::ComputeOutput(data::drivetrain::ForwardOrTurn axis)
 					- m_componentData->drivetrainData->getPositionControlStartingPosition(FORWARD))
 					/ m_componentData->drivetrainData->getVelocitySetpoint(FORWARD) * m_driveEncoders->getMaxSpeed()))
 					/ m_driveEncoders->getMaxTurnRate(); // Match turn rate to forward rate
-			velocitySetpoint += m_PIDs[POSITION][axis].update(
+			velocitySetpoint += sign * m_PIDs[POSITION][axis].update(
 					1.0 / RobotConfig::LOOP_RATE); // Correction for turn vs. forward proportion difference
 		}
 #else
