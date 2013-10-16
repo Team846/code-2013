@@ -48,6 +48,7 @@ private:
 	double m_errorThreshold;
 	
 	double m_scale;
+	double m_arcGain;
 
 	NetworkTable *table;
 	ofstream m_log_file;

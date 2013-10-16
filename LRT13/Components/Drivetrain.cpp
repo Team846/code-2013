@@ -32,6 +32,7 @@ Drivetrain::Drivetrain() :
 	m_profiled[FORWARD] = new ProfiledPID(m_profiles[FORWARD]);
 	m_profiled[TURN] = new ProfiledPID(m_profiles[TURN]);
 	m_scale = 1.0;
+	m_arcGain = 1.0;
 	table = NetworkTable::GetTable("RobotData");
 }
 
@@ -73,8 +74,6 @@ double Drivetrain::ComputeOutput(data::drivetrain::ForwardOrTurn axis)
 		}
 		else // Turn control in arc syncing mode
 		{
-			int sign = Util::Sign(m_componentData->drivetrainData->getAbsolutePositionSetpoint(TURN)
-							- m_componentData->drivetrainData->getPositionControlStartingPosition(TURN));
 			m_PIDs[POSITION][axis].setInput(m_componentData->drivetrainData->getRelativePositionSetpoint(FORWARD)
 					/ (m_componentData->drivetrainData->getAbsolutePositionSetpoint(FORWARD)
 							- m_componentData->drivetrainData->getPositionControlStartingPosition(FORWARD))
@@ -88,7 +87,7 @@ double Drivetrain::ComputeOutput(data::drivetrain::ForwardOrTurn axis)
 					- m_componentData->drivetrainData->getPositionControlStartingPosition(FORWARD))
 					/ (m_componentData->drivetrainData->getVelocitySetpoint(FORWARD) * m_driveEncoders->getMaxSpeed())))
 					/ m_driveEncoders->getMaxTurnRate(); // Match turn rate to forward rate
-			velocitySetpoint += sign * m_PIDs[POSITION][axis].update(
+			velocitySetpoint += m_arcGain * m_PIDs[POSITION][axis].update(
 					1.0 / RobotConfig::LOOP_RATE); // Correction for turn vs. forward proportion difference
 		}
 #else
@@ -110,11 +109,11 @@ double Drivetrain::ComputeOutput(data::drivetrain::ForwardOrTurn axis)
 //							* m_componentData->drivetrainData->getPositionControlMaxSpeed(
 //									axis);
 #endif
+		m_componentData->drivetrainData->setVelocitySetpoint(axis, velocitySetpoint);
 #ifdef ALTERNATE_VELOCITY
 		rawOutput = velocitySetpoint;
 		break;
 #endif
-		m_componentData->drivetrainData->setVelocitySetpoint(axis, velocitySetpoint);
 		//fall through the switch
 	case data::drivetrain::VELOCITY_CONTROL:
 #ifndef ALTERNATE_VELOCITY
@@ -255,6 +254,7 @@ void Drivetrain::Configure()
 #endif
 
 	m_scale = m_config->Get<double> (Component::GetName(), "speed_scale", 1.0);
+	m_arcGain = m_config->Get<double> (Component::GetName(), "arc_gain", 1.0);
 	m_timeToMax[FORWARD] = m_config->Get<double> (Component::GetName(), "time_to_max_forward", 1.0);
 	m_timeToMax[TURN] = m_config->Get<double> (Component::GetName(), "time_to_max_turn", 1.0);
 }
