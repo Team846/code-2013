@@ -81,12 +81,31 @@ double Drivetrain::ComputeOutput(data::drivetrain::ForwardOrTurn axis)
 					/ (m_componentData->drivetrainData->getAbsolutePositionSetpoint(TURN)
 							- m_componentData->drivetrainData->getPositionControlStartingPosition(TURN))); // Turn vs. forward proportion difference
 			m_PIDs[POSITION][axis].setSetpoint(0.0);
-			velocitySetpoint = ((m_componentData->drivetrainData->getAbsolutePositionSetpoint(TURN)
-					- m_componentData->drivetrainData->getPositionControlStartingPosition(TURN))
-					/ ((m_componentData->drivetrainData->getAbsolutePositionSetpoint(FORWARD)
+			
+//			velocitySetpoint = ((m_componentData->drivetrainData->getAbsolutePositionSetpoint(TURN)
+//					- m_componentData->drivetrainData->getPositionControlStartingPosition(TURN))
+//					/ ((m_componentData->drivetrainData->getAbsolutePositionSetpoint(FORWARD)
+//					- m_componentData->drivetrainData->getPositionControlStartingPosition(FORWARD))
+//					/ (m_componentData->drivetrainData->getVelocitySetpoint(FORWARD) * m_driveEncoders->getMaxSpeed())))
+//					/ m_driveEncoders->getMaxTurnRate(); // Match turn rate to forward rate
+			
+			/* 
+			 * To get a turn velocity from a forward velocity and a desired arc radius, use the following formula:
+			 * Turn = Forward * Robot Width / (2 * Desired Radius),
+			 * derived from arc radius formula (Desired Radius = Robot Width / (1 - Slower Wheel / Faster Wheel) - Robot Width / 2,
+			 * where Slower Wheel = Forward - Turn and Faster Wheel = Forward + Turn).
+			 * Turn is always the same sign as Forward, so add a sign to velocitySetpoint.
+			 * -RC 10/16/2013
+			 */
+			double radius = fabs((m_componentData->drivetrainData->getAbsolutePositionSetpoint(FORWARD)
 					- m_componentData->drivetrainData->getPositionControlStartingPosition(FORWARD))
-					/ (m_componentData->drivetrainData->getVelocitySetpoint(FORWARD) * m_driveEncoders->getMaxSpeed())))
-					/ m_driveEncoders->getMaxTurnRate(); // Match turn rate to forward rate
+					/ ((m_componentData->drivetrainData->getAbsolutePositionSetpoint(TURN)
+					- m_componentData->drivetrainData->getPositionControlStartingPosition(TURN)) * acos(-1) / 180.0)); // Radius = Arc Length (distance setpoint) / Central Angle (angle setpoint to radians)
+			velocitySetpoint = m_componentData->drivetrainData->getVelocitySetpoint(FORWARD)
+					* RobotConfig::ROBOT_WIDTH / (2 * radius); // Match turn rate to forward rate
+			velocitySetpoint *= Util::Sign(m_componentData->drivetrainData->getAbsolutePositionSetpoint(TURN)
+					- m_componentData->drivetrainData->getPositionControlStartingPosition(TURN));
+			
 			velocitySetpoint += m_arcGain * m_PIDs[POSITION][axis].update(
 					1.0 / RobotConfig::LOOP_RATE); // Correction for turn vs. forward proportion difference
 		}

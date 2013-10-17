@@ -1,6 +1,7 @@
 #include "DriveEncoders.h"
 #include "..\Config\RobotConfig.h"
 #include "..\Config\ConfigManager.h"
+#include "../Utils/Util.h"
 
 DriveEncoders* DriveEncoders::m_instance = NULL;
 
@@ -153,4 +154,23 @@ double DriveEncoders::getMaxSpeed()
 double DriveEncoders::getMaxTurnRate()
 {
 	return MAX_TURNING_RATE / TICKS_PER_FULL_TURN * 360;
+}
+
+double DriveEncoders::getTurnRadius()
+{
+	double faster;
+	double slower;
+	if (fabs(getNormalizedSpeed(LEFT)) > fabs(getNormalizedSpeed(RIGHT)))
+	{
+		faster = getNormalizedSpeed(LEFT);
+		slower = getNormalizedSpeed(RIGHT);
+	}
+	else
+	{
+		faster = getNormalizedSpeed(RIGHT);
+		slower = getNormalizedSpeed(LEFT);
+	}
+	if (faster == 0 && slower == 0)
+		return 0;
+	return RobotConfig::ROBOT_WIDTH / (1 - slower / faster) - RobotConfig::ROBOT_WIDTH / 2; // Radius to center of robot -RC
 }

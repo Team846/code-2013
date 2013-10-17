@@ -11,6 +11,7 @@
 namespace RobotConfig
 {
 const uint32_t LOOP_RATE = 50; //hertz
+const double ROBOT_WIDTH = 26.1;
 const std::string CONFIG_FILE_PATH = "/LRT13.conf";
 const std::string ROUTINE_FILE_PATH = "/Autonomous.routine";
 const uint32_t MAX_GAME_PIECES = 4;

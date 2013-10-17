@@ -13,7 +13,9 @@ Arc::Arc(double distance, double angle, double maxSpeed, double errorThreshold)
 void Arc::Run()
 {
 	// Arc length = angle * distance * PI / (180 * sin(angle))
-	// Resulting angle = 2 * angle;
+	// Resulting angle = 2 * angle
+	// Central angle = 2 * angle
+	// Radius = Chord Length / (2 * sin(Angle))
 	m_componentData->drivetrainData->setControlMode(data::drivetrain::FORWARD, data::drivetrain::POSITION_CONTROL);
 	m_componentData->drivetrainData->setRelativePositionSetpoint(data::drivetrain::FORWARD, m_angle * m_distance * acos(-1) / (180 * (sin(m_angle * acos(-1) / 180))), m_maxSpeed, true);
 	m_componentData->drivetrainData->setControlMode(data::drivetrain::TURN, data::drivetrain::POSITION_CONTROL);

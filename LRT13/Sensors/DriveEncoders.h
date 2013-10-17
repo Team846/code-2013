@@ -136,6 +136,13 @@ public:
 	double getNormalizedSpeed(data::drivetrain::Side side);
 	
 	/*!
+	 * @brief Arc radius calculated from turn and forward speed, defined as distance between the center of rotation and the center of the robot
+	 * 
+	 * @return radius of turn
+	 */
+	double getTurnRadius();
+	
+	/*!
 	 * @brief access the LRT Encoder.
 	 */
 	LRTEncoder *getEncoder(data::drivetrain::Side side);
