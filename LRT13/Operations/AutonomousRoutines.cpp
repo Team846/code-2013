@@ -15,6 +15,7 @@
 #include "Routines/Shoot.h"
 #include "Routines/Angle.h"
 #include "Routines/Arms.h"
+#include "Routines/Arc.h"
 #include "Routines/Pause.h"
 #include "Routines/RoutineGroup.h"
 
@@ -84,17 +85,20 @@ void AutonomousRoutines::Update()
 		}
 		if (!routines.empty())
 		{
-			if (beginNext)
-			{
-				routines.front()->Run();
-				beginNext = false;
-			}
 			if (routines.front()->Completed() && !m_joystick->IsButtonDown(DriverStationConfig::JoystickButtons::PAUSE_AUTON))
 			{
 				routines.front()->Stop();
 				delete routines.front();
 				routines.pop();
 				beginNext = true;
+			}
+		}
+		if (!routines.empty())
+		{
+			if (beginNext)
+			{
+				routines.front()->Run();
+				beginNext = false;
 			}
 		}
 	}
@@ -225,6 +229,11 @@ void AutonomousRoutines::LoadRoutine(std::string path)
 					current = new Drive(Util::lexical_cast<double>(arglist[0]),
 							Util::lexical_cast<double>(arglist[1]),
 							Util::lexical_cast<double>(arglist[2]));
+				else if (arglist.size() == 4)
+					current = new Drive(Util::lexical_cast<double>(arglist[0]),
+							Util::lexical_cast<double>(arglist[1]),
+							Util::lexical_cast<double>(arglist[2]),
+							Util::lexical_cast<bool>(arglist[3]));
 				else
 					failed = true;
 			}
@@ -239,6 +248,29 @@ void AutonomousRoutines::LoadRoutine(std::string path)
 					current = new Turn(Util::lexical_cast<double>(arglist[0]),
 							Util::lexical_cast<double>(arglist[1]),
 							Util::lexical_cast<double>(arglist[2]));
+				else
+					failed = true;
+			}
+			else if (command == "arc")
+			{
+				if (arglist.size() == 2)
+					current = new Arc(Util::lexical_cast<double>(arglist[0]),
+							Util::lexical_cast<double>(arglist[1]));
+				else if (arglist.size() == 3)
+					current = new Arc(Util::lexical_cast<double>(arglist[0]),
+							Util::lexical_cast<double>(arglist[1]),
+							Util::lexical_cast<double>(arglist[2]));
+				else if (arglist.size() == 4)
+					current = new Arc(Util::lexical_cast<double>(arglist[0]),
+							Util::lexical_cast<double>(arglist[1]),
+							Util::lexical_cast<double>(arglist[2]),
+							Util::lexical_cast<double>(arglist[3]));
+				else if (arglist.size() == 5)
+					current = new Arc(Util::lexical_cast<double>(arglist[0]),
+							Util::lexical_cast<double>(arglist[1]),
+							Util::lexical_cast<double>(arglist[2]),
+							Util::lexical_cast<double>(arglist[3]),
+							Util::lexical_cast<double>(arglist[4]));
 				else
 					failed = true;
 			}

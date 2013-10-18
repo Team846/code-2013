@@ -104,10 +104,17 @@ double Drivetrain::ComputeOutput(data::drivetrain::ForwardOrTurn axis)
 			velocitySetpoint = m_componentData->drivetrainData->getVelocitySetpoint(FORWARD)
 					* RobotConfig::ROBOT_WIDTH / (2 * radius); // Match turn rate to forward rate
 			velocitySetpoint *= Util::Sign(m_componentData->drivetrainData->getAbsolutePositionSetpoint(TURN)
-					- m_componentData->drivetrainData->getPositionControlStartingPosition(TURN));
+					- m_componentData->drivetrainData->getPositionControlStartingPosition(TURN))
+					* Util::Sign(m_componentData->drivetrainData->getAbsolutePositionSetpoint(FORWARD)
+					- m_componentData->drivetrainData->getPositionControlStartingPosition(FORWARD));
+			AsyncPrinter::Printf("Turn velocity: %f %f %f %f %f %f\n", velocitySetpoint, m_componentData->drivetrainData->getAbsolutePositionSetpoint(FORWARD)
+					- m_componentData->drivetrainData->getPositionControlStartingPosition(FORWARD), m_componentData->drivetrainData->getAbsolutePositionSetpoint(TURN)
+					- m_componentData->drivetrainData->getPositionControlStartingPosition(TURN), m_driveEncoders->getWheelDist(LEFT), m_driveEncoders->getWheelDist(RIGHT), radius);
 			
-			velocitySetpoint += m_arcGain * m_PIDs[POSITION][axis].update(
+			velocitySetpoint += m_arcGain * Util::Sign(m_componentData->drivetrainData->getAbsolutePositionSetpoint(TURN)
+					- m_componentData->drivetrainData->getPositionControlStartingPosition(TURN)) * m_PIDs[POSITION][axis].update(
 					1.0 / RobotConfig::LOOP_RATE); // Correction for turn vs. forward proportion difference
+			AsyncPrinter::Printf("Turn velocitySetpoint: %f\n", velocitySetpoint);
 		}
 #else
 		m_profiled[axis]->setInput(m_componentData->drivetrainData->getCurrentPos(axis) - m_componentData->drivetrainData->getPositionControlStartingPosition(axis));

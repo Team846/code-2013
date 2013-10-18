@@ -127,9 +127,12 @@ void TeleopInputs::Update()
 #else
 				double turn = 0.0;
 				turn = -m_driver_wheel->GetAxis(Joystick::kXAxis);
-				turn *= 3.0 / 4;
+				
+				
 
 				int sign = turn > 0 ? 1 : -1;
+				
+				turn = sign * pow(turn , 2);
 
 				//			turn *= turn * sign;
 				//turn = -m_driver_stick->GetAxis(Joystick::kZAxis);
@@ -147,6 +150,7 @@ void TeleopInputs::Update()
 					forward -= signForward * RobotConfig::Drive::DEADBAND;
 					forward /= 1.0 - RobotConfig::Drive::DEADBAND;
 				}
+				
 
 				//blending routine
 				double absForward = fabs(forward); //to ensure correct arc when switching direction

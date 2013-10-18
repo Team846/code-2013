@@ -186,7 +186,7 @@ void ESC::SetDutyCycle(float dutyCycle)
 		int brake_level = (int) (fabs(command.braking) * 8);
 		bool shouldBrakeThisCycle = ditherPattern[brake_level] & (1
 				<< m_cycle_count);
-
+//		AsyncPrinter::Printf("Braking: %d\n", shouldBrakeThisCycle);
 		
 		if (shouldBrakeThisCycle)
 		{
