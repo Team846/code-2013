@@ -16,6 +16,8 @@
 
 #include "../Log/Loggable.h"
 
+#include "LRTSpeedController.h"
+
 /*!
  * @brief Asynchronous implementation of a CAN driver for the Jaguar
  * @brief Reimplements the large majority of useful operations on the Jaguar
@@ -52,7 +54,7 @@ private:
 	char* m_name;
 
 	CachedValue<float> m_setpoint;
-	CachedValue<AsyncCANJaguar::NeutralMode> m_neutral_mode;
+	CachedValue<LRTSpeedController::NeutralMode> m_neutral_mode;
 	CachedValue<AsyncCANJaguar::ControlMode> m_control_mode;
 	CachedValue<AsyncCANJaguar::PositionReference> m_position_reference;
 	CachedValue<AsyncCANJaguar::SpeedReference> m_speed_reference;
@@ -125,7 +127,7 @@ public:
 	 * @brief Set the duty cycle of the Jaguar
 	 * @param duty_cycle
 	 */
-	void SetDutyCycle(float duty_cycle);
+	virtual void SetDutyCycle(float duty_cycle);
 
 	/*!
 	 * @brief Set the output position of the Jaguar
@@ -141,7 +143,7 @@ public:
 	
 	int GetChannel();
 	
-	char* GetName();
+	virtual char* GetName();
 protected:
 	/*!
 	 * @brief Does the actual CommTask communication, not including timing
@@ -164,7 +166,7 @@ public:
 	 * @brief Set the new neutral mode
 	 * @param mode the new mode
 	 */
-	void ConfigNeutralMode(CANJaguar::NeutralMode mode);
+	virtual void ConfigNeutralMode(LRTSpeedController::NeutralMode mode);
 
 	/*!
 	 * @brief Set the new speed reference

@@ -630,9 +630,9 @@ void Shooter::ManageShooterWheel(int roller)
 	m_jaguars[roller]->ConfigNeutralMode(CANJaguar::kNeutralMode_Coast);
 #else
 	if (normalizedError > 0.1)
-		m_talons[roller]->SetNeutralMode(LRTTalon::kNeutralMode_Brake);
+		m_talons[roller]->ConfigNeutralMode(LRTSpeedController::kNeutralMode_Brake);
 	else
-		m_talons[roller]->SetNeutralMode(LRTTalon::kNeutralMode_Coast);
+		m_talons[roller]->ConfigNeutralMode(LRTTalon::kNeutralMode_Coast);
 #endif
 
 #ifdef OPEN_LOOP

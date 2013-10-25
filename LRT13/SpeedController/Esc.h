@@ -20,7 +20,7 @@ using namespace std;
 class ESC : public Configurable
 {
 public:
-#if TALON
+
 	/*!
 	 * @brief Constructs a new LRT specific ESC object. 
 	 * @param channel Port of the Talon
@@ -28,7 +28,7 @@ public:
 	 * @param encoder 
 	 * @param name
 	 */
-	ESC(int channel, int brakeChannel, LRTEncoder* encoder, string name);
+	ESC(int channel, LRTEncoder* encoder, string name, int brakeChannel);
 	/*!
 	 * @brief Constructs a new LRT specific ESC object. 
 	 * @param channelA Port of the first Talon
@@ -39,7 +39,7 @@ public:
 	 * @param name
 	 */
 	ESC(int channelA, int channelB, int brakeChannelA, int brakeChannelB, LRTEncoder* encoder, string name);
-#else
+
 	/*!
 	 * @brief Constructs a new LRT specific ESC object. 
 	 * @param channel CANID of the Jaguar 
@@ -55,7 +55,8 @@ public:
 	 * @param name
 	 */
 	ESC(int channelA, int channelB, LRTEncoder* encoder, string name);
-#endif
+
+	
 	/*!
 	 * @brief Cleans up the speed controller including cleanup of the jaguar resources.
 	 */
@@ -89,6 +90,7 @@ private:
 #else
 	AsyncCANJaguar *m_jag1, *m_jag2;
 #endif
+	LRTSpeedController *m_controller1, *m_controller2;
 	std::string namea, nameb;
 	
 	float maxVDiff;

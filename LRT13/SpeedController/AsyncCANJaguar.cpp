@@ -176,7 +176,7 @@ INT32 AsyncCANJaguar::Tick()
 		//change the mode, then do the set point.
 		if (m_neutral_mode.hasNewValue())
 		{
-			CANJaguar::ConfigNeutralMode(m_neutral_mode.getValue());
+			CANJaguar::ConfigNeutralMode((CANJaguar::NeutralMode)m_neutral_mode.getValue());
 		}
 
 		//		AsyncPrinter::Printf("O");
@@ -390,7 +390,7 @@ void AsyncCANJaguar::SetPID(double p, double i, double d)
 	m_pid_d.setValue(d);
 }
 
-void AsyncCANJaguar::ConfigNeutralMode(NeutralMode mode)
+void AsyncCANJaguar::ConfigNeutralMode(LRTSpeedController::NeutralMode mode)
 {
 	m_neutral_mode.setValue(mode);
 }

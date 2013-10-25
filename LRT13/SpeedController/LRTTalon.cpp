@@ -31,7 +31,7 @@ LRTTalon::~LRTTalon()
 	}
 }
 
-void LRTTalon::Set(float speed)
+void LRTTalon::SetDutyCycle(float speed)
 {
 	m_pwm = speed;
 }
@@ -51,7 +51,7 @@ void LRTTalon::PIDWrite(float output)
 	Set(output);
 }
 
-void LRTTalon::SetNeutralMode(NeutralMode mode)
+void LRTTalon::ConfigNeutralMode(NeutralMode mode)
 {
 	m_neutral = mode;
 }
@@ -60,7 +60,13 @@ void LRTTalon::Update()
 {
 	Talon::Set(m_pwm);
 	if (m_brake_jumper != NULL)
-		m_brake_jumper->Set((UINT32)m_neutral);
+	{
+		if(m_neutral == LRTSpeedController::kNeutralMode_Coast)
+			m_brake_jumper->Set((UINT32)0);
+		else
+			m_brake_jumper->Set((UINT32)1);
+				
+	}
 }
 
 const char* LRTTalon::GetName()
