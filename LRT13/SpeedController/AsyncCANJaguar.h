@@ -28,7 +28,7 @@
  * @author Karthik Viswanathan
  * @author David Giandomenico
  */
-class AsyncCANJaguar : public SynchronizedProcess, public CANJaguar, public Loggable
+class AsyncCANJaguar : public SynchronizedProcess, public CANJaguar, public Loggable, public LRTSpeedController
 {
 public:
 	// collection flags

@@ -39,8 +39,8 @@ ESC::ESC(int channel, LRTEncoder *encoder, string name) :
 	m_name(name)
 {
 	m_encoder = encoder;
-	m_jag1 = new AsyncCANJaguar(channel, name.c_str());
-	m_jag2 = NULL;
+	m_controller1 = new AsyncCANJaguar(channel, name.c_str());
+	m_controller2 = NULL;
 	m_cycle_count = 0;
 	m_delta_voltage_limit = 13.0;
 	maxVDiff = 2.0;
@@ -53,11 +53,11 @@ ESC::ESC(int channelA, int channelB, LRTEncoder* encoder, string name) :
 	namea = name + "A";
 	nameb = name + "B";
 	
-	m_jag1 = new AsyncCANJaguar(channelA, namea.c_str());
-	m_jag2 = new AsyncCANJaguar(channelB, nameb.c_str());
+	m_controller1 = new AsyncCANJaguar(channelA, namea.c_str());
+	m_controller2 = new AsyncCANJaguar(channelB, nameb.c_str());
 
-	m_jag1->ConfigNeutralMode(LRTSpeedController::kNeutralMode_Coast);
-	m_jag2->ConfigNeutralMode(LRTSpeedController::kNeutralMode_Coast);
+	m_controller1->ConfigNeutralMode(LRTSpeedController::kNeutralMode_Coast);
+	m_controller2->ConfigNeutralMode(LRTSpeedController::kNeutralMode_Coast);
 
 	m_cycle_count = 0;
 	m_delta_voltage_limit = 13.0;

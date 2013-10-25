@@ -85,11 +85,7 @@ public:
 	void Disable();
 	LRTEncoder* m_encoder;
 private:
-#if TALON
-	LRTTalon *m_talon1, *m_talon2;
-#else
-	AsyncCANJaguar *m_jag1, *m_jag2;
-#endif
+
 	LRTSpeedController *m_controller1, *m_controller2;
 	std::string namea, nameb;
 	
