@@ -15,8 +15,8 @@ Climber::Climber() :
 	Component("Climber", DriverStationConfig::DigitalIns::CLIMBER, true), m_configSection("Climber"),
 			m_digital_input_left(RobotConfig::Digital::PTO_SWITCH_LEFT),
 			m_digital_input_right(RobotConfig::Digital::PTO_SWITCH_RIGHT),
-			m_servo_left(RobotConfig::Servo::LEFT_PTO_SERVO, "leftServo"),
-			m_servo_right(RobotConfig::Servo::RIGHT_PTO_SERVO, "rightServo"),
+			m_servo_left(RobotConfig::PWM::LEFT_PTO_SERVO, "leftServo"),
+			m_servo_right(RobotConfig::PWM::RIGHT_PTO_SERVO, "rightServo"),
 			m_winch_gear_tooth((UINT32) RobotConfig::Digital::WINCH_GEAR_TOOTH),
 			m_logFile()
 {

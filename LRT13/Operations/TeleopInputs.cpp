@@ -128,8 +128,6 @@ void TeleopInputs::Update()
 				double turn = 0.0;
 				turn = -m_driver_wheel->GetAxis(Joystick::kXAxis);
 				
-				
-
 				int sign = turn > 0 ? 1 : -1;
 				
 				turn = sign * pow(turn , 2);

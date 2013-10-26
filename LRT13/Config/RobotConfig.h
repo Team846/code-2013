@@ -93,10 +93,13 @@ namespace CAN // Ports 1-16 (2CAN limitation)
 	const uint32_t WINCH_WORM = 6;
 }
 
-namespace Servo
+namespace PWM
 {
 	const uint32_t LEFT_PTO_SERVO = 1;
 	const uint32_t RIGHT_PTO_SERVO = 2;
+	const uint32_t SHOOTER_A = 7;
+	const uint32_t SHOOTER_B = 8;
+	const uint32_t FLASHLIGHT = 6;
 }
 
 

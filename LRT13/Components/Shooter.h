@@ -18,6 +18,7 @@
 #include "../Utils/SmarterDashboard.h"
 //#include "Relay.h"
 #include "DigitalOutput.h"
+#include "PWM.h"
 #include "NetworkTables/NetworkTable.h"
 
 using namespace data;
@@ -94,6 +95,7 @@ private:
 	Notifier m_sensorProcessingNotifier;
 	
 	DigitalOutput* m_flashlight; // Flashlight change
+	PWM* m_flashlightPWM;
 	
 	NetworkTable *table;
 	
@@ -117,7 +119,7 @@ private:
 	
 	bool frisbeeExited;
 	bool frisbeeExitedLastCycle;
-	
+	double m_flashlightBrightness;
 	int m_timeoutCounter;
 };
 

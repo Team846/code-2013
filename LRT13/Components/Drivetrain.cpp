@@ -32,7 +32,7 @@ Drivetrain::Drivetrain() :
 	m_profiled[FORWARD] = new ProfiledPID(m_profiles[FORWARD]);
 	m_profiled[TURN] = new ProfiledPID(m_profiles[TURN]);
 	m_scale = 1.0;
-	m_arcGain = 1.0;
+	m_arcGain = 33.0;
 	table = NetworkTable::GetTable("RobotData");
 }
 
@@ -280,7 +280,7 @@ void Drivetrain::Configure()
 #endif
 
 	m_scale = m_config->Get<double> (Component::GetName(), "speed_scale", 1.0);
-	m_arcGain = m_config->Get<double> (Component::GetName(), "arc_gain", 1.0);
+	m_arcGain = m_config->Get<double> (Component::GetName(), "arc_gain", 33.0);
 	m_timeToMax[FORWARD] = m_config->Get<double> (Component::GetName(), "time_to_max_forward", 1.0);
 	m_timeToMax[TURN] = m_config->Get<double> (Component::GetName(), "time_to_max_turn", 1.0);
 }

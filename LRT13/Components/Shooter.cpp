@@ -33,8 +33,8 @@ Shooter::Shooter() :
 	m_jaguars[INNER] = new AsyncCANJaguar(RobotConfig::CAN::SHOOTER_A,
 			"ShooterBack");
 #else
-	m_talons[OUTER] = new LRTTalon(8, "ShooterFront", 9);
-	m_talons[INNER] = new LRTTalon(7, "ShooterBack", 10);
+	m_talons[OUTER] = new LRTTalon(RobotConfig::PWM::SHOOTER_B, "ShooterFront", 9);
+	m_talons[INNER] = new LRTTalon(RobotConfig::PWM::SHOOTER_A, "ShooterBack", 10);
 #endif
 
 #ifndef TALON
@@ -89,6 +89,8 @@ Shooter::Shooter() :
 	m_ticks = 0;
 
 	m_flashlight = new DigitalOutput(RobotConfig::Digital::FLASHLIGHT); // Flashlight change
+	m_flashlightPWM = new PWM(RobotConfig::PWM::FLASHLIGHT);
+	m_flashlightBrightness = 0.5;
 
 	Configure();
 
@@ -141,6 +143,7 @@ void Shooter::enabledPeriodic()
 	if (m_componentData->shooterData->IsEnabled())
 	{
 		m_flashlight->Set(1); // Flashlight change
+		m_flashlightPWM->SetRaw((int)m_flashlightBrightness * 255);
 		if (m_componentData->shooterData->ShouldLauncherBeHigh())
 		{
 			m_angler->Set(EXTENDED);
@@ -503,6 +506,7 @@ void Shooter::enabledPeriodic()
 		LCD::Instance()->Print(5, 19, false, "%c", ' ');
 		LCD::Instance()->Print(5, 20, false, "%c", ' ');
 		m_flashlight->Set(0);
+		m_flashlightPWM->SetRaw(0);
 		fubarDoDisabledPeriodic();
 		//		disabledPeriodic();
 	}
@@ -632,7 +636,7 @@ void Shooter::ManageShooterWheel(int roller)
 	if (normalizedError > 0.1)
 		m_talons[roller]->ConfigNeutralMode(LRTSpeedController::kNeutralMode_Brake);
 	else
-		m_talons[roller]->ConfigNeutralMode(LRTTalon::kNeutralMode_Coast);
+		m_talons[roller]->ConfigNeutralMode(LRTSpeedController::kNeutralMode_Coast);
 #endif
 
 #ifdef OPEN_LOOP
@@ -672,7 +676,7 @@ void Shooter::ManageShooterWheel(int roller)
 #ifndef TALON
 	m_jaguars[roller]->SetDutyCycle(out);
 #else
-	m_talons[roller]->Set((float)out);
+	m_talons[roller]->SetDutyCycle((float)out);
 #endif
 #endif
 #ifndef TALON
@@ -858,14 +862,21 @@ void Shooter::disabledPeriodic()
 	//	AsyncPrinter::Printf("fl %d\n", sw);
 	//	m_flashlight->Set(sw); // Flashlight change
 	m_flashlight->Set(1); // Flashlight on when setting up the robot
+	m_flashlightPWM->SetRaw((int)m_flashlightBrightness * 255);
 	m_errorIntegrals[OUTER] = 0;
 	m_errorIntegrals[INNER] = 0;
 	atSpeed[OUTER] = false;
 	atSpeed[INNER] = false;
 	if (m_outerSensor->Get())
+	{
 		m_flashlight->Set(1);
+		m_flashlightPWM->SetRaw((int)m_flashlightBrightness * 255);
+	}
 	else
+	{
 		m_flashlight->Set(0);
+		m_flashlightPWM->SetRaw(0);
+	}
 	
 	
 	fubarDoDisabledPeriodic();
@@ -913,6 +924,8 @@ void Shooter::Configure()
 	requiredCyclesDown = c->Get<double> (m_configSection,
 			"cyclesToRetractLoader", 50);
 
+	m_flashlightBrightness = c->Get<double> (m_configSection,
+			"flashlight_brightness", 0.5);
 	ConfigurePIDObject(&m_PIDs[INNER], "InnerWheelPID", 1.0);
 	ConfigurePIDObject(&m_PIDs[OUTER], "OuterWheelPID", 1.0);
 }

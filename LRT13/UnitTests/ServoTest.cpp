@@ -5,8 +5,8 @@
 ServoTest::ServoTest()
 : leftServoValue(1000), rightServoValue(1000)
 {
-	leftServo = new Servo(RobotConfig::Servo::LEFT_PTO_SERVO);
-	rightServo = new Servo(RobotConfig::Servo::RIGHT_PTO_SERVO);
+	leftServo = new Servo(RobotConfig::PWM::LEFT_PTO_SERVO);
+	rightServo = new Servo(RobotConfig::PWM::RIGHT_PTO_SERVO);
 	m_stick = new DebouncedJoystick(DriverStationConfig::JoystickConfig::DRIVER_STICK_PORT,
 									DriverStationConfig::JoystickConfig::NUM_JOYSTICK_BUTTONS,
 									DriverStationConfig::JoystickConfig::NUM_JOYSTICK_AXES);
