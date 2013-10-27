@@ -39,7 +39,7 @@ int RobotData::AllocateKey(string className)
 	int id = ++_id;
 	
 	// assert that this id will be the next one in the vector
-	if(id != m_loggedClasses.size())
+	if((unsigned int)id != m_loggedClasses.size())
 	{
 		// raise error
 		return -1;
@@ -48,15 +48,15 @@ int RobotData::AllocateKey(string className)
 	Data d;
 	
 	d.className = className;
-	d.indexToTypeMap;
-	d.indexToValueMap;
+	//d.indexToTypeMap;
+	//d.indexToValueMap;
 	
 	return id; 
 }
 
 void RobotData::AddValue(int key, string type, string serialized)
 {
-	if(key >= m_loggedClasses.size())
+	if((unsigned int)key >= m_loggedClasses.size())
 	{
 		// raise error
 	}
