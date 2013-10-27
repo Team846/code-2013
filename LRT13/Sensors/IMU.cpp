@@ -57,7 +57,7 @@ void IMU::construct(UINT8 address, UINT8 moduleNum)
 	// You might be asking yourself: why a loop and not a memset?
 	// The answer is:  the double format is not standardized.  All 0-bits
 	// is not guaranteed to be 0.0.  Does it really matter here?  No.
-	for(int i = 0; i < sizeof(m_gyroscopeAngles) / sizeof(double); i++)
+	for(unsigned int i = 0; i < sizeof(m_gyroscopeAngles) / sizeof(double); i++)
 	{
 		m_gyroscopeAngles[i] = 0.0;
 	}
@@ -72,7 +72,7 @@ INT32 IMU::Tick()
 	
 	for(int i = 0; i < kNumPacketsPerGroup; i++)
 	{
-		int bufferIndex = i * kPayloadBytesPerPacket;
+		//int bufferIndex = i * kPayloadBytesPerPacket;
 		UINT8 data[8] = {0};
 		
 		bool result = m_i2c->Transaction(NULL, 0, data, sizeof(data) / sizeof(UINT8));
@@ -110,12 +110,12 @@ INT32 IMU::Tick()
 			return 1;
 		}
 		
-		for(int i = 0; i < sizeof(m_gyroscopeAngles) / sizeof(double); i++)
+		for(unsigned int i = 0; i < sizeof(m_gyroscopeAngles) / sizeof(double); i++)
 		{
 			m_gyroscopeAngles[i] = ReadInt16() / 100.0;
 		}
 		
-		for(int i = 0; i < sizeof(m_accelerometerGyroscopeValues) / sizeof(INT16); i++)
+		for(unsigned int i = 0; i < sizeof(m_accelerometerGyroscopeValues) / sizeof(INT16); i++)
 		{
 			m_accelerometerGyroscopeValues[i] = ReadInt16();
 		}
@@ -138,7 +138,7 @@ double IMU::GetAngle(IMU_Rotational_Axis axis)
 
 UINT8 IMU::ReadUInt8()
 {
-	int index = m_bufferIndex++;
+	unsigned int index = m_bufferIndex++;
 	
 	if(index >= sizeof(m_internalBuffer))
 	{

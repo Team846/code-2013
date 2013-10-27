@@ -70,6 +70,7 @@ INT32 LEDIndicators::Tick()
 	{
 		m_spi->Write(*ptr++);
 	}
+	return 0;
 }
 
 void LEDIndicators::setPixelRangeColor(int startPixel, int endPixel, UINT32 grb)

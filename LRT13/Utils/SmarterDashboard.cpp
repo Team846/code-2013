@@ -83,7 +83,7 @@ void SmarterDashboard::Flush()
 	{
 		Synchronized s(m_queueSem);
 		
-		for(int i = 0; i < m_netBufferQueue.size(); i++)
+		for(unsigned int i = 0; i < m_netBufferQueue.size(); i++)
 		{
 			SD_Message nb = m_netBufferQueue.front();
 			m_netBufferQueue.pop();

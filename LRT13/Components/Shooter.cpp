@@ -520,7 +520,7 @@ void Shooter::enabledPeriodic()
 
 void Shooter::ManageShooterWheel(int roller)
 {
-	const double loopPeriod = 1.0 / RobotConfig::LOOP_RATE;
+	//const double loopPeriod = 1.0 / RobotConfig::LOOP_RATE;
 	const double measuredPeriod = m_encs[roller]->GetPeriod();
 
 	if (measuredPeriod == 0.0)
@@ -532,7 +532,7 @@ void Shooter::ManageShooterWheel(int roller)
 
 	double currentSpeedRPM = m_encs[roller]->GetStopped() ? (0.0) : (60.0
 			/ measuredPeriod);
-	double currentSpeedNormalized = currentSpeedRPM / m_max_speed[roller];
+	//double currentSpeedNormalized = currentSpeedRPM / m_max_speed[roller];
 
 	//TODO fixme, add a switch 	
 	//	m_PIDs[roller].setSetpoint(m_componentData->shooterData->GetDesiredSpeed((Roller)roller));
@@ -905,8 +905,8 @@ void Shooter::Configure()
 			"outer_lowSpeedSetpoint", 3100);
 	m_speed_setpoints[INNER][HIGH] = c->Get<double> (m_configSection,
 			"inner_lowSpeedSetpoint", 2800);
-	retractWait = c->Get<double> (m_configSection, "retractWaitCycles", 15);
-	extendWait = c->Get<double> (m_configSection, "extendWaitCycles", 10);
+	retractWait = (int)c->Get<double> (m_configSection, "retractWaitCycles", 15);
+	extendWait = (int)c->Get<double> (m_configSection, "extendWaitCycles", 10);
 
 	//TODO: Change default values.
 	requiredCyclesAtSpeed = c->Get<int> (m_configSection, "requiredCycles", 3);
@@ -921,7 +921,7 @@ void Shooter::Configure()
 	m_maxNormalizedCurrent = c->Get<double> (m_configSection,
 			"normalizedCurrentThreshold", 1.0);
 
-	requiredCyclesDown = c->Get<double> (m_configSection,
+	requiredCyclesDown = (int)c->Get<double> (m_configSection,
 			"cyclesToRetractLoader", 50);
 
 	m_flashlightBrightness = c->Get<double> (m_configSection,

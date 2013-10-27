@@ -29,6 +29,7 @@ LogManager::~LogManager()
 INT32 LogManager::Tick()
 {
 	LogAll();
+	return 0;
 }
 
 void LogManager::Register(Loggable* loggable)

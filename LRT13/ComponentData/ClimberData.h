@@ -65,7 +65,7 @@ typedef enum humanState
 		void setShouldForceContinueClimbing(bool shouldContinue);
 		
 		bool shouldPotentiallyAbort();
-		bool setShouldPotentiallyAbort(bool shouldAbort);
+		void setShouldPotentiallyAbort(bool shouldAbort);
 
 		//Debug functions
 		bool shouldDebug();
@@ -88,8 +88,8 @@ typedef enum humanState
 		
 		bool shouldPTOChangeDisengage();
 		bool shouldPTOChangeEngage();
-		bool EngagePTO();
-		bool DisengagePTO();
+		void EngagePTO();
+		void DisengagePTO();
 		
 		void changeHooks();
 		

@@ -26,8 +26,8 @@ void EncodersUnitTest::Run()
 	
 	while(true)
 	{
-		INT32 leftEncoderValue = m_leftEncoder.Get();
-		INT32 rightEncoderValue = m_rightEncoder.Get();
+		//INT32 leftEncoderValue = m_leftEncoder.Get();
+		//INT32 rightEncoderValue = m_rightEncoder.Get();
 		
 		double leftEncoderRate = m_leftEncoder.GetRate();
 		double rightEncoderRate = m_rightEncoder.GetRate();

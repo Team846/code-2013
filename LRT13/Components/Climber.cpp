@@ -351,6 +351,8 @@ void Climber::enabledPeriodic()
 			winchPawlOff();
 		}
 		break;
+	case DEBUG_MODE:
+		break;
 	}
 	
 	static int printCounter = 0;

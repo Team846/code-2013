@@ -80,9 +80,9 @@ void InputUnitTest::Run()
 				//Pneumatics::Instance()->setClimberArm(!//Pneumatics::Instance()->GetClimberState());
 			}
 			
-			float rawZAxis = m_stick->GetAxis(Joystick::kZAxis);
-			float rawYAxis = m_stick->GetAxis(Joystick::kYAxis);
-			float rawXAxis = m_wheel->GetAxis(Joystick::kXAxis);
+			//float rawZAxis = m_stick->GetAxis(Joystick::kZAxis);
+			//float rawYAxis = m_stick->GetAxis(Joystick::kYAxis);
+			//float rawXAxis = m_wheel->GetAxis(Joystick::kXAxis);
 	//		
 //			printf("Stick Raw Z Axis: %f. \n", rawZAxis);
 //			printf("Stick Raw Y Axis: %f. \n", rawYAxis);

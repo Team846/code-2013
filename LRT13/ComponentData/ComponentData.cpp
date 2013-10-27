@@ -39,11 +39,11 @@ ComponentData::ComponentData()
 : drivetrainData(new DrivetrainData()),
   shooterData(new ShooterData()),
   collectorData(new CollectorData()),
-  climberData(new ClimberData()),
+  climberData(new ClimberData()),  
+  winchPawlData(new WinchPawlData()),
   configLoaderData(new ConfigLoaderData()),
   ledIndicatorData(new LEDIndicatorData()),
   autoAimData(new AutoAimData()),
-  winchPawlData(new WinchPawlData()),
   routineRecorderData(new RoutineRecorderData())
 {
 	

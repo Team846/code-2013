@@ -22,7 +22,7 @@ void NetServerUnitTest::Run()
 	{
 		NetBuffer b;
 
-		float value = (float)fabs(sin((float)totalTime / 1000.0f));
+		//float value = (float)fabs(sin((float)totalTime / 1000.0f));
 		
 		std::stringstream ss;
 		

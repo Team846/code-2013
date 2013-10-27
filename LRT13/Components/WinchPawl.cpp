@@ -2,10 +2,10 @@
 
 WinchPawl::WinchPawl()
 	: Component("Winch Pawl", DriverStationConfig::DigitalIns::WINCH_PAWL, true),
-	  m_configSection("winch_pawl"),
 	  Configurable(),
+	  m_stopWatch(),
 	  m_jaguar(RobotConfig::CAN::WINCH_WORM, "Winch Pawl Jaguar"),
-	  m_stopWatch()
+	  m_configSection("winch_pawl")
 {
 	m_timedOut = false;
 	

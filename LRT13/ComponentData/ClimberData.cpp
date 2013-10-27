@@ -33,7 +33,7 @@ bool ClimberData::shouldPotentiallyAbort()
 	return m_shouldPotentiallyAbort;
 }
 
-bool ClimberData::setShouldPotentiallyAbort(bool shouldAbort)
+void ClimberData::setShouldPotentiallyAbort(bool shouldAbort)
 {
 	m_shouldPotentiallyAbort = shouldAbort;
 }
@@ -154,12 +154,12 @@ bool ClimberData::shouldPTOChangeEngage()
 	return false;
 }
 
-bool ClimberData::EngagePTO()
+void ClimberData::EngagePTO()
 {
 	m_shouldPTOEngage = true;
 }
 
-bool ClimberData::DisengagePTO()
+void ClimberData::DisengagePTO()
 {
 	m_shouldPTODisEngage = true;
 }
