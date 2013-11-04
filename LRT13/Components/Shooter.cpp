@@ -841,12 +841,15 @@ void Shooter::fubarDoDisabledPeriodic()
 	
 	m_timeoutCounter = 0;
 	
+	table->PutNumber("ShooterInner", m_speedsRPM[INNER] / m_max_speed[INNER]);
+	table->PutNumber("ShooterOuter", m_speedsRPM[OUTER] / m_max_speed[OUTER]);
+	
 #ifndef TALON
 	m_jaguars[OUTER]->SetDutyCycle(0.0F);
 	m_jaguars[INNER]->SetDutyCycle(0.0F);
 #else
-	m_talons[OUTER]->Set(0.0F);
-	m_talons[INNER]->Set(0.0F);
+	m_talons[OUTER]->SetDutyCycle(0.0F);
+	m_talons[INNER]->SetDutyCycle(0.0F);
 #endif
 	//	AsyncPrinter::Printf("Flashlight: %d\n", m_flashlight->Get());
 }
@@ -877,7 +880,7 @@ void Shooter::disabledPeriodic()
 		m_flashlight->Set(0);
 		m_flashlightPWM->SetRaw(0);
 	}
-	
+
 	
 	fubarDoDisabledPeriodic();
 }

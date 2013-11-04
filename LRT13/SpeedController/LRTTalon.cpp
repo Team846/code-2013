@@ -59,7 +59,6 @@ void LRTTalon::ConfigNeutralMode(NeutralMode mode)
 void LRTTalon::Update()
 {
 	Talon::Set(m_pwm);
-	printf("Talon: %f\n", m_pwm);
 	if (m_brake_jumper != NULL)
 	{
 		if(m_neutral == LRTSpeedController::kNeutralMode_Coast)

@@ -5,14 +5,15 @@
 
 PID::PID(double p_gain, double i_gain, double d_gain, double ff_gain,
 		double i_decay, bool feedforward) :
-	m_runningSum(0.87)
+	//m_runningSum(0.87)
+		m_runningSum(IIR_DECAY(0.3))
 {
 	setParameters(p_gain, i_gain, d_gain, ff_gain, i_decay, feedforward);
 	m_IIREnabled = false;
 }
 
 PID::PID() :
-	m_runningSum(0.87)
+		m_runningSum(IIR_DECAY(0.3))
 {
 	setParameters(0, 0, 0);
 	m_IIREnabled = false;

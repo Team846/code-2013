@@ -176,7 +176,7 @@ double Drivetrain::ComputeSide(data::drivetrain::Side side, double forward, doub
 		setpoint = forward - turn;
 	else if (side == RIGHT)
 		setpoint = forward + turn;
-	if (fabs(setpoint) < 2.0E-2)
+	if (fabs(setpoint) < 0.02)
 		m_PIDs[VELOCITY][side - 2].setIIREnabled(true);
 	else
 		m_PIDs[VELOCITY][side - 2].setIIREnabled(false);

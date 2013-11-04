@@ -73,6 +73,8 @@ public:
 	 */
 	void SetDutyCycle(float dutycycle);
 
+	float DitheredBraking(float dutyCycle, float speed);
+	float CurrentLimit(float dutyCycle, float speed);
 	/*!
 	 * @brief Resets the caching.
 	 */
