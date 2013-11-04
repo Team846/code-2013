@@ -140,10 +140,22 @@ void Shooter::onDisable()
 
 void Shooter::enabledPeriodic()
 {
+	
+	if(m_componentData->shooterData->IsFlashlightEnabled())
+	{
+		m_flashlight->Set(1); 
+		m_flashlightPWM->SetRaw((int)m_flashlightBrightness * 255);
+	}
+	else
+	{
+		m_flashlight->Set(0); 
+		m_flashlightPWM->SetRaw((int)128);
+
+	}
+	
 	if (m_componentData->shooterData->IsEnabled())
 	{
-		m_flashlight->Set(1); // Flashlight change
-		m_flashlightPWM->SetRaw((int)m_flashlightBrightness * 255);
+		
 		if (m_componentData->shooterData->ShouldLauncherBeHigh())
 		{
 			m_angler->Set(EXTENDED);
@@ -505,8 +517,6 @@ void Shooter::enabledPeriodic()
 	{
 		LCD::Instance()->Print(5, 19, false, "%c", ' ');
 		LCD::Instance()->Print(5, 20, false, "%c", ' ');
-		m_flashlight->Set(0);
-		m_flashlightPWM->SetRaw(0);
 		fubarDoDisabledPeriodic();
 		//		disabledPeriodic();
 	}
@@ -864,22 +874,22 @@ void Shooter::disabledPeriodic()
 	//	}	
 	//	AsyncPrinter::Printf("fl %d\n", sw);
 	//	m_flashlight->Set(sw); // Flashlight change
-	m_flashlight->Set(1); // Flashlight on when setting up the robot
-	m_flashlightPWM->SetRaw((int)m_flashlightBrightness * 255);
+//	m_flashlight->Set(1); // Flashlight on when setting up the robot
+//	m_flashlightPWM->SetRaw((int)m_flashlightBrightness * 255);
 	m_errorIntegrals[OUTER] = 0;
 	m_errorIntegrals[INNER] = 0;
 	atSpeed[OUTER] = false;
 	atSpeed[INNER] = false;
-	if (m_outerSensor->Get())
-	{
-		m_flashlight->Set(1);
-		m_flashlightPWM->SetRaw((int)m_flashlightBrightness * 255);
-	}
-	else
-	{
-		m_flashlight->Set(0);
-		m_flashlightPWM->SetRaw(0);
-	}
+//	if (m_outerSensor->Get())
+//	{
+//		m_flashlight->Set(1);
+//		m_flashlightPWM->SetRaw((int)m_flashlightBrightness * 255);
+//	}
+//	else
+//	{
+//		m_flashlight->Set(0);
+//		m_flashlightPWM->SetRaw(0);
+//	}
 
 	
 	fubarDoDisabledPeriodic();

@@ -73,7 +73,12 @@ namespace data
 				void SetEnabled(bool enabled);
 				bool IsEnabled();
 				
+				bool IsFlashlightEnabled();
+				void EnableFlashlight(bool on);
+				
 			private:
+				bool m_isFlashlightEnabled;
+				
 				bool m_shouldIncreaseSpeed, m_shouldDecreaseSpeed;
 				double acceptableSpeedError[2];
 				double speed[2];

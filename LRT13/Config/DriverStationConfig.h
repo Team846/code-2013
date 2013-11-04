@@ -53,7 +53,7 @@ const uint32_t PAWL_DOWN = 9;
 const uint32_t PURGE = 10;
 const uint32_t DISENGAGE_PTO = 11;
 const uint32_t ENGAGE_PTO = 12;
-
+const uint32_t FLASHLIGHT = 13;
 const uint32_t STOP_ROBOT = 5;
 const uint32_t REVERSE_DRIVE = 6;
 }

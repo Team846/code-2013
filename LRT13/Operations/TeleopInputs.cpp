@@ -453,6 +453,15 @@ void TeleopInputs::Update()
 		{
 			m_componentData->shooterData->SetEnabled(false);
 		}
+		
+		if(m_operator_stick->IsButtonDown(DriverStationConfig::JoystickButtons::FLASHLIGHT))
+		{
+			m_componentData->shooterData->EnableFlashlight(true);
+		}
+		else
+		{
+			m_componentData->shooterData->EnableFlashlight(false);
+		}
 
 		//		if (fabs(m_driver_stick->GetRawAxis(4)) < 0.1)
 		//		{

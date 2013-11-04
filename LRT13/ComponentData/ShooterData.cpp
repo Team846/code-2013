@@ -148,3 +148,13 @@ double ShooterData::GetSpeedOffset()
 {
 	return speedOffset;
 }
+
+bool ShooterData::IsFlashlightEnabled()
+{
+	return m_isFlashlightEnabled;
+}
+
+void ShooterData::EnableFlashlight(bool on)
+{
+	m_isFlashlightEnabled = on;
+}
