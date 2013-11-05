@@ -454,7 +454,9 @@ void TeleopInputs::Update()
 			m_componentData->shooterData->SetEnabled(false);
 		}
 		
-		if(m_operator_stick->IsButtonDown(DriverStationConfig::JoystickButtons::FLASHLIGHT))
+		if(m_operator_stick->IsButtonDown(DriverStationConfig::JoystickButtons::SHOOTER_ON)
+				|| m_driver_wheel->IsButtonDown(DriverStationConfig::JoystickButtons::FLASHLIGHT_A)
+				|| m_driver_wheel->IsButtonDown(DriverStationConfig::JoystickButtons::FLASHLIGHT_B))
 		{
 			m_componentData->shooterData->EnableFlashlight(true);
 		}

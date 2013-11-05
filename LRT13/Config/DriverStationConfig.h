@@ -38,6 +38,10 @@ const uint32_t SAVE_CONFIG = 7;
 const uint32_t RESET_ZERO = 10;
 const uint32_t PAUSE_AUTON = 11;
 
+//Driver wheel
+const uint32_t FLASHLIGHT_A = 7;
+const uint32_t FLASHLIGHT_B = 11;
+
 //Operator stick
 const uint32_t SHOOTER_OFF = 1;
 const uint32_t SHOOTER_ON = 2;
@@ -53,7 +57,6 @@ const uint32_t PAWL_DOWN = 9;
 const uint32_t PURGE = 10;
 const uint32_t DISENGAGE_PTO = 11;
 const uint32_t ENGAGE_PTO = 12;
-const uint32_t FLASHLIGHT = 13;
 const uint32_t STOP_ROBOT = 5;
 const uint32_t REVERSE_DRIVE = 6;
 }

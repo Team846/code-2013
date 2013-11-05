@@ -21,7 +21,7 @@ public:
 	 * @param feedforward whether or not feedforward is used
 	 */
 	PID(double p_gain, double i_gain, double d_gain, double ff_gain = 1.0,
-			double i_decay = 0.5, bool feedforward = true);
+			double i_decay = 0.5, bool feedforward = true, double filterFreq = 7.0);
 
 	/*!
 	 * @brief Constructs a PID controller with no gains set
@@ -40,7 +40,7 @@ public:
 	 */
 	void setParameters(double p_gain, double i_gain, double d_gain,
 					double ff_gain = 1.0, double i_decay = 0.87,
-					bool feedforward = true);
+					bool feedforward = true, double filterFreq = 7.0);
 
 	/*!
 	 * @brief updates the PID controller, call on each loop

@@ -3,11 +3,11 @@
 #define IIR_DECAY(FREQ) (2 * 3.14159 * (FREQ) / 50)
 
 PID::PID(double p_gain, double i_gain, double d_gain, double ff_gain,
-		double i_decay, bool feedforward) :
+		double i_decay, bool feedforward, double filterFreq) :
 	//m_runningSum(0.87)
-		m_runningSum(IIR_DECAY(7.0))
+		m_runningSum(IIR_DECAY(filterFreq))
 {
-	setParameters(p_gain, i_gain, d_gain, ff_gain, i_decay, feedforward);
+	setParameters(p_gain, i_gain, d_gain, ff_gain, i_decay, feedforward, filterFreq);
 	m_IIREnabled = false;
 }
 
@@ -19,7 +19,7 @@ PID::PID() :
 }
 
 void PID::setParameters(double p_gain, double i_gain, double d_gain,
-		double ff_gain, double i_decay, bool feedforward)
+		double ff_gain, double i_decay, bool feedforward, double filterFreq)
 {
 	reset();
 	m_proportional_gain = p_gain;
@@ -28,6 +28,7 @@ void PID::setParameters(double p_gain, double i_gain, double d_gain,
 	m_feedforward_gain = ff_gain;
 	m_integral_decay = i_decay != 1.0 ? i_decay : 0.9999999999999;
 	m_is_feed_forward = feedforward;
+	m_runningSum.setDecayConstant(IIR_DECAY(filterFreq));
 	enablePID();
 }
 
