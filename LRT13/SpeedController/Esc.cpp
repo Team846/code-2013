@@ -224,7 +224,6 @@ float ESC::DitheredBraking(float dutyCycle, float speed)
 
 float ESC::CurrentLimit(float dutyCycle, float speed)
 {
-	const float kCurrentLimit = 50.0 / 100.0; // % of stall current
 	if (speed < 0)
 	{
 		return -CurrentLimit(-dutyCycle, -speed);
@@ -297,6 +296,5 @@ void ESC::ResetCache()
 		dynamic_cast<AsyncCANJaguar*>(m_controller1)->ResetCache();
 	if(dynamic_cast<AsyncCANJaguar*>(m_controller2))
 		dynamic_cast<AsyncCANJaguar*>(m_controller2)->ResetCache();
-
 }
 

@@ -8,6 +8,7 @@
 #include "../SpeedController/AsyncCANJaguar.h"
 #include "../Config/RobotConfig.h"
 #include "../Config/DriverStationConfig.h"
+#include "../Sensors/DriveEncoders.h"
 #include "../Utils/AsyncPrinter.h"
 #include "../Utils/Stopwatch.h"
 #include "../Utils/SmarterDashboard.h"
@@ -32,6 +33,8 @@ public:
 	
 	void Configure();
 	
+	float CurrentLimit(float dutyCycle, float speed);
+	
 private:
 	Stopwatch m_stopWatch;
 	
@@ -41,6 +44,8 @@ private:
 	
 	ComponentData* m_componentData;
 	WinchPawlData* m_winchPawlData;
+
+	DriveEncoders* m_driving_encoders;
 	
 	bool m_timedOut;
 	
@@ -50,6 +55,8 @@ private:
 	
 	int m_overCurrentCounter;
 	int m_maxOverCurrentCounter;
+	
+	float m_forwardCurrentLimit;
 	
 	bool m_lastEnabled;
 	double m_timeout;

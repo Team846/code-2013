@@ -111,7 +111,7 @@ double Drivetrain::ComputeOutput(data::drivetrain::ForwardOrTurn axis)
 					- m_componentData->drivetrainData->getPositionControlStartingPosition(FORWARD), m_componentData->drivetrainData->getAbsolutePositionSetpoint(TURN)
 					- m_componentData->drivetrainData->getPositionControlStartingPosition(TURN), m_driveEncoders->getWheelDist(LEFT), m_driveEncoders->getWheelDist(RIGHT), radius);
 			
-			velocitySetpoint += m_arcGain * Util::Sign(m_componentData->drivetrainData->getAbsolutePositionSetpoint(TURN)
+			velocitySetpoint += m_arcGain / m_PIDs[POSITION][axis].getProportionalGain() * Util::Sign(m_componentData->drivetrainData->getAbsolutePositionSetpoint(TURN)
 					- m_componentData->drivetrainData->getPositionControlStartingPosition(TURN)) * m_PIDs[POSITION][axis].update(
 					1.0 / RobotConfig::LOOP_RATE); // Correction for turn vs. forward proportion difference
 			AsyncPrinter::Printf("Turn velocitySetpoint: %f\n", velocitySetpoint);

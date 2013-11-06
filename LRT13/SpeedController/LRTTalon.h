@@ -12,8 +12,6 @@ using namespace std;
 class LRTTalon : public Talon, public LRTSpeedController
 {
 public:
-	
-	
 	explicit LRTTalon(UINT32 channel, const char* name, UINT32 jumperChannel = 0);
 	LRTTalon(UINT8 moduleNumber, UINT32 channel, const char* name, UINT32 jumperChannel = 0);
 	virtual ~LRTTalon();
