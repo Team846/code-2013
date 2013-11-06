@@ -98,6 +98,9 @@ private:
 	
 	string m_name;
 	int m_cycle_count;
+	
+	float m_forwardCurrentLimit; // % stall current for acceleration
+	float m_reverseCurrentLimit; // % stall current for reversing direction
 
 	struct brakeAndDutyCycle
 	{

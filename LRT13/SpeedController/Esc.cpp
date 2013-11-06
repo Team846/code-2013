@@ -61,6 +61,10 @@ ESC::ESC(int channelA, int channelB, LRTEncoder* encoder, string name) :
 
 	m_cycle_count = 0;
 	m_delta_voltage_limit = 13.0;
+	
+	m_forwardCurrentLimit = 50.0 / 100.0;
+	m_reverseCurrentLimit = 50.0 / 100.0;
+	
 	printf("Constructed ESC: %s\n", name.c_str());
 }
 
@@ -91,6 +95,9 @@ void ESC::ResetMaxVDiff()
 void ESC::Configure()
 {
 	string configSection("Esc");
+
+	m_forwardCurrentLimit = m_config->Get(configSection, "forwardCurrentLimit", 50.0 / 100.0);
+	m_reverseCurrentLimit = m_config->Get(configSection, "reverseCurrentLimit", 50.0 / 100.0);
 }
 
 ESC::brakeAndDutyCycle ESC::CalculateBrakeAndDutyCycle(float desired_speed,
@@ -217,8 +224,6 @@ float ESC::DitheredBraking(float dutyCycle, float speed)
 
 float ESC::CurrentLimit(float dutyCycle, float speed)
 {
-	// TODO: change delta voltage based on battery
-
 	const float kCurrentLimit = 50.0 / 100.0; // % of stall current
 	if (speed < 0)
 	{
@@ -227,11 +232,11 @@ float ESC::CurrentLimit(float dutyCycle, float speed)
 	// At this point speed >= 0
 	if (dutyCycle > speed) // Current limit accelerating
 	{
-		dutyCycle = Util::Min(dutyCycle, speed + kCurrentLimit);
+		dutyCycle = Util::Min(dutyCycle, speed + m_forwardCurrentLimit);
 	}
 	else if (dutyCycle < 0) // Current limit reversing direction
 	{
-		float limitedDutyCycle = -kCurrentLimit / (1.0 + speed); // speed >= 0 so dutyCycle < -currentLimit
+		float limitedDutyCycle = -m_reverseCurrentLimit / (1.0 + speed); // speed >= 0 so dutyCycle < -currentLimit
 		dutyCycle = Util::Max(dutyCycle, limitedDutyCycle); // Both are negative
 	}
 	
