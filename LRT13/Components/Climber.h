@@ -89,6 +89,9 @@ private:
 	bool m_paused;
 	double m_driveSpeed;
 	int m_armUpTicks;
+	int m_armUpTicksComplete;
+	int m_armDownTicks;
+	int m_swingWaitTicks;
 	int m_climbingLevelGearToothTicks[3];
 	
 	ofstream m_logFile;

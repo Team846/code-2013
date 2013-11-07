@@ -161,7 +161,6 @@ void Climber::enabledPeriodic()
 	}
 	
 	m_climberData->setWaitingState((climber::state)((m_state + 1) % 10 + 10)); // for access from TeleopInputs to scroll starting from current state
-	m_climberData->setCurrentState(m_state);
 	m_climberData->setDesiredState(NOTHING); // reset back to nothing
 
 //	AsyncPrinter::Printf("WTF\n");
@@ -258,19 +257,50 @@ void Climber::enabledPeriodic()
 		
 		m_shooterData->SetLauncherAngleHigh();
 		
-		m_state = ARMS_DOWN;
+		winchPawlOff();
+		
+		m_timer = 0;
+
+		m_drive_train_position = m_winch_gear_tooth.Get();
+		
+		if(m_climberData->shouldContinueClimbing())
+		{
+			m_state = ARMS_UP;
+		}
+		break;
+	case ARMS_UP:
+		m_stateString = "ARMS_UP";
+		m_climberArms->Set(Pneumatics::FORWARD, true);
+
+		winchPawlUp();
+		
+		if (abs(m_winch_gear_tooth.Get() - m_drive_train_position) > m_armUpTicksComplete)
+		{
+			winchPawlOff();
+		}
+		if (m_climberData->shouldContinueClimbing())
+		{
+			m_state = ARMS_DOWN;
+			m_drive_train_position = m_winch_gear_tooth.Get();
+		}
 		break;
 	case ARMS_DOWN:
 		m_stateString = "ARMS_DOWN";
 
-		winchPawlOff();
+		m_shooterData->SetLauncherAngleLow();
+
+		winchPawlDown();
 		
-		// Engage arms to second bar
-		
+		if (abs(m_winch_gear_tooth.Get() - m_drive_train_position) > m_armDownTicks)
+		{
+			winchPawlOff();
+		}
+
 		if(m_climberData->shouldContinueClimbing())
 		{
 			m_state = CLIMB_PREPARE;
 		}
+		
 		break;
 //	case ARM_DOWN_PREPARE:
 //		m_stateString = "ARM_DOWN_PREPARE";
@@ -316,16 +346,29 @@ void Climber::enabledPeriodic()
 		
 		m_driveSpeed = 0.0;
 
+		m_timer = 0;
+		
 #ifdef STEP
 		if(m_climberData->shouldContinueClimbing())
 #endif
-		m_state = CLIMB;
+		m_state = HOOKS_UP;
 		
+		break;
+	case HOOKS_UP:
+		m_hooks->Set(Pneumatics::FORWARD, true);
+		
+		m_timer++;
+		if(m_timer >= m_swingWaitTicks)
+		{
+			m_state = CLIMB;
+		}
 		break;
 	case CLIMB:
 		m_stateString = "CLIMB";
 		
 		// m_driveSpeed is set to 0.0 in CLIMB_PREPARE
+
+		m_hooks->Set(Pneumatics::OFF, true);
 		
 		m_winchPawl->setDutyCyle(1.0F * m_winchPawlDownDirection);
 		
@@ -354,6 +397,8 @@ void Climber::enabledPeriodic()
 	case DEBUG_MODE:
 		break;
 	}
+	
+	m_climberData->setCurrentState(m_state);
 	
 	static int printCounter = 0;
 	
@@ -496,6 +541,9 @@ void Climber::Configure()
 	m_climbingLevelGearToothTicks[2] = m_config->Get<int>(m_configSection, "fromTwentyPointLevelGearToothTicks", 130);
 	
 	m_armUpTicks = m_config->Get<int>(m_configSection, "armUpTicks", 155);
+	m_armUpTicksComplete = m_config->Get<int>(m_configSection, "armUpTicksComplete", 38);
+	m_armDownTicks = m_config->Get<int>(m_configSection, "armDownTicks", 26);
+	m_swingWaitTicks = m_config->Get<int>(m_configSection, "swingWaitTicks", 50);
 }
 
 void Climber::Log()
