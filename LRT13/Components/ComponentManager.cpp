@@ -74,6 +74,7 @@ void ComponentManager::Update()
 		
 		if(comp->IsEnabled())
 		{
+//			AsyncPrinter::Printf("Updating: %s\n", comp->GetName().c_str());
 			comp->enabledPeriodic();
 		}
 		else

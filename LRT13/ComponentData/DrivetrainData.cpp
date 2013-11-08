@@ -8,6 +8,11 @@ using namespace data::drivetrain;
 DrivetrainData::DrivetrainData()
 {
 	m_driveEncoders = DriveEncoders::GetInstance();
+
+	m_overrideCurrentLimitForward = false;
+	m_overrideCurrentLimitReverse = false;
+	m_currentLimitForward = 0.5;
+	m_currentLimitReverse = 0.5;
 	
 	memset(m_controlModes, OPEN_LOOP, sizeof(m_controlModes));
 	memset(m_desiredRates, 0, sizeof(m_desiredRates));
@@ -196,3 +201,44 @@ bool DrivetrainData::syncingArc()
 	return m_syncArc;
 }
 
+void DrivetrainData::overrideForwardCurrentLimit(float limit)
+{
+	m_overrideCurrentLimitForward = true;
+	if (limit < 0)
+		limit = 0;
+	else if (limit > 1.0)
+		limit = 1.0;
+	m_currentLimitForward = limit;
+}
+
+void DrivetrainData::overrideReverseCurrentLimit(float limit)
+{
+	m_overrideCurrentLimitReverse = true;
+	if (limit < 0)
+		limit = 0;
+	else if (limit > 1.0)
+		limit = 1.0;
+	m_currentLimitReverse = limit;
+}
+
+float DrivetrainData::getForwardCurrentLimit()
+{
+	m_overrideCurrentLimitForward = false;
+	return m_currentLimitForward;
+}
+
+float DrivetrainData::getReverseCurrentLimit()
+{
+	m_overrideCurrentLimitReverse = false;
+	return m_currentLimitReverse;
+}
+
+bool DrivetrainData::shouldOverrideForwardCurrentLimit()
+{
+	return m_overrideCurrentLimitForward;
+}
+
+bool DrivetrainData::shouldOverrideReverseCurrentLimit()
+{
+	return m_overrideCurrentLimitReverse;
+}

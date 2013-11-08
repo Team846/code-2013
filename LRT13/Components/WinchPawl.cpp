@@ -87,7 +87,8 @@ void WinchPawl::enabledPeriodic()
 	}
 	
 	float out = m_timedOut ? 0.0 : requestedDutyCycle;
-	out = CurrentLimit(out, m_driving_encoders->getNormalizedForwardSpeed() / 1.07);
+	if (ComponentData::GetInstance()->climberData->isPTOEngaged())
+		out = CurrentLimit(out, m_driving_encoders->getNormalizedForwardSpeed() / 1.07);
 	m_jaguar.SetDutyCycle(out);
 	
 //	AsyncPrinter::Printf("Winch Pawl Actual: %f\n", out);

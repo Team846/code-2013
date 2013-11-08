@@ -170,7 +170,7 @@ void LRTRobot13::Tick()
 	{
 		(*it)->RunOneCycle();
 	}
-		
+
 	// Update all talons
 	for (vector<LRTTalon*>::iterator it = LRTTalon::talon_vector.begin(); it < LRTTalon::talon_vector.end(); it++)
 	{

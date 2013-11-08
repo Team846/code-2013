@@ -29,6 +29,7 @@ Climber::Climber() :
 	m_paused = false;
 	m_previous_state = NOTHING;
 	m_winch_gear_tooth.Start();
+	m_drivetrainCurrentLimit = 0.5;
 	
 	m_winchPawl = m_componentData->winchPawlData;
 	m_climberData = m_componentData->climberData;
@@ -355,6 +356,7 @@ void Climber::enabledPeriodic()
 		
 		break;
 	case HOOKS_UP:
+		m_stateString = "HOOKS_UP";
 		m_hooks->Set(Pneumatics::FORWARD, true);
 		
 		m_timer++;
@@ -370,7 +372,7 @@ void Climber::enabledPeriodic()
 
 		m_hooks->Set(Pneumatics::OFF, true);
 		
-		m_winchPawl->setDutyCyle(1.0F * m_winchPawlDownDirection);
+		m_winchPawl->setDutyCycle(1.0F * m_winchPawlDownDirection);
 		
 		if (fabs(m_driveSpeed) < 1.0)
 		{
@@ -379,6 +381,7 @@ void Climber::enabledPeriodic()
 			m_logFile << "m_driveSpeed: " << m_driveSpeed << endl;
 		}
 		
+		m_componentData->drivetrainData->overrideForwardCurrentLimit(m_drivetrainCurrentLimit);
 		m_componentData->drivetrainData->setControlMode(FORWARD, OPEN_LOOP);
 		m_componentData->drivetrainData->setControlMode(TURN, OPEN_LOOP);
 		m_componentData->drivetrainData->setOpenLoopOutput(FORWARD, m_driveSpeed);
@@ -423,6 +426,8 @@ void Climber::enabledPeriodic()
 
 void Climber::disengagePTO(bool force)
 {
+	m_climberData->setPTOEngaged(false);
+	
 	if(!m_ptoEngaged && !force)
 		return;
 	
@@ -438,6 +443,8 @@ void Climber::disengagePTO(bool force)
 
 void Climber::engagePTO(bool force)
 {	
+	m_climberData->setPTOEngaged(true);
+	
 	if(m_ptoEngaged && !force)
 		return;
 	
@@ -459,15 +466,13 @@ void Climber::winchPawlUp(bool fast)
 	{
 		fast = true; //not sketch at all
 		driveSpeed = fast ? 1.0 : 0.3;
+		m_componentData->drivetrainData->overrideForwardCurrentLimit(m_drivetrainCurrentLimit);
+		m_componentData->drivetrainData->setControlMode(FORWARD, OPEN_LOOP);
+		m_componentData->drivetrainData->setControlMode(TURN, OPEN_LOOP);
+		m_componentData->drivetrainData->setOpenLoopOutput(FORWARD, driveSpeed * m_winchPawlDownDirection);
+		m_componentData->drivetrainData->setOpenLoopOutput(TURN, 0.0);
 	}
-	m_winchPawl->setDutyCyle((fast ? 1.0 : 0.5) * m_winchPawlUpDirection);
-
-
-	
-	m_componentData->drivetrainData->setControlMode(FORWARD, OPEN_LOOP);
-	m_componentData->drivetrainData->setControlMode(TURN, OPEN_LOOP);
-	m_componentData->drivetrainData->setOpenLoopOutput(FORWARD, driveSpeed * m_winchPawlDownDirection);
-	m_componentData->drivetrainData->setOpenLoopOutput(TURN, 0.0);
+	m_winchPawl->setDutyCycle((fast ? 1.0 : 0.5) * m_winchPawlUpDirection);
 }
 
 void Climber::winchPawlDown(bool fast)
@@ -478,14 +483,13 @@ void Climber::winchPawlDown(bool fast)
 	{
 		fast = true;//not sketch at all
 		driveSpeed = fast ? 1.0 : 0.3;
+		m_componentData->drivetrainData->overrideForwardCurrentLimit(m_drivetrainCurrentLimit);
+		m_componentData->drivetrainData->setControlMode(FORWARD, OPEN_LOOP);
+		m_componentData->drivetrainData->setControlMode(TURN, OPEN_LOOP);
+		m_componentData->drivetrainData->setOpenLoopOutput(FORWARD, driveSpeed * m_winchPawlUpDirection);
+		m_componentData->drivetrainData->setOpenLoopOutput(TURN, 0.0);
 	}
-
-	m_winchPawl->setDutyCyle((fast ? 1.0 : 0.5) * m_winchPawlDownDirection);
-	
-	m_componentData->drivetrainData->setControlMode(FORWARD, OPEN_LOOP);
-	m_componentData->drivetrainData->setControlMode(TURN, OPEN_LOOP);
-	m_componentData->drivetrainData->setOpenLoopOutput(FORWARD, driveSpeed * m_winchPawlUpDirection);
-	m_componentData->drivetrainData->setOpenLoopOutput(TURN, 0.0);
+	m_winchPawl->setDutyCycle((fast ? 1.0 : 0.5) * m_winchPawlDownDirection);
 }
 
 void Climber::winchPawlOff()
@@ -498,7 +502,7 @@ void Climber::winchPawlOff()
 		m_componentData->drivetrainData->setOpenLoopOutput(TURN, 0.0);
 	}
 	
-	m_winchPawl->setDutyCyle(0.0f);
+	m_winchPawl->setDutyCycle(0.0f);
 }
 
 void Climber::disabledPeriodic()
@@ -511,6 +515,7 @@ void Climber::disabledPeriodic()
 	
 	m_componentData->climberData->setDesiredClimbingStep(INTENDED_IDLE );
 	m_state = NOTHING;//Restart the routine, makes debugging easier.
+	m_climberData->setCurrentState(m_state);
 	static int e = 0;
 	e++;
 //	if (e % 10 == 0)
@@ -544,6 +549,8 @@ void Climber::Configure()
 	m_armUpTicksComplete = m_config->Get<int>(m_configSection, "armUpTicksComplete", 38);
 	m_armDownTicks = m_config->Get<int>(m_configSection, "armDownTicks", 26);
 	m_swingWaitTicks = m_config->Get<int>(m_configSection, "swingWaitTicks", 50);
+	
+	m_drivetrainCurrentLimit = m_config->Get<float>(m_configSection, "drivetrainCurrentLimit", 0.5);
 }
 
 void Climber::Log()

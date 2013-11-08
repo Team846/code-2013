@@ -93,6 +93,7 @@ private:
 	int m_armDownTicks;
 	int m_swingWaitTicks;
 	int m_climbingLevelGearToothTicks[3];
+	float m_drivetrainCurrentLimit;
 	
 	ofstream m_logFile;
 	

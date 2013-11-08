@@ -12,7 +12,7 @@ namespace data
 		public:
 			WinchPawlData();
 			
-			void setDutyCyle(float f);
+			void setDutyCycle(float f);
 			float getDutyCycle();
 
 			void updateMotorCurrent(double d); // this should ONLY be used by the winch pawl component

@@ -226,6 +226,25 @@ void Drivetrain::enabledPeriodic()
 		m_log_file << (double) (ticks++ / 50.0) << "," << m_driveEncoders->getNormalizedForwardSpeed() * m_driveEncoders->getMaxSpeed() << "," << m_profiles[FORWARD]->getVelocity() << ',' << m_componentData->drivetrainData->getCurrentPos(FORWARD) - m_componentData->drivetrainData->getPositionControlStartingPosition(FORWARD) << ',' << m_profiles[FORWARD]->getOutput() << '\n';
 	lastSpeed[LEFT] = m_driveEncoders->getNormalizedSpeed(drivetrain::LEFT);
 	lastSpeed[RIGHT] = m_driveEncoders->getNormalizedSpeed(drivetrain::RIGHT);
+	
+	if (m_componentData->drivetrainData->shouldOverrideForwardCurrentLimit())
+	{
+		m_escs[LEFT]->SetForwardCurrentLimit(m_componentData->drivetrainData->getForwardCurrentLimit());
+		m_escs[RIGHT]->SetForwardCurrentLimit(m_componentData->drivetrainData->getForwardCurrentLimit());
+	}
+	else
+	{
+		ConfigureForwardCurrentLimit();
+	}
+	if (m_componentData->drivetrainData->shouldOverrideReverseCurrentLimit())
+	{
+		m_escs[LEFT]->SetReverseCurrentLimit(m_componentData->drivetrainData->getReverseCurrentLimit());
+		m_escs[RIGHT]->SetReverseCurrentLimit(m_componentData->drivetrainData->getReverseCurrentLimit());
+	}
+	else
+	{
+		ConfigureReverseCurrentLimit();
+	}
 	if (DriverStation::GetInstance()->GetBatteryVoltage() < 7.0)
 	{
 		AsyncPrinter::Printf("Decreasing current\n");
@@ -279,6 +298,9 @@ void Drivetrain::Configure()
 	ConfigurePIDObject(&m_PIDs[POSITION][FORWARD], "position_fwd", false);
 #endif
 
+	ConfigureForwardCurrentLimit();
+	ConfigureReverseCurrentLimit();
+	
 	m_scale = m_config->Get<double> (Component::GetName(), "speed_scale", 1.0);
 	m_arcGain = m_config->Get<double> (Component::GetName(), "arc_gain", 33.0);
 	m_timeToMax[FORWARD] = m_config->Get<double> (Component::GetName(), "time_to_max_forward", 1.0);
@@ -301,4 +323,16 @@ void Drivetrain::ConfigurePIDObject(PID *pid, std::string objName,
 			m_config->Get<double> (Component::GetName(), objName + "_D", 0.0);
 
 	pid->setParameters(p, i, d, 1.0, 0.87, feedForward);//super high decay, this makes it just like a filter. If you want it to act more like an integral you reduce the decay. This must be tuned. 
+}
+
+void Drivetrain::ConfigureForwardCurrentLimit()
+{
+	m_escs[LEFT]->SetForwardCurrentLimit(m_config->Get<float>(Component::GetName(), "forwardCurrentLimit", 50.0 / 100.0));
+	m_escs[RIGHT]->SetForwardCurrentLimit(m_config->Get<float>(Component::GetName(), "forwardCurrentLimit", 50.0 / 100.0));
+}
+
+void Drivetrain::ConfigureReverseCurrentLimit()
+{
+	m_escs[LEFT]->SetReverseCurrentLimit(m_config->Get<float>(Component::GetName(), "reverseCurrentLimit", 50.0 / 100.0));
+	m_escs[RIGHT]->SetReverseCurrentLimit(m_config->Get<float>(Component::GetName(), "reverseCurrentLimit", 50.0 / 100.0));
 }

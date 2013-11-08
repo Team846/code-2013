@@ -111,6 +111,9 @@ typedef enum humanState
 		state getWaitingState();
 		void setShouldHooksChange(bool hooksDown);
 		bool shouldHooksChange();
+		
+		bool isPTOEngaged();
+		void setPTOEngaged(bool engaged);
 	private:
 		humanState m_desiredClimbingStep;
 		bool m_shouldContinueClimbing, m_shouldForceContinueClimbing;
@@ -122,6 +125,7 @@ typedef enum humanState
 		
 		bool m_shouldPTOEngage;
 		bool m_shouldPTODisEngage;
+		bool m_PTOEngaged;
 		
 		bool m_shoulddebug;
 		

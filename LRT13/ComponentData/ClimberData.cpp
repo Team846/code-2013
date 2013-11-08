@@ -13,6 +13,7 @@ ClimberData::ClimberData()
 	
 	m_shouldPTOEngage = false;
 	m_shouldPTODisEngage = false;
+	m_PTOEngaged = false;
 
 	m_shouldPotentiallyAbort = false;
 	
@@ -222,4 +223,14 @@ bool ClimberData::shouldHooksChange()
 		return true;
 	}
 	return false;
+}
+
+bool ClimberData::isPTOEngaged()
+{
+	return m_PTOEngaged;
+}
+
+void ClimberData::setPTOEngaged(bool engaged)
+{
+	m_PTOEngaged = engaged;
 }

@@ -130,7 +130,7 @@ void TeleopInputs::Update()
 				
 				int sign = turn > 0 ? 1 : -1;
 				
-				turn = sign * pow(turn , 2);
+				turn = pow(turn , 3);
 
 				//			turn *= turn * sign;
 				//turn = -m_driver_stick->GetAxis(Joystick::kZAxis);

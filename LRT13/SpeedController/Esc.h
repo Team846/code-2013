@@ -73,8 +73,9 @@ public:
 	 */
 	void SetDutyCycle(float dutycycle);
 
-	float DitheredBraking(float dutyCycle, float speed);
-	float CurrentLimit(float dutyCycle, float speed);
+	void SetForwardCurrentLimit(float limit);
+	void SetReverseCurrentLimit(float limit);
+	
 	/*!
 	 * @brief Resets the caching.
 	 */
@@ -87,6 +88,8 @@ public:
 	void Disable();
 	LRTEncoder* m_encoder;
 private:
+	float DitheredBraking(float dutyCycle, float speed);
+	float CurrentLimit(float dutyCycle, float speed);
 
 	LRTSpeedController *m_controller1, *m_controller2;
 	std::string namea, nameb;

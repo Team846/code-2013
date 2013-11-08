@@ -75,6 +75,13 @@ namespace drivetrain
 		
 		void syncArc();
 		bool syncingArc();
+		
+		void overrideForwardCurrentLimit(float limit);
+		void overrideReverseCurrentLimit(float limit);
+		float getForwardCurrentLimit();
+		float getReverseCurrentLimit();
+		bool shouldOverrideForwardCurrentLimit();
+		bool shouldOverrideReverseCurrentLimit();
 	
 	private:
 		
@@ -88,6 +95,10 @@ namespace drivetrain
 		float m_zeroHeading;
 		bool m_positionSetpointChanged[2];
 		bool m_syncArc;
+		bool m_overrideCurrentLimitForward;
+		bool m_overrideCurrentLimitReverse;
+		float m_currentLimitForward;
+		float m_currentLimitReverse;
 		
 		typedef struct drivetrainOpSem
 		{

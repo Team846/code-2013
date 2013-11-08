@@ -56,6 +56,8 @@ private:
 	double lastSpeed[4];
 	
 	void ConfigurePIDObject(PID *pid, std::string objName, bool feedForward);
+	void ConfigureForwardCurrentLimit();
+	void ConfigureReverseCurrentLimit();
 	double ComputeOutput(data::drivetrain::ForwardOrTurn axis);
 	double ComputeSide(data::drivetrain::Side side, double forward, double turn);
 };

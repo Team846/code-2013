@@ -5,6 +5,7 @@
 
 #include "../ComponentData/ComponentData.h"
 #include "../ComponentData/WinchPawlData.h"
+#include "../ComponentData/ClimberData.h"
 #include "../SpeedController/AsyncCANJaguar.h"
 #include "../Config/RobotConfig.h"
 #include "../Config/DriverStationConfig.h"

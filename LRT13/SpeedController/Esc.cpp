@@ -96,8 +96,8 @@ void ESC::Configure()
 {
 	string configSection("Esc");
 
-	m_forwardCurrentLimit = m_config->Get(configSection, "forwardCurrentLimit", 50.0 / 100.0);
-	m_reverseCurrentLimit = m_config->Get(configSection, "reverseCurrentLimit", 50.0 / 100.0);
+//	m_forwardCurrentLimit = m_config->Get(configSection, "forwardCurrentLimit", 50.0 / 100.0);
+//	m_reverseCurrentLimit = m_config->Get(configSection, "reverseCurrentLimit", 50.0 / 100.0);
 }
 
 ESC::brakeAndDutyCycle ESC::CalculateBrakeAndDutyCycle(float desired_speed,
@@ -282,6 +282,17 @@ float ESC::CurrentLimit(float dutyCycle, float speed)
 //		}
 //	}
 }
+
+void ESC::SetForwardCurrentLimit(float limit)
+{
+	m_forwardCurrentLimit = limit;
+}
+
+void ESC::SetReverseCurrentLimit(float limit)
+{
+	m_reverseCurrentLimit = limit;
+}
+
 void ESC::Disable()
 {
 	m_controller1->SetDutyCycle(0.0);

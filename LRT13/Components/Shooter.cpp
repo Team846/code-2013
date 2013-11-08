@@ -158,13 +158,13 @@ void Shooter::enabledPeriodic()
 		
 		if (m_componentData->shooterData->ShouldLauncherBeHigh())
 		{
-			m_angler->Set(EXTENDED);
+			m_angler->Set(EXTENDED, true);
 			//		AsyncPrinter::Printf("High\n");
 		}
 		else
 		{
 			//		AsyncPrinter::Printf("Low\n");
-			m_angler->Set(RETRACTED);
+			m_angler->Set(RETRACTED, true);
 		}
 
 		//	AsyncPrinter::Printf("Period %.5f\n", m_encs[INNER]->GetPeriod());
@@ -316,8 +316,11 @@ void Shooter::enabledPeriodic()
 			{
 			case FIRING_OFF:
 				firingWaitTicks = 0;
-				m_pusher->Set(RETRACTED);
-				m_fireState = RETRACT_LOADER_WAIT_FOR_LIFT;
+				if (atSpeed[OUTER] && atSpeed[INNER])
+				{
+					m_pusher->Set(RETRACTED);
+					m_fireState = RETRACT_LOADER_WAIT_FOR_LIFT;
+				}
 				break;
 			case RETRACT_LOADER_WAIT_FOR_LIFT:
 				m_pusher->Set(RETRACTED);
@@ -360,8 +363,11 @@ void Shooter::enabledPeriodic()
 			{
 			case FIRING_OFF:
 				firingWaitTicks = 0;
-				m_pusher->Set(RETRACTED);
-				m_fireState = RETRACT_LOADER_WAIT_FOR_LIFT;
+				if (atSpeed[OUTER] && atSpeed[INNER])
+				{
+					m_pusher->Set(RETRACTED);
+					m_fireState = RETRACT_LOADER_WAIT_FOR_LIFT;
+				}
 				break;
 			case RETRACT_LOADER_WAIT_FOR_LIFT:
 				m_pusher->Set(RETRACTED);
@@ -370,8 +376,7 @@ void Shooter::enabledPeriodic()
 				{
 					m_fireState = RETRACT_LOADER_WAIT_FOR_FALL;
 				}
-				if (firingWaitTicks >= retractWait && atSpeed[OUTER]
-						&& atSpeed[INNER])
+				if (firingWaitTicks >= retractWait)
 				{
 					m_pusher->Set(EXTENDED);
 					m_fireState = EXTEND_LOADER;

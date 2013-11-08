@@ -9,7 +9,7 @@ WinchPawlData::WinchPawlData()
 	m_dutyCycle = 0.0f;
 }
 
-void WinchPawlData::setDutyCyle(float f)
+void WinchPawlData::setDutyCycle(float f)
 {
 	m_dutyCycle = f;
 }
