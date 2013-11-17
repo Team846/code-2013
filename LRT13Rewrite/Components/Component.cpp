@@ -1,39 +1,40 @@
 #include "Component.h"
+#include "../RobotState.h"
 
-Component::Component(std::string name, int dio, bool requiresEnabledState)
-: m_componentData(data::ComponentData::GetInstance()),
-  m_name(name)
+vector<Component*> Component::component_vector;
+
+Component::Component(const char *name, int di, bool requiresEnabledState) :
+	m_name(name), m_digitalIn(di), m_requiresEnabled(requiresEnabledState)
 {
-	m_DIO = dio;
-	m_requiresEnabled = requiresEnabledState;
+	component_vector.push_back(this);
 }
 
 Component::~Component()
 {
 }
 
-std::string Component::GetName()
+void Component::Update()
+{
+	if (RobotState::Instance().GameMode() != RobotState::DISABLED || !m_requiresEnabled)
+	{
+		if (m_digitalIn == -1 || DriverStation::GetInstance()->GetDigitalIn(m_digitalIn))
+		{
+			UpdateEnabled();
+		}
+		else
+		{
+			UpdateDisabled();
+		}
+	}
+	else
+	{
+		UpdateDisabled();
+	}
+}
+
+const char* Component::GetName()
 {
 	return m_name;
-}
-
-void Component::Enable()
-{
-	onEnable();
-	
-	m_enabled = true;
-}
-
-void Component::Disable()
-{
-	onDisable();
-	
-	m_enabled = false;
-}
-
-bool Component::IsEnabled()
-{
-	return m_enabled;
 }
 
 bool Component::EnableRequired()
@@ -41,7 +42,8 @@ bool Component::EnableRequired()
 	return m_requiresEnabled;
 }
 
-int Component::GetDIO()
+int Component::GetDigitalIn()
 {
-	return m_DIO;
+	return m_digitalIn;
 }
+

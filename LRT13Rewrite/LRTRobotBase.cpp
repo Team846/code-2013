@@ -15,16 +15,12 @@ LRTRobotBase::~LRTRobotBase()
 
 void LRTRobotBase::StartCompetition()
 {
-	//Diagnostic: Print the task name.
 	printf("vxWorks task: %s\n", m_task->GetName()); //Maybe this line was crashing it...
 
 	GetWatchdog().SetEnabled(false);
 	m_loopSynchronizer.StartPeriodic(1.0/50.0);
 
-	// first and one-time initialization
 	RobotInit();
-//	
-//	//start the thread
 	Run();
 }
 
@@ -33,11 +29,11 @@ void LRTRobotBase::Run()
 	while(true)
 	{
 		semTake(m_loopSynchSem, WAIT_FOREVER);
-		Tick();
+		Main();
 	}
 }
 
-void LRTRobotBase::Tick()
+void LRTRobotBase::Main()
 {
 	printf("LRTRobotBase::Run(): Override me!");
 }

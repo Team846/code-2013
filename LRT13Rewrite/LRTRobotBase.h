@@ -19,7 +19,7 @@ public:
 	
 
 	// Function to execute each pass in the loop; similar to a main function, but it gets run multiple times.
-	virtual void Tick();
+	virtual void Main();
 
 private:
 	// Function to execute each pass in the loop; similar to a main function, but it gets run multiple times.
