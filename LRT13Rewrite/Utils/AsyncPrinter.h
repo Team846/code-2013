@@ -8,14 +8,13 @@
 #include "../Process/AsyncProcess.h"
 
 /*!
- * @brief Asynchronous process for non-blocking printf
- * @author Tony Peng
+ * @brief Asynchronous process for non-blocking printf.
  */
 
 class AsyncPrinter : public AsyncProcess
 {
 public:
-	static AsyncPrinter* Instance();
+	static void Initialize();
 	static void Finalize();
 	
 	static int Printf(const char* msg, ...);

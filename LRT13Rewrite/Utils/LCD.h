@@ -3,6 +3,7 @@
 
 #include <WPILib.h>
 #include "../Process/SynchronizedProcess.h"
+#include "../RobotState.h"
 
 /**
  * Provides LCD output on the Driver Station LCD. Utilizes scrolling.
@@ -35,14 +36,12 @@ public:
 
 	void ScrollLCD(int x, int y);
 
-	static void UpdateGameTime(double time);
-
 protected:
 	virtual INT32 Tick();
 
 private:
 	LCD();
-	static LCD* instance;
+	static LCD *instance;
 	DISALLOW_COPY_AND_ASSIGN(LCD);
 
 	int curLineIndex;
@@ -55,12 +54,12 @@ private:
 	// even on the new DriverStation, still 21 char
 	static const UINT8 kNumLcdPhysicalColumns = 21;
 
-	const char* loadArray;
-	char* textBuffer;
-	char* outputBuffer;
-	semaphore* textBufferSemaphore;
+	const char *loadArray;
+	char *textBuffer;
+	char *outputBuffer;
+	semaphore *textBufferSemaphore;
 
-	static double gameTime;
+	RobotState &m_robotState;
 };
 
 #endif //LRT_DRIVER_STATION_LCD_H_

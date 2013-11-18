@@ -14,11 +14,14 @@ using namespace std;
 class Output
 {
 public:
-	Output();
-	virtual const char* GetName() = 0;
+	Output(const char *name);
+	virtual const char* GetName();
 	virtual void Update() = 0;
 	
 	static vector<Output*> output_vector;
+	
+private:
+	const char *m_name;
 };
 
 #endif

@@ -6,11 +6,11 @@
 #include <Synchronized.h>
 
 LCD* LCD::instance = NULL;
-double LCD::gameTime = -1.0;
 
 LCD::LCD() :
-	SynchronizedProcess("LCD", Task::kDefaultPriority + 2),
-	loadArray("\\|/-")
+	SynchronizedProcess("LCD", Task::kDefaultPriority + 3),
+	loadArray("\\|/-"),
+	m_robotState(RobotState::Instance())
 {
 	textBuffer = new char[kNumBufferLines * kNumBufferColumns];
 	outputBuffer = new char[USER_DS_LCD_DATA_SIZE];
@@ -37,7 +37,7 @@ LCD* LCD::Instance()
 
 void LCD::Finalize()
 {
-	DELETE(instance);
+	delete instance;
 }
 
 void LCD::Print(UINT8 line, UINT8 index, bool clear, const char* format, ...)
@@ -110,15 +110,10 @@ INT32 LCD::Tick()
 		LCDUpdate();
 
 	char heartbeat = loadArray[(loops / 10) % 4];
-	Print(kHeartbeatLine, 0, true, "%c  %s  %f", heartbeat, "LRT13", gameTime);
+	Print(kHeartbeatLine, 0, true, "%c  %s  %f", heartbeat, "LRT14", m_robotState.TotalTime());
 //	Print(5, 0, true, "");
 //	Print(5, loops % 42 >= 21 ? loops % 21 : 20 - loops % 21, true, "%c", '_');
 	loops++;
 	
 	return 0;
-}
-
-void LCD::UpdateGameTime(double time)
-{
-	gameTime = time;
 }

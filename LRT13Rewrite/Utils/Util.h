@@ -14,6 +14,8 @@
  * @author Brian Axelrod
  * @author David Giandomenico
  * @author Tony Peng
+ * @author Raphael Chang
+ * @author Manoj Vasishta
  */
 
 using namespace std;

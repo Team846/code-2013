@@ -28,7 +28,6 @@ RobotState::RobotState()
 
 RobotState::~RobotState()
 {
-	
 }
 
 RobotState::Mode RobotState::GameMode()

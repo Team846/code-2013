@@ -7,8 +7,6 @@
 class LRTRobotBase : public RobotBase
 {
 public:
-	static bool IsRunning();
-	
 	LRTRobotBase();
 	virtual ~LRTRobotBase();
 	

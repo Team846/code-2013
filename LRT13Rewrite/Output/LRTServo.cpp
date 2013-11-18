@@ -2,25 +2,46 @@
 #include "../Utils/AsyncPrinter.h"
 #include "../Utils/Util.h"
 
-LRTServo::LRTServo(UINT32 channel, char* name)
+LRTServo::LRTServo(UINT32 channel, const char* name)
     : Servo(channel)
-    , enabled(true)
-    , previous_value_(999.0) //an out of range value
-    , m_name(name)
+	, Output(name)
+    , m_controlMode(kValue)
+	, m_value(0.0)
+    , enabled(false)
+    , previous_value(999.0)
 {
-    if(!m_name) m_name = "servo";
-    printf("Created %s on channel %d\n", m_name, channel);
+    printf("Created LRTServo %s on channel %d\n", name, channel);
 }
 
 LRTServo::~LRTServo()
 {
 }
 
+void LRTServo::Update()
+{
+	if (enabled)
+	{
+		switch(m_controlMode)
+		{
+		case kValue:
+	        Servo::Set(m_value);
+			break;
+		case kMicroseconds:
+	    	float val = (float)(m_value - MIN_VAL) / (MAX_VAL - MIN_VAL);
+	        Servo::Set(val);
+			break;
+		case kAngle:
+	        Servo::SetAngle(m_value);
+			break;
+		}
+	}
+	else
+        this->SetOffline();
+}
+
 void LRTServo::SetEnabled(bool enabled)
 {
     this->enabled = enabled;
-    if(!enabled)
-        this->SetOffline();
 }
 
 bool LRTServo::IsEnabled()
@@ -30,30 +51,38 @@ bool LRTServo::IsEnabled()
 
 void LRTServo::Set(float value)
 {
-    if(enabled)
-    {
-        if(previous_value_ != value)
-            AsyncPrinter::Printf("%s set: %4f\n", m_name, previous_value_ = value);
-
-        Servo::Set(value);
-    }
+	m_controlMode = kValue;
+	m_value = value;
 }
 
 void LRTServo::SetMicroseconds(int ms) 
 {
-    if(enabled)
-    {
-    	// TODO: CHANGE CONSTANTS TO CONFIG
-    	const int MIN_VAL = 727;
-    	const int MAX_VAL = 2252;
-    	ms = Util::Clamp<int>(ms, MIN_VAL, MAX_VAL);
-    	float val = (float)(ms - MIN_VAL) / (MAX_VAL - MIN_VAL);
-        Servo::Set(val);
-    }
+	m_controlMode = kMicroseconds;
+	m_value = Util::Clamp<int>(ms, MIN_VAL, MAX_VAL);
 }
 
 void LRTServo::SetAngle(float angle)
 {
-    if(enabled)
-        Servo::SetAngle(angle);
+	m_controlMode = kAngle;
+	m_value = angle;
+}
+
+void LRTServo::SetControlMode(LRTServo::ControlMode mode)
+{
+	m_controlMode = mode;
+}
+
+float LRTServo::Get()
+{
+	return m_value;
+}
+
+float LRTServo::GetHardwareValue()
+{
+	return Servo::Get();
+}
+
+LRTServo::ControlMode LRTServo::GetControlMode()
+{
+	return m_controlMode;
 }

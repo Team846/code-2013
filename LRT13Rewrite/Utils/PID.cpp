@@ -4,7 +4,6 @@
 
 PID::PID(double p_gain, double i_gain, double d_gain, double ff_gain,
 		double i_decay, bool feedforward, double filterFreq) :
-	//m_runningSum(0.87)
 		m_runningSum(IIR_DECAY(filterFreq))
 {
 	setParameters(p_gain, i_gain, d_gain, ff_gain, i_decay, feedforward, filterFreq);

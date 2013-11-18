@@ -3,10 +3,7 @@
 
 #include <WPILib.h>
 
-#include <list>
 #include <string>
-
-class Counter;
 
 /*!
  * @brief Generic abstract class for components
@@ -58,11 +55,23 @@ protected:
 	 */
 	virtual void UpdateDisabled() = 0;
 	
+	/*!
+	 * @brief Called the first cycle that the component is enabled.
+	 */
+	virtual void OnEnabled() = 0;
+	
+	/*!
+	 * @brief Called the first cycle that the component is disabled.
+	 */
+	virtual void OnDisabled() = 0;
+	
 private:
 	const char *m_name;
 
 	int m_digitalIn;
 	bool m_requiresEnabled;
+	
+	bool m_lastEnabled;
 };
 
 #endif //COMPONENT_H_

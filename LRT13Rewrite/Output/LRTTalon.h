@@ -17,6 +17,7 @@ public:
 	virtual ~LRTTalon();
 	virtual void SetDutyCycle(float speed);
 	virtual float GetDutyCycle();
+	virtual float GetHardwareValue();
 	void Set(float speed);
 	virtual float Get();
 	virtual void Disable();
@@ -26,14 +27,11 @@ public:
 	/*
 	 * Writes the values to the Talon.
 	 */
-	void Update();
-	
-	virtual const char* GetName();
+	void Send();
 	
 	static vector<LRTTalon*> talon_vector;
 	
 private:
-	const char* m_name;
 	float m_pwm;
 	
 	DigitalOutput* m_brake_jumper;

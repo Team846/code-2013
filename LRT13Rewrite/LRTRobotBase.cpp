@@ -38,11 +38,6 @@ void LRTRobotBase::Main()
 	printf("LRTRobotBase::Run(): Override me!");
 }
 
-bool LRTRobotBase::IsRunning()
-{
-	return true;
-}
-
 void LRTRobotBase::ReleaseLoop(void *param)
 {
 	LRTRobotBase *robot = (LRTRobotBase *) param;

@@ -38,11 +38,9 @@ public:
 	 */
 	static vector<AsyncCANJaguar*> jaguar_vector;
 
-	void Update();
+	void Send();
 	
 	int GetChannel();
-	
-	char* GetName();
 	
 	/*!
 	 * @brief Set the duty cycle of the Jaguar
@@ -173,10 +171,16 @@ public:
 	void SetCollectionFlags(uint32_t flags);
 
 	/*!
-	 * @brief Get the duty cycle of the Jaguar
+	 * @brief Get the duty cycle of the Jaguar that is pending to be sent
 	 * @return duty cycle
 	 */
 	float GetDutyCycle();
+
+	/*!
+	 * @brief Get the duty cycle of the Jaguar that was last received
+	 * @return duty cycle
+	 */
+	float GetHardwareValue();
 	
 	/*!
 	 * @brief Gets the P gain
@@ -298,6 +302,7 @@ public:
 	const static uint32_t REVLIMOK = (1 << 11);
 	const static uint32_t PWRCYCLE = (1 << 12);
 	const static uint32_t EXPIRE = (1 << 13);
+	const static uint32_t VALUE = (1 << 14);
 	
 protected:
 	/*!
@@ -313,7 +318,6 @@ private:
 	string m_task_name;
 	PrintInConstructor m_print_ctor_dtor;
 	int m_channel;
-	char *m_name;
 
 	CachedValue<float> m_setpoint;
 	CachedValue<LRTSpeedController::NeutralMode> m_neutral_mode;
@@ -350,6 +354,7 @@ private:
 	volatile bool m_rev_limit_ok;
 	volatile bool m_pwr_cyc;
 	volatile float m_expire;
+	volatile float m_value;
 
 	RobotState::Mode m_last_game_mode;
 };

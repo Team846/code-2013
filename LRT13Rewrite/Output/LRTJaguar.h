@@ -18,6 +18,8 @@ public:
 	virtual ~LRTJaguar();
 	virtual void SetDutyCycle(float value);
 	virtual float GetDutyCycle();
+	virtual float GetHardwareValue();
+	void Set(float speed);
 	virtual float Get();
 	virtual void Disable();
 	virtual void PIDWrite(float output);
@@ -26,14 +28,11 @@ public:
 	/*
 	 * Writes the values to the Talon.
 	 */
-	void Update();
-	
-	virtual const char* GetName();
+	void Send();
 	
 	static vector<LRTJaguar*> jaguar_vector;
 	
 private:
-	const char* m_name;
 	float m_pwm;
 	
 	DigitalOutput* m_brake_jumper;

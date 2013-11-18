@@ -10,6 +10,7 @@ vector<AsyncCANJaguar*> AsyncCANJaguar::jaguar_vector;
 AsyncCANJaguar::AsyncCANJaguar(UINT8 channel, const char* name) :
 			SynchronizedProcess((std::string("AsyncCANJaguar #") + Util::ToString<int>(channel)).c_str(),Task::kDefaultPriority - 2),
 			CANJaguar(channel),
+			LRTSpeedController(name),
 			m_print_ctor_dtor(m_task_name.c_str(), (m_task_name + "\n").c_str())
 {
 	m_task_name = "JAG#" + Util::ToString<int>(channel);
@@ -21,25 +22,14 @@ AsyncCANJaguar::AsyncCANJaguar(UINT8 channel, const char* name) :
 	m_last_game_mode = RobotState::Instance().GameMode();
 	jaguar_vector.push_back(this);
 
-	if (name == NULL)
-	{
-		m_name = strdup("?");
-	}
-	else
-	{
-		m_name = strdup(name);
-	}
-
-	printf("Constructed Jaguar %2d: %s\n", channel, m_name);
+	printf("Constructed AsyncCANJaguar %s on channel %2d\n", name, channel);
 }
 
 AsyncCANJaguar::~AsyncCANJaguar()
 {
-	delete m_name;
-	m_name = NULL;
 }
 
-void AsyncCANJaguar::Update()
+void AsyncCANJaguar::Send()
 {
 	RunOneCycle();
 }
@@ -300,11 +290,20 @@ INT32 AsyncCANJaguar::Tick()
 				Println("Invalid expiration time, not storing\n");
 		}
 
+		if (m_collection_flags & VALUE)
+		{
+			float v = CANJaguar::Get();
+			if (StatusOK())
+				m_value = v;
+			else
+				Println("Invalid hardware value, not storing\n");
+		}
+
 		m_last_game_mode = RobotState::Instance().GameMode();
 	}
 	else
 	{
-		AsyncPrinter::Printf("[ERROR] AsyncCANJaguar: %s on channel 0.\n", m_name);
+		AsyncPrinter::Printf("[ERROR] AsyncCANJaguar: %s on channel 0.\n", GetName());
 	}
 	return 0;
 }
@@ -312,11 +311,6 @@ INT32 AsyncCANJaguar::Tick()
 int AsyncCANJaguar::GetChannel()
 {
 	return m_channel;
-}
-
-char* AsyncCANJaguar::GetName()
-{
-	return m_name;
 }
 
 void AsyncCANJaguar::SetDutyCycle(float duty_cycle)
@@ -339,7 +333,7 @@ void AsyncCANJaguar::SetVelocity(float velocity)
 
 void AsyncCANJaguar::Set(float setpoint, UINT8 syncGroup)
 {
-	printf("[WARNING] Calling Set() in AsyncCANJaguar: %s, use SetDutyCycle() instead.\n;", m_name);
+	printf("[WARNING] Calling Set() in AsyncCANJaguar: %s, use SetDutyCycle() instead.\n;", GetName());
 	m_setpoint.setValue(setpoint);
 }
 
@@ -465,6 +459,11 @@ float AsyncCANJaguar::GetDutyCycle()
 	return m_setpoint.peek();
 }
 
+float AsyncCANJaguar::GetHardwareValue()
+{
+	return m_value;
+}
+
 double AsyncCANJaguar::GetP()
 {
 	return m_p;
@@ -546,5 +545,5 @@ float AsyncCANJaguar::GetExpiration()
 
 void AsyncCANJaguar::Println(const char * str)
 {
-	AsyncPrinter::Printf("%s: %s", m_name, str);
+	AsyncPrinter::Printf("%s: %s", GetName(), str);
 }

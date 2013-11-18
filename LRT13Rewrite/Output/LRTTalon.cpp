@@ -4,22 +4,26 @@ vector<LRTTalon*> LRTTalon::talon_vector;
 
 LRTTalon::LRTTalon(UINT32 channel, const char* name, UINT32 jumperChannel) :
 	Talon(channel),
-	m_name(name),
+	LRTSpeedController(name),
 	m_brake_jumper(jumperChannel != 0 ? new DigitalOutput(jumperChannel) : NULL)
 {
 	m_pwm = 0.0;
 	m_neutral = kNeutralMode_Coast;
 	talon_vector.push_back(this);
+	
+	printf("Constructed LRTTalon %s on channel %2d\n", name, channel);
 }
 
 LRTTalon::LRTTalon(UINT8 moduleNumber, UINT32 channel, const char* name, UINT32 jumperChannel) :
 	Talon(moduleNumber, channel),
-	m_name(name),
+	LRTSpeedController(name),
 	m_brake_jumper(jumperChannel != 0 ? new DigitalOutput(jumperChannel) : NULL)
 {
 	m_pwm = 0.0;
 	m_neutral = kNeutralMode_Coast;
 	talon_vector.push_back(this);
+	
+	printf("Constructed LRTTalon %s on channel %2d\n", name, channel);
 }
 
 LRTTalon::~LRTTalon()
@@ -41,9 +45,14 @@ float LRTTalon::GetDutyCycle()
 	return m_pwm;
 }
 
+float LRTTalon::GetHardwareValue()
+{
+	return Talon::Get();
+}
+
 void LRTTalon::Set(float speed)
 {
-	printf("[WARNING] Calling Set() in LRTTalon: %s, use SetDutyCycle() instead.\n;", m_name);
+	printf("[WARNING] Calling Set() in LRTTalon: %s, use SetDutyCycle() instead.\n;", GetName());
 	SetDutyCycle(speed);
 }
 
@@ -67,7 +76,7 @@ void LRTTalon::ConfigNeutralMode(NeutralMode mode)
 	m_neutral = mode;
 }
 
-void LRTTalon::Update()
+void LRTTalon::Send()
 {
 	Talon::Set(m_pwm);
 	if (m_brake_jumper != NULL)
@@ -79,7 +88,3 @@ void LRTTalon::Update()
 	}
 }
 
-const char* LRTTalon::GetName()
-{
-	return m_name;
-}

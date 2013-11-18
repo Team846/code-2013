@@ -7,20 +7,22 @@
 #include <Solenoid.h>
 #include <Compressor.h>
 
+#include "Output.h"
+
 #include "../Config/RobotConfig.h"
 #include "../Config/Configurable.h"
 #include "../Process/SynchronizedProcess.h"
 #include "../Config/ConfigManager.h"
 #include "../Utils/AsyncPrinter.h"
 
-class Pneumatics : public SynchronizedProcess, public Configurable
+class Pneumatics : public SynchronizedProcess, public Configurable, public Output
 {
 public:
 	enum State
 	{
-		OFF = false,
-		FORWARD = true,
-		REVERSE = false
+		OFF,
+		FORWARD,
+		REVERSE
 	};
 	
 	// Double solenoid
@@ -37,12 +39,11 @@ public:
 	static void DestroyCompressor();
 	static void SetCompressor(bool on);
 	
-	void Set(bool on, bool force = false);
-	bool Get();
+	void Set(State on, bool force = false);
+	State Get();
+	State GetHardwareValue();
 
 	virtual void Configure();
-	
-	const char* GetName();
 	
 	static vector<Pneumatics*> pneumatic_vector;
 	
@@ -60,8 +61,6 @@ private:
 	int counter;
 	bool pulsed;
 	State state;
-	
-	const char *m_name;
 	
 	DISALLOW_COPY_AND_ASSIGN(Pneumatics);
 

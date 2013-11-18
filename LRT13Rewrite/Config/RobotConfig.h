@@ -102,7 +102,6 @@ namespace PWM
 	const uint32_t FLASHLIGHT = 6;
 }
 
-
 }
 
 #endif

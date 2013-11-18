@@ -7,6 +7,7 @@ Component::Component(const char *name, int di, bool requiresEnabledState) :
 	m_name(name), m_digitalIn(di), m_requiresEnabled(requiresEnabledState)
 {
 	component_vector.push_back(this);
+	m_lastEnabled = false;
 }
 
 Component::~Component()
@@ -19,16 +20,25 @@ void Component::Update()
 	{
 		if (m_digitalIn == -1 || DriverStation::GetInstance()->GetDigitalIn(m_digitalIn))
 		{
+			if (!m_lastEnabled)
+				OnEnabled();
 			UpdateEnabled();
+			m_lastEnabled = true;
 		}
 		else
 		{
+			if (m_lastEnabled)
+				OnDisabled();
 			UpdateDisabled();
+			m_lastEnabled = false;
 		}
 	}
 	else
 	{
+		if (m_lastEnabled)
+			OnDisabled();
 		UpdateDisabled();
+		m_lastEnabled = false;
 	}
 }
 

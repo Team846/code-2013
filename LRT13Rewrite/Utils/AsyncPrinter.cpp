@@ -1,21 +1,21 @@
 #include "AsyncPrinter.h"
 
-AsyncPrinter* AsyncPrinter::_instance = NULL;
+AsyncPrinter *AsyncPrinter::_instance = NULL;
 
-AsyncPrinter* AsyncPrinter::Instance()
+void AsyncPrinter::Initialize()
 {
 	if(!_instance)
 	{
 		_instance = new AsyncPrinter();
-		_instance->Start();
 	}
 	
-	return _instance;
+	_instance->Start();
 }
 
 void AsyncPrinter::Finalize()
 {
-	DELETE(_instance);
+	_instance->Abort(0, 1.0 / 50);
+	delete _instance;
 }
 
 AsyncPrinter::AsyncPrinter()
@@ -43,21 +43,21 @@ int AsyncPrinter::Printf(const char * msg, ...)
 	
 	if (n_bytes >= 0)
 	{
-		Synchronized s(Instance()->m_queueSem);
+		Synchronized s(_instance->m_queueSem);
 
 		string str(buffer);
 
-		Instance()->_messageQueue.push(str);
+		_instance->_messageQueue.push(str);
 		//me.queue_bytes_ += n_bytes;
 
-		if (Instance()->_messageQueue.size() >= kMaxQueueSize)
+		if (_instance->_messageQueue.size() >= kMaxQueueSize)
 		{
-			while (!Instance()->_messageQueue.empty())
-				Instance()->_messageQueue.pop();
+			while (!_instance->_messageQueue.empty())
+				_instance->_messageQueue.pop();
 
 			string overflow("(AsyncPrinter Buffer Overflow)\n");
 
-			Instance()->_messageQueue.push(overflow);
+			_instance->_messageQueue.push(overflow);
 		}
 	}
 	
@@ -112,7 +112,7 @@ INT32 AsyncPrinter::Tick()
 		}
 	}
 	
-	Wait(0.001);
+	taskDelay(sysClkRateGet() / 1000);
 	
 	return 0;
 }

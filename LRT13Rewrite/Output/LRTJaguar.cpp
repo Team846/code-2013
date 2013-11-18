@@ -4,22 +4,26 @@ vector<LRTJaguar*> LRTJaguar::jaguar_vector;
 
 LRTJaguar::LRTJaguar(UINT32 channel, const char* name, UINT32 jumperChannel) :
 	Jaguar(channel),
-	m_name(name),
+	LRTSpeedController(name),
 	m_brake_jumper(jumperChannel != 0 ? new DigitalOutput(jumperChannel) : NULL)
 {
 	m_pwm = 0.0;
 	m_neutral = kNeutralMode_Coast;
 	jaguar_vector.push_back(this);
+	
+	printf("Constructed LRTJaguar %s on channel %2d\n", name, channel);
 }
 
 LRTJaguar::LRTJaguar(UINT8 moduleNumber, UINT32 channel, const char* name, UINT32 jumperChannel) :
 	Jaguar(moduleNumber, channel),
-	m_name(name),
+	LRTSpeedController(name),
 	m_brake_jumper(jumperChannel != 0 ? new DigitalOutput(jumperChannel) : NULL)
 {
 	m_pwm = 0.0;
 	m_neutral = kNeutralMode_Coast;
 	jaguar_vector.push_back(this);
+
+	printf("Constructed LRTJaguar %s on channel %2d\n", name, channel);
 }
 
 LRTJaguar::~LRTJaguar()
@@ -39,6 +43,17 @@ void LRTJaguar::SetDutyCycle(float speed)
 float LRTJaguar::GetDutyCycle()
 {
 	return m_pwm;
+}
+
+float LRTJaguar::GetHardwareValue()
+{
+	return Jaguar::Get();
+}
+
+void LRTJaguar::Set(float speed)
+{
+	printf("[WARNING] Calling Set() in LRTTalon: %s, use SetDutyCycle() instead.\n;", GetName());
+	SetDutyCycle(speed);
 }
 
 float LRTJaguar::Get()
@@ -61,7 +76,7 @@ void LRTJaguar::ConfigNeutralMode(NeutralMode mode)
 	m_neutral = mode;
 }
 
-void LRTJaguar::Update()
+void LRTJaguar::Send()
 {
 	Jaguar::Set(m_pwm);
 	printf("Talon: %f\n", m_pwm);
@@ -73,9 +88,4 @@ void LRTJaguar::Update()
 			m_brake_jumper->Set((UINT32)1);
 				
 	}
-}
-
-const char* LRTJaguar::GetName()
-{
-	return m_name;
 }
