@@ -1,7 +1,7 @@
 #ifndef CONFIGURABLE_H_
 #define CONFIGURABLE_H_
 
-class ConfigManager;
+class ConfigRuntime;
 
 /*!
  * @brief Interface for reading from configuration file through ConfigManager
@@ -20,7 +20,7 @@ public:
 	virtual void Configure() = 0;
 	
 protected:
-	ConfigManager * const m_config;
+	ConfigRuntime * const m_config;
 };
 
 #endif

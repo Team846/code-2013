@@ -1,6 +1,7 @@
 #include "AsyncPrinter.h"
 
 AsyncPrinter *AsyncPrinter::_instance = NULL;
+bool AsyncPrinter::filePrinting = false;
 
 void AsyncPrinter::Initialize()
 {
@@ -96,20 +97,49 @@ void AsyncPrinter::DbgPrint(const char* msg, ...)
 #endif
 }
 
+void AsyncPrinter::RedirectToFile(const char* file)
+{
+	if (!filePrinting)
+	{
+		Synchronized s(_instance->m_queueSem);
+		printf("\n--------------------Redirecting print stream to file--------------------\n");
+		fflush(stdout);
+		fgetpos(stdout, &pos);
+		fd = dup(fileno(stdout));
+		freopen(file, "a", stdout);
+		printf("\n--------------------Print stream redirected--------------------\n");
+		filePrinting = true;
+	}
+}
+
+void AsyncPrinter::RestoreToConsole()
+{
+	if (filePrinting)
+	{
+		Synchronized s(_instance->m_queueSem);
+		printf("\n--------------------Restoring print stream to console--------------------\n");
+		fflush(stdout);
+		dup2(fd, fileno(stdout));
+		close(fd);
+		clearerr(stdout);
+		fsetpos(stdout, &pos); 
+		printf("\n--------------------Print stream restored--------------------\n");
+		filePrinting = false;
+	}
+}
+
 INT32 AsyncPrinter::Tick()
 {
 	UINT32 printed = 0;
 	
+	Synchronized s(m_queueSem);
+	
+	while(!_messageQueue.empty() && ++printed <= kMaxPrintsPerCycle && IsRunning())
 	{
-		Synchronized s(m_queueSem);
+		string msg = _messageQueue.front();
+		_messageQueue.pop();
 		
-		while(!_messageQueue.empty() && ++printed <= kMaxPrintsPerCycle && IsRunning())
-		{
-			string msg = _messageQueue.front();
-			_messageQueue.pop();
-			
-			printf(msg.c_str());
-		}
+		printf(msg.c_str());
 	}
 	
 	taskDelay(sysClkRateGet() / 1000);

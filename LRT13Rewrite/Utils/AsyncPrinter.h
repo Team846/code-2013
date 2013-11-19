@@ -21,6 +21,9 @@ public:
 	static int Println(const char* msg, ...);
 	static void DbgPrint(const char* msg, ...);
 	
+	static void RedirectToFile(const char* file);
+	static void RestoreToConsole();
+	
 	AsyncPrinter();
 	~AsyncPrinter();
 	
@@ -36,6 +39,10 @@ private:
 	SEM_ID m_queueSem;
 	
 	queue<string> _messageQueue;
+	
+	static bool filePrinting;
+	static int fd;
+	static fpos_t pos;
 };
 
 #endif

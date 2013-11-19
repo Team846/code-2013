@@ -7,15 +7,15 @@
 #include <Solenoid.h>
 #include <Compressor.h>
 
-#include "Output.h"
+#include "Actuator.h"
 
-#include "../Config/RobotConfig.h"
+#include "../Config/ConfigPortMappings.h"
 #include "../Config/Configurable.h"
 #include "../Process/SynchronizedProcess.h"
-#include "../Config/ConfigManager.h"
+#include "../Config/ConfigRuntime.h"
 #include "../Utils/AsyncPrinter.h"
 
-class Pneumatics : public SynchronizedProcess, public Configurable, public Output
+class Pneumatics : public SynchronizedProcess, public Configurable, public Actuator
 {
 public:
 	enum State

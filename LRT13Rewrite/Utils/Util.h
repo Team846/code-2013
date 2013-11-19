@@ -293,7 +293,37 @@ public:
 		
 		return true;
 	}
-	
+
+	static inline string Trim(string str)
+	{
+		int startIndex = -1, endIndex = str.size() - 1;
+
+		// Find first non-whitespace index
+		for (unsigned int i = 0; i < str.size(); i++)
+		{
+			if (!isspace(str[i]))
+			{
+				startIndex = i;
+				break;
+			}
+		}
+
+		if (startIndex == -1)
+			return ""; // Blank line
+
+		// Find index of end of non-whitespace
+		for (int i = str.size() - 1; i >= 0; i--)
+		{
+			if (!isspace(str[i]))
+			{
+				endIndex = i;
+				break;
+			}
+		}
+
+		return str.substr(startIndex, endIndex - startIndex + 1);
+	}
+
 	/*!
 	 * @brief Kills the current process
 	 */

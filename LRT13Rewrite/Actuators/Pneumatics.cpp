@@ -8,7 +8,7 @@ Compressor *Pneumatics::m_compressor;
 Pneumatics::Pneumatics(uint32_t forward, uint32_t reverse, const char *name) :
 	SynchronizedProcess((std::string("Pneumatics") + std::string(name)).c_str(), Task::kDefaultPriority - 1),
 	Configurable(),
-	Output(name),
+	Actuator(name),
 	m_configSection("Pneumatics")
 {
 	printf("Created DoubleSolenoid %s\n", name);
@@ -23,7 +23,7 @@ Pneumatics::Pneumatics(uint32_t forward, uint32_t reverse, const char *name) :
 Pneumatics::Pneumatics(uint32_t forward, uint32_t reverse, uint8_t module, const char *name) :
 	SynchronizedProcess("Pneumatics", Task::kDefaultPriority - 1),
 	Configurable(),
-	Output(name),
+	Actuator(name),
 	m_configSection("Pneumatics")
 {
 	printf("Created DoubleSolenoid %s\n", name);
@@ -38,7 +38,7 @@ Pneumatics::Pneumatics(uint32_t forward, uint32_t reverse, uint8_t module, const
 Pneumatics::Pneumatics(uint32_t forward, const char *name) :
 	SynchronizedProcess((std::string("Pneumatics") + std::string(name)).c_str(), Task::kDefaultPriority - 1),
 	Configurable(),
-	Output(name),
+	Actuator(name),
 	m_configSection("Pneumatics")
 {
 	printf("Created Solenoid %s\n", name);
@@ -53,7 +53,7 @@ Pneumatics::Pneumatics(uint32_t forward, const char *name) :
 Pneumatics::Pneumatics(uint32_t forward, uint8_t module, const char *name) :
 	SynchronizedProcess("Pneumatics", Task::kDefaultPriority - 1),
 	Configurable(),
-	Output(name),
+	Actuator(name),
 	m_configSection("Pneumatics")
 {
 	printf("Created Solenoid %s\n", name);
@@ -78,8 +78,8 @@ void Pneumatics::Update()
 void Pneumatics::CreateCompressor()
 {
 	m_compressor = new Compressor(
-			RobotConfig::Digital::COMPRESSOR_PRESSURE_SENSOR_PIN,
-			RobotConfig::Relay::COMPRESSOR_RELAY);
+			ConfigPortMappings::Get("Digital/COMPRESSOR_PRESSURE_SENSOR_PIN"),
+			ConfigPortMappings::Get("Relay/COMPRESSOR_RELAY"));
 	m_compressor->Start();
 }
 
@@ -198,7 +198,7 @@ INT32 Pneumatics::Tick()
 
 void Pneumatics::Configure()
 {
-	ConfigManager *c = ConfigManager::Instance();
+	ConfigRuntime *c = ConfigRuntime::Instance();
 	m_pulse_length = c->Get<int> (m_configSection, "pulseLength", 25);
 }
 

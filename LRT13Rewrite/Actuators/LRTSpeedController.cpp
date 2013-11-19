@@ -2,7 +2,7 @@
 #include <math.h>
 
 LRTSpeedController::LRTSpeedController(const char *name) :
-	Output(name)
+	Actuator(name)
 {
 	m_encoder = NULL;
 	m_timeoutSeconds = 0;

@@ -23,6 +23,21 @@ public:
 	virtual ~Component();
 
 	/*!
+	 * @brief Creates all components.
+	 */
+	static void CreateComponents();
+	
+	/*!
+	 * @brief Destroys all components.
+	 */
+	static void DestroyComponents();
+	
+	/*!
+	 * @brief Calls Update() on all created components
+	 */
+	static void UpdateAll();
+	
+	/*!
 	 * @brief Updates the component each cycle.
 	 */
 	void Update();
@@ -41,8 +56,6 @@ public:
 	 * @brief Gets the component's name.
 	 */
 	const char* GetName();
-	
-	static vector<Component*> component_vector;
 	
 protected:
 	/*!
@@ -66,6 +79,8 @@ protected:
 	virtual void OnDisabled() = 0;
 	
 private:
+	static vector<Component*> component_vector;
+	
 	const char *m_name;
 
 	int m_digitalIn;

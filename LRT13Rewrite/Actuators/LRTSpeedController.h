@@ -1,7 +1,7 @@
 #ifndef LRT_SPEEDCONTROLLER_H_
 #define LRT_SPEEDCONTROLLER_H_
 
-#include "Output.h"
+#include "Actuator.h"
 #include <CounterBase.h>
 #include <Timer.h>
 
@@ -11,7 +11,7 @@
  * @author Manoj Vasishta, Raphael Chang
  */
 
-class LRTSpeedController : public Output
+class LRTSpeedController : public Actuator
 {
 public:
 	typedef enum

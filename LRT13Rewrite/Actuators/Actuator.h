@@ -2,25 +2,27 @@
 #define OUTPUT_H_
 
 #include <vector>
+#include <Error.h>
 
 /*!
- * @brief Interface for all output resources.
+ * @brief Interface for all actuators.
  * 
  * @author Raphael Chang
  */
 
 using namespace std;
 
-class Output
+class Actuator
 {
 public:
-	Output(const char *name);
+	Actuator(const char *name);
 	virtual const char* GetName();
 	virtual void Update() = 0;
 	
-	static vector<Output*> output_vector;
+	static void UpdateAll();
 	
 private:
+	static vector<Actuator*> actuator_vector;
 	const char *m_name;
 };
 

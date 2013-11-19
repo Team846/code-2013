@@ -2,9 +2,9 @@
 #define LRT_SERVO_H_
 
 #include "Servo.h"
-#include "Output.h"
+#include "Actuator.h"
 
-class LRTServo : public Servo, public Output
+class LRTServo : public Servo, public Actuator
 {
 public:
 	typedef enum

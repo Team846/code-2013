@@ -1,9 +1,16 @@
 #include "LRTRobot13.h"
 
-#include "Output/Output.h"
-#include "Output/AsyncCANJaguar.h"
-#include "Output/Pneumatics.h"
+#include "Components/Component.h"
+#include "Actuators/Actuator.h"
+#include "Actuators/AsyncCANJaguar.h"
+#include "Actuators/Pneumatics.h"
 #include "RobotState.h"
+
+#include "Config/ConfigRuntime.h"
+#include "Config/ConfigPortMappings.h"
+#include "Config/RobotConfig.h"
+#include "Config/DriverStationConfig.h"
+#include "Utils/LCD.h"
 
 LRTRobot13::LRTRobot13()
 {
@@ -26,20 +33,29 @@ LRTRobot13::~LRTRobot13()
 		(*it)->Abort();
 	}
 	
-	AsyncPrinter::Finalize();
-	ConfigManager::Finalize();
-	LCD::Finalize();
+	Component::DestroyComponents();
+	ConfigPortMappings::Finalize();
+	ConfigRuntime::Finalize();
 	Pneumatics::DestroyCompressor();
+	LCD::Finalize();
+	AsyncPrinter::Finalize();
+	RobotState::Finalize();
 }
 
 void LRTRobot13::RobotInit()
 {
-	// Initialize Robot State
+	// Initialize global robot state object
 	RobotState::Initialize();
 	
 	// Initialize Utilities
 	AsyncPrinter::Initialize();
 	LCD::Instance()->Start();
+	
+	// Read port mappings
+	ConfigPortMappings::Instance()->Load();
+	
+	// Create all components
+	Component::CreateComponents();
 	
 	AsyncPrinter::Println("Starting Jaguar Tasks...");
 	for (vector<AsyncCANJaguar*>::iterator it = AsyncCANJaguar::jaguar_vector.begin(); it < AsyncCANJaguar::jaguar_vector.end(); it++)
@@ -55,12 +71,12 @@ void LRTRobot13::RobotInit()
 	
 	Pneumatics::CreateCompressor();
 
-	ConfigManager::Instance()->ConfigureAll();
+	ConfigRuntime::ConfigureAll();
 }
 
 static int TimeoutCallback(...)
 {
-	printf("Main loop execution time > 20ms\n");
+	printf("Main loop execution time > 20 ms\n");
 	
 	return 0;
 }
@@ -70,13 +86,23 @@ void LRTRobot13::Main()
 	wdStart(_watchdog, sysClkRateGet() / RobotConfig::LOOP_RATE,
 			TimeoutCallback, 0);
 
+	if (DriverStation::GetInstance()->IsFMSAttached())
+	{
+		AsyncPrinter::RedirectToFile("/stdout.out");
+	}
+	else
+	{
+		AsyncPrinter::RestoreToConsole();
+	}
+	
+	// Update global robot state object
 	RobotState::Update();
 	
-	// Update all output resources
-	for (vector<Output*>::iterator it = Output::output_vector.begin(); it < Output::output_vector.end(); it++)
-	{
-		(*it)->Update();
-	}
+	// Update all components
+	Component::UpdateAll();
+	
+	// Flush outputs to all actuators
+	Actuator::UpdateAll();
 
 	if (DriverStation::GetInstance()->GetDigitalIn(DriverStationConfig::DigitalIns::COMPRESSOR))
 	{

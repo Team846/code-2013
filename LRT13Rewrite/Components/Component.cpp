@@ -6,12 +6,36 @@ vector<Component*> Component::component_vector;
 Component::Component(const char *name, int di, bool requiresEnabledState) :
 	m_name(name), m_digitalIn(di), m_requiresEnabled(requiresEnabledState)
 {
-	component_vector.push_back(this);
 	m_lastEnabled = false;
+	
+	printf("Created component: %s\n", name);
 }
 
 Component::~Component()
 {
+}
+
+void Component::CreateComponents()
+{
+//	component_vector.push_back(...);
+}
+
+void Component::DestroyComponents()
+{
+	for (vector<Component*>::iterator it = component_vector.begin(); it < component_vector.end(); it++)
+	{
+		delete *it;
+		*it = NULL;
+	}
+	component_vector.clear();
+}
+
+void Component::UpdateAll()
+{
+	for (vector<Component*>::iterator it = component_vector.begin(); it < component_vector.end(); it++)
+	{
+		(*it)->Update();
+	}
 }
 
 void Component::Update()

@@ -1,10 +1,10 @@
 #include "Configurable.h"
-#include "ConfigManager.h"
+#include "ConfigRuntime.h"
 
 Configurable::Configurable()
-:m_config(ConfigManager::Instance())
+:m_config(ConfigRuntime::Instance())
 {
-	ConfigManager::Register(this);
+	ConfigRuntime::Register(this);
 }
 
 Configurable::~Configurable()

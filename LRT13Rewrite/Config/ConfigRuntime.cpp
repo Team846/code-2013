@@ -1,38 +1,37 @@
-#include "ConfigManager.h"
+#include "ConfigRuntime.h"
 #include "RobotConfig.h"
 #include "../Utils/AsyncPrinter.h"
 #include "../Utils/Util.h"
 #include <fstream>
 #include <sstream>
 
-vector<Configurable*> ConfigManager::configurables; // note: static vectors must be declared in the CPP file -TP
-ConfigManager* ConfigManager::m_instance = NULL;
-const string ConfigManager::CONFIG_FILE_PATH = RobotConfig::CONFIG_FILE_PATH;
-const string ConfigManager::COMMENT_DELIMITERS = "#;";
+vector<Configurable*> ConfigRuntime::configurables; // note: static vectors must be declared in the CPP file -TP
+ConfigRuntime* ConfigRuntime::m_instance = NULL;
+const string ConfigRuntime::CONFIG_FILE_PATH = RobotConfig::CONFIG_FILE_PATH;
+const string ConfigRuntime::COMMENT_DELIMITERS = "#;";
 
-ConfigManager* ConfigManager::Instance()
+ConfigRuntime* ConfigRuntime::Instance()
 {
 	if (m_instance == NULL)
-		m_instance = new ConfigManager();
+		m_instance = new ConfigRuntime();
 	return m_instance;
 }
 
-void ConfigManager::Finalize()
+void ConfigRuntime::Finalize()
 {
 	DELETE(m_instance);
 }
 
-ConfigManager::ConfigManager()
+ConfigRuntime::ConfigRuntime()
 : lastReadTime(0)
 {
 	fileData = NULL;
 	configData = NULL;
 	sectionMap = NULL;
-	AsyncPrinter::Printf("Loaded ConfigManager\n");
 	Load();
 }
 
-ConfigManager::~ConfigManager()
+ConfigRuntime::~ConfigRuntime()
 {
 	if (fileData != NULL)
 		DELETE(fileData);
@@ -44,30 +43,30 @@ ConfigManager::~ConfigManager()
 		DELETE(sectionMap);
 }
 
-void ConfigManager::Load()
+void ConfigRuntime::Load()
 {
 	LoadConfig(CONFIG_FILE_PATH);
-	AsyncPrinter::Printf("Done loading %s\n", CONFIG_FILE_PATH.c_str());
+	AsyncPrinter::Printf("ConfigRuntime: Done loading %s\n", CONFIG_FILE_PATH.c_str());
 	ConfigureAll();
 }
 
-void ConfigManager::Save()
+void ConfigRuntime::Save()
 {
 	SaveConfig(CONFIG_FILE_PATH);
 }
 
-template bool ConfigManager::Get<bool>(string section, string key,
+template bool ConfigRuntime::Get<bool>(string section, string key,
 		bool defaultValue);
-template float ConfigManager::Get<float>(string section, string key,
+template float ConfigRuntime::Get<float>(string section, string key,
 		float defaultValue);
-template double ConfigManager::Get<double>(string section, string key,
+template double ConfigRuntime::Get<double>(string section, string key,
 		double defaultValue);
-template string ConfigManager::Get<string>(string section, string key,
+template string ConfigRuntime::Get<string>(string section, string key,
 		string defaultValue);
-template int ConfigManager::Get<int>(string section, string key,
+template int ConfigRuntime::Get<int>(string section, string key,
 		int defaultValue);
 
-template<typename T> T ConfigManager::Get(string section, string key,
+template<typename T> T ConfigRuntime::Get(string section, string key,
 		T defaultValue)
 {
 	if (KeyExists(section, key))
@@ -84,15 +83,15 @@ template<typename T> T ConfigManager::Get(string section, string key,
 	}
 }
 
-template void ConfigManager::Set<bool>(string section, string key, bool val);
-template void ConfigManager::Set<float>(string section, string key, float val);
-template void ConfigManager::Set<int>(string section, string key, int val);
+template void ConfigRuntime::Set<bool>(string section, string key, bool val);
+template void ConfigRuntime::Set<float>(string section, string key, float val);
+template void ConfigRuntime::Set<int>(string section, string key, int val);
 template void
-		ConfigManager::Set<double>(string section, string key, double val);
+		ConfigRuntime::Set<double>(string section, string key, double val);
 template void
-		ConfigManager::Set<string>(string section, string key, string val);
+		ConfigRuntime::Set<string>(string section, string key, string val);
 
-template<typename T> void ConfigManager::Set(string section, string key,
+template<typename T> void ConfigRuntime::Set(string section, string key,
 		T value)
 {
 	string newValue = Util::ToString<T>(value);
@@ -133,7 +132,7 @@ template<typename T> void ConfigManager::Set(string section, string key,
 	(*configData)[section][key].value = newValue; // Update current config data
 }
 
-void ConfigManager::CheckForFileUpdates()
+void ConfigRuntime::CheckForFileUpdates()
 {
 	struct stat statistics;
 	stat(CONFIG_FILE_PATH.c_str(), &statistics);
@@ -150,18 +149,18 @@ void ConfigManager::CheckForFileUpdates()
 	}
 }
 
-bool ConfigManager::KeyExists(string section, string key)
+bool ConfigRuntime::KeyExists(string section, string key)
 {
 	return configData->find(section) != configData->end()
 			&& (*configData)[section].find(key) != (*configData)[section].end();
 }
 
-void ConfigManager::Register(Configurable* configurable)
+void ConfigRuntime::Register(Configurable* configurable)
 {
 	configurables.push_back(configurable);
 }
 
-void ConfigManager::ConfigureAll()
+void ConfigRuntime::ConfigureAll()
 {
 	AsyncPrinter::Printf("Applying configuration to all configurables\n");
 	for (vector<Configurable*>::iterator it = configurables.begin(); it
@@ -171,7 +170,7 @@ void ConfigManager::ConfigureAll()
 	}
 }
 
-void ConfigManager::LoadConfig(string path)
+void ConfigRuntime::LoadConfig(string path)
 {
 	// Clear previous data
 	if (fileData != NULL)
@@ -194,7 +193,7 @@ void ConfigManager::LoadConfig(string path)
 
 	if (!fin.is_open())
 	{
-		AsyncPrinter::Printf("ConfigManager could not open %s for reading\n",
+		AsyncPrinter::Printf("ConfigManager: Could not open %s for reading\n",
 				path.c_str());
 		return;
 	}
@@ -212,11 +211,11 @@ void ConfigManager::LoadConfig(string path)
 	for (list<string>::iterator it = fileData->begin(); it != fileData->end(); it++)
 	{
 		unsigned int length = it->find_first_of(
-				ConfigManager::COMMENT_DELIMITERS.c_str()); // String length up to first comment
+				ConfigRuntime::COMMENT_DELIMITERS.c_str()); // String length up to first comment
 		if (length == string::npos) // If no comments on this line
 			length = it->length();
 
-		string line = Trim(it->substr(0, length)); // Trim whitespace from non-comment part of this line
+		string line = Util::Trim(it->substr(0, length)); // Trim whitespace from non-comment part of this line
 		if (line.length() == 0) // If this line contains no data
 			continue;
 
@@ -238,12 +237,12 @@ void ConfigManager::LoadConfig(string path)
 	}
 }
 
-void ConfigManager::SaveConfig(string path)
+void ConfigRuntime::SaveConfig(string path)
 {
 	ofstream fout(path.c_str());
 	if (!fout.is_open())
 	{
-		AsyncPrinter::Printf("ConfigManager could not open %s for writing\n",
+		AsyncPrinter::Printf("ConfigManager: could not open %s for writing\n",
 				path.c_str());
 	}
 
@@ -257,32 +256,3 @@ void ConfigManager::SaveConfig(string path)
 	AsyncPrinter::Printf("Done saving %s\n", path.c_str());
 }
 
-string ConfigManager::Trim(string str)
-{
-	int startIndex = -1, endIndex = str.size() - 1;
-
-	// Find first non-whitespace index
-	for (unsigned int i = 0; i < str.size(); i++)
-	{
-		if (!isspace(str[i]))
-		{
-			startIndex = i;
-			break;
-		}
-	}
-
-	if (startIndex == -1)
-		return ""; // Blank line
-
-	// Find index of end of non-whitespace
-	for (int i = str.size() - 1; i >= 0; i--)
-	{
-		if (!isspace(str[i]))
-		{
-			endIndex = i;
-			break;
-		}
-	}
-
-	return str.substr(startIndex, endIndex - startIndex + 1);
-}

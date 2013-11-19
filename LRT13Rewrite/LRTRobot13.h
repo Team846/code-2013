@@ -7,15 +7,8 @@
 #include <sysLib.h>
 
 #include "LRTRobotBase.h"
-#include "Config/ConfigManager.h"
-#include "Config/RobotConfig.h"
-#include "Config/DriverStationConfig.h"
 
-#include "Utils/LCD.h"
-
-#include "Utils/Profiler.h"
-
-
+#include <stdio.h>
 
 class LRTRobot13 : public LRTRobotBase
 {
@@ -32,7 +25,6 @@ class LRTRobot13 : public LRTRobotBase
 		Timer timer;
 		
 		WDOG_ID _watchdog;
-
 };
 
 #endif

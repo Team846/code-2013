@@ -1,5 +1,5 @@
-#ifndef CONFIG_MANAGER_H_
-#define CONFIG_MANAGER_H_
+#ifndef CONFIG_RUNTINE_H_
+#define CONFIG_RUNTINE_H_
 
 #include <string>
 #include <sys/types.h>
@@ -27,13 +27,13 @@ struct Config
 };
 typedef map<string, map<string, Config> > config;
 
-class ConfigManager
+class ConfigRuntime
 {
 public:
-	static ConfigManager* Instance();
+	static ConfigRuntime* Instance();
 	static void Finalize();
 	
-	~ConfigManager();
+	~ConfigRuntime();
 	
 	void Load();
 	void Save();
@@ -59,14 +59,14 @@ public:
 	void CheckForFileUpdates();
 	
 private:
-	ConfigManager();
-	static ConfigManager* m_instance;
+	ConfigRuntime();
+	static ConfigRuntime* m_instance;
 	static vector<Configurable*> configurables;
 	
 	/*!
 	 * @brief Loads the config file into memory
 	 */
-	void LoadConfig(string path);	
+	void LoadConfig(string path);
 	/*!
 	 * @brief Saves config data from memory into config file
 	 */
@@ -76,12 +76,11 @@ private:
 	map<string, list<string>::iterator> *sectionMap;
 	time_t lastReadTime;
 	bool KeyExists(string section, string key);
-	string Trim(string str);
 	
-	const static string ConfigManager::CONFIG_FILE_PATH;
-	const static string ConfigManager::COMMENT_DELIMITERS;
+	const static string ConfigRuntime::CONFIG_FILE_PATH;
+	const static string ConfigRuntime::COMMENT_DELIMITERS;
 	
-	DISALLOW_COPY_AND_ASSIGN(ConfigManager);
+	DISALLOW_COPY_AND_ASSIGN(ConfigRuntime);
 };
 
 #endif

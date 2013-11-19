@@ -4,7 +4,7 @@
 
 LRTServo::LRTServo(UINT32 channel, const char* name)
     : Servo(channel)
-	, Output(name)
+	, Actuator(name)
     , m_controlMode(kValue)
 	, m_value(0.0)
     , enabled(false)
