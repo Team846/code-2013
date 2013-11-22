@@ -1,5 +1,6 @@
 #include "LRTRobot13.h"
 
+#include "Brain/Brain.h"
 #include "Components/Component.h"
 #include "Actuators/Actuator.h"
 #include "Actuators/AsyncCANJaguar.h"
@@ -11,6 +12,7 @@
 #include "Config/RobotConfig.h"
 #include "Config/DriverStationConfig.h"
 #include "Utils/LCD.h"
+#include "Brain/Events/Event.h"
 
 LRTRobot13::LRTRobot13()
 {
@@ -57,6 +59,10 @@ void LRTRobot13::RobotInit()
 	// Create all components
 	Component::CreateComponents();
 	
+	// Initialize the Brain
+	Brain::Initialize();
+	
+	// Start Actuator tasks
 	AsyncPrinter::Println("Starting Jaguar Tasks...");
 	for (vector<AsyncCANJaguar*>::iterator it = AsyncCANJaguar::jaguar_vector.begin(); it < AsyncCANJaguar::jaguar_vector.end(); it++)
 	{
@@ -115,6 +121,8 @@ void LRTRobot13::Main()
 	
 	// Utilities
 	LCD::Instance()->RunOneCycle();
+	
+	Event::UpdateEvents();
 	
 	wdCancel(_watchdog);
 }
