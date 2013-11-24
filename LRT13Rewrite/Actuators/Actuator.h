@@ -15,7 +15,7 @@ using namespace std;
 class Actuator
 {
 public:
-	Actuator(const char *name);
+	explicit Actuator(const char *name);
 	virtual const char* GetName();
 	virtual void Update() = 0;
 	

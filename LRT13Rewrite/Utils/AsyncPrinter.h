@@ -37,12 +37,11 @@ private:
 	static AsyncPrinter* _instance;
 	
 	SEM_ID m_queueSem;
+	SEM_ID m_ioSem;
 	
 	queue<string> _messageQueue;
 	
-	static bool filePrinting;
-	static int fd;
-	static fpos_t pos;
+	FILE* m_out;
 };
 
 #endif

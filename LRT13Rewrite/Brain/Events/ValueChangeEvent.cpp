@@ -12,9 +12,7 @@ template<typename T> ValueChangeEvent<T>::~ValueChangeEvent()
 
 template<typename T> bool ValueChangeEvent<T>::Fired()
 {
-	if (m_lastValue != m_value && *m_variable = m_value)
-		return true;
-	return false;
+	return m_lastValue != m_value && *m_variable == m_value;
 }
 
 template<typename T> void ValueChangeEvent<T>::Update()
