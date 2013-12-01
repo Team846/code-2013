@@ -2,9 +2,13 @@
 #define EVENT_H_
 
 #include <vector>
+#include "../Automation.h"
 
 using namespace std;
 
+/*!
+ * @brief Base class for events, which are used to control automation routines.
+ */
 class Event
 {
 public:
@@ -15,10 +19,20 @@ public:
 	
 	virtual void Update() = 0;
 	
-	static void UpdateEvents();
+	void AddStartListener(Automation* routine);
+	void AddAbortListener(Automation* routine);
+	void AddContinueListener(Automation* routine);
+	vector<Automation*>& GetStartListeners();
+	vector<Automation*>& GetAbortListeners();
+	vector<Automation*>& GetContinueListeners();
+	
+	static vector<Event*> event_vector;
 	
 private:
-	static vector<Event*> event_vector;
+	vector<Automation*> start_listeners;
+    vector<Automation*> abort_listeners;
+    vector<Automation*> continue_listeners;
+    
 };
 
 #endif

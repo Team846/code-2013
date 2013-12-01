@@ -1,14 +1,14 @@
-#ifndef JOYSTICK_PRESSED_EVENT_H_
-#define JOYSTICK_PRESSED_EVENT_H_
+#ifndef JOYSTICK_HOLD_EVENT_H_
+#define JOYSTICK_HOLD_EVENT_H_
 
 #include "Event.h"
 #include "../../DriverStation/DebouncedJoystick.h"
 
-class JoystickPressedEvent : public Event
+class JoystickHoldEvent : public Event
 {
 public:
-	JoystickPressedEvent(DebouncedJoystick *joystick, int button = 0);
-	virtual ~JoystickPressedEvent();
+	JoystickHoldEvent(DebouncedJoystick *joystick, int button, int cycles);
+	virtual ~JoystickHoldEvent();
 	
 	virtual bool Fired();
 	
@@ -20,7 +20,10 @@ public:
 private:
 	DebouncedJoystick *m_joystick;
 	int m_button;
+	int m_cycles;
 	int m_lastFiredButton;
+	int m_currentCycles;
+	int m_fired;
 };
 
 #endif

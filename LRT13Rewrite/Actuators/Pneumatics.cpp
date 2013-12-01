@@ -7,8 +7,9 @@ Compressor *Pneumatics::m_compressor;
 
 Pneumatics::Pneumatics(uint32_t forward, uint32_t reverse, const char *name) :
 	SynchronizedProcess((std::string("Pneumatics") + std::string(name)).c_str(), Task::kDefaultPriority - 1),
-	Configurable(),
 	Actuator(name),
+	Configurable("Pneumatics"),
+	Loggable("Pneumatics" + std::string(name)),
 	m_configSection("Pneumatics")
 {
 	printf("Created DoubleSolenoid %s\n", name);
@@ -22,8 +23,9 @@ Pneumatics::Pneumatics(uint32_t forward, uint32_t reverse, const char *name) :
 
 Pneumatics::Pneumatics(uint32_t forward, uint32_t reverse, uint8_t module, const char *name) :
 	SynchronizedProcess("Pneumatics", Task::kDefaultPriority - 1),
-	Configurable(),
 	Actuator(name),
+	Configurable("Pneumatics"),
+	Loggable("Pneumatics" + std::string(name)),
 	m_configSection("Pneumatics")
 {
 	printf("Created DoubleSolenoid %s\n", name);
@@ -37,8 +39,9 @@ Pneumatics::Pneumatics(uint32_t forward, uint32_t reverse, uint8_t module, const
 
 Pneumatics::Pneumatics(uint32_t forward, const char *name) :
 	SynchronizedProcess((std::string("Pneumatics") + std::string(name)).c_str(), Task::kDefaultPriority - 1),
-	Configurable(),
 	Actuator(name),
+	Configurable("Pneumatics"),
+	Loggable("Pneumatics" + std::string(name)),
 	m_configSection("Pneumatics")
 {
 	printf("Created Solenoid %s\n", name);
@@ -52,8 +55,9 @@ Pneumatics::Pneumatics(uint32_t forward, const char *name) :
 
 Pneumatics::Pneumatics(uint32_t forward, uint8_t module, const char *name) :
 	SynchronizedProcess("Pneumatics", Task::kDefaultPriority - 1),
-	Configurable(),
 	Actuator(name),
+	Configurable("Pneumatics"),
+	Loggable("Pneumatics" + std::string(name)),
 	m_configSection("Pneumatics")
 {
 	printf("Created Solenoid %s\n", name);
@@ -202,3 +206,7 @@ void Pneumatics::Configure()
 	m_pulse_length = c->Get<int> (m_configSection, "pulseLength", 25);
 }
 
+void Pneumatics::Log()
+{
+	LogToFile(&state, "State");
+}

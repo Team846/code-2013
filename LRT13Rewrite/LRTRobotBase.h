@@ -15,12 +15,10 @@ public:
 	// Inherited from RobotBase, starts the competition
 	virtual void StartCompetition();
 	
-
 	// Function to execute each pass in the loop; similar to a main function, but it gets run multiple times.
 	virtual void Main();
 
 private:
-	// Function to execute each pass in the loop; similar to a main function, but it gets run multiple times.
 	void Run();
 
 	Notifier m_loopSynchronizer;

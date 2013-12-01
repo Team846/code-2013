@@ -1,9 +1,10 @@
 #include "Configurable.h"
 #include "ConfigRuntime.h"
 
-Configurable::Configurable()
+Configurable::Configurable(string configSection)
 :m_config(ConfigRuntime::Instance())
 {
+	m_configSection = configSection;
 	ConfigRuntime::Register(this);
 }
 

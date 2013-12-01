@@ -2,7 +2,7 @@
 #define JOYSTICK_MOVED_EVENT_H_
 
 #include "Event.h"
-#include "../DebouncedJoystick.h"
+#include "../../DriverStation/DebouncedJoystick.h"
 
 class JoystickMovedEvent : public Event
 {
@@ -14,10 +14,14 @@ public:
 	
 	virtual void Update();
 	
+	int GetAxis();
+	DebouncedJoystick* GetJoystick();
+	
 private:
 	DebouncedJoystick *m_joystick;
 	int m_axis;
 	float m_sensitivity;
+	int m_lastFiredAxis;
 };
 
 #endif

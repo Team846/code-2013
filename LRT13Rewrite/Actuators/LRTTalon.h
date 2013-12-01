@@ -3,13 +3,17 @@
 
 #include "Talon.h"
 #include "LRTSpeedController.h"
+#include "../Logging/Loggable.h"
 
 #include "DigitalOutput.h"
 #include <vector>
 
 using namespace std;
 
-class LRTTalon : public Talon, public LRTSpeedController
+/*!
+ * @brief Wrapper for Talon speed controller.
+ */
+class LRTTalon : public Talon, public LRTSpeedController, public Loggable
 {
 public:
 	explicit LRTTalon(UINT32 channel, const char* name, UINT32 jumperChannel = 0);
@@ -24,10 +28,13 @@ public:
 	virtual void PIDWrite(float output);
 	
 	virtual void ConfigNeutralMode(LRTSpeedController::NeutralMode mode);
-	/*
-	 * Writes the values to the Talon.
+	
+	/*!
+	 * @brief Writes the values to the Talon.
 	 */
 	void Send();
+	
+	void Log();
 	
 	static vector<LRTTalon*> talon_vector;
 	

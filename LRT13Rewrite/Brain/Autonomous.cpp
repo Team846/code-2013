@@ -29,7 +29,7 @@ Autonomous::~Autonomous()
 
 }
 
-void Autonomous::Start(Event *trigger)
+Automation::Status Autonomous::Start(Event *trigger)
 {
 	int autonRoutine = (int)(DriverStation::GetInstance()->GetAnalogIn(DriverStationConfig::AnalogIns::AUTONOMOUS_SELECT) + 0.5) + 1;
 	AsyncPrinter::Printf("Starting autonomous routine %d\n", autonRoutine);
@@ -52,31 +52,36 @@ void Autonomous::Start(Event *trigger)
 //			m_componentData->drivetrainData->zeroLastPositionSetpoint(FORWARD);
 //			m_componentData->drivetrainData->zeroLastPositionSetpoint(TURN);
 //			m_componentData->shooterData->SetEnabled(true);
+	return SUCCESS;
 }
 
-void Autonomous::Run()
+bool Autonomous::Run()
 {
-	if (!routines.empty())
+	if (routines.empty())
+		return true;
+	if (routines.front()->Completed())
 	{
-		if (routines.front()->Completed())
-		{
-			routines.front()->Stop();
-			delete routines.front();
-			routines.pop();
-			beginNext = true;
-		}
+		routines.front()->Stop();
+		delete routines.front();
+		routines.pop();
+		beginNext = true;
 	}
-	if (!routines.empty())
+	if (beginNext)
 	{
-		if (beginNext)
-		{
-			routines.front()->Run();
-			beginNext = false;
-		}
+		routines.front()->Run();
+		beginNext = false;
 	}
+	return false;
 }
 
-void Autonomous::Abort(Event *trigger)
+Automation::Status Autonomous::Abort(Event *trigger)
+{
+	while (!routines.empty())
+		routines.pop();
+	return SUCCESS;
+}
+
+void Autonomous::AllocateResources()
 {
 	
 }

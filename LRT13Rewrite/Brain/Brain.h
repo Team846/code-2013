@@ -4,11 +4,14 @@
 #include <string>
 #include <WPILib.h>
 #include "Automation.h"
-#include <vector>
-#include "DebouncedJoystick.h"
+#include "InputProcessor.h"
+#include <list>
 
 using namespace std;
 
+/*!
+ * @brief Controls all automation and input processing. Coordinates and sends commands to components.
+ */
 class Brain
 {
 public:
@@ -21,17 +24,26 @@ public:
 	void Update();
 	
 private:
+	enum BlockedAction
+	{
+		IGNORE,
+		ABORT_SELF,
+		ABORT_OTHER,
+		OVERRIDE
+	};
 	Brain();
 	
+	void ProcessAutomationTasks();
 	void ProcessInputs();
 	
 	static Brain* m_instance;
 	
-	vector<Automation*> m_automation;
+	vector<InputProcessor*> m_inputs;
 	
-	DebouncedJoystick *m_driver_stick;
-	DebouncedJoystick *m_operator_stick;
-	DebouncedJoystick *m_driver_wheel;
+	list<Automation*> m_runningTasks;
+	map<Automation*, Event*> m_abortingTasks;
+	map<Automation*, Event*> m_queuedTasks;
+	map<Automation*, map<Automation*, BlockedAction> > m_blockedActions;
 	
 	DISALLOW_COPY_AND_ASSIGN(Brain);
 };

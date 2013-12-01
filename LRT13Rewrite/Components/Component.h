@@ -43,17 +43,20 @@ public:
 	void Update();
 	
 	/*!
-	 * @brief Returns whether or not the component requires to be in an enabled state.
+	 * @brief Returns whether or not the robot requires to be in an enabled state to run the enabled function.
+	 * @return whether the component requires an enabled state
 	 */
 	bool EnableRequired();
 	
 	/*!
-	 * @brief Gets the driver station digital input channel for the component
+	 * @brief Gets the driver station digital input channel for the component.
+	 * @return the digital input channel
 	 */
 	int GetDigitalIn();
 
 	/*!
 	 * @brief Gets the component's name.
+	 * @return the name of the component
 	 */
 	const char* GetName();
 	

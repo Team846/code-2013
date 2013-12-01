@@ -8,10 +8,11 @@
 vector<AsyncCANJaguar*> AsyncCANJaguar::jaguar_vector;
 
 AsyncCANJaguar::AsyncCANJaguar(UINT8 channel, const char* name) :
-			SynchronizedProcess((std::string("AsyncCANJaguar #") + Util::ToString<int>(channel)).c_str(),Task::kDefaultPriority - 2),
-			CANJaguar(channel),
-			LRTSpeedController(name),
-			m_print_ctor_dtor(m_task_name.c_str(), (m_task_name + "\n").c_str())
+	SynchronizedProcess((std::string("AsyncCANJaguar #") + Util::ToString<int>(channel)).c_str(),Task::kDefaultPriority - 2),
+	CANJaguar(channel),
+	LRTSpeedController(name),
+	Loggable("AsyncCANJaguar" + std::string(name)),
+	m_print_ctor_dtor(m_task_name.c_str(), (m_task_name + "\n").c_str())
 {
 	m_task_name = "JAG#" + Util::ToString<int>(channel);
 	m_channel = channel;
@@ -541,6 +542,11 @@ bool AsyncCANJaguar::GetPowerCycled()
 float AsyncCANJaguar::GetExpiration()
 {
 	return m_expire;
+}
+
+void AsyncCANJaguar::Log()
+{
+	LogToFile(GetDutyCycle(), "DutyCycle");
 }
 
 void AsyncCANJaguar::Println(const char * str)

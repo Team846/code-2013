@@ -3,8 +3,12 @@
 
 #include "Servo.h"
 #include "Actuator.h"
+#include "../Logging/Loggable.h"
 
-class LRTServo : public Servo, public Actuator
+/*!
+ * @brief Wrapper for Servos.
+ */
+class LRTServo : public Servo, public Actuator, public Loggable
 {
 public:
 	typedef enum
@@ -28,6 +32,8 @@ public:
     float Get();
     float GetHardwareValue();
     ControlMode GetControlMode();
+    
+    void Log();
     
 private:
     ControlMode m_controlMode;

@@ -2,7 +2,7 @@
 #define JOYSTICK_RELEASED_EVENT_H_
 
 #include "Event.h"
-#include "../DebouncedJoystick.h"
+#include "../../DriverStation/DebouncedJoystick.h"
 
 class JoystickReleasedEvent : public Event
 {
@@ -14,9 +14,13 @@ public:
 	
 	virtual void Update();
 	
+	int GetButton();
+	DebouncedJoystick* GetJoystick();
+	
 private:
 	DebouncedJoystick *m_joystick;
 	int m_button;
+	int m_lastFiredButton;
 };
 
 #endif

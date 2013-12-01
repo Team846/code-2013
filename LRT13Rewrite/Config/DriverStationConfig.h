@@ -1,6 +1,8 @@
 #ifndef DRIVER_STATION_CONFIG_H_
 #define DRIVER_STATION_CONFIG_H_
 
+#include <string>
+
 /*!
  * @brief Contains all constants for driver station configuration
  */
@@ -45,7 +47,7 @@ const uint32_t FLASHLIGHT_B = 11;
 //Operator stick
 const uint32_t SHOOTER_OFF = 1;
 const uint32_t SHOOTER_ON = 2;
-const uint32_t CONDITIONAL_ABORT = 2;
+const uint32_t ABORT_CLIMB = 2;
 const uint32_t CONTINUE_CLIMB = 3;
 const uint32_t CHANGE_ANGLE = 4;
 const uint32_t COLLECTOR_DOWN_NO_MOTOR = 5;

@@ -26,9 +26,11 @@ public:
 	Autonomous();
 	~Autonomous();
 	
-	void Start(Event *trigger);
-	void Run();
-	void Abort(Event *trigger);
+protected:
+	Status Start(Event *trigger);
+	bool Run();
+	Status Abort(Event *trigger);
+	void AllocateResources();
 	
 private:
     void LoadRoutine(std::string path);

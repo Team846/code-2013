@@ -12,13 +12,14 @@ class PID
 {
 public:
 	/*!
-	 * @brief Constructs a PID controller. All gains are in constant (not timebase) form
+	 * @brief Constructs a PID controller. All gains are in constant (not timebase) form.
 	 * @param p_gain proportional gain
 	 * @param i_gain integral gain
 	 * @param d_gain derivative gain
 	 * @param ff_gain feedforward gain (defaults to 1.0)
 	 * @param i_decay integral decay (defaults to 0.5)
 	 * @param feedforward whether or not feedforward is used
+	 * @param filterFreq the frequency of the low pass filter
 	 */
 	PID(double p_gain, double i_gain, double d_gain, double ff_gain = 1.0,
 			double i_decay = 0.5, bool feedforward = true, double filterFreq = 7.0);
@@ -37,124 +38,125 @@ public:
 	 * @param ff_gain feedforward gain (defaults to 1.0)
 	 * @param i_decay integral decay (defaults to 0.5)
 	 * @param feedforward whether or not feedforward is used
+	 * @param filterFreq the frequency of the low pass filter
 	 */
 	void setParameters(double p_gain, double i_gain, double d_gain,
 					double ff_gain = 1.0, double i_decay = 0.87,
 					bool feedforward = true, double filterFreq = 7.0);
 
 	/*!
-	 * @brief updates the PID controller, call on each loop
+	 * @brief Updates the PID controller, call on each loop.
 	 * @param dt time differential
 	 * @return pid output
 	 */
 	virtual double update(double dt);
 
 	/*!
-	 * @brief sets the feedback input
-	 * @param PID input
+	 * @brief Sets the feedback input.
+	 * @param input PID input
 	 */
 	void setInput(double input);
 
 	/*!
-	 * @brief sets the setpoint
-	 * @param setpoint
+	 * @brief Sets the setpoint.
+	 * @param setpoint the setpoint to set
 	 */
 	virtual void setSetpoint(double setpoint);
 
 	/*!
-	 * @brief gets the PID output
+	 * @brief Gets the PID output.
 	 * @return PID output
 	 */
 	double getOutput();
 
 	/*!
-	 * @brief Gets the p gain
+	 * @brief Gets the p gain.
 	 * @return proportional PID gain
 	 */
 	double getProportionalGain();
 
 	/*!
-	 * @brief Gets the i gain
+	 * @brief Gets the i gain.
 	 * @return integral PID gain
 	 */
 	double getIntegralGain();
 
 	/*!
-	 * @brief Gets the d gain
+	 * @brief Gets the d gain.
 	 * @return derivative PID gain
 	 */
 	double getDerivativeGain();
 
 	/*!
-	 * @brief Gets the feed forward gain
+	 * @brief Gets the feed forward gain.
 	 * @return feed forward gain
 	 */
 	double getFeedForwardGain();
 
 	/*!
-	 * @brief Gets the integral decay rate
+	 * @brief Gets the integral decay rate.
 	 * @return integral decay rate
 	 */
 	double getIntegralDecay();
 
 	/*!
-	 * @brief Gets the input value
+	 * @brief Gets the input value.
 	 * @return input
 	 */
 	double getInput();
 
 	/*!
-	 * @brief Gets the setpoint value
+	 * @brief Gets the setpoint value.
 	 * @return setpoint
 	 */
 	double getSetpoint();
 
 	/*!
-	 * @brief Gets the error value
+	 * @brief Gets the error value.
 	 * @return error
 	 */
 	double getError();
 
 	/*!
-	 * @brief Gets the accumulated m_is_running sum
+	 * @brief Gets the accumulated m_is_running sum.
 	 * @return m_is_running sum
 	 */
 	double getAccumulatedError();
 
 	/*!
-	 * @brief Gets the previous error (one iteration ago)
+	 * @brief Gets the previous error (one iteration ago).
 	 * @return previous error
 	 */
 	double getPreviousError();
 
 	/*!
-	 * @brief m_status flag for feed-forward PID
+	 * @brief m_status flag for feed-forward PID.
 	 * @return whether this controller uses feedforward PID
 	 */
 	bool isFeedForward();
 
 	/*!
-	 * @brief Resets PID setpoint, input, error, accumulated error, differential, and output
+	 * @brief Resets PID setpoint, input, error, accumulated error, differential, and output.
 	 */
 	void reset();
 
 	/*!
-	 * @brief Disables PID -- output returns setpoint
+	 * @brief Disables PID -- output returns setpoint.
 	 */
 	void disablePID();
 
 	/*!
-	 * @brief Enables PID
+	 * @brief Enables PID.
 	 */
 	void enablePID();
 	
 	/*!
-	 * @brief Enables an IIR filter on output
+	 * @brief Enables an IIR filter on output.
 	 */
 	void setIIREnabled(bool enabled);
 	
 	/*!
-	 * @brief Sets the IFR Decay rate
+	 * @brief Sets the IFR Decay rate.
 	 */
 	void setIIRDecay(double decay);
 	

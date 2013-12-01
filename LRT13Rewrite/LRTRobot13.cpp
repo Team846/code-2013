@@ -6,13 +6,14 @@
 #include "Actuators/AsyncCANJaguar.h"
 #include "Actuators/Pneumatics.h"
 #include "RobotState.h"
+#include "DriverStation/LRTDriverStation.h"
 
 #include "Config/ConfigRuntime.h"
 #include "Config/ConfigPortMappings.h"
 #include "Config/RobotConfig.h"
 #include "Config/DriverStationConfig.h"
 #include "Utils/LCD.h"
-#include "Brain/Events/Event.h"
+#include "Logging/Logger.h"
 
 LRTRobot13::LRTRobot13()
 {
@@ -38,9 +39,12 @@ LRTRobot13::~LRTRobot13()
 	Component::DestroyComponents();
 	ConfigPortMappings::Finalize();
 	ConfigRuntime::Finalize();
+	Logger::Finalize();
 	Pneumatics::DestroyCompressor();
+	Brain::Finalize();
 	LCD::Finalize();
 	AsyncPrinter::Finalize();
+	LRTDriverStation::Finalize();
 	RobotState::Finalize();
 }
 
@@ -52,6 +56,9 @@ void LRTRobot13::RobotInit()
 	// Initialize Utilities
 	AsyncPrinter::Initialize();
 	LCD::Instance()->Start();
+
+	// Create the Driver Station
+	LRTDriverStation::Initialize();
 	
 	// Read port mappings
 	ConfigPortMappings::Instance()->Load();
@@ -91,10 +98,11 @@ void LRTRobot13::Main()
 {
 	wdStart(_watchdog, sysClkRateGet() / RobotConfig::LOOP_RATE,
 			TimeoutCallback, 0);
-
+	
+	// Redirect all prints to a file when console is blocked during matches
 	if (DriverStation::GetInstance()->IsFMSAttached())
 	{
-		AsyncPrinter::RedirectToFile("/stdout.out");
+		AsyncPrinter::RedirectToFile(RobotConfig::PRINT_FILE_PATH.c_str());
 	}
 	else
 	{
@@ -103,6 +111,12 @@ void LRTRobot13::Main()
 	
 	// Update global robot state object
 	RobotState::Update();
+	
+	// Update the Driver Station
+	LRTDriverStation::Update();
+	
+	// Update the Brain
+	Brain::Instance()->Update();
 	
 	// Update all components
 	Component::UpdateAll();
@@ -121,8 +135,7 @@ void LRTRobot13::Main()
 	
 	// Utilities
 	LCD::Instance()->RunOneCycle();
-	
-	Event::UpdateEvents();
+	Logger::Instance()->Run();
 	
 	wdCancel(_watchdog);
 }

@@ -5,6 +5,7 @@
 LRTServo::LRTServo(UINT32 channel, const char* name)
     : Servo(channel)
 	, Actuator(name)
+	, Loggable("Servo" + std::string(name))
     , m_controlMode(kValue)
 	, m_value(0.0)
     , enabled(false)
@@ -85,4 +86,10 @@ float LRTServo::GetHardwareValue()
 LRTServo::ControlMode LRTServo::GetControlMode()
 {
 	return m_controlMode;
+}
+
+void LRTServo::Log()
+{
+	LogToFile(&m_controlMode, "ControlMode");
+	LogToFile(&m_value, "Value");
 }

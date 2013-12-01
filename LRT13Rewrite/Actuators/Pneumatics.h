@@ -11,11 +11,15 @@
 
 #include "../Config/ConfigPortMappings.h"
 #include "../Config/Configurable.h"
+#include "../Logging/Loggable.h"
 #include "../Process/SynchronizedProcess.h"
 #include "../Config/ConfigRuntime.h"
 #include "../Utils/AsyncPrinter.h"
 
-class Pneumatics : public SynchronizedProcess, public Configurable, public Actuator
+/*!
+ * @brief Container for single solenoids and double solenoids
+ */
+class Pneumatics : public SynchronizedProcess, public Actuator, public Configurable, public Loggable
 {
 public:
 	enum State
@@ -43,7 +47,8 @@ public:
 	State Get();
 	State GetHardwareValue();
 
-	virtual void Configure();
+	void Configure();
+	void Log();
 	
 	static vector<Pneumatics*> pneumatic_vector;
 	

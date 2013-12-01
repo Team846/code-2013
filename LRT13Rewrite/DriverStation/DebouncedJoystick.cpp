@@ -1,9 +1,11 @@
 #include "DebouncedJoystick.h"
 #include <cstdio>
-#include "..\Utils\AsyncPrinter.h"
+#include "../Utils/AsyncPrinter.h"
+#include "../Utils/Util.h"
 
 DebouncedJoystick::DebouncedJoystick(UINT32 port, int nBtns, int nAxes) :
-	Joystick(port)
+	Joystick(port),
+	Loggable("Joystick" + Util::ToString(port))
 {
 	m_num_buttons = nBtns;
 	m_num_axes = nAxes;
@@ -12,7 +14,7 @@ DebouncedJoystick::DebouncedJoystick(UINT32 port, int nBtns, int nAxes) :
 	isPressed = new bool[nBtns + 1];
 	axisPrevValue = new double[nAxes + 1];
 	axisValue = new double[nAxes + 1];
-
+	m_port = port;
 	Init();
 }
 
@@ -28,8 +30,7 @@ bool DebouncedJoystick::ButtonInBounds(int button)
 {
 	if (button <= 0 || button > m_num_buttons)
 	{
-		AsyncPrinter::Printf(
-				"[!]DebouncedJoystick: Button %d out of bounds!\n", button);
+		AsyncPrinter::Printf("[!]DebouncedJoystick: Button %d out of bounds!\n", button);
 		return false;
 	}
 	return true;
@@ -39,8 +40,7 @@ bool DebouncedJoystick::AxisInBounds(int axis)
 {
 	if (axis <= 0 || axis > m_num_axes)
 	{
-		AsyncPrinter::Printf("[!]DebouncedJoystick: Axis %d out of bounds!\n",
-				axis);
+		AsyncPrinter::Printf("[!]DebouncedJoystick: Axis %d out of bounds!\n", axis);
 		return false;
 	}
 	return true;
@@ -58,6 +58,7 @@ void DebouncedJoystick::Init()
 		axisPrevValue[i] = axisValue[i] = 0;
 	}
 }
+
 void DebouncedJoystick::Update()
 {
 	for (int i = 1; i <= m_num_buttons; ++i)
@@ -76,7 +77,16 @@ void DebouncedJoystick::Update()
 double DebouncedJoystick::GetRawAxisDelta(int axis)
 {
 	// return positive when stick is pushed forward
+	if (!AxisInBounds(axis))
+		return false;
 	return axisPrevValue[axis] - axisValue[axis];
+}
+
+double DebouncedJoystick::GetLastAxis(int axis)
+{
+	if (!AxisInBounds(axis))
+		return false;
+	return axisPrevValue[axis];
 }
 
 bool DebouncedJoystick::IsButtonJustPressed(int button)
@@ -141,4 +151,15 @@ int DebouncedJoystick::GetNumButtons()
 int DebouncedJoystick::GetNumAxes()
 {
 	return m_num_axes;
+}
+
+UINT32 DebouncedJoystick::GetPort()
+{
+	return m_port;
+}
+
+void DebouncedJoystick::Log()
+{
+	LogToFile(isPressed, "Buttons");
+	LogToFile(axisValue, "Axes");
 }

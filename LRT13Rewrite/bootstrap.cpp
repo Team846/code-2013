@@ -1,12 +1,5 @@
 #include "LRTRobot13.h"
 
-/* ----- BOOTSTRAPPER ----- */
-/* This file is very important.
- * If you don't have this, you don't have any
- * loaded code. :)
- */
-
-
 /*!
  * Pre-defined macro is:
  * START_ROBOT_CLASS(class);

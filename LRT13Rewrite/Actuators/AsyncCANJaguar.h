@@ -13,12 +13,13 @@
 #include "../RobotState.h"
 
 #include "LRTSpeedController.h"
+#include "../Logging/Loggable.h"
 
 /*!
  * @brief Asynchronous implementation of a CAN driver for the Jaguar.
  * @brief Reimplements the large majority of useful operations on the Jaguar in a threaded fashion.
  */
-class AsyncCANJaguar : public SynchronizedProcess, public CANJaguar, public LRTSpeedController
+class AsyncCANJaguar : public SynchronizedProcess, public CANJaguar, public LRTSpeedController, public Loggable
 {
 public:
 	/*!
@@ -277,15 +278,17 @@ public:
 	float GetExpiration();
 
 	/*!
-	 * Simple wrapper for GetFaults() == 0
+	 * @brief Simple wrapper for GetFaults() == 0
 	 * @return true if no faults
 	 */
 	bool StatusOK();
 
 	/*!
-	 * @param Clear the cache
+	 * @brief Clear the cache
 	 */
 	void ResetCache();
+	
+	void Log();
 	
 	// collection flags
 	const static uint32_t SPEEDREF = (1 << 0);

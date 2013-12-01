@@ -5,6 +5,7 @@ vector<LRTTalon*> LRTTalon::talon_vector;
 LRTTalon::LRTTalon(UINT32 channel, const char* name, UINT32 jumperChannel) :
 	Talon(channel),
 	LRTSpeedController(name),
+	Loggable("LRTTalon" + std::string(name)),
 	m_brake_jumper(jumperChannel != 0 ? new DigitalOutput(jumperChannel) : NULL)
 {
 	m_pwm = 0.0;
@@ -17,6 +18,7 @@ LRTTalon::LRTTalon(UINT32 channel, const char* name, UINT32 jumperChannel) :
 LRTTalon::LRTTalon(UINT8 moduleNumber, UINT32 channel, const char* name, UINT32 jumperChannel) :
 	Talon(moduleNumber, channel),
 	LRTSpeedController(name),
+	Loggable("LRTTalon" + std::string(name)),
 	m_brake_jumper(jumperChannel != 0 ? new DigitalOutput(jumperChannel) : NULL)
 {
 	m_pwm = 0.0;
@@ -85,3 +87,7 @@ void LRTTalon::Send()
 	}
 }
 
+void LRTTalon::Log()
+{
+	LogToFile(&m_pwm, "PWM");
+}

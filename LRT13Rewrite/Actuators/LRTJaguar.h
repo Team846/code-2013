@@ -3,13 +3,17 @@
 
 #include "Jaguar.h"
 #include "LRTSpeedController.h"
+#include "../Logging/Loggable.h"
 
 #include "DigitalOutput.h"
 #include <vector>
 
 using namespace std;
 
-class LRTJaguar : public Jaguar, public LRTSpeedController
+/*!
+ * @brief Wrapper for PWM Jaguars.
+ */
+class LRTJaguar : public Jaguar, public LRTSpeedController, public Loggable
 {
 public:
 	
@@ -25,10 +29,13 @@ public:
 	virtual void PIDWrite(float output);
 	
 	virtual void ConfigNeutralMode(LRTSpeedController::NeutralMode mode);
-	/*
-	 * Writes the values to the Talon.
+	
+	/*!
+	 * Writes the values to the Jaguar.
 	 */
 	void Send();
+	
+	void Log();
 	
 	static vector<LRTJaguar*> jaguar_vector;
 	

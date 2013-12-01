@@ -1,21 +1,18 @@
-#ifndef OUTPUT_H_
-#define OUTPUT_H_
+#ifndef ACTUATOR_H_
+#define ACTUATOR_H_
 
 #include <vector>
-#include <Error.h>
-
-/*!
- * @brief Interface for all actuators.
- * 
- * @author Raphael Chang
- */
 
 using namespace std;
 
+/*!
+ * @brief Base class for all actuators.
+ */
 class Actuator
 {
 public:
 	explicit Actuator(const char *name);
+	
 	virtual const char* GetName();
 	virtual void Update() = 0;
 	

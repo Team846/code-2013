@@ -1,17 +1,19 @@
 #ifndef CONFIGURABLE_H_
 #define CONFIGURABLE_H_
 
+#include <string>
+
 class ConfigRuntime;
 
 /*!
- * @brief Interface for reading from configuration file through ConfigManager
+ * @brief Interface for reading from configuration file through ConfigManager.
  * @author Raphael Chang
  */
 
 class Configurable
 {
 public:
-	Configurable();
+	Configurable(std::string configSection);
 	virtual ~Configurable();
 	
 	/*!
@@ -21,6 +23,7 @@ public:
 	
 protected:
 	ConfigRuntime * const m_config;
+	std::string m_configSection;
 };
 
 #endif

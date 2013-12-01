@@ -1,68 +1,75 @@
 #include "Automation.h"
 
+map<ComponentData*, Automation*> Automation::allocated;
+
 Automation::Automation()
 {
-	m_running = false;
+	m_continueEvent = NULL;
 }
 
 Automation::~Automation()
 {
-	for (vector<Event*>::iterator it = start_events.begin(); it < start_events.end(); it++)
-	{
-		delete *it;
-		*it = NULL;
-	}
-	start_events.clear();
-	for (vector<Event*>::iterator it = abort_events.begin(); it < abort_events.end(); it++)
-	{
-		delete *it;
-		*it = NULL;
-	}
-	abort_events.clear();
 }
 
-void Automation::Update()
+Automation::Status Automation::Update()
 {
-	bool fired = true;
-	for (vector<Event*>::iterator it = start_events.begin(); it < start_events.end(); it++)
+	blocking.clear();
+	AllocateResources();
+	if (blocking.empty())
 	{
-		if (!(*it)->Fired())
-		{
-			fired = false;
-			break;
-		}
+		bool completed = Run();
+		m_continueEvent = NULL;
+		if(completed)
+			return COMPLETED;
+		else
+			return IN_PROGRESS;
 	}
-	if (fired && !m_running)
+	else
 	{
-		Start(*start_events.begin());
-		m_running = true;
-	}
-	fired = true;
-	for (vector<Event*>::iterator it = abort_events.begin(); it < abort_events.end(); it++)
-	{
-		if (!(*it)->Fired())
-		{
-			fired = false;
-			break;
-		}
-	}
-	if (fired && m_running)
-	{
-		Abort(*abort_events.begin());
-		m_running = false;
-	}
-	if (m_running)
-	{
-		Run();
+		m_continueEvent = NULL;
+		return RESOURCE_BUSY;
 	}
 }
 
-void Automation::AddStartEvent(Event *trigger)
+void Automation::Continue(Event *trigger)
 {
-	start_events.push_back(trigger);
+	m_continueEvent = trigger;
 }
 
-void Automation::AddAbortEvent(Event *trigger)
+bool Automation::Continued()
 {
-	abort_events.push_back(trigger);
+	return m_continueEvent != NULL;
+}
+
+Event* Automation::GetContinueEvent()
+{
+	return m_continueEvent;
+}
+
+bool Automation::AllocateResource(ComponentData* resource)
+{
+	if (allocated.find(resource) == allocated.end())
+	{
+		allocated[resource] = this;
+		return true;
+	}
+	blocking.insert(allocated[resource]);
+	return false;
+}
+
+set<Automation*>& Automation::GetBlockingTasks()
+{
+	return blocking;
+}
+
+Automation* Automation::GetAllocation(ComponentData* resource)
+{
+	if (allocated.find(resource) != allocated.end())
+		return allocated[resource];
+	return NULL;
+}
+
+void Automation::DeallocateAll()
+{
+	allocated.clear();
 }
