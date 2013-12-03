@@ -37,6 +37,16 @@ LRTDriverStation::LRTDriverStation()
 			DriverStationConfig::JoystickConfig::NUM_WHEEL_AXES);
 }
 
+LRTDriverStation::~LRTDriverStation()
+{
+	delete m_driver_stick;
+	m_driver_stick = NULL;
+	delete m_operator_stick;
+	m_operator_stick = NULL;
+	delete m_driver_wheel;
+	m_driver_wheel = NULL;
+}
+
 void LRTDriverStation::Update()
 {
  	Instance()->m_driver_stick->Update();

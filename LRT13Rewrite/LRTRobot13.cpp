@@ -54,19 +54,24 @@ void LRTRobot13::RobotInit()
 	RobotState::Initialize();
 	
 	// Initialize Utilities
+	printf("Initializing Utilities...");
 	AsyncPrinter::Initialize();
 	LCD::Instance()->Start();
 
 	// Create the Driver Station
+	AsyncPrinter::Println("Initializing Driver Station...");
 	LRTDriverStation::Initialize();
 	
 	// Read port mappings
+	AsyncPrinter::Println("Loading Port Mappings...");
 	ConfigPortMappings::Instance()->Load();
 	
 	// Create all components
+	AsyncPrinter::Println("Creating Components...");
 	Component::CreateComponents();
 	
 	// Initialize the Brain
+	AsyncPrinter::Println("Initializing Brain...");
 	Brain::Initialize();
 	
 	// Start Actuator tasks

@@ -8,7 +8,6 @@ void AsyncPrinter::Initialize()
 	{
 		_instance = new AsyncPrinter();
 	}
-	
 	_instance->Start();
 }
 

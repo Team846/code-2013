@@ -64,20 +64,6 @@ void Logger::Run()
 	}
 }
 
-template<typename T> void Logger::Log(T *field, const char* name)
-{
-	Field f = {typeid(*field).name(), name, sizeof(*field)};
-	fields.push_back(f);
-	Write(field, sizeof(*field));
-}
-
-template<typename T> void Logger::Log(T value, const char* name)
-{
-	Field f = {typeid(value).name(), name, sizeof(value)};
-	fields.push_back(f);
-	Write(&value, sizeof(value));
-}
-
 void Logger::Write(void* field, size_t size)
 {
 	if (RobotState::Instance().GameMode() != RobotState::DISABLED)

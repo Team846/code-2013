@@ -31,14 +31,25 @@ public:
 	 * @param field pointer to the variable
 	 * @param name name of the field
 	 */
-	template<typename T> void Log(T *field, const char* name);
-	
+	template<typename T> void Logger::Log(T *field, const char* name)
+	{
+		Field f = {typeid(*field).name(), name, sizeof(*field)};
+		fields.push_back(f);
+		Write(field, sizeof(*field));
+	}
+
 	/*!
 	 * @brief Saves a value for logging.
 	 * @param value value to log
 	 * @param name name of the field
 	 */
-	template<typename T> void Log(T value, const char* name);
+	template<typename T> void Logger::Log(T value, const char* name)
+	{
+		Field f = {typeid(value).name(), name, sizeof(value)};
+		fields.push_back(f);
+		Write(&value, sizeof(value));
+	}
+
 	
 	/*!
 	 * @brief Registers a Loggable object for logging.

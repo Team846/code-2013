@@ -24,15 +24,21 @@ protected:
 	 * @param field pointer to the variable
 	 * @param name name of the field
 	 */
-	template<typename T> void LogToFile(T *field, string name);
-	
+	template<typename T> void Loggable::LogToFile(T *field, string name)
+	{
+		m_logger->Log(field, (m_name + "/" + name).c_str());
+	}
+
 	/*!
 	 * @brief Saves a value to the Logger for logging.
 	 * @param value value to log
 	 * @param name name of the field
 	 */
-	template<typename T> void LogToFile(T value, string name);
-	
+	template<typename T> void Loggable::LogToFile(T value, string name)
+	{
+		m_logger->Log(value, (m_name + "/" + name).c_str());
+	}
+
 private:
 	Logger *m_logger;
 	string m_name;
