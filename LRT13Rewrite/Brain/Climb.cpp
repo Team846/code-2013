@@ -8,7 +8,8 @@
 //#define STEP
 
 Climb::Climb() :
-	Configurable("Climb")
+	Configurable("Climb"),
+	Loggable("Climb")
 {
 	table = NetworkTable::GetTable("RobotData");
 	m_pressure_a = new AnalogChannel(ConfigPortMappings::Get("Analog/PRESSURE_A"));
@@ -142,4 +143,9 @@ void Climb::Configure()
 {
 	m_swingWaitTicks = m_config->Get<int>(m_configSection, "swingWaitTicks", 50);
 	m_pressure_scale = m_config->Get<double> (m_configSection, "pressure_scale", 1400);
+}
+
+void Climb::Log()
+{
+	LogToFile(&m_state, "State");
 }

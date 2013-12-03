@@ -19,7 +19,7 @@
  * @brief Asynchronous implementation of a CAN driver for the Jaguar.
  * @brief Reimplements the large majority of useful operations on the Jaguar in a threaded fashion.
  */
-class AsyncCANJaguar : public SynchronizedProcess, public CANJaguar, public LRTSpeedController, public Loggable
+class AsyncCANJaguar : public SynchronizedProcess, public CANJaguar, public LRTSpeedController
 {
 public:
 	/*!
@@ -182,6 +182,12 @@ public:
 	 * @return duty cycle
 	 */
 	float GetHardwareValue();
+
+	/*!
+	 * @brief Gets the neutral mode (brake or coast).
+	 * @return the neutral mode (brake or coast)
+	 */
+	LRTSpeedController::NeutralMode GetNeutralMode();
 	
 	/*!
 	 * @brief Gets the P gain
@@ -287,8 +293,6 @@ public:
 	 * @brief Clear the cache
 	 */
 	void ResetCache();
-	
-	void Log();
 	
 	// collection flags
 	const static uint32_t SPEEDREF = (1 << 0);

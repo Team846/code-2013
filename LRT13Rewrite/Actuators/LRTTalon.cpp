@@ -4,8 +4,7 @@ vector<LRTTalon*> LRTTalon::talon_vector;
 
 LRTTalon::LRTTalon(UINT32 channel, const char* name, UINT32 jumperChannel) :
 	Talon(channel),
-	LRTSpeedController(name),
-	Loggable("LRTTalon" + std::string(name)),
+	LRTSpeedController(("LRTTalon" + std::string(name)).c_str()),
 	m_brake_jumper(jumperChannel != 0 ? new DigitalOutput(jumperChannel) : NULL)
 {
 	m_pwm = 0.0;
@@ -17,8 +16,7 @@ LRTTalon::LRTTalon(UINT32 channel, const char* name, UINT32 jumperChannel) :
 
 LRTTalon::LRTTalon(UINT8 moduleNumber, UINT32 channel, const char* name, UINT32 jumperChannel) :
 	Talon(moduleNumber, channel),
-	LRTSpeedController(name),
-	Loggable("LRTTalon" + std::string(name)),
+	LRTSpeedController(("LRTTalon" + std::string(name)).c_str()),
 	m_brake_jumper(jumperChannel != 0 ? new DigitalOutput(jumperChannel) : NULL)
 {
 	m_pwm = 0.0;
@@ -75,6 +73,11 @@ void LRTTalon::ConfigNeutralMode(NeutralMode mode)
 	m_neutral = mode;
 }
 
+LRTTalon::NeutralMode LRTTalon::GetNeutralMode()
+{
+	return m_neutral;
+}
+
 void LRTTalon::Send()
 {
 	Talon::Set(m_pwm);
@@ -85,9 +88,4 @@ void LRTTalon::Send()
 		if(m_neutral == LRTSpeedController::kNeutralMode_Brake)
 			m_brake_jumper->Set((UINT32)1);
 	}
-}
-
-void LRTTalon::Log()
-{
-	LogToFile(&m_pwm, "PWM");
 }

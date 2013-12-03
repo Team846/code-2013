@@ -4,8 +4,7 @@ vector<LRTJaguar*> LRTJaguar::jaguar_vector;
 
 LRTJaguar::LRTJaguar(UINT32 channel, const char* name, UINT32 jumperChannel) :
 	Jaguar(channel),
-	LRTSpeedController(name),
-	Loggable("LRTJaguar" + std::string(name)),
+	LRTSpeedController(("LRTJaguar" + std::string(name)).c_str()),
 	m_brake_jumper(jumperChannel != 0 ? new DigitalOutput(jumperChannel) : NULL)
 {
 	m_pwm = 0.0;
@@ -17,8 +16,7 @@ LRTJaguar::LRTJaguar(UINT32 channel, const char* name, UINT32 jumperChannel) :
 
 LRTJaguar::LRTJaguar(UINT8 moduleNumber, UINT32 channel, const char* name, UINT32 jumperChannel) :
 	Jaguar(moduleNumber, channel),
-	LRTSpeedController(name),
-	Loggable("LRTJaguar" + std::string(name)),
+	LRTSpeedController(("LRTJaguar" + std::string(name)).c_str()),
 	m_brake_jumper(jumperChannel != 0 ? new DigitalOutput(jumperChannel) : NULL)
 {
 	m_pwm = 0.0;
@@ -78,6 +76,11 @@ void LRTJaguar::ConfigNeutralMode(NeutralMode mode)
 	m_neutral = mode;
 }
 
+LRTJaguar::NeutralMode LRTJaguar::GetNeutralMode()
+{
+	return m_neutral;
+}
+
 void LRTJaguar::Send()
 {
 	Jaguar::Set(m_pwm);
@@ -90,9 +93,4 @@ void LRTJaguar::Send()
 			m_brake_jumper->Set((UINT32)1);
 				
 	}
-}
-
-void LRTJaguar::Log()
-{
-	LogToFile(&m_pwm, "PWM");
 }

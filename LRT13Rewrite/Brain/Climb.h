@@ -4,6 +4,7 @@
 #include <string>
 
 #include "../Config/Configurable.h"
+#include "../Logging/Loggable.h"
 #include "../Utils/LCD.h"
 #include "AnalogChannel.h"
 
@@ -12,7 +13,7 @@
 /*!
  * @brief Climb routine.
  */
-class Climb : public Automation, public Configurable
+class Climb : public Automation, public Configurable, public Loggable
 {
 public:
 	typedef enum State
@@ -28,9 +29,10 @@ public:
 	};
 	
 	Climb();
-	virtual ~Climb();
+	~Climb();
 	
-	virtual void Configure();
+	void Configure();
+	void Log();
 	
 protected:
 	Status Start(Event *trigger);

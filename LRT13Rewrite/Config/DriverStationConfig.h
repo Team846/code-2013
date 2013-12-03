@@ -4,7 +4,7 @@
 #include <string>
 
 /*!
- * @brief Contains all constants for driver station configuration
+ * @brief Contains all constants for driver station configuration.
  */
 
 namespace DriverStationConfig

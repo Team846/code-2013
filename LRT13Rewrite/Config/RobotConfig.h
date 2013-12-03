@@ -3,7 +3,7 @@
 #include <string>
 
 /*!
- * @brief Contains all constants for robot configuration
+ * @brief Contains all constants for robot configuration.
  */
 
 #define CHANGEME 99
@@ -15,7 +15,7 @@ const double ROBOT_WIDTH = 26.1;
 const std::string CONFIG_FILE_PATH = "/LRT13.conf";
 const std::string PORT_MAPPINGS_FILE_PATH = "/PortMappings.conf";
 const std::string ROUTINE_FILE_PATH = "/Autonomous.routine";
-const std::string LOG_FILE_PATH = "/Log.bin";
+const std::string LOG_FILE_PATH = "/log.bin";
 const std::string PRINT_FILE_PATH = "/stdout.out";
 const uint32_t MAX_GAME_PIECES = 4;
 const double MAX_VOLTAGE = 13;

@@ -1,6 +1,9 @@
 #include "AsyncPrinter.h"
 
 AsyncPrinter *AsyncPrinter::_instance = NULL;
+bool AsyncPrinter::filePrinting = false;
+int AsyncPrinter::fd;
+fpos_t AsyncPrinter::pos;
 
 void AsyncPrinter::Initialize()
 {
@@ -8,6 +11,7 @@ void AsyncPrinter::Initialize()
 	{
 		_instance = new AsyncPrinter();
 	}
+	
 	_instance->Start();
 }
 
@@ -21,7 +25,6 @@ AsyncPrinter::AsyncPrinter()
 	: AsyncProcess("AsyncPrinter", Task::kDefaultPriority + 1)
 {
 	m_queueSem = semBCreate(SEM_Q_PRIORITY, SEM_FULL);
-	m_ioSem = semBCreate(SEM_Q_PRIORITY, SEM_FULL);
 }
 
 AsyncPrinter::~AsyncPrinter()
@@ -98,20 +101,33 @@ void AsyncPrinter::DbgPrint(const char* msg, ...)
 
 void AsyncPrinter::RedirectToFile(const char* file)
 {
-	Synchronized s(_instance->m_ioSem);
-	fflush(_instance->m_out);
-	if(_instance->m_out != stdout) // don't want to close stdout
-		fclose(_instance->m_out);
-	_instance->m_out = fopen(file, "w");
+	if (!filePrinting)
+	{
+		Synchronized s(_instance->m_queueSem);
+		printf("\n--------------------Redirecting print stream to file--------------------\n");
+		fflush(stdout);
+		fgetpos(stdout, &pos);
+		fd = dup(fileno(stdout));
+		freopen(file, "a", stdout);
+		printf("\n--------------------Print stream redirected--------------------\n");
+		filePrinting = true;
+	}
 }
 
 void AsyncPrinter::RestoreToConsole()
 {
-	Synchronized s(_instance->m_ioSem);
-	fflush(_instance->m_out);
-	if(_instance->m_out != stdout) // don't want to close stdout
-		fclose(_instance->m_out);
-	_instance->m_out = stdout;
+	if (filePrinting)
+	{
+		Synchronized s(_instance->m_queueSem);
+		printf("\n--------------------Restoring print stream to console--------------------\n");
+		fflush(stdout);
+		dup2(fd, fileno(stdout));
+		close(fd);
+		clearerr(stdout);
+		fsetpos(stdout, &pos); 
+		printf("\n--------------------Print stream restored--------------------\n");
+		filePrinting = false;
+	}
 }
 
 INT32 AsyncPrinter::Tick()
@@ -119,15 +135,13 @@ INT32 AsyncPrinter::Tick()
 	UINT32 printed = 0;
 	
 	Synchronized s(m_queueSem);
-	Synchronized s2(m_ioSem);
 	
 	while(!_messageQueue.empty() && ++printed <= kMaxPrintsPerCycle && IsRunning())
 	{
 		string msg = _messageQueue.front();
 		_messageQueue.pop();
 		
-		if(m_out != NULL)
-			fprintf(m_out, msg.c_str());
+		printf(msg.c_str());
 	}
 	
 	taskDelay(sysClkRateGet() / 1000);
