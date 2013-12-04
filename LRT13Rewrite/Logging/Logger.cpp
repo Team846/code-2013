@@ -2,6 +2,7 @@
 #include "Loggable.h"
 #include "../Config/RobotConfig.h"
 #include "../RobotState.h"
+#include "../Utils/AsyncPrinter.h"
 
 Logger *Logger::m_instance = NULL;
 vector<Loggable*> Logger::loggables;
@@ -21,10 +22,46 @@ void Logger::Finalize()
 
 Logger::Logger()
 {
+	startLoc = curLoc = NULL;
+	dataSize = 0;
+	initialized = false;
+}
+
+Logger::~Logger()
+{
+	free(startLoc);
+	startLoc = NULL;
+	curLoc = NULL;
+}
+
+void Logger::Initialize()
+{
+	if (initialized)
+		return;
+	for (vector<Loggable*>::iterator it = loggables.begin(); it < loggables.end(); it++)
+	{
+		(*it)->Log();
+	}
+	free(startLoc);
+	startLoc = malloc(dataSize);
+	FILE* header = fopen((RobotConfig::LOG_FILE_PATH + ".header").c_str(), "w");
+	fprintf(header, "%d\n", fields.size());
+	for (vector<Field>::iterator it = fields.begin(); it < fields.end(); it++)
+	{
+		fprintf(header, "%s %s %d\n", it->type, it->name.c_str(), it->size);
+	}
+	fclose(header);
+	fields.clear();
+	initialized = true;
 }
 
 void Logger::Run()
 {
+	if (!initialized)
+	{
+		AsyncPrinter::Printf("[ERROR] Logger is not initialized\n");
+		return;
+	}
 	if (RobotState::Instance().GameMode() == RobotState::DISABLED)
 	{
 		if (RobotState::Instance().LastGameMode() != RobotState::DISABLED)
@@ -42,39 +79,31 @@ void Logger::Run()
 #else
 			file = fopen(RobotConfig::LOG_FILE_PATH.c_str(), "wb");
 #endif
-	
+		curLoc = (char*)startLoc;
 		for (vector<Loggable*>::iterator it = loggables.begin(); it < loggables.end(); it++)
 		{
 			(*it)->Log();
 		}
-#ifndef USE_IOLIB
+#ifdef USE_IOLIB
+		write(file, startLoc, dataSize);
+#else
+		fwrite(startLoc, dataSize, 1, file);
 		fflush(file);
 #endif
-
-		if (RobotState::Instance().LastGameMode() == RobotState::DISABLED)
-		{
-			FILE* header = fopen((RobotConfig::LOG_FILE_PATH + ".header").c_str(), "w");
-			fprintf(header, "%d\n", fields.size());
-			for (vector<Field>::iterator it = fields.begin(); it < fields.end(); it++)
-			{
-				fprintf(header, "%s %s %d\n", it->type, it->name, it->size);
-			}
-		}
-		fields.clear();
 	}
 }
 
 void Logger::Write(void* field, size_t size)
 {
-	if (RobotState::Instance().GameMode() != RobotState::DISABLED)
-#ifdef USE_IOLIB
-		write(file, (char*)field, size);
-#else
-		fwrite(field, size, 1, file);
-#endif
+//	fwrite(field, size, 1, file);
+	memcpy(curLoc, field, size);
+	curLoc += size;
 }
 
 void Logger::RegisterLoggable(Loggable *loggable)
 {
-	loggables.push_back(loggable);
+	if (m_instance == NULL || !m_instance->initialized)
+		loggables.push_back(loggable);
+	else
+		AsyncPrinter::Printf("[ERROR] Logger initialized before all Loggable objects were created\n");
 }

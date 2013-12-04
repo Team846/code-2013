@@ -54,7 +54,6 @@ void LRTRobot13::RobotInit()
 	RobotState::Initialize();
 	
 	// Initialize Utilities
-	printf("Initializing Utilities...");
 	AsyncPrinter::Initialize();
 	LCD::Instance()->Start();
 
@@ -80,15 +79,21 @@ void LRTRobot13::RobotInit()
 	{
 		(*it)->Start();
 	}
-	
 	AsyncPrinter::Println("Starting Pneumatics Tasks...");
 	for (vector<Pneumatics*>::iterator it = Pneumatics::pneumatic_vector.begin(); it < Pneumatics::pneumatic_vector.end(); it++)
 	{
 		(*it)->Start();
 	}
-	
+
+	// Create and start compressor
+	AsyncPrinter::Println("Creating Pneumatics Compressor...");
 	Pneumatics::CreateCompressor();
 
+	// Initialize the Logger
+	AsyncPrinter::Println("Initializing Logger...");
+	Logger::Instance()->Initialize();
+	
+	// Apply runtime configuration
 	ConfigRuntime::ConfigureAll();
 }
 
@@ -129,6 +134,7 @@ void LRTRobot13::Main()
 	// Flush outputs to all actuators
 	Actuator::UpdateAll();
 
+	// Toggle compressor based on Driver Station switches
 	if (DriverStation::GetInstance()->GetDigitalIn(DriverStationConfig::DigitalIns::COMPRESSOR))
 	{
 		Pneumatics::SetCompressor(true);

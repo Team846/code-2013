@@ -26,7 +26,17 @@ protected:
 	 */
 	template<typename T> void Loggable::LogToFile(T *field, string name)
 	{
-		m_logger->Log(field, (m_name + "/" + name).c_str());
+		m_logger->Log(field, m_name + "/" + name);
+	}
+	/*!
+	 * @brief Saves a dynamically allocated array to the Logger for logging.
+	 * @param field pointer to the variable
+	 * @param count number of elements from the array pointer to log
+	 * @param name name of the field
+	 */
+	template<typename T> void Loggable::LogToFile(T *field, int count, string name)
+	{
+		m_logger->Log(field, count * sizeof(*field), m_name + "/" + name);
 	}
 
 	/*!
@@ -36,7 +46,7 @@ protected:
 	 */
 	template<typename T> void Loggable::LogToFile(T value, string name)
 	{
-		m_logger->Log(value, (m_name + "/" + name).c_str());
+		m_logger->Log(value, m_name + "/" + name);
 	}
 
 private:
