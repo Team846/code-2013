@@ -7,6 +7,7 @@
 #endif
 #include <vector>
 #include <typeinfo>
+#include <string>
 
 class Loggable;
 
@@ -34,16 +35,17 @@ public:
 	void Run();
 	
 	/*!
-	 * @brief Saves a variable for logging.
+	 * @brief Saves a number of bytes from a variable for logging.
 	 * @param field pointer to the variable
 	 * @param size number of bytes to write from the pointer
 	 * @param name name of the field
+	 * @param source name of the Loggable object that logged this field
 	 */
-	template<typename T> void Log(T *field, size_t size, string name)
+	template<typename T> void Log(T *field, size_t size, string name, string source)
 	{
 		if (!initialized)
 		{
-			Field f = {typeid(*field).name(), name, size};
+			Field f = {typeid(*field).name(), source + "/" + name, size};
 			fields.push_back(f);
 			dataSize += size;
 		}
@@ -55,20 +57,22 @@ public:
 	 * @brief Saves a variable for logging.
 	 * @param field pointer to the variable
 	 * @param name name of the field
+	 * @param source name of the Loggable object that logged this variable
 	 */
-	template<typename T> void Log(T *field, string name)
+	template<typename T> void Log(T *field, string name, string source)
 	{
-		Log(field, sizeof(*field), name);
+		Log(field, sizeof(*field), name, source);
 	}
 	
 	/*!
 	 * @brief Saves a value for logging.
 	 * @param value value to log
 	 * @param name name of the field
+	 * @param source name of the Loggable object that logged this field
 	 */
-	template<typename T> void Log(T value, string name)
+	template<typename T> void Log(T value, string name, string source)
 	{
-		Log(&value, name);
+		Log(&value, sizeof(value), name, source);
 	}
 
 	/*!
