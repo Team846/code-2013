@@ -7,7 +7,8 @@
 #endif
 #include <vector>
 #include <typeinfo>
-#include <string>
+#include <sstream>
+#include "../Utils/Util.h"
 
 class Loggable;
 
@@ -45,7 +46,9 @@ public:
 	{
 		if (!initialized)
 		{
-			Field f = {typeid(*field).name(), source + "/" + name, size};
+			int count = size / sizeof(*field); // Check for dynamically allocated arrays
+			Field f = {count == 1 ? typeid(*field).name() :
+					"A" + Util::ToString(count) + "_" + typeid(*field).name(), source + "/" + name, size}; // Change type to static array
 			fields.push_back(f);
 			dataSize += size;
 		}
@@ -84,7 +87,7 @@ public:
 private:
 	typedef struct
 	{
-		const char *type;
+		string type;
 		string name;
 		size_t size;
 	} Field;

@@ -48,7 +48,7 @@ void Logger::Initialize()
 	fprintf(header, "%d\n", fields.size());
 	for (vector<Field>::iterator it = fields.begin(); it < fields.end(); it++)
 	{
-		fprintf(header, "%s %s %d\n", it->type, it->name.c_str(), it->size);
+		fprintf(header, "%s %s %d\n", it->type.c_str(), it->name.c_str(), it->size);
 	}
 	fclose(header);
 	fields.clear();

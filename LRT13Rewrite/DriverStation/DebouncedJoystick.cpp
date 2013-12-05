@@ -160,6 +160,6 @@ UINT32 DebouncedJoystick::GetPort()
 
 void DebouncedJoystick::Log()
 {
-	LogToFile(isPressed, m_num_buttons + 1, "Buttons");
-	LogToFile(axisValue, m_num_axes + 1, "Axes");
+	LogToFile(&isPressed[1], m_num_buttons, "Buttons");
+	LogToFile(&axisValue[1], m_num_axes, "Axes");
 }
