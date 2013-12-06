@@ -1,4 +1,5 @@
 #include "Automation.h"
+#include "../Utils/AsyncPrinter.h"
 
 map<ComponentData*, Automation*> Automation::allocated;
 

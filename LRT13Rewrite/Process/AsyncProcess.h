@@ -23,7 +23,7 @@ public:
 	bool IsRunning();
 protected:
 	virtual void preTick();
-	virtual INT32 Tick() = 0;
+	virtual void Tick() = 0;
 	bool m_isRunning;
 private:
 	static void _TASK_ENTRY(void* asyncProcessInstance);

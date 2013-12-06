@@ -58,7 +58,7 @@ Automation::Status Autonomous::Start(Event *trigger)
 bool Autonomous::Run()
 {
 	if (routines.empty())
-		return true;
+		return false;
 	if (routines.front()->Completed())
 	{
 		routines.front()->Stop();
@@ -253,7 +253,7 @@ void Autonomous::LoadRoutine(std::string path)
 		{
 //			routines.push(new RoutineGroup(parallelRoutines));
 		}
-		else
+		else if (parallelRoutines.size() == 1)
 		{
 			routines.push(parallelRoutines[0]);
 		}

@@ -130,7 +130,7 @@ void AsyncPrinter::RestoreToConsole()
 	}
 }
 
-INT32 AsyncPrinter::Tick()
+void AsyncPrinter::Tick()
 {
 	UINT32 printed = 0;
 	
@@ -145,6 +145,4 @@ INT32 AsyncPrinter::Tick()
 	}
 	
 	taskDelay(sysClkRateGet() / 1000);
-	
-	return 0;
 }

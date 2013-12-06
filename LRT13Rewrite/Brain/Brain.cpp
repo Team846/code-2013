@@ -11,11 +11,13 @@
 
 #include "Autonomous.h"
 #include "Climb.h"
+#include "CollectorSlide.h"
 
 #include "Events/GameModeChangeEvent.h"
 #include "Events/JoystickMovedEvent.h"
 #include "Events/JoystickPressedEvent.h"
 #include "Events/JoystickHoldEvent.h"
+#include "Events/JoystickReleasedEvent.h"
 
 Brain* Brain::m_instance = NULL;
 
@@ -46,18 +48,21 @@ Brain::Brain()
 	// Create automation tasks
 	Automation *auton = new Autonomous();
 	Automation *climb = new Climb();
+	Automation *collectorSlide = new CollectorSlide();
 	
 	// Create events to use
 	Event *toAuto = new GameModeChangeEvent(RobotState::AUTONOMOUS);
 	Event *toDisabled = new GameModeChangeEvent(RobotState::DISABLED);
 	Event *driverStickMoved = new JoystickMovedEvent(LRTDriverStation::Instance()->GetDriverStick());
-	Event *operatorStickMoved = new JoystickMovedEvent(LRTDriverStation::Instance()->GetDriverStick());
+	Event *operatorStickMoved = new JoystickMovedEvent(LRTDriverStation::Instance()->GetOperatorStick());
 	Event *driverStickPressed = new JoystickPressedEvent(LRTDriverStation::Instance()->GetDriverStick());
 	Event *operatorStickPressed = new JoystickPressedEvent(LRTDriverStation::Instance()->GetOperatorStick());
-	Event *operatorStickHeld = new JoystickHoldEvent(LRTDriverStation::Instance()->GetOperatorStick(), DriverStationConfig::JoystickButtons::CONTINUE_CLIMB, 25);
+	Event *climb_button_held = new JoystickHoldEvent(LRTDriverStation::Instance()->GetOperatorStick(), DriverStationConfig::JoystickButtons::CONTINUE_CLIMB, 25);
 	Event *abort_climb = new JoystickPressedEvent(LRTDriverStation::Instance()->GetOperatorStick(), DriverStationConfig::JoystickButtons::ABORT_CLIMB);
 	Event *start_climb = new JoystickPressedEvent(LRTDriverStation::Instance()->GetDriverStick(), DriverStationConfig::JoystickButtons::START_CLIMB);
 	Event *continue_climb = new JoystickPressedEvent(LRTDriverStation::Instance()->GetOperatorStick(), DriverStationConfig::JoystickButtons::CONTINUE_CLIMB);
+	Event *collector_down = new JoystickPressedEvent(LRTDriverStation::Instance()->GetDriverStick(), DriverStationConfig::JoystickButtons::COLLECTOR_SLIDE);
+	Event *collector_up = new JoystickReleasedEvent(LRTDriverStation::Instance()->GetDriverStick(), DriverStationConfig::JoystickButtons::COLLECTOR_SLIDE);
 	
 	// Map events to tasks to start/abort/continue
 	toAuto->AddStartListener(auton);
@@ -65,11 +70,13 @@ Brain::Brain()
 	operatorStickMoved->AddAbortListener(auton);
 	driverStickPressed->AddAbortListener(auton);
 	operatorStickPressed->AddAbortListener(auton);
-	operatorStickHeld->AddStartListener(climb);
+	climb_button_held->AddStartListener(climb);
 	toDisabled->AddAbortListener(climb);
 	abort_climb->AddAbortListener(climb);
 	start_climb->AddContinueListener(climb);
 	continue_climb->AddContinueListener(climb);
+	collector_down->AddStartListener(collectorSlide);
+	collector_up->AddAbortListener(collectorSlide);
 
 	// Define actions between blocked tasks
 	m_blockedActions[auton][climb] = OVERRIDE;

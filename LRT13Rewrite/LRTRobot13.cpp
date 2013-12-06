@@ -124,7 +124,7 @@ void LRTRobot13::Main()
 	
 	// Update the Driver Station
 	LRTDriverStation::Update();
-	
+
 	// Update the Brain
 	Brain::Instance()->Update();
 	

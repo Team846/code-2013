@@ -315,7 +315,7 @@ protected:
 	/*!
 	 * @brief Does the actual communication, not including timing
 	 */
-	INT32 Tick();
+	void Tick();
 	
 private:
 	void Set(float setpoint, UINT8 syncGroup = 0);

@@ -102,7 +102,7 @@ void LCD::ScrollLCD(int x, int y)
 			curColumnIndex);
 }
 
-INT32 LCD::Tick()
+void LCD::Tick()
 {
 	static int loops = 0;
 
@@ -114,6 +114,4 @@ INT32 LCD::Tick()
 //	Print(5, 0, true, "");
 //	Print(5, loops % 42 >= 21 ? loops % 21 : 20 - loops % 21, true, "%c", '_');
 	loops++;
-	
-	return 0;
 }

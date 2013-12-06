@@ -1,14 +1,16 @@
 #ifndef LOGGER_H_
 #define LOGGER_H_
 
-//#define USE_IOLIB
+#define USE_IOLIB
 #ifdef USE_IOLIB
 #include <ioLib.h>
 #endif
+#include <WPILib.h>
 #include <vector>
 #include <typeinfo>
 #include <sstream>
 #include "../Utils/Util.h"
+#include "../Process/SynchronizedProcess.h"
 
 class Loggable;
 
@@ -17,7 +19,7 @@ using namespace std;
 /*!
  * @brief Logs data from Loggable classes to a global log file in binary format each cycle.
  */
-class Logger
+class Logger : public SynchronizedProcess
 {
 public:
 	static Logger* Instance();
@@ -84,6 +86,9 @@ public:
 	 */
 	static void RegisterLoggable(Loggable* loggable);
 
+protected:
+	void Tick();
+	
 private:
 	typedef struct
 	{
@@ -114,6 +119,7 @@ private:
 	size_t dataSize;
 	char *curLoc;
 	void *startLoc;
+	SEM_ID m_writeSem;
 };
 
 #endif /* LOGGER_H_ */

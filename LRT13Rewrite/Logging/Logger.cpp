@@ -20,7 +20,8 @@ void Logger::Finalize()
 	m_instance = NULL;
 }
 
-Logger::Logger()
+Logger::Logger() :
+	SynchronizedProcess("Logger")
 {
 	startLoc = curLoc = NULL;
 	dataSize = 0;
@@ -53,6 +54,8 @@ void Logger::Initialize()
 	fclose(header);
 	fields.clear();
 	initialized = true;
+	m_writeSem = semBCreate(SEM_Q_PRIORITY, SEM_FULL);
+	Start();
 }
 
 void Logger::Run()
@@ -80,22 +83,28 @@ void Logger::Run()
 			file = fopen(RobotConfig::LOG_FILE_PATH.c_str(), "wb");
 #endif
 		curLoc = (char*)startLoc;
+		Synchronized s(m_writeSem);
 		for (vector<Loggable*>::iterator it = loggables.begin(); it < loggables.end(); it++)
 		{
 			(*it)->Log();
 		}
-#ifdef USE_IOLIB
-		write(file, startLoc, dataSize);
-#else
-		fwrite(startLoc, dataSize, 1, file);
-		fflush(file);
-#endif
+		RunOneCycle();
 	}
+}
+
+void Logger::Tick()
+{
+	Synchronized s(m_writeSem);
+#ifdef USE_IOLIB
+	write(file, (char*)startLoc, dataSize);
+#else
+	fwrite(startLoc, dataSize, 1, file);
+	fflush(file);
+#endif
 }
 
 void Logger::Write(void* field, size_t size)
 {
-//	fwrite(field, size, 1, file);
 	memcpy(curLoc, field, size);
 	curLoc += size;
 }

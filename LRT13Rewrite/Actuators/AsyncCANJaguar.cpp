@@ -34,7 +34,7 @@ void AsyncCANJaguar::Send()
 	RunOneCycle();
 }
 
-INT32 AsyncCANJaguar::Tick()
+void AsyncCANJaguar::Tick()
 {
 	if (m_channel != 0)
 	{
@@ -305,7 +305,6 @@ INT32 AsyncCANJaguar::Tick()
 	{
 		AsyncPrinter::Printf("[ERROR] AsyncCANJaguar: %s on channel 0.\n", GetName());
 	}
-	return 0;
 }
 
 int AsyncCANJaguar::GetChannel()

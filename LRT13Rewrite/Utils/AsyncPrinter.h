@@ -31,7 +31,7 @@ public:
 	static const UINT32 kMaxPrintsPerCycle = 50;
 	
 protected:
-	INT32 Tick();
+	void Tick();
 	
 private:
 	static AsyncPrinter* _instance;

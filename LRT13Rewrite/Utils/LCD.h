@@ -37,7 +37,7 @@ public:
 	void ScrollLCD(int x, int y);
 
 protected:
-	virtual INT32 Tick();
+	void Tick();
 
 private:
 	LCD();

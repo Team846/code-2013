@@ -148,7 +148,7 @@ Pneumatics::State Pneumatics::GetHardwareValue()
 	return current;
 }
 
-INT32 Pneumatics::Tick()
+void Pneumatics::Tick()
 {
 	if (pulsed && dynamic_cast<DoubleSolenoid*>(solenoid))
 	{
@@ -196,8 +196,6 @@ INT32 Pneumatics::Tick()
 				dynamic_cast<DoubleSolenoid*>(solenoid)->Set(DoubleSolenoid::kReverse);
 		}
 	}
-	
-	return 0;
 }
 
 void Pneumatics::Configure()

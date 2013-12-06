@@ -53,7 +53,7 @@ public:
 	static vector<Pneumatics*> pneumatic_vector;
 	
 protected:
-	INT32 Tick();
+	void Tick();
 
 private:
 	std::string m_configSection;
