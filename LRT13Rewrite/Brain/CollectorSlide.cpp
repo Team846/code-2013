@@ -5,8 +5,6 @@
 #include "../Utils/AsyncPrinter.h"
 #include "../RobotState.h"
 
-//#define STEP
-
 CollectorSlide::CollectorSlide() :
 	Configurable("collector")
 {
@@ -14,7 +12,6 @@ CollectorSlide::CollectorSlide() :
 	m_collector = new Pneumatics(ConfigPortMappings::Get("Solenoid/COLLECTOR_A"), ConfigPortMappings::Get("Solenoid/COLLECTOR_B"), "Collector");
 	m_timer = 0;
 	aborting = false;
-	done = false;
 }
 
 CollectorSlide::~CollectorSlide()
@@ -25,7 +22,7 @@ CollectorSlide::~CollectorSlide()
 Automation::Status CollectorSlide::Start(Event *trigger)
 {
 	aborting = false;
-	done = false;
+	m_timer = 0;
 	return SUCCESS;
 }
 
@@ -53,7 +50,7 @@ bool CollectorSlide::Run()
 		if (m_timer > m_retractCycles)
 		{
 			m_collector->Set(Pneumatics::REVERSE);
-			done = true;
+			return true;
 		}
 	}
 	return false;
@@ -61,16 +58,11 @@ bool CollectorSlide::Run()
 
 Automation::Status CollectorSlide::Abort(Event *trigger)
 {
-	if (RobotState::Instance().GameMode() == RobotState::DISABLED)
-		return CLEANING_UP;
 	if (!aborting)
 	{
-		m_timer = 0;
 		aborting = true;
-		return CLEANING_UP;
+		m_timer = 0;
 	}
-	if (done)
-		return SUCCESS;
 	return CLEANING_UP;
 }
 

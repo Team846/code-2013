@@ -43,7 +43,6 @@ private:
 	int m_retractCycles;
 	int m_timer;
 	bool aborting;
-	bool done;
 };
 
 #endif

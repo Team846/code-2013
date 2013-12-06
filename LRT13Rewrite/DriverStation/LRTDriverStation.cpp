@@ -1,4 +1,5 @@
 #include "LRTDriverStation.h"
+#include "../RobotState.h"
 
 LRTDriverStation* LRTDriverStation::m_instance = NULL;
 
@@ -49,9 +50,12 @@ LRTDriverStation::~LRTDriverStation()
 
 void LRTDriverStation::Update()
 {
- 	Instance()->m_driver_stick->Update();
- 	Instance()->m_operator_stick->Update();
- 	Instance()->m_driver_wheel->Update();
+	if (RobotState::Instance().GameMode() != RobotState::DISABLED)
+	{
+		Instance()->m_driver_stick->Update();
+		Instance()->m_operator_stick->Update();
+		Instance()->m_driver_wheel->Update();
+	}
 }
 
 DebouncedJoystick* LRTDriverStation::GetOperatorStick()
