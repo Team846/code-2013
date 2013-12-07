@@ -7,6 +7,7 @@
 #include "Actuators/Pneumatics.h"
 #include "RobotState.h"
 #include "DriverStation/LRTDriverStation.h"
+#include "ComponentData/ComponentData.h"
 
 #include "Config/ConfigRuntime.h"
 #include "Config/ConfigPortMappings.h"
@@ -37,6 +38,7 @@ LRTRobot13::~LRTRobot13()
 	}
 	
 	Component::DestroyComponents();
+	ComponentData::Finalize();
 	ConfigPortMappings::Finalize();
 	ConfigRuntime::Finalize();
 	Logger::Finalize();
@@ -64,6 +66,10 @@ void LRTRobot13::RobotInit()
 	// Read port mappings
 	AsyncPrinter::Println("Loading Port Mappings...");
 	ConfigPortMappings::Instance()->Load();
+	
+	// Create ComponentData
+	AsyncPrinter::Println("Creating ComponentData...");
+	ComponentData::Initialize();
 	
 	// Create all components
 	AsyncPrinter::Println("Creating Components...");

@@ -58,7 +58,7 @@ Automation::Status Autonomous::Start(Event *trigger)
 bool Autonomous::Run()
 {
 	if (routines.empty())
-		return false;
+		return true;
 	if (routines.front()->Completed())
 	{
 		routines.front()->Stop();
