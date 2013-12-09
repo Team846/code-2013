@@ -7,7 +7,7 @@ vector<ComponentData*> ComponentData::data;
 ComponentData::ComponentData(string name) :
 	Loggable(name)
 {
-	AddComponentData(this, name);
+	componentData_map[name] = this;
 }
 
 void ComponentData::Initialize()
@@ -24,12 +24,17 @@ void ComponentData::Finalize()
 	}
 }
 
-void ComponentData::AddComponentData(ComponentData *data, string name)
-{
-	componentData_map[name] = data;
-}
-
 ComponentData* ComponentData::GetComponentData(string name)
 {
-	return componentData_map[name];
+	if (componentData_map.find(name) != componentData_map.end())
+		return componentData_map[name];
+	return NULL;
+}
+
+void ComponentData::ResetAllCommands()
+{
+	for (vector<ComponentData*>::iterator it = data.begin(); it < data.end(); it++)
+	{
+		(*it)->ResetCommands();
+	}
 }

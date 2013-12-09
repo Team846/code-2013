@@ -38,7 +38,7 @@ bool CollectorSlide::Run()
 		m_angle->Set(Pneumatics::REVERSE);
 		m_collector->Set(Pneumatics::FORWARD);
 		m_timer++;
-		if (m_timer > m_extendCycles)
+		if (m_timer >= m_extendCycles)
 		{
 			m_angle->Set(Pneumatics::FORWARD);
 		}
@@ -47,7 +47,7 @@ bool CollectorSlide::Run()
 	{
 		m_angle->Set(Pneumatics::REVERSE);
 		m_timer++;
-		if (m_timer > m_retractCycles)
+		if (m_timer >= m_retractCycles)
 		{
 			m_collector->Set(Pneumatics::REVERSE);
 			return true;

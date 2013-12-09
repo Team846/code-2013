@@ -19,13 +19,15 @@ public:
 	
 	static void Initialize();
 	static void Finalize();
+
+	static void ResetAllCommands();
 	
 protected:
+	virtual void ResetCommands() = 0;
+	
 	static ComponentData* GetComponentData(string name);
 	
 private:
-	static void AddComponentData(ComponentData *data, string name);
-	
 	static map<string, ComponentData*> componentData_map;
 	static vector<ComponentData*> data;
 };

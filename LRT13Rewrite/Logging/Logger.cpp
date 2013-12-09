@@ -105,8 +105,11 @@ void Logger::Tick()
 
 void Logger::Write(void* field, size_t size)
 {
-	memcpy(curLoc, field, size);
-	curLoc += size;
+	if (RobotState::Instance().GameMode() != RobotState::DISABLED)
+	{
+		memcpy(curLoc, field, size);
+		curLoc += size;
+	}
 }
 
 void Logger::RegisterLoggable(Loggable *loggable)

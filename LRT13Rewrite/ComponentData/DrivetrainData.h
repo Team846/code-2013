@@ -23,7 +23,7 @@ public:
 	
 	DrivetrainData();
 	static DrivetrainData* Get();
-	
+	void ResetCommands();
 	void Log();
 	
 	void SetControlMode(DrivetrainData::Axis axis, DrivetrainData::ControlMode mode);

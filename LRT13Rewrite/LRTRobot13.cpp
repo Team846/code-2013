@@ -154,6 +154,9 @@ void LRTRobot13::Main()
 	LCD::Instance()->RunOneCycle();
 	Logger::Instance()->Run();
 	
+	// Reset ComponentData command fields
+	ComponentData::ResetAllCommands();
+	
 	wdCancel(_watchdog);
 }
 

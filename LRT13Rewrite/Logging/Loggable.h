@@ -3,6 +3,9 @@
 
 #include "Logger.h"
 #include <string>
+#include <vector>
+
+using namespace std;
 
 /*!
  * @brief Base class for classes that can log to the global log file.
