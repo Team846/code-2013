@@ -9,8 +9,8 @@ DriveESC::DriveESC(LRTSpeedController *esc, LRTEncoder* encoder, string name) :
 {
 	m_controller1->ConfigNeutralMode(LRTSpeedController::kNeutralMode_Coast);
 	
+	m_dutyCycle = 0.0;
 	m_cycle_count = 0;
-	
 	m_shouldBrakeThisCycle = false;
 	
 	m_forwardCurrentLimit = 50.0 / 100.0;
@@ -23,14 +23,11 @@ DriveESC::DriveESC(LRTSpeedController *esc1, LRTSpeedController *esc2, LRTEncode
 	m_controller1(esc1),
 	m_controller2(esc2)
 {
-	string namea = name + "A";
-	string nameb = name + "B";
-
 	m_controller1->ConfigNeutralMode(LRTSpeedController::kNeutralMode_Coast);
 	m_controller2->ConfigNeutralMode(LRTSpeedController::kNeutralMode_Coast);
 
+	m_dutyCycle = 0.0;
 	m_cycle_count = 0;
-	
 	m_shouldBrakeThisCycle = false;
 	
 	m_forwardCurrentLimit = 50.0 / 100.0;
