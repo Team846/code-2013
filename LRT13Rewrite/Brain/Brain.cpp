@@ -8,6 +8,7 @@
 #include "../Config/DriverStationConfig.h"
 
 #include "DrivetrainInputs.h"
+#include "CollectorRollersInputs.h"
 
 #include "Autonomous.h"
 #include "Climb.h"
@@ -44,6 +45,7 @@ Brain::Brain()
 {
 	// Create joystick input processors
 	m_inputs.push_back(new DrivetrainInputs());
+	m_inputs.push_back(new CollectorRollersInputs());
 	
 	// Create automation tasks
 	Automation *auton = new Autonomous();
@@ -61,8 +63,10 @@ Brain::Brain()
 	Event *abort_climb = new JoystickPressedEvent(LRTDriverStation::Instance()->GetOperatorStick(), DriverStationConfig::JoystickButtons::ABORT_CLIMB);
 	Event *start_climb = new JoystickPressedEvent(LRTDriverStation::Instance()->GetDriverStick(), DriverStationConfig::JoystickButtons::START_CLIMB);
 	Event *continue_climb = new JoystickPressedEvent(LRTDriverStation::Instance()->GetOperatorStick(), DriverStationConfig::JoystickButtons::CONTINUE_CLIMB);
-	Event *collector_down = new JoystickPressedEvent(LRTDriverStation::Instance()->GetDriverStick(), DriverStationConfig::JoystickButtons::COLLECTOR_SLIDE);
-	Event *collector_up = new JoystickReleasedEvent(LRTDriverStation::Instance()->GetDriverStick(), DriverStationConfig::JoystickButtons::COLLECTOR_SLIDE);
+	Event *collector_down_driver = new JoystickPressedEvent(LRTDriverStation::Instance()->GetDriverStick(), DriverStationConfig::JoystickButtons::COLLECTOR_SLIDE);
+	Event *collector_down_operator = new JoystickPressedEvent(LRTDriverStation::Instance()->GetOperatorStick(), DriverStationConfig::JoystickButtons::COLLECTOR_DOWN_NO_MOTOR);
+	Event *collector_up_driver = new JoystickReleasedEvent(LRTDriverStation::Instance()->GetDriverStick(), DriverStationConfig::JoystickButtons::COLLECTOR_SLIDE);
+	Event *collector_up_operator = new JoystickReleasedEvent(LRTDriverStation::Instance()->GetOperatorStick(), DriverStationConfig::JoystickButtons::COLLECTOR_DOWN_NO_MOTOR);
 	
 	// Map events to tasks to start/abort/continue
 	toAuto->AddStartListener(auton);
@@ -75,8 +79,10 @@ Brain::Brain()
 	abort_climb->AddAbortListener(climb);
 	start_climb->AddContinueListener(climb);
 	continue_climb->AddContinueListener(climb);
-	collector_down->AddStartListener(collectorSlide);
-	collector_up->AddAbortListener(collectorSlide);
+	collector_down_driver->AddStartListener(collectorSlide);
+	collector_up_driver->AddAbortListener(collectorSlide);
+	collector_down_operator->AddStartListener(collectorSlide);
+	collector_up_operator->AddAbortListener(collectorSlide);
 
 	// Define actions between blocked tasks
 	m_blockedActions[auton][climb] = OVERRIDE;

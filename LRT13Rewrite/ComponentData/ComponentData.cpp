@@ -1,5 +1,6 @@
 #include "ComponentData.h"
 #include "DrivetrainData.h"
+#include "CollectorRollersData.h"
 
 map<string, ComponentData*> ComponentData::componentData_map;
 vector<ComponentData*> ComponentData::data;
@@ -13,6 +14,7 @@ ComponentData::ComponentData(string name) :
 void ComponentData::Initialize()
 {
 	data.push_back(new DrivetrainData());
+	data.push_back(new CollectorRollersData());
 }
 
 void ComponentData::Finalize()

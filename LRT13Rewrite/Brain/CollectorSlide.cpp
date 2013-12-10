@@ -23,6 +23,7 @@ Automation::Status CollectorSlide::Start(Event *trigger)
 {
 	aborting = false;
 	m_timer = 0;
+	startEvent = (JoystickPressedEvent*)trigger;
 	return SUCCESS;
 }
 
@@ -58,6 +59,8 @@ bool CollectorSlide::Run()
 
 Automation::Status CollectorSlide::Abort(Event *trigger)
 {
+	if (startEvent->GetJoystick() != dynamic_cast<JoystickReleasedEvent*>(trigger)->GetJoystick())
+		return REJECTED;
 	if (!aborting)
 	{
 		aborting = true;

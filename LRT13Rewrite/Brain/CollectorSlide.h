@@ -5,6 +5,8 @@
 #include "../Logging/Loggable.h"
 #include "Automation.h"
 #include "../Actuators/Pneumatics.h"
+#include "Events/JoystickPressedEvent.h"
+#include "Events/JoystickReleasedEvent.h"
 
 /*!
  * @brief Slides the collector up and down while changing angle.
@@ -43,6 +45,7 @@ private:
 	int m_retractCycles;
 	int m_timer;
 	bool aborting;
+	JoystickPressedEvent *startEvent;
 };
 
 #endif

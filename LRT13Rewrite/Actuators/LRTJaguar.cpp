@@ -84,7 +84,6 @@ LRTJaguar::NeutralMode LRTJaguar::GetNeutralMode()
 void LRTJaguar::Send()
 {
 	Jaguar::Set(m_pwm);
-	printf("Talon: %f\n", m_pwm);
 	if (m_brake_jumper != NULL)
 	{
 		if(m_neutral == LRTSpeedController::kNeutralMode_Coast)

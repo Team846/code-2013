@@ -1,5 +1,6 @@
 #include "Component.h"
 #include "Drivetrain.h"
+#include "CollectorRollers.h"
 #include "../RobotState.h"
 
 vector<Component*> Component::component_vector;
@@ -19,6 +20,7 @@ Component::~Component()
 void Component::CreateComponents()
 {
 	component_vector.push_back(new Drivetrain());
+	component_vector.push_back(new CollectorRollers());
 }
 
 void Component::DestroyComponents()
