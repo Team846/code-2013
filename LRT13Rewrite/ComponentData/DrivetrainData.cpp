@@ -52,3 +52,75 @@ void DrivetrainData::SetVelocitySetpoint(DrivetrainData::Axis axis, float veloci
 {
 	m_desiredRates[axis] = velocity;
 }
+
+void DrivetrainData::SetOpenLoopOutput(DrivetrainData::Axis axis, double setpoint)
+{
+	m_desiredOpenLoopOutputs[axis] = setpoint;
+}
+
+DrivetrainData::ControlMode DrivetrainData::GetControlMode(DrivetrainData::Axis axis)
+{
+	return m_controlModes[axis];
+}
+
+double DrivetrainData::GetOpenLoopOutput(DrivetrainData::Axis axis)
+{
+	return m_desiredOpenLoopOutputs[axis];
+}
+
+double DrivetrainData::GetVelocitySetpoint(DrivetrainData::Axis axis)
+{
+	return m_desiredRates[axis];
+}
+
+void DrivetrainData::SyncArc()
+{
+	m_syncArc = true;
+}
+
+bool DrivetrainData::SyncingArc()
+{
+	return m_syncArc;
+}
+
+void DrivetrainData::OverrideForwardCurrentLimit(float limit)
+{
+	m_overrideCurrentLimitForward = true;
+	if (limit < 0)
+		limit = 0;
+	else if (limit > 1.0)
+		limit = 1.0;
+	m_currentLimitForward = limit;
+}
+
+void DrivetrainData::OverrideReverseCurrentLimit(float limit)
+{
+	m_overrideCurrentLimitReverse = true;
+	if (limit < 0)
+		limit = 0;
+	else if (limit > 1.0)
+		limit = 1.0;
+	m_currentLimitReverse = limit;
+}
+
+float DrivetrainData::GetForwardCurrentLimit()
+{
+	m_overrideCurrentLimitForward = false;
+	return m_currentLimitForward;
+}
+
+float DrivetrainData::GetReverseCurrentLimit()
+{
+	m_overrideCurrentLimitReverse = false;
+	return m_currentLimitReverse;
+}
+
+bool DrivetrainData::ShouldOverrideForwardCurrentLimit()
+{
+	return m_overrideCurrentLimitForward;
+}
+
+bool DrivetrainData::ShouldOverrideReverseCurrentLimit()
+{
+	return m_overrideCurrentLimitReverse;
+}

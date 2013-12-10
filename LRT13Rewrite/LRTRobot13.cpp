@@ -32,10 +32,6 @@ LRTRobot13::~LRTRobot13()
 	{
 		(*it)->Abort();
 	}
-	for (vector<Pneumatics*>::iterator it = Pneumatics::pneumatic_vector.begin(); it < Pneumatics::pneumatic_vector.end(); it++)
-	{
-		(*it)->Abort();
-	}
 	
 	Component::DestroyComponents();
 	ComponentData::Finalize();
@@ -80,13 +76,8 @@ void LRTRobot13::RobotInit()
 	Brain::Initialize();
 	
 	// Start Actuator tasks
-	AsyncPrinter::Println("Starting Jaguar Tasks...");
+	AsyncPrinter::Println("Starting AsyncCANJaguar Tasks...");
 	for (vector<AsyncCANJaguar*>::iterator it = AsyncCANJaguar::jaguar_vector.begin(); it < AsyncCANJaguar::jaguar_vector.end(); it++)
-	{
-		(*it)->Start();
-	}
-	AsyncPrinter::Println("Starting Pneumatics Tasks...");
-	for (vector<Pneumatics*>::iterator it = Pneumatics::pneumatic_vector.begin(); it < Pneumatics::pneumatic_vector.end(); it++)
 	{
 		(*it)->Start();
 	}

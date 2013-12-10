@@ -7,11 +7,10 @@
 
 vector<AsyncCANJaguar*> AsyncCANJaguar::jaguar_vector;
 
-AsyncCANJaguar::AsyncCANJaguar(UINT8 channel, const char* name) :
+AsyncCANJaguar::AsyncCANJaguar(UINT8 channel, std::string name) :
 	SynchronizedProcess((std::string("AsyncCANJaguar #") + Util::ToString<int>(channel)).c_str(),Task::kDefaultPriority - 2),
 	CANJaguar(channel),
-	LRTSpeedController(("AsyncCANJaguar" + std::string(name)).c_str()),
-	m_print_ctor_dtor(m_task_name.c_str(), (m_task_name + "\n").c_str())
+	LRTSpeedController(("AsyncCANJaguar" + name).c_str())
 {
 	m_task_name = "JAG#" + Util::ToString<int>(channel);
 	m_channel = channel;
@@ -22,7 +21,7 @@ AsyncCANJaguar::AsyncCANJaguar(UINT8 channel, const char* name) :
 	m_last_game_mode = RobotState::Instance().GameMode();
 	jaguar_vector.push_back(this);
 
-	printf("Constructed AsyncCANJaguar %s on channel %2d\n", name, channel);
+	printf("Constructed AsyncCANJaguar %s on channel %d\n", name.c_str(), channel);
 }
 
 AsyncCANJaguar::~AsyncCANJaguar()

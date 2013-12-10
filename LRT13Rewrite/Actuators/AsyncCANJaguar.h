@@ -27,7 +27,7 @@ public:
 	 * @param channel Channel that the Jaguar is assigned to
 	 * @param name The name of the Jaguar
 	 */
-	AsyncCANJaguar(UINT8 channel, const char* name);
+	AsyncCANJaguar(UINT8 channel, std::string name);
 
 	/*!
 	 * @brief Destroys the AsyncCANJaguar object
@@ -323,7 +323,6 @@ private:
 	void Println(const char *str);
 	
 	string m_task_name;
-	PrintInConstructor m_print_ctor_dtor;
 	int m_channel;
 
 	CachedValue<float> m_setpoint;

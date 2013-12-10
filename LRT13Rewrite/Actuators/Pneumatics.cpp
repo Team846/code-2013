@@ -6,7 +6,6 @@ vector<Pneumatics*> Pneumatics::pneumatic_vector;
 Compressor *Pneumatics::m_compressor;
 
 Pneumatics::Pneumatics(uint32_t forward, uint32_t reverse, const char *name) :
-	SynchronizedProcess((std::string("Pneumatics") + std::string(name)).c_str(), Task::kDefaultPriority - 1),
 	Actuator(name),
 	Configurable("Pneumatics"),
 	Loggable("Pneumatics" + std::string(name)),
@@ -22,7 +21,6 @@ Pneumatics::Pneumatics(uint32_t forward, uint32_t reverse, const char *name) :
 }
 
 Pneumatics::Pneumatics(uint32_t forward, uint32_t reverse, uint8_t module, const char *name) :
-	SynchronizedProcess("Pneumatics", Task::kDefaultPriority - 1),
 	Actuator(name),
 	Configurable("Pneumatics"),
 	Loggable("Pneumatics" + std::string(name)),
@@ -38,7 +36,6 @@ Pneumatics::Pneumatics(uint32_t forward, uint32_t reverse, uint8_t module, const
 }
 
 Pneumatics::Pneumatics(uint32_t forward, const char *name) :
-	SynchronizedProcess((std::string("Pneumatics") + std::string(name)).c_str(), Task::kDefaultPriority - 1),
 	Actuator(name),
 	Configurable("Pneumatics"),
 	Loggable("Pneumatics" + std::string(name)),
@@ -54,7 +51,6 @@ Pneumatics::Pneumatics(uint32_t forward, const char *name) :
 }
 
 Pneumatics::Pneumatics(uint32_t forward, uint8_t module, const char *name) :
-	SynchronizedProcess("Pneumatics", Task::kDefaultPriority - 1),
 	Actuator(name),
 	Configurable("Pneumatics"),
 	Loggable("Pneumatics" + std::string(name)),
@@ -76,7 +72,52 @@ Pneumatics::~Pneumatics()
 
 void Pneumatics::Update()
 {
-	RunOneCycle();
+	if (pulsed && dynamic_cast<DoubleSolenoid*>(solenoid))
+	{
+		if (counter > 0)
+		{
+			counter--;
+			if (state == FORWARD)
+			{
+				dynamic_cast<DoubleSolenoid*>(solenoid)->Set(DoubleSolenoid::kForward);
+			}
+			else if (state == REVERSE)
+			{
+				dynamic_cast<DoubleSolenoid*>(solenoid)->Set(DoubleSolenoid::kReverse);
+			}
+			else if (state == OFF)
+			{
+				dynamic_cast<DoubleSolenoid*>(solenoid)->Set(DoubleSolenoid::kOff);
+			}
+		}
+		else
+		{
+			counter = 0;
+			dynamic_cast<DoubleSolenoid*>(solenoid)->Set(DoubleSolenoid::kOff);
+		}
+	}
+	else
+	{
+		if (state == FORWARD)
+		{
+			if (dynamic_cast<Solenoid*>(solenoid))
+				dynamic_cast<Solenoid*>(solenoid)->Set(true);
+			else if (dynamic_cast<DoubleSolenoid*>(solenoid))
+				dynamic_cast<DoubleSolenoid*>(solenoid)->Set(DoubleSolenoid::kForward);
+		}
+		else if (state == OFF)
+		{
+			if (dynamic_cast<Solenoid*>(solenoid))
+				dynamic_cast<Solenoid*>(solenoid)->Set(false);
+			else if (dynamic_cast<DoubleSolenoid*>(solenoid))
+				dynamic_cast<DoubleSolenoid*>(solenoid)->Set(DoubleSolenoid::kOff);
+		}
+		else if (state == REVERSE)
+		{
+			if (dynamic_cast<DoubleSolenoid*>(solenoid))
+				dynamic_cast<DoubleSolenoid*>(solenoid)->Set(DoubleSolenoid::kReverse);
+		}
+	}
 }
 
 void Pneumatics::CreateCompressor()
@@ -146,56 +187,6 @@ Pneumatics::State Pneumatics::GetHardwareValue()
 			current = OFF;
 	}
 	return current;
-}
-
-void Pneumatics::Tick()
-{
-	if (pulsed && dynamic_cast<DoubleSolenoid*>(solenoid))
-	{
-		if (counter > 0)
-		{
-			counter--;
-			if (state == FORWARD)
-			{
-				dynamic_cast<DoubleSolenoid*>(solenoid)->Set(DoubleSolenoid::kForward);
-			}
-			else if (state == REVERSE)
-			{
-				dynamic_cast<DoubleSolenoid*>(solenoid)->Set(DoubleSolenoid::kReverse);
-			}
-			else if (state == OFF)
-			{
-				dynamic_cast<DoubleSolenoid*>(solenoid)->Set(DoubleSolenoid::kOff);
-			}
-		}
-		else
-		{
-			counter = 0;
-			dynamic_cast<DoubleSolenoid*>(solenoid)->Set(DoubleSolenoid::kOff);
-		}
-	}
-	else
-	{
-		if (state == FORWARD)
-		{
-			if (dynamic_cast<Solenoid*>(solenoid))
-				dynamic_cast<Solenoid*>(solenoid)->Set(true);
-			else if (dynamic_cast<DoubleSolenoid*>(solenoid))
-				dynamic_cast<DoubleSolenoid*>(solenoid)->Set(DoubleSolenoid::kForward);
-		}
-		else if (state == OFF)
-		{
-			if (dynamic_cast<Solenoid*>(solenoid))
-				dynamic_cast<Solenoid*>(solenoid)->Set(false);
-			else if (dynamic_cast<DoubleSolenoid*>(solenoid))
-				dynamic_cast<DoubleSolenoid*>(solenoid)->Set(DoubleSolenoid::kOff);
-		}
-		else if (state == REVERSE)
-		{
-			if (dynamic_cast<DoubleSolenoid*>(solenoid))
-				dynamic_cast<DoubleSolenoid*>(solenoid)->Set(DoubleSolenoid::kReverse);
-		}
-	}
 }
 
 void Pneumatics::Configure()

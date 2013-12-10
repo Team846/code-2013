@@ -95,12 +95,18 @@ void Logger::Run()
 void Logger::Tick()
 {
 	Synchronized s(m_writeSem);
+	double start = Timer::GetFPGATimestamp();
 #ifdef USE_IOLIB
 	write(file, (char*)startLoc, dataSize);
 #else
 	fwrite(startLoc, dataSize, 1, file);
 	fflush(file);
 #endif
+	double end = Timer::GetFPGATimestamp();
+	if (end - start > 0.01)
+	{
+		AsyncPrinter::Printf("Logging time overflow: %f\n", 1000 * (end - start));
+	}
 }
 
 void Logger::Write(void* field, size_t size)

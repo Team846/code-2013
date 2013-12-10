@@ -12,14 +12,13 @@
 #include "../Config/ConfigPortMappings.h"
 #include "../Config/Configurable.h"
 #include "../Logging/Loggable.h"
-#include "../Process/SynchronizedProcess.h"
 #include "../Config/ConfigRuntime.h"
 #include "../Utils/AsyncPrinter.h"
 
 /*!
  * @brief Container for single solenoids and double solenoids
  */
-class Pneumatics : public SynchronizedProcess, public Actuator, public Configurable, public Loggable
+class Pneumatics : public Actuator, public Configurable, public Loggable
 {
 public:
 	enum State
@@ -52,9 +51,6 @@ public:
 	
 	static vector<Pneumatics*> pneumatic_vector;
 	
-protected:
-	void Tick();
-
 private:
 	std::string m_configSection;
 

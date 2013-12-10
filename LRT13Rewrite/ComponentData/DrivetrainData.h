@@ -26,8 +26,20 @@ public:
 	void ResetCommands();
 	void Log();
 	
-	void SetControlMode(DrivetrainData::Axis axis, DrivetrainData::ControlMode mode);
-	void SetVelocitySetpoint(DrivetrainData::Axis axis, float velocity);
+	void SetControlMode(Axis axis, ControlMode mode);
+	void SetVelocitySetpoint(Axis axis, float velocity);
+	void SetOpenLoopOutput(Axis axis, double setpoint);
+	ControlMode GetControlMode(Axis axis);
+	double GetOpenLoopOutput(Axis axis);
+	double GetVelocitySetpoint(Axis axis);
+	void SyncArc();
+	bool SyncingArc();
+	void OverrideForwardCurrentLimit(float limit);
+	void OverrideReverseCurrentLimit(float limit);
+	float GetForwardCurrentLimit();
+	float GetReverseCurrentLimit();
+	bool ShouldOverrideForwardCurrentLimit();
+	bool ShouldOverrideReverseCurrentLimit();
 	
 private:
 	ControlMode m_controlModes[2];

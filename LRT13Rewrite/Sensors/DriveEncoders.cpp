@@ -10,16 +10,12 @@ double DriveEncoders::PULSES_PER_REVOLUTION = 1;
 double DriveEncoders::TICKS_PER_FULL_TURN = 1;
 double DriveEncoders::WHEEL_DIAMETER = 1;
 
-DriveEncoders::DriveEncoders() :
+DriveEncoders::DriveEncoders(UINT32 leftSourceA, UINT32 leftSourceB, UINT32 rightSourceA, UINT32 rightSourceB) :
 	Configurable("DriveEncoders"),
 	Loggable("DriveEncoders")
 {
-	m_encoders[LEFT] = new LRTEncoder("LeftDriveEncoder",
-			ConfigPortMappings::Get("Digital/LEFT_DRIVE_ENCODER_A"),
-			ConfigPortMappings::Get("Digital/LEFT_DRIVE_ENCODER_B"));
-	m_encoders[RIGHT] = new LRTEncoder("RightDriveEncoder",
-			ConfigPortMappings::Get("Digital/RIGHT_DRIVE_ENCODER_A"),
-			ConfigPortMappings::Get("Digital/RIGHT_DRIVE_ENCODER_B"));
+	m_encoders[LEFT] = new LRTEncoder("LeftDriveEncoder", leftSourceA, leftSourceB);
+	m_encoders[RIGHT] = new LRTEncoder("RightDriveEncoder", rightSourceA, rightSourceB);
 
 	m_encoders[LEFT]->SetDistancePerPulse(1);
 	m_encoders[RIGHT]->SetDistancePerPulse(1);
