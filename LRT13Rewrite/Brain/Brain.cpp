@@ -7,18 +7,19 @@
 #include "../DriverStation/LRTDriverStation.h"
 #include "../Config/DriverStationConfig.h"
 
-#include "DrivetrainInputs.h"
-#include "CollectorRollersInputs.h"
+#include "InputProcessor/DrivetrainInputs.h"
+#include "InputProcessor/CollectorRollersInputs.h"
 
-#include "Autonomous.h"
-#include "Climb.h"
-#include "CollectorSlide.h"
+#include "Automation/Autonomous.h"
+#include "Automation/Climb.h"
+#include "Automation/CollectorSlide.h"
 
 #include "Events/GameModeChangeEvent.h"
 #include "Events/JoystickMovedEvent.h"
 #include "Events/JoystickPressedEvent.h"
-#include "Events/JoystickHoldEvent.h"
+#include "Events/JoystickHeldEvent.h"
 #include "Events/JoystickReleasedEvent.h"
+#include "Events/MultipleEvent.h"
 
 Brain* Brain::m_instance = NULL;
 
@@ -50,23 +51,25 @@ Brain::Brain()
 	// Create automation tasks
 	Automation *auton = new Autonomous();
 	Automation *climb = new Climb();
-	Automation *collectorSlide = new CollectorSlide();
+	Automation *collectorDown = new CollectorSlide(true);
+	Automation *collectorUp = new CollectorSlide(false);
 	
-	// Create events to use
+	// Create events to be used
 	Event *toAuto = new GameModeChangeEvent(RobotState::AUTONOMOUS);
 	Event *toDisabled = new GameModeChangeEvent(RobotState::DISABLED);
 	Event *driverStickMoved = new JoystickMovedEvent(LRTDriverStation::Instance()->GetDriverStick());
 	Event *operatorStickMoved = new JoystickMovedEvent(LRTDriverStation::Instance()->GetOperatorStick());
 	Event *driverStickPressed = new JoystickPressedEvent(LRTDriverStation::Instance()->GetDriverStick());
 	Event *operatorStickPressed = new JoystickPressedEvent(LRTDriverStation::Instance()->GetOperatorStick());
-	Event *climb_button_held = new JoystickHoldEvent(LRTDriverStation::Instance()->GetOperatorStick(), DriverStationConfig::JoystickButtons::CONTINUE_CLIMB, 25);
+	Event *climb_button_held = new JoystickHeldEvent(LRTDriverStation::Instance()->GetOperatorStick(), DriverStationConfig::JoystickButtons::CONTINUE_CLIMB, 25);
 	Event *abort_climb = new JoystickPressedEvent(LRTDriverStation::Instance()->GetOperatorStick(), DriverStationConfig::JoystickButtons::ABORT_CLIMB);
 	Event *start_climb = new JoystickPressedEvent(LRTDriverStation::Instance()->GetDriverStick(), DriverStationConfig::JoystickButtons::START_CLIMB);
 	Event *continue_climb = new JoystickPressedEvent(LRTDriverStation::Instance()->GetOperatorStick(), DriverStationConfig::JoystickButtons::CONTINUE_CLIMB);
 	Event *collector_down_driver = new JoystickPressedEvent(LRTDriverStation::Instance()->GetDriverStick(), DriverStationConfig::JoystickButtons::COLLECTOR_SLIDE);
 	Event *collector_down_operator = new JoystickPressedEvent(LRTDriverStation::Instance()->GetOperatorStick(), DriverStationConfig::JoystickButtons::COLLECTOR_DOWN_NO_MOTOR);
-	Event *collector_up_driver = new JoystickReleasedEvent(LRTDriverStation::Instance()->GetDriverStick(), DriverStationConfig::JoystickButtons::COLLECTOR_SLIDE);
-	Event *collector_up_operator = new JoystickReleasedEvent(LRTDriverStation::Instance()->GetOperatorStick(), DriverStationConfig::JoystickButtons::COLLECTOR_DOWN_NO_MOTOR);
+	MultipleEvent *collector_up = new MultipleEvent();
+	collector_up->AddEvent(new JoystickReleasedEvent(LRTDriverStation::Instance()->GetDriverStick(), DriverStationConfig::JoystickButtons::COLLECTOR_SLIDE));
+	collector_up->AddEvent(new JoystickReleasedEvent(LRTDriverStation::Instance()->GetOperatorStick(), DriverStationConfig::JoystickButtons::COLLECTOR_DOWN_NO_MOTOR));
 	
 	// Map events to tasks to start/abort/continue
 	toAuto->AddStartListener(auton);
@@ -79,14 +82,18 @@ Brain::Brain()
 	abort_climb->AddAbortListener(climb);
 	start_climb->AddContinueListener(climb);
 	continue_climb->AddContinueListener(climb);
-	collector_down_driver->AddStartListener(collectorSlide);
-	collector_up_driver->AddAbortListener(collectorSlide);
-	collector_down_operator->AddStartListener(collectorSlide);
-	collector_up_operator->AddAbortListener(collectorSlide);
+	collector_down_driver->AddStartListener(collectorDown);
+	collector_down_operator->AddStartListener(collectorDown);
+	collector_up->AddAbortListener(collectorDown);
+	collector_up->AddStartListener(collectorUp);
+	collector_down_driver->AddAbortListener(collectorUp);
+	collector_down_operator->AddAbortListener(collectorUp);
 
 	// Define actions between blocked tasks
 	m_blockedActions[auton][climb] = OVERRIDE;
 	m_blockedActions[climb][auton] = ABORT_SELF;
+	m_blockedActions[collectorDown][collectorUp] = ABORT_OTHER;
+	m_blockedActions[collectorUp][collectorDown] = ABORT_SELF;
 }
 
 Brain::~Brain()
@@ -155,13 +162,13 @@ void Brain::ProcessAutomationTasks()
 		    // Tasks started by this event
         	for (vector<Automation*>::iterator a = (*it)->GetStartListeners().begin(); a < (*it)->GetStartListeners().end(); a++)
         	{
-        	    if (find(m_runningTasks.begin(), m_runningTasks.end(), *a) == m_runningTasks.end()) // If task isn't running
-        	    {
-        		    Automation::Status ret = (*a)->Start(*it);
-        		    if (ret == Automation::SUCCESS)
-        		        m_runningTasks.push_back(*a);
-        		    else if (ret == Automation::WAIT)
-        		        m_queuedTasks.insert(pair<Automation*, Event*>(*a, *it));
+        		if (find(m_runningTasks.begin(), m_runningTasks.end(), *a) == m_runningTasks.end() || (*a)->IsRestartable()) // If task isn't running or is restartable
+        		{
+        			Automation::Status ret = (*a)->Start(*it);
+        			if (ret == Automation::SUCCESS)
+        				m_runningTasks.push_back(*a);
+        			else if (ret == Automation::WAIT)
+        				m_queuedTasks.insert(pair<Automation*, Event*>(*a, *it));
         		}
         	}
         	

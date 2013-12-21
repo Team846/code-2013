@@ -4,15 +4,16 @@
 #include "Event.h"
 #include "../../DriverStation/DebouncedJoystick.h"
 
+/*!
+ * @brief Event that fires when a joystick axis is moved.
+ */
 class JoystickMovedEvent : public Event
 {
 public:
 	JoystickMovedEvent(DebouncedJoystick *joystick, int axis = 0, float sensitivity = 0.02);
 	virtual ~JoystickMovedEvent();
 	
-	virtual bool Fired();
-	
-	virtual void Update();
+	virtual bool CheckCondition();
 	
 	int GetAxis();
 	DebouncedJoystick* GetJoystick();

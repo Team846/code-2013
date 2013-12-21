@@ -19,21 +19,19 @@ GameModeChangeEvent::~GameModeChangeEvent()
 
 bool GameModeChangeEvent::Fired()
 {
-	if (RobotState::Instance().GameMode() == m_toMode)
+	if (Event::Fired())
 	{
-		if (m_from && RobotState::Instance().LastGameMode() == m_fromMode)
+		if (m_from && RobotState::Instance().LastGameMode() != m_fromMode)
 		{
-			return true;
+			return false;
 		}
-		else if (!m_from && RobotState::Instance().LastGameMode() != m_toMode)
-		{
-			return true;
-		}
+		return true;
 	}
 	return false;
 }
 
-void GameModeChangeEvent::Update()
+bool GameModeChangeEvent::CheckCondition()
 {
+	return RobotState::Instance().GameMode() == m_toMode;
 }
 

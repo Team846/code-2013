@@ -16,7 +16,7 @@
 #include "../Utils/AsyncPrinter.h"
 
 /*!
- * @brief Container for single solenoids and double solenoids
+ * @brief Container for single solenoids and double solenoids.
  */
 class Pneumatics : public Actuator, public Configurable, public Loggable
 {

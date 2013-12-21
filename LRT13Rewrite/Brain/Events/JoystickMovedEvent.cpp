@@ -13,30 +13,23 @@ JoystickMovedEvent::~JoystickMovedEvent()
 {
 }
 
-bool JoystickMovedEvent::Fired()
+bool JoystickMovedEvent::CheckCondition()
 {
 	if (m_axis == 0)
 	{
 		for (int i = 1; i <= m_joystick->GetNumAxes(); i++)
 		{
-			if (m_joystick->GetLastAxis(i) && fabs(m_joystick->GetRawAxis(i)) >= m_sensitivity)
+			if (fabs(m_joystick->GetRawAxis(i)) >= m_sensitivity)
 			{
-				m_lastFiredAxis = i;
 				return true;
 			}
 		}
 	}
-	else if (m_joystick->GetLastAxis(m_axis) && fabs(m_joystick->GetRawAxis(m_axis)) >= m_sensitivity)
+	else if (fabs(m_joystick->GetRawAxis(m_axis)) >= m_sensitivity)
 	{
-		m_lastFiredAxis = m_axis;
 		return true;
 	}
 	return false;
-}
-
-void JoystickMovedEvent::Update()
-{
-	
 }
 
 int JoystickMovedEvent::GetAxis()

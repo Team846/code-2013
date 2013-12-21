@@ -137,13 +137,12 @@ void ConfigRuntime::CheckForFileUpdates()
 	struct stat statistics;
 	stat(CONFIG_FILE_PATH.c_str(), &statistics);
 
-	// reload when the file has been modified
+	// Reload when the file has been modified
 	if (lastReadTime != statistics.st_mtime)
 	{
 		Load();
 
-		// Load() sometimes saves the configuration,
-		// so get the new modified time.
+		// Load() sometimes saves the configuration, so get the new modified time.
 		stat(CONFIG_FILE_PATH.c_str(), &statistics);
 		lastReadTime = statistics.st_mtime;
 	}

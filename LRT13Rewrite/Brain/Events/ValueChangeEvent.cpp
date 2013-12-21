@@ -10,13 +10,8 @@ template<typename T> ValueChangeEvent<T>::~ValueChangeEvent()
 {
 }
 
-template<typename T> bool ValueChangeEvent<T>::Fired()
+template<typename T> bool ValueChangeEvent<T>::CheckCondition()
 {
-	return m_lastValue != m_value && *m_variable == m_value;
-}
-
-template<typename T> void ValueChangeEvent<T>::Update()
-{
-	m_lastValue = *m_variable;
+	return *m_variable == m_value;
 }
 

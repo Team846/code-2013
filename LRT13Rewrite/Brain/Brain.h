@@ -3,8 +3,8 @@
 
 #include <string>
 #include <WPILib.h>
-#include "Automation.h"
-#include "InputProcessor.h"
+#include "Automation/Automation.h"
+#include "InputProcessor/InputProcessor.h"
 #include <list>
 
 using namespace std;

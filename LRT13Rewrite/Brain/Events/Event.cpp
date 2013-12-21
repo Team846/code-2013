@@ -5,6 +5,7 @@ vector<Event*> Event::event_vector;
 Event::Event()
 {
 	event_vector.push_back(this);
+	lastFired = false;
 }
 
 Event::~Event()
@@ -24,6 +25,16 @@ Event::~Event()
 		delete *it;
 		*it = NULL;
 	}
+}
+
+bool Event::Fired()
+{
+	return CheckCondition() && !lastFired;
+}
+
+void Event::Update()
+{
+	lastFired = CheckCondition();
 }
 
 void Event::AddStartListener(Automation* routine)

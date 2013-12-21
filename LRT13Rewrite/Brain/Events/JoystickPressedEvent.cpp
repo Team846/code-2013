@@ -11,29 +11,23 @@ JoystickPressedEvent::~JoystickPressedEvent()
 {
 }
 
-bool JoystickPressedEvent::Fired()
+bool JoystickPressedEvent::CheckCondition()
 {
 	if (m_button == 0)
 	{
 		for (int i = 1; i <= m_joystick->GetNumButtons(); i++)
 		{
-			if (m_joystick->IsButtonJustPressed(i))
+			if (m_joystick->IsButtonDown(i))
 			{
-				m_lastFiredButton = i;
 				return true;
 			}
 		}
 	}
-	else if (m_joystick->IsButtonJustPressed(m_button))
+	else if (m_joystick->IsButtonDown(m_button))
 	{
-		m_lastFiredButton = m_button;
 		return true;
 	}
 	return false;
-}
-
-void JoystickPressedEvent::Update()
-{
 }
 
 int JoystickPressedEvent::GetButton()

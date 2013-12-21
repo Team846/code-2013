@@ -90,20 +90,20 @@ double Drivetrain::ComputeOutput(DrivetrainData::Axis axis)
 //		m_drivetrainData->SetVelocitySetpoint(axis, velocitySetpoint);
 	case DrivetrainData::VELOCITY_CONTROL:
 		if (fabs(velocitySetpoint) < 2.0E-2)
-			m_PIDs[VELOCITY][axis].setIIREnabled(true);
+			m_PIDs[VELOCITY][axis].SetIIREnabled(true);
 		else
-			m_PIDs[VELOCITY][axis].setIIREnabled(false);
+			m_PIDs[VELOCITY][axis].SetIIREnabled(false);
 
 		if (axis == DrivetrainData::FORWARD)
-			m_PIDs[VELOCITY][axis].setInput(
+			m_PIDs[VELOCITY][axis].SetInput(
 					m_driveEncoders->GetNormalizedForwardSpeed());
 		else
-			m_PIDs[VELOCITY][axis].setInput(
+			m_PIDs[VELOCITY][axis].SetInput(
 					m_driveEncoders->GetNormalizedTurningSpeed());
 
-		m_PIDs[VELOCITY][axis].setSetpoint(velocitySetpoint);
+		m_PIDs[VELOCITY][axis].SetSetpoint(velocitySetpoint);
 
-		rawOutput = m_PIDs[VELOCITY][axis].update(1.0 / RobotConfig::LOOP_RATE);
+		rawOutput = m_PIDs[VELOCITY][axis].Update(1.0 / RobotConfig::LOOP_RATE);
 		break;
 	case DrivetrainData::OPEN_LOOP:
 		break;
@@ -174,14 +174,11 @@ void Drivetrain::Configure()
 
 void Drivetrain::ConfigurePIDObject(PID *pid, std::string objName, bool feedForward)
 {
-	double p =
-			m_config->Get<double> (m_configSection, objName + "_P", 2.0);
-	double i =
-			m_config->Get<double> (m_configSection, objName + "_I", 0.0);
-	double d =
-			m_config->Get<double> (m_configSection, objName + "_D", 0.0);
+	double p = m_config->Get<double> (m_configSection, objName + "_P", 2.0);
+	double i = m_config->Get<double> (m_configSection, objName + "_I", 0.0);
+	double d = m_config->Get<double> (m_configSection, objName + "_D", 0.0);
 
-	pid->setParameters(p, i, d, 1.0, 0.87, feedForward);
+	pid->SetParameters(p, i, d, 1.0, 0.87, feedForward);
 }
 
 void Drivetrain::ConfigureForwardCurrentLimit()

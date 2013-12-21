@@ -15,6 +15,7 @@
 #include "Config/DriverStationConfig.h"
 #include "Utils/LCD.h"
 #include "Logging/Logger.h"
+#include "Network/LiveNetworkSender.h"
 
 LRTRobot13::LRTRobot13()
 {
@@ -33,11 +34,13 @@ LRTRobot13::~LRTRobot13()
 		(*it)->Abort();
 	}
 	
+	// Delete all singletons
 	Component::DestroyComponents();
 	ComponentData::Finalize();
 	ConfigPortMappings::Finalize();
 	ConfigRuntime::Finalize();
 	Logger::Finalize();
+	LiveNetworkSender::Finalize();
 	Pneumatics::DestroyCompressor();
 	Brain::Finalize();
 	LCD::Finalize();
@@ -90,6 +93,10 @@ void LRTRobot13::RobotInit()
 	AsyncPrinter::Println("Initializing Logger...");
 	Logger::Instance()->Initialize();
 	
+	// Initialize the LiveNetworkSender
+	AsyncPrinter::Println("Initializing LiveNetworkSender...");
+	LiveNetworkSender::Initialize();
+	
 	// Apply runtime configuration
 	ConfigRuntime::ConfigureAll();
 }
@@ -141,9 +148,16 @@ void LRTRobot13::Main()
 		Pneumatics::SetCompressor(false);
 	}
 	
+	// Check for runtime configuration file changes
+	if (RobotState::Instance().GameMode() == RobotState::DISABLED)
+	{
+		ConfigRuntime::Instance()->CheckForFileUpdates();
+	}
+	
 	// Utilities
 	LCD::Instance()->RunOneCycle();
 	Logger::Instance()->Run();
+	LiveNetworkSender::Instance()->Run();
 	
 	// Reset ComponentData command fields
 	ComponentData::ResetAllCommands();

@@ -4,15 +4,16 @@
 #include "Event.h"
 #include "../../DriverStation/DebouncedJoystick.h"
 
+/*!
+ * @brief Event that fires when a joystick button is released.
+ */
 class JoystickReleasedEvent : public Event
 {
 public:
 	JoystickReleasedEvent(DebouncedJoystick *joystick, int button = 0);
 	virtual ~JoystickReleasedEvent();
 	
-	virtual bool Fired();
-	
-	virtual void Update();
+	virtual bool CheckCondition();
 	
 	int GetButton();
 	DebouncedJoystick* GetJoystick();

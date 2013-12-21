@@ -11,29 +11,23 @@ JoystickReleasedEvent::~JoystickReleasedEvent()
 {
 }
 
-bool JoystickReleasedEvent::Fired()
+bool JoystickReleasedEvent::CheckCondition()
 {
 	if (m_button == 0)
 	{
 		for (int i = 1; i <= m_joystick->GetNumButtons(); i++)
 		{
-			if (m_joystick->IsButtonJustReleased(i))
+			if (!m_joystick->IsButtonDown(i))
 			{
-				m_lastFiredButton = i;
 				return true;
 			}
 		}
 	}
-	else if (m_joystick->IsButtonJustReleased(m_button))
+	else if (!m_joystick->IsButtonDown(m_button))
 	{
-		m_lastFiredButton = m_button;
 		return true;
 	}
 	return false;
-}
-
-void JoystickReleasedEvent::Update()
-{
 }
 
 int JoystickReleasedEvent::GetButton()

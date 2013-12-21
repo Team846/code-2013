@@ -3,7 +3,7 @@
 
 #include "../Config/Configurable.h"
 #include "Component.h"
-#include "../Utils/PID.h"
+#include "../Control/PID.h"
 #include "../ComponentData/DrivetrainData.h"
 
 class DriveESC;
