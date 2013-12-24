@@ -15,7 +15,8 @@ public:
 	explicit LRTTalon(UINT32 channel, const char* name, UINT32 jumperChannel = 0);
 	LRTTalon(UINT8 moduleNumber, UINT32 channel, const char* name, UINT32 jumperChannel = 0);
 	virtual ~LRTTalon();
-	virtual void SetDutyCycle(float value);
+	virtual void SetDutyCycle(float speed);
+	void Set(float speed);
 	virtual float Get();
 	virtual void Disable();
 	virtual void PIDWrite(float output);

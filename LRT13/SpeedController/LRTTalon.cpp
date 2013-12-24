@@ -36,6 +36,12 @@ void LRTTalon::SetDutyCycle(float speed)
 	m_pwm = speed;
 }
 
+void LRTTalon::Set(float speed)
+{
+	printf("[WARNING] Calling Set() in LRTTalon: %s, use SetDutyCycle() instead.\n;", m_name);
+	SetDutyCycle(speed);
+}
+
 float LRTTalon::Get()
 {
 	return m_pwm;
@@ -48,7 +54,7 @@ void LRTTalon::Disable()
 
 void LRTTalon::PIDWrite(float output) 
 {
-	Set(output);
+	SetDutyCycle(output);
 }
 
 void LRTTalon::ConfigNeutralMode(NeutralMode mode)
