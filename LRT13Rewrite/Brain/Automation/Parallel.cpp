@@ -1,13 +1,12 @@
 #include "Parallel.h"
-#include <math.h>
 
-Parallel::Parallel(const char *name, bool restartable) :
-	Automation(name, restartable)
+Parallel::Parallel(const char *name, bool queueIfBlocked, bool restartable) :
+	Automation(name, false, queueIfBlocked, restartable)
 {
 }
 
-Parallel::Parallel(const char *name, vector<Automation*> sequence, bool restartable) :
-	Automation(name, restartable)
+Parallel::Parallel(const char *name, vector<Automation*> sequence, bool queueIfBlocked, bool restartable) :
+	Automation(name, false, queueIfBlocked, restartable)
 {
 	routines = sequence;
 }
@@ -21,22 +20,25 @@ void Parallel::AllocateResources()
 {
 	for (vector<Automation*>::iterator it = routines.begin(); it < routines.end(); it++)
 	{
-		(*it)->GetBlockingTasks().clear();
 		(*it)->AllocateResources();
-		GetBlockingTasks().insert((*it)->GetBlockingTasks().begin(), (*it)->GetBlockingTasks().begin());
 	}
 }
 
-Automation::Status Parallel::Start(Event *trigger)
+bool Parallel::Start()
 {
-	Status successLevel = SUCCESS;
+	bool success = true;
+	running.clear();
 	for (vector<Automation*>::iterator it = routines.begin(); it < routines.end(); it++)
 	{
-		Status ret = (*it)->Start(trigger);
-		if (ret > successLevel)
-			successLevel = ret;
+		bool ret = (*it)->StartAutomation(GetStartEvent());
+		if (!ret)
+			success = false;
 	}
-	return successLevel;
+	if (success)
+	{
+		running = routines;
+	}
+	return success;
 }
 
 bool Parallel::Run()
@@ -44,22 +46,34 @@ bool Parallel::Run()
 	bool completed = true;
 	for (vector<Automation*>::iterator it = routines.begin(); it < routines.end(); it++)
 	{
-		if(!(*it)->Run())
+		if(!(*it)->Update())
+		{
 			completed = false;
+		}
+		else
+		{
+			running.erase(it++);
+			it--;
+		}
 	}
 	return completed;
 }
 
-Automation::Status Parallel::Abort(Event *trigger)
+bool Parallel::Abort()
 {
-	Status successLevel = SUCCESS;
+	bool success = true;
 	for (vector<Automation*>::iterator it = routines.begin(); it < routines.end(); it++)
 	{
-		Status ret = (*it)->Abort(trigger);
-		if (ret > successLevel)
-			successLevel = ret;
+		bool ret = (*it)->AbortAutomation(GetAbortEvent());
+		if (!ret)
+			success = false;
+		else
+		{
+			running.erase(it++);
+			it--;
+		}
 	}
-	return successLevel;
+	return success;
 }
 
 void Parallel::AddAutomation(Automation *automation)
@@ -72,7 +86,7 @@ void Parallel::AddAutomation(vector<Automation*> automation)
 	routines.reserve(routines.size() + automation.size());
 	routines.insert(routines.end(), automation.begin(), automation.end());
 }
-
+	
 void Parallel::ClearAutomation()
 {
 	routines.clear();

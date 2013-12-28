@@ -6,13 +6,14 @@
 #include "Automation/Automation.h"
 #include "InputProcessor/InputProcessor.h"
 #include <list>
+#include "../Logging/Loggable.h"
 
 using namespace std;
 
 /*!
  * @brief Controls all automation and input processing. Coordinates and sends commands to components.
  */
-class Brain
+class Brain : public Loggable
 {
 public:
 	static Brain* Instance();
@@ -23,14 +24,9 @@ public:
 	
 	void Update();
 	
+	void Log();
+	
 private:
-	enum BlockedAction
-	{
-		IGNORE,
-		ABORT_SELF,
-		ABORT_OTHER,
-		OVERRIDE
-	};
 	Brain();
 	
 	void ProcessAutomationTasks();
@@ -39,11 +35,10 @@ private:
 	static Brain* m_instance;
 	
 	vector<InputProcessor*> m_inputs;
+	vector<Automation*> m_automation;
 	
 	list<Automation*> m_runningTasks;
-	map<Automation*, Event*> m_abortingTasks;
-	map<Automation*, Event*> m_queuedTasks;
-	map<Automation*, map<Automation*, BlockedAction> > m_blockedActions;
+	map<Automation*, Event*> m_waitingTasks;
 	
 	DISALLOW_COPY_AND_ASSIGN(Brain);
 };

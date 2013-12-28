@@ -12,15 +12,15 @@ InputProcessor::~InputProcessor()
 
 bool InputProcessor::CheckResources()
 {
-	for (vector<Automation::Resource>::iterator it = resources.begin(); it < resources.end(); it++)
+	for (vector<ControlResource>::iterator it = resources.begin(); it < resources.end(); it++)
 	{
-		if (Automation::GetAllocation(*it) != NULL)
+		if (Automation::GetAllocation(*it))
 			return false;
 	}
 	return true;
 }
 
-void InputProcessor::RegisterResource(Automation::Resource resource)
+void InputProcessor::RegisterResource(ControlResource resource)
 {
 	resources.push_back(resource);
 }

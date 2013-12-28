@@ -9,9 +9,9 @@ class CollectorPosition : public Automation
 public:
 	CollectorPosition(bool down);
 
-	Status Start(Event *trigger);
+	bool Start();
 	bool Run();
-	Status Abort(Event *trigger);
+	bool Abort();
 	void AllocateResources();
 	
 private:

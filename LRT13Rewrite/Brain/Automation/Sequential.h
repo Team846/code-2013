@@ -18,7 +18,7 @@ public:
 	 * @param name the name of the routine
 	 * @param restartable whether the routine can be restarted
 	 */
-	Sequential(const char *name, bool restartable = false);
+	Sequential(const char *name, bool queueIfBlocked = false, bool restartable = false);
 	
 	/*!
 	 * @brief Creates a sequential routine initialized with a sequence of routines.
@@ -26,11 +26,11 @@ public:
 	 * @param sequence the list of routines to initialize the sequential routine with
 	 * @param restartable whether the routine can be restarted
 	 */
-	Sequential(const char *name, vector<Automation*> sequence, bool restartable = false);
+	Sequential(const char *name, vector<Automation*> sequence, bool queueIfBlocked = false, bool restartable = false);
 	virtual ~Sequential();
 
-	virtual Status Start(Event *trigger);
-	virtual Status Abort(Event *trigger);
+	virtual bool Start();
+	virtual bool Abort();
 	virtual bool Run();
 	virtual void AllocateResources();
 	
@@ -61,7 +61,6 @@ protected:
 private:
 	vector<Automation*> routines;
 	queue<Automation*> queued;
-	Event *startEvent;
     bool started;
 };
 

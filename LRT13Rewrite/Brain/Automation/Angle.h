@@ -9,9 +9,9 @@ class Angle : public Automation
 public:
 	Angle(bool high);
 
-	Status Start(Event *trigger);
+	bool Start();
 	bool Run();
-	Status Abort(Event *trigger);
+	bool Abort();
 	void AllocateResources();
 	
 private:

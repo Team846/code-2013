@@ -11,9 +11,9 @@ void Angle::AllocateResources()
 	AllocateResource(ANGLE);
 }
 
-Automation::Status Angle::Start(Event *trigger)
+bool Angle::Start()
 {
-	return SUCCESS;
+	return true;
 }
 
 bool Angle::Run()
@@ -25,7 +25,7 @@ bool Angle::Run()
 	return true;
 }
 
-Automation::Status Angle::Abort(Event *trigger)
+bool Angle::Abort()
 {
-	return SUCCESS;
+	return true;
 }

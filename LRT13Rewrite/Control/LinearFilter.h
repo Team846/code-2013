@@ -28,13 +28,13 @@ public:
 	
 	/*!
 	 * @brief Creates a single pole IIR low-pass filter.
-	 * @param gain the gain of the filter, between 0 and 1 (decay constant)
+	 * @param decay the gain of the filter, between 0 and 1 (decay constant)
 	 * @return the created filter
 	 */
 	static LinearFilter* SinglePoleIIRLowPassFilter(double decay);
 	/*!
 	 * @brief Creates a single pole IIR high-pass filter.
-	 * @param gain the gain of the filter, between 0 and 1 (decay constant)
+	 * @param decay the gain of the filter, between 0 and 1 (decay constant)
 	 * @return the created filter
 	 */
 	static LinearFilter* SinglePoleIIRHighPassFilter(double decay);

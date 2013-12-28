@@ -19,7 +19,7 @@ void Pause::AllocateResources()
 	
 }
 
-Automation::Status Pause::Start(Event *trigger)
+bool Pause::Start()
 {
 	if (timingCycles)
 	{
@@ -30,7 +30,7 @@ Automation::Status Pause::Start(Event *trigger)
 		m_timer.Reset();
 		m_timer.Start();
 	}
-	return SUCCESS;
+	return true;
 }
 
 bool Pause::Run()
@@ -40,7 +40,7 @@ bool Pause::Run()
 	return timingCycles ? m_timer.Get() > m_time : m_currentCycles >= m_cycles;
 }
 
-Automation::Status Pause::Abort(Event *trigger)
+bool Pause::Abort()
 {
 	if (timingCycles)
 	{
@@ -50,5 +50,5 @@ Automation::Status Pause::Abort(Event *trigger)
 	{
 		m_timer.Stop();
 	}
-	return SUCCESS;
+	return true;
 }

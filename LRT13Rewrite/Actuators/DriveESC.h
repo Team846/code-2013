@@ -20,20 +20,20 @@ class DriveESC : public Loggable
 public:
 
 	/*!
-	 * @brief Constructs a new LRT specific ESC object with one motor. 
-	 * @param channel Port of the LRTSpeedController
+	 * @brief Constructs a new drivetrain ESC object with one motor. 
+	 * @param esc the LRTSpeedController
 	 * @param brakeChannel Port of the Talon jumper
-	 * @param encoder 
-	 * @param name
+	 * @param encoder the encoder that measures the speed of this ESC
+	 * @param name the name of this ESC
 	 */
 	DriveESC(LRTSpeedController *esc, LRTEncoder *encoder, string name);
 	
 	/*!
-	 * @brief Constructs a new LRT specific ESC object with two motors. 
-	 * @param channelA Port of the first LRTSpeedController
-	 * @param channelB Port of the second LRTSpeedController 
-	 * @param encoder
-	 * @param name
+	 * @brief Constructs a new drivetrain ESC object with two motors. 
+	 * @param esc1 the first LRTSpeedController
+	 * @param esc2 the second LRTSpeedController 
+	 * @param encoder the encoder that measures the speed of this ESC
+	 * @param name the name of this ESC
 	 */
 	DriveESC(LRTSpeedController *esc1, LRTSpeedController *esc2, LRTEncoder *encoder, string name);
 

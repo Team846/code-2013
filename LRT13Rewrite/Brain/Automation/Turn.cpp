@@ -13,14 +13,14 @@ Turn::Turn(double angle, double maxSpeed, double errorThreshold) :
 
 void Turn::AllocateResources()
 {
-	
+	AllocateResource(TURN);
 }
 
-Automation::Status Turn::Start(Event *trigger)
+bool Turn::Start()
 {
 	m_drivetrain->SetControlMode(DrivetrainData::TURN, DrivetrainData::POSITION_CONTROL);
 	//m_drivetrain->SetRelativePositionSetpoint(DrivetrainData::TURN, m_angle, m_maxSpeed, true);
-	return SUCCESS;
+	return true;
 }
 
 bool Turn::Run()
@@ -28,7 +28,7 @@ bool Turn::Run()
 	return true;//fabs(m_drivetrain->GetRelativePositionSetpoint(DrivetrainData::TURN)) < m_errorThreshold;
 }
 
-Automation::Status Turn::Abort(Event *trigger)
+bool Turn::Abort()
 {
-	return SUCCESS;
+	return true;
 }

@@ -13,7 +13,8 @@
 //#include "Routines/Arms.h"
 //#include "Routines/Arc.h"
 #include "Pause.h"
-//#include "Routines/RoutineGroup.h"
+#include "Repeating.h"
+#include "Parallel.h"
 
 Autonomous::Autonomous() :
 	Sequential("Autonomous")
@@ -26,7 +27,7 @@ Autonomous::~Autonomous()
 
 }
 
-Automation::Status Autonomous::Start(Event *trigger)
+bool Autonomous::Start()
 {
 	int autonRoutine = (int)(DriverStation::GetInstance()->GetAnalogIn(DriverStationConfig::AnalogIns::AUTONOMOUS_SELECT) + 0.5) + 1;
 	AsyncPrinter::Printf("Starting autonomous routine %d\n", autonRoutine);
@@ -43,7 +44,7 @@ Automation::Status Autonomous::Start(Event *trigger)
 	
 	LoadRoutine(RobotConfig::ROUTINE_FILE_PATH.substr(0, RobotConfig::ROUTINE_FILE_PATH.find('.')) + Util::lexical_cast(autonRoutine) + RobotConfig::ROUTINE_FILE_PATH.substr(RobotConfig::ROUTINE_FILE_PATH.find('.'), RobotConfig::ROUTINE_FILE_PATH.length() - RobotConfig::ROUTINE_FILE_PATH.find('.')));
 
-	return Sequential::Start(trigger);
+	return Sequential::Start();
 }
 
 void Autonomous::AllocateResources()
@@ -199,25 +200,25 @@ void Autonomous::LoadRoutine(std::string path)
 //				else
 //					failed = true;
 //			}
-//			else
-//			{
-//				AsyncPrinter::Printf(
-//						"[WARNING] Unknown routine: %s on line %d, ignoring.\n",
-//						command.c_str(), lineNumber);
-//				continue;
-//			}
-//			if (failed)
-//			{
-//				AsyncPrinter::Printf(
-//						"[WARNING] Incorrect number of arguments for routine: %s on line %d, ignoring.\n",
-//						command.c_str(), lineNumber);
-//				continue;
-//			}
-//			parallelRoutines.push_back(current);
+			else
+			{
+				AsyncPrinter::Printf(
+						"[WARNING] Unknown routine: %s on line %d, ignoring.\n",
+						command.c_str(), lineNumber);
+				continue;
+			}
+			if (failed)
+			{
+				AsyncPrinter::Printf(
+						"[WARNING] Incorrect number of arguments for routine: %s on line %d, ignoring.\n",
+						command.c_str(), lineNumber);
+				continue;
+			}
+			parallelRoutines.push_back(current);
 		}
 		if (parallelRoutines.size() > 1)
 		{
-//			AddAutomation(new RoutineGroup(parallelRoutines));
+			AddAutomation(new Parallel("AutonomousParallel", parallelRoutines));
 		}
 		else if (parallelRoutines.size() == 1)
 		{

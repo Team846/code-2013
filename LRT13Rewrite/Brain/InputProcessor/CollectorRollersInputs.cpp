@@ -6,7 +6,7 @@ CollectorRollersInputs::CollectorRollersInputs()
 	m_operator_stick = LRTDriverStation::Instance()->GetOperatorStick();
 	
 	collectorRollersData = CollectorRollersData::Get();
-	RegisterResource(Automation::COLLECTOR_ROLLERS);
+	RegisterResource(COLLECTOR_ROLLERS);
 }
 
 void CollectorRollersInputs::Update()

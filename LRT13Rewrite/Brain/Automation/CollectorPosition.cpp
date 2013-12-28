@@ -11,9 +11,9 @@ void CollectorPosition::AllocateResources()
 	AllocateResource(COLLECTOR_SLIDE);
 }
 
-Automation::Status CollectorPosition::Start(Event *trigger)
+bool CollectorPosition::Start()
 {
-	return SUCCESS;
+	return true;
 }
 
 bool CollectorPosition::Run()
@@ -25,7 +25,7 @@ bool CollectorPosition::Run()
 	return true;
 }
 
-Automation::Status CollectorPosition::Abort(Event *trigger)
+bool CollectorPosition::Abort()
 {
-	return SUCCESS;
+	return true;
 }

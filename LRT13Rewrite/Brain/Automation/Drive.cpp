@@ -15,10 +15,10 @@ Drive::Drive(double distance, double maxSpeed, double errorThreshold, bool conti
 
 void Drive::AllocateResources()
 {
-	
+	AllocateResource(DRIVE);
 }
 
-Automation::Status Drive::Start(Event *trigger)
+bool Drive::Start()
 {
 	if (!m_continuous)
 	{
@@ -30,7 +30,7 @@ Automation::Status Drive::Start(Event *trigger)
 		m_drivetrain->SetVelocitySetpoint(DrivetrainData::FORWARD, Util::Sign(m_distance) * m_maxSpeed);
 	}
 	//m_drivetrain->SetRelativePositionSetpoint(DrivetrainData::FORWARD, m_distance, m_maxSpeed, true);
-	return SUCCESS;
+	return true;
 }
 
 bool Drive::Run()
@@ -38,11 +38,11 @@ bool Drive::Run()
 	return true;//fabs(m_drivetrain->GetRelativePositionSetpoint(DrivetrainData::FORWARD)) < m_errorThreshold;
 }
 
-Automation::Status Drive::Abort(Event *trigger)
+bool Drive::Abort()
 {
 	if (m_continuous)
 	{
 		m_drivetrain->SetControlMode(DrivetrainData::FORWARD, DrivetrainData::POSITION_CONTROL);
 	}
-	return SUCCESS;
+	return true;
 }

@@ -7,8 +7,8 @@ DrivetrainInputs::DrivetrainInputs()
 	m_driver_wheel = LRTDriverStation::Instance()->GetDriverWheel();
 	
 	drivetrainData = DrivetrainData::Get();
-	RegisterResource(Automation::DRIVE);
-	RegisterResource(Automation::TURN);
+	RegisterResource(DRIVE);
+	RegisterResource(TURN);
 	
 	lastStop = false;
 	driveSign = -1;

@@ -1,14 +1,13 @@
 #include "Sequential.h"
-#include <math.h>
 
-Sequential::Sequential(const char *name, bool restartable) :
-	Automation(name, restartable)
+Sequential::Sequential(const char *name, bool queueIfBlocked, bool restartable) :
+	Automation(name, false, queueIfBlocked, restartable)
 {
 	started = false;
 }
 
-Sequential::Sequential(const char *name, vector<Automation*> sequence, bool restartable) :
-	Automation(name, restartable)
+Sequential::Sequential(const char *name, vector<Automation*> sequence, bool queueIfBlocked, bool restartable) :
+	Automation(name, false, queueIfBlocked, restartable)
 {
 	routines = sequence;
 	started = false;
@@ -21,40 +20,35 @@ Sequential::~Sequential()
 
 void Sequential::AllocateResources()
 {
-	if (!queued.empty())
-	{
-		queued.front()->GetBlockingTasks().clear();
-		queued.front()->AllocateResources();
-		GetBlockingTasks().insert(queued.front()->GetBlockingTasks().begin(), queued.front()->GetBlockingTasks().begin());
-	}
+	for (vector<Automation*>::iterator it = routines.begin(); it < routines.end(); it++)
+		(*it)->AllocateResources();
 }
 
-Automation::Status Sequential::Start(Event *trigger)
+bool Sequential::Start()
 {
 	if (routines.empty())
-		return REJECTED;
+		return false;
 	while (!queued.empty())
 		queued.pop();
 	for (vector<Automation*>::iterator it = routines.begin(); it < routines.end(); it++)
 		queued.push(*it);
-	startEvent = trigger;
 	started = false;
-	return SUCCESS;
+	return true;
 }
 
 bool Sequential::Run()
 {
 	if (!started && ContinueNextStep())
 	{
-		Status res = queued.front()->Start(startEvent);
-		if (res == SUCCESS)
+		bool res = queued.front()->StartAutomation(GetStartEvent());
+		if (res)
 			started = true;
-		else if (res == REJECTED)
+		else
 			return true;
 	}
 	if (started)
 	{
-		bool completed = queued.front()->Run();
+		bool completed = queued.front()->Update();
 		if (completed)
 		{
 			queued.pop();
@@ -66,19 +60,19 @@ bool Sequential::Run()
 	return false;
 }
 
-Automation::Status Sequential::Abort(Event *trigger)
+bool Sequential::Abort()
 {
 	if (!queued.empty())
 	{
-		Status res = queued.front()->Abort(trigger);
-		if (res == SUCCESS)
+		bool res = queued.front()->AbortAutomation(GetAbortEvent());
+		if (res)
 		{
 			while (!queued.empty())
 				queued.pop();
 		}
 		return res;
 	}
-	return SUCCESS;
+	return true;
 }
 
 void Sequential::AddAutomation(Automation *automation)

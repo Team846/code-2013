@@ -26,11 +26,11 @@ Climb::~Climb()
 
 }
 
-Automation::Status Climb::Start(Event *trigger)
+bool Climb::Start()
 {
 	m_state = BEGIN;
 	m_previousState = BEGIN;
-	return SUCCESS;
+	return true;
 }
 
 void Climb::AllocateResources()
@@ -133,11 +133,11 @@ bool Climb::Run()
 	return false;
 }
 
-Automation::Status Climb::Abort(Event *trigger)
+bool Climb::Abort()
 {
 	m_state = BEGIN;
 	m_previousState = BEGIN;
-	return SUCCESS;
+	return true;
 }
 
 void Climb::Configure()

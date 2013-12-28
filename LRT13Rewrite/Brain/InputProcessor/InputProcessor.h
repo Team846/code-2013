@@ -3,9 +3,10 @@
 
 #include "../../DriverStation/LRTDriverStation.h"
 #include "../Automation/Automation.h"
+#include "../ControlResource.h"
 
 /*!
- * @brief Interface for joystick input processors.
+ * @brief Base for joystick input processors.
  */
 class InputProcessor
 {
@@ -28,10 +29,10 @@ protected:
 	 * @brief Adds a resource to be used.
 	 * @param resource the resource to add
 	 */
-	void RegisterResource(Automation::Resource resource);
+	void RegisterResource(ControlResource resource);
 	
 private:
-	vector<Automation::Resource> resources;
+	vector<ControlResource> resources;
 };
 
 #endif

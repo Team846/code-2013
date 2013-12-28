@@ -15,7 +15,7 @@ public:
 	Autonomous();
 	~Autonomous();
 	
-	Status Start(Event *trigger);
+	bool Start();
 	void AllocateResources();
 	
 private:

@@ -10,21 +10,6 @@ Event::Event()
 
 Event::~Event()
 {
-	for (vector<Automation*>::iterator it = start_listeners.begin(); it < start_listeners.end(); it++)
-	{
-		delete *it;
-		*it = NULL;
-	}
-	for (vector<Automation*>::iterator it = abort_listeners.begin(); it < abort_listeners.end(); it++)
-	{
-		delete *it;
-		*it = NULL;
-	}
-	for (vector<Automation*>::iterator it = continue_listeners.begin(); it < continue_listeners.end(); it++)
-	{
-		delete *it;
-		*it = NULL;
-	}
 }
 
 bool Event::Fired()

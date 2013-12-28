@@ -17,7 +17,7 @@ public:
 	 * @param name the name of the routine
 	 * @param restartable whether the routine can be restarted
 	 */
-	Parallel(const char *name, bool restartable = false);
+	Parallel(const char *name, bool queueIfBlocked = false, bool restartable = false);
 	
 	/*!
 	 * @brief Creates a parallel routine initialized with a list of routines.
@@ -25,11 +25,11 @@ public:
 	 * @param sequence the list of routines to initialize the parallel routine with
 	 * @param restartable whether the routine can be restarted
 	 */
-	Parallel(const char *name, vector<Automation*> sequence, bool restartable = false);
+	Parallel(const char *name, vector<Automation*> sequence, bool queueIfBlocked = false, bool restartable = false);
 	virtual ~Parallel();
 
-	virtual Status Start(Event *trigger);
-	virtual Status Abort(Event *trigger);
+	virtual bool Start();
+	virtual bool Abort();
 	virtual bool Run();
 	virtual void AllocateResources();
 	
@@ -52,6 +52,7 @@ public:
 	
 private:
 	vector<Automation*> routines;
+	vector<Automation*> running;
 };
 
 #endif

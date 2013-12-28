@@ -113,7 +113,7 @@ float DriveESC::DitheredBraking(float dutyCycle, float speed)
 	{
 		dutyCycle = 0.0;
 
-		// cycleCount ranges from 0 to 8
+		// cycle count ranges from 0 to 8
 		if (++m_cycle_count >= 8)
 			m_cycle_count = 0;
 
