@@ -26,6 +26,8 @@ public:
 	 */
 	~DriveEncoders();
 	
+	static DriveEncoders* Instance();
+	
 	/*!
 	 * @brief Configures constants.
 	 */
@@ -131,6 +133,8 @@ public:
 	static double GetMaxTurnRate();
 	
 private:
+	static DriveEncoders *m_instance;
+	
 	const static double PI = 3.14159;
 
 	LRTEncoder* m_encoders[2];
@@ -142,8 +146,6 @@ private:
 
 	static double TICKS_PER_FULL_TURN;
 	static double WHEEL_DIAMETER; // Inches
-	
-	DISALLOW_COPY_AND_ASSIGN(DriveEncoders);
 };
 
 #endif

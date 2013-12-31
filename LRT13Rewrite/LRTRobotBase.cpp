@@ -10,7 +10,7 @@ LRTRobotBase::LRTRobotBase()
 
 LRTRobotBase::~LRTRobotBase()
 {
-	printf("robot destructing\n");
+	printf("LRTRobotBase Destructing\n");
 }
 
 void LRTRobotBase::StartCompetition()
@@ -18,7 +18,7 @@ void LRTRobotBase::StartCompetition()
 	printf("vxWorks task: %s\n", m_task->GetName()); //Maybe this line was crashing it...
 
 	GetWatchdog().SetEnabled(false);
-	m_loopSynchronizer.StartPeriodic(1.0/50.0);
+	m_loopSynchronizer.StartPeriodic(1.0 / 50.0);
 
 	RobotInit();
 	Run();

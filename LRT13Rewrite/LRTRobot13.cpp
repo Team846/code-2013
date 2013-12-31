@@ -8,6 +8,7 @@
 #include "RobotState.h"
 #include "DriverStation/LRTDriverStation.h"
 #include "ComponentData/ComponentData.h"
+#include "Sensors/RobotLocation.h"
 
 #include "Config/ConfigRuntime.h"
 #include "Config/ConfigPortMappings.h"
@@ -78,7 +79,7 @@ void LRTRobot13::RobotInit()
 	AsyncPrinter::Println("Initializing Brain...");
 	Brain::Initialize();
 	
-	// Start Actuator tasks
+	// Start AsyncCANJaguar tasks
 	AsyncPrinter::Println("Starting AsyncCANJaguar Tasks...");
 	for (vector<AsyncCANJaguar*>::iterator it = AsyncCANJaguar::jaguar_vector.begin(); it < AsyncCANJaguar::jaguar_vector.end(); it++)
 	{
@@ -88,6 +89,10 @@ void LRTRobot13::RobotInit()
 	// Create and start compressor
 	AsyncPrinter::Println("Creating Pneumatics Compressor...");
 	Pneumatics::CreateCompressor();
+
+	// Initialize localization
+	AsyncPrinter::Println("Initializing Robot Localization...");
+	RobotLocation::Initialize();
 
 	// Initialize the Logger
 	AsyncPrinter::Println("Initializing Logger...");
@@ -125,6 +130,12 @@ void LRTRobot13::Main()
 	
 	// Update global robot state object
 	RobotState::Update();
+	
+	// Zero robot location if enabled
+	if (RobotState::Instance().GameMode() != RobotState::DISABLED && RobotState::Instance().LastGameMode() == RobotState::DISABLED)
+	{
+		RobotLocation::Instance()->Zero();
+	}
 	
 	// Update the Driver Station
 	LRTDriverStation::Update();
