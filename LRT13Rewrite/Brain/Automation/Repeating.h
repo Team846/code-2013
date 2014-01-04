@@ -18,6 +18,7 @@ public:
 	 * @param name the name of the routine
 	 * @param routine the routine to repeat
 	 * @param times the number of times to repeat, or 0 if the routine should be repeated until aborted
+     * @param queueIfBlocked whether the routine should be queued if blocked
 	 * @param restartable whether the routine can be restarted
 	 */
 	Repeating(const char *name, Automation *routine, int times = 0, bool queueIfBlocked = false, bool restartable = false);

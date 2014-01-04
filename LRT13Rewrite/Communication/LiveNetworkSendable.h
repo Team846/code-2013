@@ -26,7 +26,8 @@ protected:
 	/*!
 	 * @brief Sends a value to the network through LiveNetworkSender.
 	 * @param value value to log
-	 * @param name name of the field
+	 * @param key name of the field
+	 * @param table NetworkTable to send to
 	 */
 	template<typename T> void LiveNetworkSendable::SendToNetwork(T value, string key, string table)
 	{

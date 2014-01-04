@@ -22,7 +22,6 @@ public:
 	/*!
 	 * @brief Constructs a new drivetrain ESC object with one motor. 
 	 * @param esc the LRTSpeedController
-	 * @param brakeChannel Port of the Talon jumper
 	 * @param encoder the encoder that measures the speed of this ESC
 	 * @param name the name of this ESC
 	 */

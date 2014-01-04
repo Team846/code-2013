@@ -19,6 +19,8 @@ public:
     /*!
      * @brief Creates an automation routine.
      * @param name the name of the routine
+     * @param requiresAbortCycles whether the routine requires multiple cycles to abort
+     * @param queueIfBlocked whether the routine should be queued if blocked
      * @param restartable whether the routine can be restarted
      */
 	Automation(const char *name, bool requiresAbortCycles = false, bool queueIfBlocked = false, bool restartable = false);

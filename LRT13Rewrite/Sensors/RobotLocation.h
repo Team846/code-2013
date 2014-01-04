@@ -56,7 +56,6 @@ public:
 	
 private:
 	RobotLocation();
-	~RobotLocation();
 	
 	static RobotLocation *m_instance;
 	

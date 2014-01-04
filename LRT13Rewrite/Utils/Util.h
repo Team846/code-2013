@@ -232,6 +232,23 @@ public:
 		return std::string(static_cast<ostringstream*>(&(ostringstream() << value))->str());
 	}
 	
+	template<typename T>
+	static inline T swap_endian(T u)
+	{
+		union
+		{
+			T u;
+			unsigned char u8[sizeof(T)];
+		} source, dest;
+
+		source.u = u;
+
+		for (size_t k = 0; k < sizeof(T); k++)
+			dest.u8[k] = source.u8[sizeof(T) - k - 1];
+
+		return dest.u;
+	}
+	
 	/*!
 	 * @brief Frees the resources pointed to in a map<pointer, object>
 	 */

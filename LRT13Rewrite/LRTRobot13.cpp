@@ -16,7 +16,8 @@
 #include "Config/DriverStationConfig.h"
 #include "Utils/LCD.h"
 #include "Logging/Logger.h"
-#include "Network/LiveNetworkSender.h"
+#include "Communication/LiveNetworkSender.h"
+#include "Communication/OffboardCommunication.h"
 
 LRTRobot13::LRTRobot13()
 {
@@ -93,6 +94,10 @@ void LRTRobot13::RobotInit()
 	// Initialize localization
 	AsyncPrinter::Println("Initializing Robot Localization...");
 	RobotLocation::Initialize();
+	
+	// Initialize offboard communication
+	AsyncPrinter::Println("Initializing Offboard Communication...");
+	OffboardCommunication::Initialize();
 
 	// Initialize the Logger
 	AsyncPrinter::Println("Initializing Logger...");

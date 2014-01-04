@@ -15,6 +15,7 @@ public:
 	/*!
 	 * @brief Creates a parallel routine.
 	 * @param name the name of the routine
+     * @param queueIfBlocked whether the routine should be queued if blocked
 	 * @param restartable whether the routine can be restarted
 	 */
 	Parallel(const char *name, bool queueIfBlocked = false, bool restartable = false);
@@ -23,6 +24,7 @@ public:
 	 * @brief Creates a parallel routine initialized with a list of routines.
 	 * @param name the name of the routine
 	 * @param sequence the list of routines to initialize the parallel routine with
+     * @param queueIfBlocked whether the routine should be queued if blocked
 	 * @param restartable whether the routine can be restarted
 	 */
 	Parallel(const char *name, vector<Automation*> sequence, bool queueIfBlocked = false, bool restartable = false);

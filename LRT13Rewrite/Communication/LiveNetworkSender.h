@@ -11,7 +11,7 @@ class LiveNetworkSendable;
 using namespace std;
 
 /*!
- * @brief Logs data from Loggable classes to a global log file in binary format each cycle.
+ * @brief Sends data from LiveNetworkSendable objects to the network each cycle.
  */
 class LiveNetworkSender
 {
@@ -28,8 +28,10 @@ public:
 	void Run();
 
 	/*!
-	 * @brief Sends data to the network.
-	 * @param value the value to send
+	 * @brief Sends a value to the network through LiveNetworkSender.
+	 * @param value value to log
+	 * @param key name of the field
+	 * @param table NetworkTable to send to
 	 */
 	template<typename T> void Send(T value, string key, string table);
 

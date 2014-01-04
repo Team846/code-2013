@@ -17,10 +17,6 @@ RobotLocation::RobotLocation() :
 	m_notifier.StartPeriodic(1.0 / 100.0);
 }
 
-RobotLocation::~RobotLocation()
-{	
-}
-
 void RobotLocation::Initialize()
 {
 	if (m_instance == NULL)

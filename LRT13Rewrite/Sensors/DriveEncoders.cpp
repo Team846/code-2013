@@ -32,6 +32,8 @@ DriveEncoders::DriveEncoders(UINT32 leftSourceA, UINT32 leftSourceB, UINT32 righ
 DriveEncoders::~DriveEncoders()
 {	
 	delete[] m_encoders;
+	delete m_instance;
+	m_instance = NULL;
 }
 
 DriveEncoders* DriveEncoders::Instance()
